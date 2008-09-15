@@ -1,0 +1,996 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <metadata name="addToList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="addToList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="addToList.Text" xml:space="preserve">
+    <value>&amp;Add to List</value>
+  </data>
+  <metadata name="copy.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="copy.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+C</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="copy.ShowShortcutKeys" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="copy.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="copy.Text" xml:space="preserve">
+    <value>&amp;Copy</value>
+  </data>
+  <metadata name="reverseLookup.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="reverseLookup.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+R</value>
+  </data>
+  <data name="reverseLookup.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="reverseLookup.Text" xml:space="preserve">
+    <value>&amp;Reverse Lookup</value>
+  </data>
+  <metadata name="fileMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="showStartPage.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="exitMenuItem.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="fileMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 20</value>
+  </data>
+  <data name="fileMenu.Text" xml:space="preserve">
+    <value>&amp;File</value>
+  </data>
+  <metadata name="showStartPage.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="showStartPage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>159, 22</value>
+  </data>
+  <data name="showStartPage.Text" xml:space="preserve">
+    <value>&amp;Show Start Page</value>
+  </data>
+  <metadata name="toolStripSeparator2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripSeparator2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>156, 6</value>
+  </data>
+  <metadata name="exitMenuItem.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="exitMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>159, 22</value>
+  </data>
+  <data name="exitMenuItem.Text" xml:space="preserve">
+    <value>E&amp;xit</value>
+  </data>
+  <metadata name="searchMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="switchModeMenuItem.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripMenuItem2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="focusSearchFieldMenuItem.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="clearSearch.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripMenuItem3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="nextPerfectMatch.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="previousPerfectMatch.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="searchMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>54, 20</value>
+  </data>
+  <data name="searchMenu.Text" xml:space="preserve">
+    <value>&amp;Search</value>
+  </data>
+  <data name="forwards.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+E</value>
+  </data>
+  <data name="forwards.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="forwards.Text" xml:space="preserve">
+    <value>&amp;English ⇔ Hungarian</value>
+  </data>
+  <data name="backwards.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+H</value>
+  </data>
+  <data name="backwards.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="backwards.Text" xml:space="preserve">
+    <value>&amp;Hungarian ⇔ English</value>
+  </data>
+  <metadata name="switchModeMenuItem.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="switchModeMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+M</value>
+  </data>
+  <data name="switchModeMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="switchModeMenuItem.Text" xml:space="preserve">
+    <value>&amp;Switch Mode</value>
+  </data>
+  <metadata name="toolStripMenuItem2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripMenuItem2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 6</value>
+  </data>
+  <metadata name="focusSearchFieldMenuItem.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="focusSearchFieldMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+K</value>
+  </data>
+  <data name="focusSearchFieldMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="focusSearchFieldMenuItem.Text" xml:space="preserve">
+    <value>&amp;Focus Search Field</value>
+  </data>
+  <metadata name="clearSearch.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="clearSearch.ShortcutKeyDisplayString" xml:space="preserve">
+    <value>Esc</value>
+  </data>
+  <data name="clearSearch.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="clearSearch.Text" xml:space="preserve">
+    <value>&amp;Clear Search</value>
+  </data>
+  <metadata name="toolStripMenuItem3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripMenuItem3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 6</value>
+  </data>
+  <data name="ignoreAccentsMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+1</value>
+  </data>
+  <data name="ignoreAccentsMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="ignoreAccentsMenuItem.Text" xml:space="preserve">
+    <value>Ignore Acce&amp;nts</value>
+  </data>
+  <data name="ignoreCaseMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+2</value>
+  </data>
+  <data name="ignoreCaseMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="ignoreCaseMenuItem.Text" xml:space="preserve">
+    <value>Ignore C&amp;ase</value>
+  </data>
+  <metadata name="toolStripSeparator1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripSeparator1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>244, 6</value>
+  </data>
+  <metadata name="nextPerfectMatch.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="nextPerfectMatch.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>F3</value>
+  </data>
+  <data name="nextPerfectMatch.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="nextPerfectMatch.Text" xml:space="preserve">
+    <value>Next &amp;Perfect Match</value>
+  </data>
+  <metadata name="previousPerfectMatch.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="previousPerfectMatch.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Shift+F3</value>
+  </data>
+  <data name="previousPerfectMatch.Size" type="System.Drawing.Size, System.Drawing">
+    <value>247, 22</value>
+  </data>
+  <data name="previousPerfectMatch.Text" xml:space="preserve">
+    <value>Previous P&amp;erfect Match</value>
+  </data>
+  <metadata name="listMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="newList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="openList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="importList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripMenuItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="listMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>37, 20</value>
+  </data>
+  <data name="listMenu.Text" xml:space="preserve">
+    <value>&amp;List</value>
+  </data>
+  <metadata name="newList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="newList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 22</value>
+  </data>
+  <data name="newList.Text" xml:space="preserve">
+    <value>&amp;New</value>
+  </data>
+  <metadata name="openList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="openList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 22</value>
+  </data>
+  <data name="openList.Text" xml:space="preserve">
+    <value>&amp;Open...</value>
+  </data>
+  <metadata name="importList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="importList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 22</value>
+  </data>
+  <data name="importList.Text" xml:space="preserve">
+    <value>&amp;Import...</value>
+  </data>
+  <metadata name="toolStripMenuItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>133, 6</value>
+  </data>
+  <metadata name="dummyItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="recentLists.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 22</value>
+  </data>
+  <data name="recentLists.Text" xml:space="preserve">
+    <value>&amp;Recent Lists</value>
+  </data>
+  <metadata name="dummyItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="dummyItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>144, 22</value>
+  </data>
+  <data name="dummyItem1.Text" xml:space="preserve">
+    <value>Dummy Item</value>
+  </data>
+  <metadata name="dictionaryMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="editInformation.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="editEntries.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="importDictionary.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="dictionaryMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>73, 20</value>
+  </data>
+  <data name="dictionaryMenu.Text" xml:space="preserve">
+    <value>&amp;Dictionary</value>
+  </data>
+  <metadata name="editInformation.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="editInformation.Size" type="System.Drawing.Size, System.Drawing">
+    <value>160, 22</value>
+  </data>
+  <data name="editInformation.Text" xml:space="preserve">
+    <value>Edit &amp;Information</value>
+  </data>
+  <metadata name="editEntries.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="editEntries.Size" type="System.Drawing.Size, System.Drawing">
+    <value>160, 22</value>
+  </data>
+  <data name="editEntries.Text" xml:space="preserve">
+    <value>Edit &amp;Entries</value>
+  </data>
+  <metadata name="importDictionary.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="importDictionary.Size" type="System.Drawing.Size, System.Drawing">
+    <value>160, 22</value>
+  </data>
+  <data name="importDictionary.Text" xml:space="preserve">
+    <value>&amp;Import...</value>
+  </data>
+  <metadata name="toolsMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="options.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolsMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 20</value>
+  </data>
+  <data name="toolsMenu.Text" xml:space="preserve">
+    <value>&amp;Tools</value>
+  </data>
+  <metadata name="options.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="options.Size" type="System.Drawing.Size, System.Drawing">
+    <value>116, 22</value>
+  </data>
+  <data name="options.Text" xml:space="preserve">
+    <value>&amp;Options</value>
+  </data>
+  <data name="grid.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <metadata name="contextMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>128, 12</value>
+  </metadata>
+  <data name="contextMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 70</value>
+  </data>
+  <data name="&gt;&gt;contextMenu.Name" xml:space="preserve">
+    <value>contextMenu</value>
+  </data>
+  <data name="&gt;&gt;contextMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="grid.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 55</value>
+  </data>
+  <data name="grid.ScrollBars" type="System.Windows.Forms.ScrollBars, System.Windows.Forms">
+    <value>Vertical</value>
+  </data>
+  <data name="grid.Size" type="System.Drawing.Size, System.Drawing">
+    <value>700, 415</value>
+  </data>
+  <data name="grid.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;grid.Name" xml:space="preserve">
+    <value>grid</value>
+  </data>
+  <data name="&gt;&gt;grid.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grid.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;grid.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="switchMode.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="switchMode.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="switchMode.Location" type="System.Drawing.Point, System.Drawing">
+    <value>278, 0</value>
+  </data>
+  <data name="switchMode.Size" type="System.Drawing.Size, System.Drawing">
+    <value>168, 22</value>
+  </data>
+  <data name="switchMode.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;switchMode.Name" xml:space="preserve">
+    <value>switchMode</value>
+  </data>
+  <data name="&gt;&gt;switchMode.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;switchMode.Parent" xml:space="preserve">
+    <value>searchPanel</value>
+  </data>
+  <data name="&gt;&gt;switchMode.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="ignoreLabel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="ignoreLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="ignoreLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Verdana, 8.25pt, style=Italic</value>
+  </data>
+  <data name="ignoreLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="ignoreLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>81, 4</value>
+  </data>
+  <data name="ignoreLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>54, 13</value>
+  </data>
+  <data name="ignoreLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="ignoreLabel.Text" xml:space="preserve">
+    <value>Ignore: </value>
+  </data>
+  <data name="&gt;&gt;ignoreLabel.Name" xml:space="preserve">
+    <value>ignoreLabel</value>
+  </data>
+  <data name="&gt;&gt;ignoreLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ignoreLabel.Parent" xml:space="preserve">
+    <value>searchPanel</value>
+  </data>
+  <data name="&gt;&gt;ignoreLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="searchPanel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="searchBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="searchBox.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Verdana, 8.25pt</value>
+  </data>
+  <data name="searchBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>453, 1</value>
+  </data>
+  <data name="searchBox.PromptText" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="searchBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>241, 21</value>
+  </data>
+  <data name="searchBox.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;searchBox.Name" xml:space="preserve">
+    <value>searchBox</value>
+  </data>
+  <data name="&gt;&gt;searchBox.Type" xml:space="preserve">
+    <value>Szotar.WindowsForms.Controls.SearchBox, Szotar, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;searchBox.Parent" xml:space="preserve">
+    <value>searchPanel</value>
+  </data>
+  <data name="&gt;&gt;searchBox.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="ignoreCaseCheck.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="ignoreCaseCheck.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="ignoreCaseCheck.Location" type="System.Drawing.Point, System.Drawing">
+    <value>217, 3</value>
+  </data>
+  <data name="ignoreCaseCheck.Size" type="System.Drawing.Size, System.Drawing">
+    <value>55, 17</value>
+  </data>
+  <data name="ignoreCaseCheck.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="ignoreCaseCheck.Text" xml:space="preserve">
+    <value>Case</value>
+  </data>
+  <data name="&gt;&gt;ignoreCaseCheck.Name" xml:space="preserve">
+    <value>ignoreCaseCheck</value>
+  </data>
+  <data name="&gt;&gt;ignoreCaseCheck.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ignoreCaseCheck.Parent" xml:space="preserve">
+    <value>searchPanel</value>
+  </data>
+  <data name="&gt;&gt;ignoreCaseCheck.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="ignoreAccentsCheck.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="ignoreAccentsCheck.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="ignoreAccentsCheck.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="ignoreAccentsCheck.Location" type="System.Drawing.Point, System.Drawing">
+    <value>141, 3</value>
+  </data>
+  <data name="ignoreAccentsCheck.Size" type="System.Drawing.Size, System.Drawing">
+    <value>70, 17</value>
+  </data>
+  <data name="ignoreAccentsCheck.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="ignoreAccentsCheck.Text" xml:space="preserve">
+    <value>Accents</value>
+  </data>
+  <data name="&gt;&gt;ignoreAccentsCheck.Name" xml:space="preserve">
+    <value>ignoreAccentsCheck</value>
+  </data>
+  <data name="&gt;&gt;ignoreAccentsCheck.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ignoreAccentsCheck.Parent" xml:space="preserve">
+    <value>searchPanel</value>
+  </data>
+  <data name="&gt;&gt;ignoreAccentsCheck.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="searchPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 27</value>
+  </data>
+  <data name="searchPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>700, 21</value>
+  </data>
+  <data name="searchPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;searchPanel.Name" xml:space="preserve">
+    <value>searchPanel</value>
+  </data>
+  <data name="&gt;&gt;searchPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;searchPanel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;searchPanel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <metadata name="mainMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 13</value>
+  </metadata>
+  <data name="&gt;&gt;mainMenu.Name" xml:space="preserve">
+    <value>mainMenu</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.Parent" xml:space="preserve">
+    <value>toolStripPanel</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="toolStripPanel.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="toolStripPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="toolStripPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>700, 24</value>
+  </data>
+  <data name="&gt;&gt;toolStripPanel.Name" xml:space="preserve">
+    <value>toolStripPanel</value>
+  </data>
+  <data name="&gt;&gt;toolStripPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripPanel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripPanel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;toolStripPanel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <metadata name="mainMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 13</value>
+  </metadata>
+  <data name="mainMenu.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>None</value>
+  </data>
+  <data name="mainMenu.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="mainMenu.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>7, 2, 0, 2</value>
+  </data>
+  <data name="mainMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>700, 24</value>
+  </data>
+  <data name="mainMenu.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="mainMenu.Text" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.Name" xml:space="preserve">
+    <value>mainMenu</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.Parent" xml:space="preserve">
+    <value>toolStripPanel</value>
+  </data>
+  <data name="&gt;&gt;mainMenu.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>51</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>7, 13</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>700, 471</value>
+  </data>
+  <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Verdana, 8.25pt</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Dictionary Lookup</value>
+  </data>
+  <data name="&gt;&gt;addToList.Name" xml:space="preserve">
+    <value>addToList</value>
+  </data>
+  <data name="&gt;&gt;addToList.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;copy.Name" xml:space="preserve">
+    <value>copy</value>
+  </data>
+  <data name="&gt;&gt;copy.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;reverseLookup.Name" xml:space="preserve">
+    <value>reverseLookup</value>
+  </data>
+  <data name="&gt;&gt;reverseLookup.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;fileMenu.Name" xml:space="preserve">
+    <value>fileMenu</value>
+  </data>
+  <data name="&gt;&gt;fileMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;showStartPage.Name" xml:space="preserve">
+    <value>showStartPage</value>
+  </data>
+  <data name="&gt;&gt;showStartPage.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator2.Name" xml:space="preserve">
+    <value>toolStripSeparator2</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;exitMenuItem.Name" xml:space="preserve">
+    <value>exitMenuItem</value>
+  </data>
+  <data name="&gt;&gt;exitMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;searchMenu.Name" xml:space="preserve">
+    <value>searchMenu</value>
+  </data>
+  <data name="&gt;&gt;searchMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;forwards.Name" xml:space="preserve">
+    <value>forwards</value>
+  </data>
+  <data name="&gt;&gt;forwards.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;backwards.Name" xml:space="preserve">
+    <value>backwards</value>
+  </data>
+  <data name="&gt;&gt;backwards.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;switchModeMenuItem.Name" xml:space="preserve">
+    <value>switchModeMenuItem</value>
+  </data>
+  <data name="&gt;&gt;switchModeMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem2.Name" xml:space="preserve">
+    <value>toolStripMenuItem2</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;focusSearchFieldMenuItem.Name" xml:space="preserve">
+    <value>focusSearchFieldMenuItem</value>
+  </data>
+  <data name="&gt;&gt;focusSearchFieldMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;clearSearch.Name" xml:space="preserve">
+    <value>clearSearch</value>
+  </data>
+  <data name="&gt;&gt;clearSearch.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem3.Name" xml:space="preserve">
+    <value>toolStripMenuItem3</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ignoreAccentsMenuItem.Name" xml:space="preserve">
+    <value>ignoreAccentsMenuItem</value>
+  </data>
+  <data name="&gt;&gt;ignoreAccentsMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ignoreCaseMenuItem.Name" xml:space="preserve">
+    <value>ignoreCaseMenuItem</value>
+  </data>
+  <data name="&gt;&gt;ignoreCaseMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator1.Name" xml:space="preserve">
+    <value>toolStripSeparator1</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;nextPerfectMatch.Name" xml:space="preserve">
+    <value>nextPerfectMatch</value>
+  </data>
+  <data name="&gt;&gt;nextPerfectMatch.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;previousPerfectMatch.Name" xml:space="preserve">
+    <value>previousPerfectMatch</value>
+  </data>
+  <data name="&gt;&gt;previousPerfectMatch.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;listMenu.Name" xml:space="preserve">
+    <value>listMenu</value>
+  </data>
+  <data name="&gt;&gt;listMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;newList.Name" xml:space="preserve">
+    <value>newList</value>
+  </data>
+  <data name="&gt;&gt;newList.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;openList.Name" xml:space="preserve">
+    <value>openList</value>
+  </data>
+  <data name="&gt;&gt;openList.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;importList.Name" xml:space="preserve">
+    <value>importList</value>
+  </data>
+  <data name="&gt;&gt;importList.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem1.Name" xml:space="preserve">
+    <value>toolStripMenuItem1</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;recentLists.Name" xml:space="preserve">
+    <value>recentLists</value>
+  </data>
+  <data name="&gt;&gt;recentLists.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dummyItem1.Name" xml:space="preserve">
+    <value>dummyItem1</value>
+  </data>
+  <data name="&gt;&gt;dummyItem1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dictionaryMenu.Name" xml:space="preserve">
+    <value>dictionaryMenu</value>
+  </data>
+  <data name="&gt;&gt;dictionaryMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;editInformation.Name" xml:space="preserve">
+    <value>editInformation</value>
+  </data>
+  <data name="&gt;&gt;editInformation.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;editEntries.Name" xml:space="preserve">
+    <value>editEntries</value>
+  </data>
+  <data name="&gt;&gt;editEntries.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;importDictionary.Name" xml:space="preserve">
+    <value>importDictionary</value>
+  </data>
+  <data name="&gt;&gt;importDictionary.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolsMenu.Name" xml:space="preserve">
+    <value>toolsMenu</value>
+  </data>
+  <data name="&gt;&gt;toolsMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;options.Name" xml:space="preserve">
+    <value>options</value>
+  </data>
+  <data name="&gt;&gt;options.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>LookupForm</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+</root>

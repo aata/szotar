@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A902E300-0002-43DF-80E8-F65204E2084D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Szotar.WindowsForms</RootNamespace>
+    <AssemblyName>Szotar</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\GuiConfiguration.cs" />
+    <Compile Include="Base\ThemeUtilities.cs" />
+    <Compile Include="Controls\DictionaryGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DictionaryGrid.designer.cs">
+      <DependentUpon>DictionaryGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DualImporterUI.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DualImporterUI.designer.cs">
+      <DependentUpon>DualImporterUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ErrorUI.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ErrorUI.designer.cs">
+      <DependentUpon>ErrorUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ListSearch.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ListSearch.designer.cs">
+      <DependentUpon>ListSearch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ProgressUI.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ProgressUI.designer.cs">
+      <DependentUpon>ProgressUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\QuizletSetSelector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\QuizletSetSelector.designer.cs">
+      <DependentUpon>QuizletSetSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SearchBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SearchBox.designer.cs">
+      <DependentUpon>SearchBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Importing\DictionaryImporting.cs" />
+    <Compile Include="Base\FileIsInUse.cs" />
+    <Compile Include="Importing\Importing.cs" />
+    <Compile Include="Importing\ListImporting.cs" />
+    <Compile Include="Base\NativeToolStripRenderer.cs" />
+    <Compile Include="Base\Preferences.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Base\Program.cs" />
+    <Compile Include="Forms\DictionaryImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DictionaryImport.designer.cs">
+      <DependentUpon>DictionaryImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DictionaryInfoEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DictionaryInfoEditor.designer.cs">
+      <DependentUpon>DictionaryInfoEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\GridTester.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GridTester.designer.cs">
+      <DependentUpon>GridTester.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ImportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportForm.designer.cs">
+      <DependentUpon>ImportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ListBuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ListBuilder.designer.cs">
+      <DependentUpon>ListBuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\LookupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\LookupForm.designer.cs">
+      <DependentUpon>LookupForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PracticeWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PracticeWindow.designer.cs">
+      <DependentUpon>PracticeWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Preferences.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Preferences.designer.cs">
+      <DependentUpon>Preferences.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\StartPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\StartPage.designer.cs">
+      <DependentUpon>StartPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Preferences\ResetSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Preferences\ResetSettings.designer.cs">
+      <DependentUpon>ResetSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Preferences\Startup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Preferences\Startup.designer.cs">
+      <DependentUpon>Startup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Preferences\UserInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Preferences\UserInfo.designer.cs">
+      <DependentUpon>UserInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\DictionaryGrid.resx">
+      <DependentUpon>DictionaryGrid.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DualImporterUI.resx">
+      <DependentUpon>DualImporterUI.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ErrorUI.resx">
+      <DependentUpon>ErrorUI.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ListSearch.resx">
+      <DependentUpon>ListSearch.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ProgressUI.resx">
+      <DependentUpon>ProgressUI.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\QuizletSetSelector.resx">
+      <DependentUpon>QuizletSetSelector.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SearchBox.resx">
+      <DependentUpon>SearchBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DictionaryImport.resx">
+      <DependentUpon>DictionaryImport.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DictionaryInfoEditor.resx">
+      <DependentUpon>DictionaryInfoEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GridTester.resx">
+      <DependentUpon>GridTester.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportForm.resx">
+      <DependentUpon>ImportForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ListBuilder.resx">
+      <DependentUpon>ListBuilder.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LookupForm.resx">
+      <DependentUpon>LookupForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PracticeWindow.resx">
+      <DependentUpon>PracticeWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Preferences.resx">
+      <DependentUpon>Preferences.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\StartPage.resx">
+      <DependentUpon>StartPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\ResetSettings.resx">
+      <DependentUpon>ResetSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Startup.resx">
+      <DependentUpon>Startup.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\UserInfo.resx">
+      <DependentUpon>UserInfo.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\DictionaryInfo.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\Errors.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\ImporterDescriptions.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\LanguagePair.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\LookupForm.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\Quizlet.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\SimpleDictionary.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\SimpleDictionarySection.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Base\RtlAwareMessageBox.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\DictionaryInfo.Designer.cs">
+      <DependentUpon>DictionaryInfo.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\Errors.Designer.cs">
+      <DependentUpon>Errors.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\ImporterDescriptions.Designer.cs">
+      <DependentUpon>ImporterDescriptions.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\LanguagePair.Designer.cs">
+      <DependentUpon>LanguagePair.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\LookupForm.Designer.cs">
+      <DependentUpon>LookupForm.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\Quizlet.Designer.cs">
+      <DependentUpon>Quizlet.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\SimpleDictionary.Designer.cs">
+      <DependentUpon>SimpleDictionary.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Strings\SimpleDictionarySection.Designer.cs">
+      <DependentUpon>SimpleDictionarySection.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Szotar.Core\Szotar.Core.csproj">
+      <Project>{1285E5FD-6D44-48E5-8BA3-578C90961475}</Project>
+      <Name>Szotar.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Images\dictionary.ico" />
+    <Content Include="Resources\Images\floppy.png" />
+    <Content Include="Resources\Images\genericdocument.png" />
+    <Content Include="Resources\Images\genericdocument16.png" />
+    <Content Include="Resources\Images\list.png" />
+    <Content Include="Resources\Images\TopInwardShadow.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
