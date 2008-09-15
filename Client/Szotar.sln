@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Szotar.WindowsForms", "Szotar.WindowsForms\Szotar.WindowsForms.csproj", "{A902E300-0002-43DF-80E8-F65204E2084D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Szotar.Core", "Szotar.Core\Szotar.Core.csproj", "{1285E5FD-6D44-48E5-8BA3-578C90961475}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A902E300-0002-43DF-80E8-F65204E2084D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A902E300-0002-43DF-80E8-F65204E2084D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A902E300-0002-43DF-80E8-F65204E2084D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A902E300-0002-43DF-80E8-F65204E2084D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1285E5FD-6D44-48E5-8BA3-578C90961475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1285E5FD-6D44-48E5-8BA3-578C90961475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1285E5FD-6D44-48E5-8BA3-578C90961475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1285E5FD-6D44-48E5-8BA3-578C90961475}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
