@@ -188,7 +188,9 @@ namespace Szotar {
 					pairs.Add(new Entry { Key = kv.Key, Value = kv.Value });
 				}
 			}
-			
+
+			Directory.CreateDirectory(Path.GetDirectoryName(path));
+
 			using(StreamWriter sw = new StreamWriter(path)) {
 				serializer.Serialize(sw, pairs);
 			}
