@@ -34,7 +34,7 @@
 			this.selectionPrompt.AutoSize = true;
 			this.selectionPrompt.Location = new System.Drawing.Point(12, 15);
 			this.selectionPrompt.Name = "selectionPrompt";
-			this.selectionPrompt.Size = new System.Drawing.Size(28, 13);
+			this.selectionPrompt.Size = new System.Drawing.Size(30, 13);
 			this.selectionPrompt.TabIndex = 1;
 			this.selectionPrompt.Text = "Edit:";
 			// 
@@ -82,6 +82,7 @@
 			this.Controls.Add(this.closeButton);
 			this.Controls.Add(this.objects);
 			this.Controls.Add(this.selectionPrompt);
+			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.MinimumSize = new System.Drawing.Size(264, 267);
 			this.Name = "DictionaryInfoEditor";
 			this.Text = "Edit Dictionary Info";

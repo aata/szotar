@@ -46,6 +46,12 @@ namespace Szotar {
 			}
 
 			public Entry GetFullEntry(Entry stub) {
+				//We've already got the full entry, so no work to do.
+				if (stub.Translations != null)
+					return stub;
+				if (stub.Tag == null)
+					throw new ArgumentException("The in-memory dictionary entry has no entry tag, and cannot be fully loaded.");
+
 				Entry full = dictionary.GetFullEntry(stub, this);
 				ReplaceEntry(stub, full);
 				return full;
@@ -97,7 +103,7 @@ namespace Szotar {
 
 			StringPool pool = new StringPool();
 
-			reader = new Utf8LineReader(path);
+			OpenFile();
 			bool firstLine = true;
 
 			try {
@@ -191,12 +197,19 @@ namespace Szotar {
 			}
 		}
 
+		protected void OpenFile() {
+			reader = new Utf8LineReader(Path);
+		}
+
 		public Entry GetFullEntry(Entry entryStub, Section section) {
 			System.Diagnostics.Debug.Print("Getting entry {0}", entryStub.Phrase);
 			long bytePosition = (long)entryStub.Tag.Data;
 			Entry entry = null, current = null;
 			Translation lastTrans = null;
 			string[] bits;
+
+			if (reader == null)
+				OpenFile();
 
 			reader.Seek(bytePosition);
 			while (!reader.EndOfStream) {
@@ -274,10 +287,25 @@ namespace Szotar {
 		}
 
 		/// <summary>
-		/// Writes all entries to a file.
+		/// Writes all entries to a file. There's no way to tell if the dictionary entries have been modified,
+		/// as of yet, so currently we must write the file whether it's necessary or not.
 		/// </summary>
 		/// <param name="path">The file name (relative or absolute) to write to.</param>
 		public void Write(string path) {
+			//First, fully load any entry stubs before we start writing, to avoid massive data loss...
+			foreach (Entry e in ForwardsSection)
+				ForwardsSection.GetFullEntry(e);
+			foreach (Entry e in ReverseSection)
+				ReverseSection.GetFullEntry(e);
+
+			//Now dispose of the reader so that we can unlock the file.
+			//The file needs to be truncated anyway, so it's not possible to share the file stream
+			//with the Line Reader.
+			if (reader != null) {
+				reader.Dispose();
+				reader = null;
+			}
+
 			using (Stream stream = File.Open(path, FileMode.Create, FileAccess.Write)) {
 				using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8)) {
 					writer.WriteLine(magicNumber);
@@ -406,7 +434,8 @@ namespace Szotar {
 
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
-				reader.Dispose();
+				if(reader != null)
+					reader.Dispose();
 			}
 		}
 		#endregion

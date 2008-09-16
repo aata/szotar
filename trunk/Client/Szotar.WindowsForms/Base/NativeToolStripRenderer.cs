@@ -29,7 +29,7 @@ namespace Szotar.WindowsForms {
 				public int cyBottomHeight;
 			}
 
-			[DllImport("uxtheme", ExactSpelling = true)]
+			[DllImport("uxtheme.dll", ExactSpelling = true)]
 			public extern static Int32 GetThemeMargins(IntPtr hTheme, IntPtr hdc, int iPartId, int iStateId, int iPropId, IntPtr rect, out MARGINS pMargins);
 		}
 
