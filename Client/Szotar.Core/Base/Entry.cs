@@ -179,7 +179,7 @@ namespace Szotar {
 			get {
 				return translations;
 			}
-			private set {
+			set {
 				translations = value;
 				RaisePropertyChanged("Translations");
 			}

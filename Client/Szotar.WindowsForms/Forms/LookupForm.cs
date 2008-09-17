@@ -93,6 +93,11 @@ namespace Szotar.WindowsForms.Forms {
 			this.InputLanguageChanged += new InputLanguageChangedEventHandler(LookupForm_InputLanguageChanged);
 			grid.CellFormatting += new DataGridViewCellFormattingEventHandler(grid_CellFormatting);
 			grid.ColumnWidthChanged += new DataGridViewColumnEventHandler(grid_ColumnWidthChanged);
+			
+			//Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
+			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
+			grid.MouseLeave += new EventHandler(grid_MouseLeave);
+			grid.ShowCellToolTips = false;
 
 			UpdateResults();
 
@@ -100,6 +105,9 @@ namespace Szotar.WindowsForms.Forms {
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 			grid.Columns[0].FillWeight = GuiConfiguration.LookupFormColumn1FillWeight;
 			grid.Columns[1].Resizable = DataGridViewTriState.False;
+
+			ignoreAccentsCheck.CheckedChanged += new EventHandler(ignoreAccentsCheck_CheckedChanged);
+			ignoreCaseCheck.CheckedChanged += new EventHandler(ignoreCaseCheck_CheckedChanged);
 
 			this.Shown += new EventHandler(LookupForm_Shown);
 			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
@@ -143,6 +151,7 @@ namespace Szotar.WindowsForms.Forms {
 		//Update UI state.
 		void SettingChanging(object sender, SettingChangedEventArgs e) {
 			if (e.SettingName == "IgnoreAccents" || e.SettingName == "IgnoreCase") {
+				//This shouldn't fire the CheckedChanged/SettingChanged events in an infinite loop.
 				if (e.SettingName == "IgnoreAccents")
 					ignoreAccentsMenuItem.Checked = ignoreAccentsCheck.Checked = GuiConfiguration.IgnoreAccents;
 				else if (e.SettingName == "IgnoreCase")
@@ -163,7 +172,7 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Search code
-		private ISearchDataSource GetSectionBySearchMode(SearchMode mode) {
+		private IDictionarySection GetSectionBySearchMode(SearchMode mode) {
 			return mode == SearchMode.Forward ? Dictionary.ForwardsSection : Dictionary.ReverseSection;
 		}
 
@@ -239,6 +248,136 @@ namespace Szotar.WindowsForms.Forms {
 		private void FocusSearchField() {
 			searchBox.Focus();
 			searchBox.SelectAll();
+		}
+		#endregion
+
+		#region ToolTip
+		ToolTip infoTip;
+		int infoTipRow;
+		string infoTipText;
+		Point currentInfoTipMouseLocation;
+
+		string GetInfoTipTitle(int rowIndex) {
+			if (rowIndex < 0 || rowIndex > results.Count)
+				return null;
+			return results[rowIndex].Phrase;
+		}
+
+		string GetInfoTipText(int rowIndex) {
+			if (rowIndex < 0 || rowIndex > results.Count)
+				return null;
+
+			//Use the cached version in the current tooltip if possible.
+			if (infoTipRow == rowIndex)
+				return infoTipText;
+
+			SearchMode dsm = DisplayedSearchMode;
+			Entry entry = results[rowIndex].Entry;
+			if (entry.Translations == null)
+				GetSectionBySearchMode(DisplayedSearchMode).GetFullEntry(entry);
+
+			ISearchDataSource otherSide = GetSectionBySearchMode(dsm == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward);
+			StringBuilder sb = new StringBuilder();
+			foreach (Translation term in entry.Translations) {
+				if (sb.Length > 0)
+					sb.Append(",");
+				sb.Append(term.Value);
+			}
+			string search = sb.ToString();
+			sb.Length = 0;
+
+			foreach (SearchResult sr in otherSide.Search(search, false, false)) {
+				if (sr.MatchType == MatchType.PerfectMatch) {
+					sb.AppendLine(SanitizeToolTipLine(sr.Phrase + " -> " + sr.Translation));
+				}
+			}
+
+			if (sb.Length > 0)
+				return sb.ToString();
+			return null;
+		}
+		
+		//Remove some common annoyances with tooltips (really wide tooltips).
+		//Currently not needed (tooltip size is limited, text wraps)
+		string SanitizeToolTipLine(string line) {
+			return line;
+
+			const int maxWidth = 200;
+			if (line.Length < maxWidth)
+				return line;
+
+			var sb = new StringBuilder();
+			while (line.Length > maxWidth) {
+				if(sb.Length > 0)
+					sb.Append("\t");
+
+				//Find first space before maxWidth characters.
+				int i = line.LastIndexOf(" ", maxWidth);
+				if(i == -1) {
+					//No spaces before maxWidth?! As a last resort, increase the width a little.
+					i = line.LastIndexOf(" ", maxWidth + 20);
+					if(i == -1) {
+						sb.AppendLine(line);
+						return sb.ToString();
+					}
+				}
+
+				sb.AppendLine(line.Substring(0, i));
+				line = line.Substring(i + 1).Trim();
+			}
+
+			sb.AppendLine(line);
+
+			return sb.ToString();
+		}
+
+		void grid_MouseMove(object sender, MouseEventArgs e) {
+			if(e.Button != MouseButtons.None)
+				return;
+
+			if (e.Location == currentInfoTipMouseLocation)
+				return;
+			currentInfoTipMouseLocation = e.Location;
+
+			var hitTest = grid.HitTest(e.X, e.Y);
+			if(hitTest.Type != DataGridViewHitTestType.Cell && hitTest.Type != DataGridViewHitTestType.RowHeader) {
+				if(infoTip != null && infoTip.Active)
+					infoTip.Hide(grid);
+				infoTipText = null;
+				infoTipRow = -1;
+				return;
+			}
+
+			if (hitTest.RowIndex == infoTipRow)
+				return;
+
+			string text = GetInfoTipText(hitTest.RowIndex);
+
+			if (text == null) {
+				if(infoTip != null)
+					infoTip.Hide(grid);
+				return;
+			}
+
+			infoTipRow = hitTest.RowIndex;
+			infoTipText = text;
+
+			if (infoTip == null) {
+				infoTip = new ToolTip(components);
+				infoTip.StripAmpersands = false;
+				infoTip.UseAnimation = false;
+				infoTip.Popup += (s, e3) => { e3.ToolTipSize = new Size(Math.Min(e3.ToolTipSize.Width, grid.Width), e3.ToolTipSize.Height);  };
+			}
+
+			infoTip.ToolTipTitle = GetInfoTipTitle(hitTest.RowIndex);
+
+			int offset = grid.GetRowDisplayRectangle(hitTest.RowIndex, true).Height;
+			infoTip.Show(text, grid, e.X + offset, e.Y + offset);
+		}
+
+		void grid_MouseLeave(object sender, EventArgs e) {
+			if (infoTip != null && infoTip.Active)
+				infoTip.Hide(grid);
 		}
 		#endregion
 
@@ -458,6 +597,14 @@ namespace Szotar.WindowsForms.Forms {
 			GuiConfiguration.IgnoreCase = ignoreCaseMenuItem.Checked;
 		}
 
+		void ignoreCaseCheck_CheckedChanged(object sender, EventArgs e) {
+			GuiConfiguration.IgnoreCase = ignoreCaseCheck.Checked;
+		}
+
+		void ignoreAccentsCheck_CheckedChanged(object sender, EventArgs e) {
+			GuiConfiguration.IgnoreAccents = ignoreAccentsCheck.Checked;
+		}
+
 		//Would it perhaps be better to wrap in the case where no more are found?
 		private void nextPerfectMatch_Click(object sender, EventArgs e) {
 			if (results != null) {
@@ -597,10 +744,6 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 		#endregion
-
-		private void ignoreCaseCheck_CheckedChanged(object sender, EventArgs e) {
-
-		}
 		#endregion
 	}
 

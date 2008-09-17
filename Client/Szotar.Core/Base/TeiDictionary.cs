@@ -42,8 +42,7 @@ namespace Szotar {
 			return Searcher.Search(this, search, ignoreAccents, ignoreCase);
 		}
 
-		Entry IDictionarySection.GetFullEntry(Entry stub) {
-			return stub;
+		void IDictionarySection.GetFullEntry(Entry stub) {
 		}
 	}
 
