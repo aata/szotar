@@ -4,38 +4,33 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace Asztal.Szótár {
+namespace Szotar.WindowsForms {
+	[Flags]
+	public enum FileIsInUseCapabilities : int {
+		Closable = 1,
+		HasWindow = 2
+	}
+
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	[ComVisible(true)]
 	[Guid("64a1cbf0-3a1a-4461-9158-376969693950")]
 	public interface IFileIsInUse {
 		void GetAppName([MarshalAs(UnmanagedType.LPWStr)] out string name);
 		void GetUsage(out int usageType);
-		void GetCapabilities(out int capabilities);
+		void GetCapabilities(out FileIsInUseCapabilities capabilities);
 		void GetSwitchToHWND(out IntPtr hwnd);
 		void CloseFile();
+	}
+
+	public enum FileUsageType {
+		Playing,
+		Editing,
+		Generic = 2
 	}
 
 	public class FileIsInUse : IDisposable, IFileIsInUse {
 		int? cookie;
 		IMoniker moniker;
-
-		#region IDisposable
-		public void Dispose() {
-			Dispose(true);
-		}
-
-		public void Dispose(bool disposing) {
-			if (disposing) {
-				Revoke();
-			}
-			GC.SuppressFinalize(this);
-		}
-
-		~FileIsInUse() {
-			Dispose(true);
-		}
-		#endregion
 
 		public FileIsInUse(string path) {
 			try {
@@ -54,7 +49,6 @@ namespace Asztal.Szótár {
 			CanClose = false;
 		}
 
-		#region IRunningObjectTable stuff
 		IRunningObjectTable GetTable() {
 			IRunningObjectTable table;
 
@@ -69,7 +63,7 @@ namespace Asztal.Szótár {
 			if (cookie == null) {
 				IRunningObjectTable table = GetTable();
 				if (table != null) {
-					object comObject = this;
+					object comObject = (IFileIsInUse)this;
 					cookie = table.Register((int)(NativeMethods.RotFlags.RegistrationKeepsAlive), comObject, moniker);
 				}
 			} else {
@@ -89,13 +83,12 @@ namespace Asztal.Szótár {
 				}
 			}
 		}
-		#endregion
 
 		bool Supported {
 			get { return moniker != null; }
 		}
 
-		bool IsInUse {
+		public bool IsInUse {
 			get {
 				return cookie.HasValue;
 			}
@@ -109,23 +102,9 @@ namespace Asztal.Szótár {
 			}
 		}
 
-		IntPtr WindowHandle {
-			get;
-			set;
-		}
-
-		bool CanClose { get; set; }
-
-		enum FileUsageType {
-			Playing,
-			Editing,
-			Generic = 2
-		}
-
-		FileUsageType UsageType {
-			get;
-			set;
-		}
+		public IntPtr WindowHandle { get; set; }
+		public bool CanClose { get; set; }
+		public FileUsageType UsageType { get; set; }
 
 		internal class NativeMethods {
 			[DllImport("ole32.dll")]
@@ -143,24 +122,23 @@ namespace Asztal.Szótár {
 			}
 		}
 
-		#region IFileIsInUse
-		public void CloseFile() {
+		public virtual void CloseFile() {
 			throw new NotImplementedException();
 		}
 
-		public void GetAppName(out string name) {
+		public virtual void GetAppName(out string name) {
 			name = System.Windows.Forms.Application.ProductName;
 		}
 
-		public void GetCapabilities(out int capabilities) {
+		public virtual void GetCapabilities(out FileIsInUseCapabilities capabilities) {
 			capabilities = 0;
 			if (CanClose)
-				capabilities |= 1;
+				capabilities |= FileIsInUseCapabilities.Closable;
 			if (WindowHandle != IntPtr.Zero)
-				capabilities |= 2;
+				capabilities |= FileIsInUseCapabilities.HasWindow;
 		}
 
-		public void GetSwitchToHWND(out IntPtr hwnd) {
+		public virtual void GetSwitchToHWND(out IntPtr hwnd) {
 			if (WindowHandle != IntPtr.Zero) {
 				hwnd = WindowHandle;
 			} else {
@@ -169,9 +147,23 @@ namespace Asztal.Szótár {
 			}
 		}
 
-		public void GetUsage(out int usageType) {
+		public virtual void GetUsage(out int usageType) {
 			usageType = (int)UsageType;
 		}
-		#endregion
+
+		public void Dispose() {
+			Dispose(true);
+		}
+
+		public void Dispose(bool disposing) {
+			if (disposing) {
+				Revoke();
+			}
+			GC.SuppressFinalize(this);
+		}
+
+		~FileIsInUse() {
+			Dispose(true);
+		}
 	}
 }

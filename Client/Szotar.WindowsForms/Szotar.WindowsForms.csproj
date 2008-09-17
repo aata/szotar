@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\DisposableComponent.cs" />
     <Compile Include="Base\GuiConfiguration.cs" />
     <Compile Include="Base\ThemeUtilities.cs" />
     <Compile Include="Controls\DictionaryGrid.cs">
