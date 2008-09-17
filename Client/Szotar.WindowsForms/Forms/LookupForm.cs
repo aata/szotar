@@ -43,7 +43,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			InitialiseView();
 
-			NativeToolStripRenderer.SetToolStripRenderer(ToolbarTheme.CommunicationsToolbar, mainMenu, contextMenu, toolStripPanel);
+			mainMenu.Renderer = contextMenu.Renderer = toolStripPanel.Renderer = new ToolStripAeroRenderer(ToolbarTheme.CommunicationsToolbar);
 		}
 
 		public LookupForm(DictionaryInfo dictionaryInfo)

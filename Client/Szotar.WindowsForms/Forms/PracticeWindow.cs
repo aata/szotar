@@ -11,7 +11,7 @@ namespace Szotar.WindowsForms.Forms {
 		public PracticeWindow() {
 			InitializeComponent();
 
-			NativeToolStripRenderer.SetToolStripRenderer(ToolbarTheme.MediaToolbar, mainMenu);
+			mainMenu.Renderer = new ToolStripAeroRenderer(ToolbarTheme.MediaToolbar);
 		}
 	}
 }

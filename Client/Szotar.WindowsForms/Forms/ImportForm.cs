@@ -45,7 +45,6 @@ namespace Szotar.WindowsForms.Forms {
 			if (importerSelection.Items.Count > 0)
 				importerSelection.SelectedIndex = 0;
 
-			NativeToolStripRenderer.SetToolStripRenderer(toolStrip);
 		}
 
 		void ImportForm_Closed(object sender, EventArgs e) {

@@ -17,7 +17,8 @@ namespace Szotar.WindowsForms.UITests {
 				return;
 			}
 
-			NativeToolStripRenderer.SetToolStripRenderer(GetToolbarTheme(), toolStripPanel1, toolStrip1, menuStrip1, contextMenuStrip1);
+			toolStripPanel1.Renderer = toolStrip1.Renderer = menuStrip1.Renderer = contextMenuStrip1.Renderer = 
+				new ToolStripAeroRenderer(GetToolbarTheme());
 		}
 
 		ToolbarTheme GetToolbarTheme() {
