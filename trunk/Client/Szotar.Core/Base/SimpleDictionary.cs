@@ -45,23 +45,16 @@ namespace Szotar {
 				return Searcher.Search(this, search, ignoreAccents, ignoreCase);
 			}
 
-			public Entry GetFullEntry(Entry stub) {
+			public void GetFullEntry(Entry stub) {
 				//We've already got the full entry, so no work to do.
 				if (stub.Translations != null)
-					return stub;
+					return;
 				if (stub.Tag == null)
 					throw new ArgumentException("The in-memory dictionary entry has no entry tag, and cannot be fully loaded.");
 
 				Entry full = dictionary.GetFullEntry(stub, this);
-				ReplaceEntry(stub, full);
-				return full;
-			}
-
-			protected void ReplaceEntry(Entry entryStub, Entry fullEntry) {
-				int index = entries.IndexOf(entryStub);
-				if (index < 0)
-					throw new ArgumentException();
-				entries[index] = fullEntry;
+				stub.Translations = full.Translations;
+				stub.Tag = null;
 			}
 		}
 		
@@ -202,7 +195,6 @@ namespace Szotar {
 		}
 
 		public Entry GetFullEntry(Entry entryStub, Section section) {
-			System.Diagnostics.Debug.Print("Getting entry {0}", entryStub.Phrase);
 			long bytePosition = (long)entryStub.Tag.Data;
 			Entry entry = null, current = null;
 			Translation lastTrans = null;

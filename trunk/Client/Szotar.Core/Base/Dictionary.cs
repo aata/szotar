@@ -54,7 +54,7 @@ namespace Szotar {
 		int HeadWords { get; }
 		string Name { get; set; }
 
-		Entry GetFullEntry(Entry entry);
+		void GetFullEntry(Entry entry);
 	}
 
 	[Serializable]

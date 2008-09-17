@@ -440,8 +440,7 @@ namespace Szotar.Sqlite {
 				return new Entry[] { new Entry("to try sg out", new List<Translation>(new Translation[] { new Translation("kiprobalni") })) }.GetEnumerator();
 			}
 
-			Entry IDictionarySection.GetFullEntry(Entry entry) {
-				return entry;
+			void IDictionarySection.GetFullEntry(Entry entry) {
 			}
 		}
 	}
