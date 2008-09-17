@@ -131,7 +131,7 @@
             toolStripSeparator3,
             toolStripMenuItem6});
 			toolStripMenuItem4.Name = "toolStripMenuItem4";
-			toolStripMenuItem4.Size = new System.Drawing.Size(37, 20);
+			toolStripMenuItem4.Size = new System.Drawing.Size(37, 19);
 			toolStripMenuItem4.Text = "&File";
 			// 
 			// toolStripMenuItem5
@@ -167,7 +167,7 @@
             toolStripMenuItem15,
             toolStripMenuItem16});
 			toolStripMenuItem7.Name = "toolStripMenuItem7";
-			toolStripMenuItem7.Size = new System.Drawing.Size(54, 20);
+			toolStripMenuItem7.Size = new System.Drawing.Size(54, 19);
 			toolStripMenuItem7.Text = "&Search";
 			// 
 			// toolStripMenuItem8
@@ -262,7 +262,7 @@
             toolStripSeparator7,
             this.toolStripMenuItem21});
 			toolStripMenuItem17.Name = "toolStripMenuItem17";
-			toolStripMenuItem17.Size = new System.Drawing.Size(37, 20);
+			toolStripMenuItem17.Size = new System.Drawing.Size(37, 19);
 			toolStripMenuItem17.Text = "&List";
 			// 
 			// toolStripMenuItem18
@@ -309,7 +309,7 @@
             toolStripMenuItem25,
             toolStripMenuItem26});
 			toolStripMenuItem23.Name = "toolStripMenuItem23";
-			toolStripMenuItem23.Size = new System.Drawing.Size(73, 20);
+			toolStripMenuItem23.Size = new System.Drawing.Size(73, 19);
 			toolStripMenuItem23.Text = "&Dictionary";
 			// 
 			// toolStripMenuItem24
@@ -335,7 +335,7 @@
 			toolStripMenuItem27.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             toolStripMenuItem28});
 			toolStripMenuItem27.Name = "toolStripMenuItem27";
-			toolStripMenuItem27.Size = new System.Drawing.Size(48, 20);
+			toolStripMenuItem27.Size = new System.Drawing.Size(48, 19);
 			toolStripMenuItem27.Text = "&Tools";
 			// 
 			// toolStripMenuItem28

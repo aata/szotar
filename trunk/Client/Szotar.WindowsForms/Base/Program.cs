@@ -9,6 +9,8 @@ namespace Szotar.WindowsForms {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
+			ToolStripManager.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
+
 			switch (GuiConfiguration.StartupAction) {
 				case "Dictionary":
 					string dict = GuiConfiguration.StartupDictionary;

@@ -20,8 +20,6 @@ namespace Szotar.WindowsForms.Forms {
 		public ListBuilder(WordList wordList) {
 			InitializeComponent();
 
-			NativeToolStripRenderer.SetToolStripRenderer(mainMenu, itemContextMenu);
-
 			this.list = wordList;
 			editingList = new BindingList<TranslationPair>(list);
 			editingList.AllowNew = true;
