@@ -14,11 +14,12 @@ namespace Szotar.WindowsForms {
 	}
 	
 	/// <summary>
-	/// Renders a toolstrip using the UxTheme API via VisualStyleRenderer. Visual styles must be supported for this to work; if you need to support other operating systems use
+	/// Renders a toolstrip using the UxTheme API via VisualStyleRenderer. Visual styles must be supported for this to work; if you need to support other operating systems use NativeToolStripRenderer.
 	/// </summary>
 	class UXThemeToolStripRenderer : ToolStripSystemRenderer {
 		/// <summary>
-		/// It shouldn't be necessary to P/Invoke like this, however a bug in VisualStyleRenderer.GetMargins forces my hand.
+		/// It shouldn't be necessary to P/Invoke like this, however VisualStyleRenderer.GetMargins
+		/// misses out a parameter in its own P/Invoke.
 		/// </summary>
 		static internal class NativeMethods {
 			[StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -36,71 +37,71 @@ namespace Szotar.WindowsForms {
 		//See http://msdn2.microsoft.com/en-us/library/bb773210.aspx - "Parts and States"
 		#region Parts and States 
 		enum MenuParts : int {
-			MENU_MENUITEM_TMSCHEMA = 1,
-			MENU_MENUDROPDOWN_TMSCHEMA = 2,
-			MENU_MENUBARITEM_TMSCHEMA = 3,
-			MENU_MENUBARDROPDOWN_TMSCHEMA = 4,
-			MENU_CHEVRON_TMSCHEMA = 5,
-			MENU_SEPARATOR_TMSCHEMA = 6,
-			MENU_BARBACKGROUND = 7,
-			MENU_BARITEM = 8,
-			MENU_POPUPBACKGROUND = 9,
-			MENU_POPUPBORDERS = 10,
-			MENU_POPUPCHECK = 11,
-			MENU_POPUPCHECKBACKGROUND = 12,
-			MENU_POPUPGUTTER = 13,
-			MENU_POPUPITEM = 14,
-			MENU_POPUPSEPARATOR = 15,
-			MENU_POPUPSUBMENU = 16,
-			MENU_SYSTEMCLOSE = 17,
-			MENU_SYSTEMMAXIMIZE = 18,
-			MENU_SYSTEMMINIMIZE = 19,
-			MENU_SYSTEMRESTORE = 20
+			ItemTMSchema = 1,
+			DropDownTMSchema = 2,
+			BarItemTMSchema = 3,
+			BarDropDownTMSchema = 4,
+			ChevronTMSchema = 5,
+			SeparatorTMSchema = 6,
+			BarBackground = 7,
+			BarItem = 8,
+			PopupBackground = 9,
+			PopupBorders = 10,
+			PopupCheck = 11,
+			PopupCheckBackground = 12,
+			PopupGutter = 13,
+			PopupItem = 14,
+			PopupSeparator = 15,
+			PopupSubmenu = 16,
+			SystemClose = 17,
+			SystemMaximize = 18,
+			SystemMinimize = 19,
+			SystemRestore = 20
 		}
 
 		enum MenuBarStates : int {
-			MB_ACTIVE = 1,
-			MB_INACTIVE = 2
+			Active = 1,
+			Inactive = 2
 		}
 
 		enum MenuBarItemStates : int {
-			MBI_NORMAL = 1,
-			MBI_HOT = 2,
-			MBI_PUSHED = 3,
-			MBI_DISABLED = 4,
-			MBI_DISABLEDHOT = 5,
-			MBI_DISABLEDPUSHED = 6
+			Normal = 1,
+			Hover = 2,
+			Pushed = 3,
+			Disabled = 4,
+			DisabledHover = 5,
+			DisabledPushed = 6
 		}
 
 		enum MenuPopupItemStates : int {
-			MPI_NORMAL = 1,
-			MPI_HOT = 2,
-			MPI_DISABLED = 3,
-			MPI_DISABLEDHOT = 4
+			Normal = 1,
+			Hover = 2,
+			Disabled = 3,
+			DisabledHover = 4
 		}
 
 		enum MenuPopupCheckStates : int {
-			MC_CHECKMARKNORMAL = 1,
-			MC_CHECKMARKDISABLED = 2,
-			MC_BULLETNORMAL = 3,
-			MC_BULLETDISABLED = 4
+			CheckmarkNormal = 1,
+			CheckmarkDisabled = 2,
+			BulletNormal = 3,
+			BulletDisabled = 4
 		}
 
 		enum MenuPopupCheckBackgroundStates : int {
-			MCB_DISABLED = 1,
-			MCB_NORMAL = 2,
-			MCB_BITMAP = 3
+			Disabled = 1,
+			Normal = 2,
+			Bitmap = 3
 		}
 
 		enum MenuPopupSubMenuStates : int {
-			MSM_NORMAL = 1,
-			MSM_DISABLED = 2
+			Normal = 1,
+			Disabled = 2
 		}
 
 		enum MarginTypes : int {
-			TMT_SIZINGMARGINS = 3601,
-			TMT_CONTENTMARGINS = 3602,
-			TMT_CAPTIONMARGINS = 3603
+			Sizing = 3601,
+			Content = 3602,
+			Caption = 3603
 		}
 
 		const int RP_BACKGROUND = 6;
@@ -125,14 +126,14 @@ namespace Szotar.WindowsForms {
 
 			if (item.Owner.IsDropDown) {
 				if (item.Enabled)
-					return hot ? (int)MenuPopupItemStates.MPI_HOT : (int)MenuPopupItemStates.MPI_NORMAL;
-				return hot ? (int)MenuPopupItemStates.MPI_DISABLEDHOT : (int)MenuPopupItemStates.MPI_DISABLED;
+					return hot ? (int)MenuPopupItemStates.Hover : (int)MenuPopupItemStates.Normal;
+				return hot ? (int)MenuPopupItemStates.DisabledHover : (int)MenuPopupItemStates.Disabled;
 			} else {
 				if (pressed)
-					return item.Enabled ? (int)MenuBarItemStates.MBI_PUSHED : (int)MenuBarItemStates.MBI_DISABLEDPUSHED;
+					return item.Enabled ? (int)MenuBarItemStates.Pushed : (int)MenuBarItemStates.DisabledPushed;
 				if (item.Enabled)
-					return hot ? (int)MenuBarItemStates.MBI_HOT : (int)MenuBarItemStates.MBI_NORMAL;
-				return hot ? (int)MenuBarItemStates.MBI_DISABLEDHOT : (int)MenuBarItemStates.MBI_DISABLED;
+					return hot ? (int)MenuBarItemStates.Hover : (int)MenuBarItemStates.Normal;
+				return hot ? (int)MenuBarItemStates.DisabledHover : (int)MenuBarItemStates.Disabled;
 			}
 		}
 		#endregion
@@ -186,7 +187,7 @@ namespace Szotar.WindowsForms {
 
 		#region Borders
 		protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e) {
-			renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPBORDERS, 0);
+			renderer.SetParameters(MenuClass, (int)MenuParts.PopupBorders, 0);
 			if (e.ToolStrip.IsDropDown) {
 				Region oldClip = e.Graphics.Clip;
 
@@ -204,16 +205,15 @@ namespace Szotar.WindowsForms {
 		}
 		#endregion
 
-		#region Backgrounds
 		protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e) {
-			int partId = e.Item.Owner.IsDropDown ? (int)MenuParts.MENU_POPUPITEM : (int)MenuParts.MENU_BARITEM;
-			renderer.SetParameters(MenuClass, partId, GetItemState(e.Item));
+			int partID = e.Item.Owner.IsDropDown ? (int)MenuParts.PopupItem : (int)MenuParts.BarItem;
+			renderer.SetParameters(MenuClass, partID, GetItemState(e.Item));
 			
 			Rectangle bgRect = e.Item.ContentRectangle;
 
-			Padding content = GetThemeMargins(e.Graphics, MarginTypes.TMT_CONTENTMARGINS),
-					sizing = GetThemeMargins(e.Graphics, MarginTypes.TMT_SIZINGMARGINS),
-					caption = GetThemeMargins(e.Graphics, MarginTypes.TMT_CAPTIONMARGINS);
+			Padding content = GetThemeMargins(e.Graphics, MarginTypes.Content),
+					sizing = GetThemeMargins(e.Graphics, MarginTypes.Sizing),
+					caption = GetThemeMargins(e.Graphics, MarginTypes.Caption);
 
 			if (!e.Item.Owner.IsDropDown) {
 				bgRect.Y = 0;
@@ -254,7 +254,7 @@ namespace Szotar.WindowsForms {
 		//Render the background of an actual menu bar, dropdown menu or toolbar.
 		protected override void OnRenderToolStripBackground(System.Windows.Forms.ToolStripRenderEventArgs e) {
 			if (e.ToolStrip.IsDropDown) {
-				renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPBACKGROUND, 0);
+				renderer.SetParameters(MenuClass, (int)MenuParts.PopupBackground, 0);
 			} else {
 				//It's a MenuStrip or a ToolStrip. If it's contained inside a larger panel, it should have a
 				//transparent background, showing the panel's background.
@@ -281,32 +281,27 @@ namespace Szotar.WindowsForms {
 			renderer.DrawBackground(e.Graphics, e.ToolStrip.ClientRectangle, e.AffectedBounds);
 		}
 
-		protected override void OnRenderToolStripContentPanelBackground(ToolStripContentPanelRenderEventArgs e) {
-			//e.Graphics.FillRectangle(Brushes.RosyBrown, e.ToolStripContentPanel.ClientRectangle);
-			//base.OnRenderToolStripContentPanelBackground(e);
+		//The only purpose of this override is to change the arrow colour.
+		//It's OK to just draw over the default arrow since we also pass down arrow drawing to the system renderer.
+		protected override void OnRenderSplitButtonBackground(ToolStripItemRenderEventArgs e) {
+			ToolStripSplitButton sb = (ToolStripSplitButton)e.Item;
+			base.OnRenderSplitButtonBackground(e);
+			OnRenderArrow(new ToolStripArrowRenderEventArgs(e.Graphics, sb, sb.DropDownButtonBounds, Color.Red, ArrowDirection.Down));
 		}
 
-		//Some sort of chevron thing?
-		//protected override void OnRenderOverflowButtonBackground(ToolStripItemRenderEventArgs e) {
-		//    base.OnRenderOverflowButtonBackground(e);
-		//}
-		#endregion
+		Color GetItemTextColor(ToolStripItem item) {
+			int partId = item.IsOnDropDown ? (int)MenuParts.PopupItem : (int)MenuParts.BarItem;
+			renderer.SetParameters(MenuClass, partId, GetItemState(item));
+			return renderer.GetColor(ColorProperty.TextColor);
+		}
 
-		#region Text
 		protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e) {
-			int partId = e.Item.Owner.IsDropDown ? (int)MenuParts.MENU_POPUPITEM : (int)MenuParts.MENU_BARITEM;
-			renderer.SetParameters(MenuClass, partId, GetItemState(e.Item));
-			Color color = renderer.GetColor(ColorProperty.TextColor);
-
-			if(e.Item.Owner.IsDropDown || e.Item.Owner is MenuStrip)
-				e.TextColor = color;
+			e.TextColor = GetItemTextColor(e.Item);
 
 			base.OnRenderItemText(e);
 		}
-		#endregion
 
-		#region Glyphs
-
+		//This is ugly. Need to get the actual grip bounds.
 		//protected override void OnRenderGrip(ToolStripGripRenderEventArgs e) {
 		//    if (e.GripStyle == ToolStripGripStyle.Visible) {
 		//        renderer.SetParameters(VisualStyleElement.Rebar.Gripper.Normal);
@@ -316,17 +311,30 @@ namespace Szotar.WindowsForms {
 
 		protected override void OnRenderImageMargin(ToolStripRenderEventArgs e) {
 			if (e.ToolStrip.IsDropDown) {
-				renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPGUTTER, 0);
-				Rectangle displayRect = e.ToolStrip.DisplayRectangle,
-					marginRect = new Rectangle(0, displayRect.Top, displayRect.Left, displayRect.Height);
-				//e.Graphics.DrawRectangle(Pens.Black, marginRect);
-				renderer.DrawBackground(e.Graphics, marginRect, marginRect);
+				renderer.SetParameters(MenuClass, (int)MenuParts.PopupGutter, 0);
+				//The AffectedBounds is usually too small, way too small to look right. Instead of using that,
+				//use the AffectedBounds but with the right width. Then narrow the rectangle to the correct edge
+				//based on whether or not it's RTL. (It doesn't need to be narrowed to an edge in LTR mode, but let's
+				//do that anyway.)
+				//Using the DisplayRectangle gets roughly the right size so that the separator is closer to the text.
+				int extraWidth = (e.ToolStrip.Width - e.ToolStrip.DisplayRectangle.Width) - e.AffectedBounds.Width;
+				Rectangle rect = e.AffectedBounds;
+				rect.Y += 2;
+				rect.Height -= 4;
+				int sepWidth = renderer.GetPartSize(e.Graphics, ThemeSizeType.True).Width;
+				if (e.ToolStrip.RightToLeft == RightToLeft.Yes) {
+					rect = new Rectangle(rect.X - extraWidth, rect.Y, sepWidth, rect.Height);
+					rect.X += sepWidth;
+				} else {
+					rect = new Rectangle(rect.Width + extraWidth - sepWidth, rect.Y, sepWidth, rect.Height);
+				}
+				renderer.DrawBackground(e.Graphics, rect);
 			}
 		}
 
 		protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e) {
 			if (e.ToolStrip.IsDropDown) {
-				renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPSEPARATOR, 0);
+				renderer.SetParameters(MenuClass, (int)MenuParts.PopupSeparator, 0);
 				Rectangle rect = new Rectangle(e.ToolStrip.DisplayRectangle.Left, 0, e.ToolStrip.DisplayRectangle.Width, e.Item.Height);
 				renderer.DrawBackground(e.Graphics, rect, rect);
 			} else {
@@ -334,56 +342,65 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
+		//Currently the check mark looks a bit odd in most configurations because the icon isn't scaled very well.
+		//ToolStrip gets the wrong sizes for most of its items, so it could be difficult to get it to draw correctly.
 		protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e) {
-			ToolStripMenuItem item = e.Item as ToolStripMenuItem;
-			if (item != null) {
-				if (item.Checked) {
-					Rectangle rect = e.Item.ContentRectangle;
-					rect.Width = rect.Height;
+			Rectangle rect = e.Item.ContentRectangle;
+			rect.Width = rect.Height;
 
-					//Center the checkmark horizontally in the gutter (looks ugly, though)
-					//rect.X = (e.ToolStrip.DisplayRectangle.Left - rect.Width) / 2;
+			//Center the checkmark horizontally in the gutter (looks ugly, though)
+			//rect.X = (e.ToolStrip.DisplayRectangle.Left - rect.Width) / 2;
 
-					renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPCHECKBACKGROUND, e.Item.Enabled ? (int)MenuPopupCheckBackgroundStates.MCB_NORMAL : (int)MenuPopupCheckBackgroundStates.MCB_DISABLED);
-					renderer.DrawBackground(e.Graphics, rect);
-					
-					Padding margins = GetThemeMargins(e.Graphics, MarginTypes.TMT_SIZINGMARGINS);
+			//Now, mirror its position if the menu item is RTL.
+			if (e.Item.RightToLeft == RightToLeft.Yes)
+				rect = new Rectangle(e.ToolStrip.ClientSize.Width - rect.X - rect.Width, rect.Y, rect.Width, rect.Height);
 
-					rect = new Rectangle(rect.X + margins.Left, rect.Y + margins.Top,
-						rect.Width - margins.Horizontal,
-						rect.Height - margins.Vertical);
+			renderer.SetParameters(MenuClass, (int)MenuParts.PopupCheckBackground, e.Item.Enabled ? (int)MenuPopupCheckBackgroundStates.Normal : (int)MenuPopupCheckBackgroundStates.Disabled);
+			renderer.DrawBackground(e.Graphics, rect);
+			
+			Padding margins = GetThemeMargins(e.Graphics, MarginTypes.Sizing);
 
-					//I don't think ToolStrip even supports radio box items. So no need to render them.
-					renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPCHECK, e.Item.Enabled ? (int)MenuPopupCheckStates.MC_CHECKMARKNORMAL : (int)MenuPopupCheckStates.MC_CHECKMARKDISABLED);
+			rect = new Rectangle(rect.X + margins.Left, rect.Y + margins.Top,
+				rect.Width - margins.Horizontal,
+				rect.Height - margins.Vertical);
 
-					renderer.DrawBackground(e.Graphics, rect);
-				}
-			} else {
-				base.OnRenderItemCheck(e);
-			}
+			//I don't think ToolStrip even supports radio box items, so no need to render them.
+			renderer.SetParameters(MenuClass, (int)MenuParts.PopupCheck, e.Item.Enabled ? (int)MenuPopupCheckStates.CheckmarkNormal : (int)MenuPopupCheckStates.CheckmarkDisabled);
+
+			renderer.DrawBackground(e.Graphics, rect);
 		}
 
 		//This is broken for RTL
 		protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e) {
-			int stateId = e.Item.Enabled ? (int)MenuPopupSubMenuStates.MSM_NORMAL : (int)MenuPopupSubMenuStates.MSM_DISABLED;
-			renderer.SetParameters(MenuClass, (int)MenuParts.MENU_POPUPSUBMENU, stateId);
-			renderer.DrawBackground(e.Graphics, e.ArrowRectangle);
+			//The default renderer will draw an arrow for us (the UXTheme API seems not to have one for all directions),
+			//but it will get the colour wrong in many cases. The text colour is probably the best colour to use.
+			e.ArrowColor = GetItemTextColor(e.Item);
+			base.OnRenderArrow(e);
 		}
 
 		protected override void OnRenderOverflowButtonBackground(ToolStripItemRenderEventArgs e) {
-			renderer.SetParameters(RebarClass, VisualStyleElement.Rebar.Chevron.Normal.Part, VisualStyleElement.Rebar.Chevron.Normal.State);
-			renderer.DrawBackground(e.Graphics, e.Item.ContentRectangle);
+			//BrowserTabBar::Rebar draws the chevron using the default background. Odd.
+			string rebarClass = RebarClass;
+			if(Theme == ToolbarTheme.BrowserTabBar)
+				rebarClass = "Rebar";
 
-			//base.OnRenderOverflowButtonBackground(e);
+			int state = VisualStyleElement.Rebar.Chevron.Normal.State;
+			if (e.Item.Pressed) {
+				state = VisualStyleElement.Rebar.Chevron.Pressed.State;
+			} else if (e.Item.Selected) {
+				state = VisualStyleElement.Rebar.Chevron.Hot.State;
+			}
+
+			renderer.SetParameters(rebarClass, VisualStyleElement.Rebar.Chevron.Normal.Part, state);
+			renderer.DrawBackground(e.Graphics, new Rectangle(Point.Empty, e.Item.Size));
 		}
-		#endregion
 
 		public static bool IsSupported {
 			get {
 				if (!VisualStyleRenderer.IsSupported)
 					return false;
 
-				return VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement("MENU", (int)MenuParts.MENU_BARBACKGROUND, (int)MenuBarStates.MB_ACTIVE));
+				return VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement("MENU", (int)MenuParts.BarBackground, (int)MenuBarStates.Active));
 			} 
 		}
 	}
@@ -579,6 +596,26 @@ namespace Szotar.WindowsForms {
 
 		protected override void OnRenderToolStripPanelBackground(ToolStripPanelRenderEventArgs e) {
 			ActualRenderer.DrawToolStripPanelBackground(e);
+		}
+
+		protected override void OnRenderLabelBackground(ToolStripItemRenderEventArgs e) {
+			ActualRenderer.DrawLabelBackground(e);
+		}
+
+		protected override void OnRenderOverflowButtonBackground(ToolStripItemRenderEventArgs e) {
+			ActualRenderer.DrawOverflowButtonBackground(e);
+		}
+
+		protected override void OnRenderSplitButtonBackground(ToolStripItemRenderEventArgs e) {
+			ActualRenderer.DrawSplitButton(e);
+		}
+
+		protected override void OnRenderStatusStripSizingGrip(ToolStripRenderEventArgs e) {
+			ActualRenderer.DrawStatusStripSizingGrip(e);
+		}
+
+		protected override void OnRenderToolStripStatusLabelBackground(ToolStripItemRenderEventArgs e) {
+			ActualRenderer.DrawToolStripStatusLabelBackground(e);
 		}
 		#endregion
 	}
