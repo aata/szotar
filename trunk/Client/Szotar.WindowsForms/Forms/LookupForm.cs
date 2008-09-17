@@ -19,9 +19,30 @@ namespace Szotar.WindowsForms.Forms {
 		IList<SearchResult> results;
 		bool ctrlHeld = false;
 
+		class LookupFormFileIsInUse : FileIsInUse {
+			LookupForm form;
+
+			public LookupFormFileIsInUse(LookupForm form, string path)
+				: base(path)
+			{
+				this.form = form;
+				base.CanClose = true;
+				base.WindowHandle = form.Handle;
+			}
+
+			//Who knows what thread this will be invoked on?
+			public override void CloseFile() {
+				form.Invoke(new EventHandler((s, e) => {
+					form.Close();
+				}));
+			}
+		}
+
 		public LookupForm(IBilingualDictionary dictionary)
 			: this()
-		{
+		{			
+			components.Add(new DisposableComponent(new LookupFormFileIsInUse(this, dictionary.Path)));
+
 			Dictionary = dictionary;
 
 			//Set the menu items' Text to match the names of the dictionary sections.
