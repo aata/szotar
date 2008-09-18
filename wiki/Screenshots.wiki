@@ -1,0 +1,24 @@
+#summary Screenshots of the program in action.
+#labels Featured
+
+These screenshots were taken using the Windows.Forms version on Windows Vista.
+
+[http://asztal.net/szotar/images/lookup.png]
+
+The main interface for looking up words. The coloured rows indicate perfect matches and matches at the start of the English phrase.
+
+[http://asztal.net/szotar/images/infotips2.png]
+
+Info tips help to find out which of the translations is the most appropriate.
+
+[http://asztal.net/szotar/images/listbuilder.png]
+
+Building a list of vocabulary (this feature is likely to change significantly).
+
+[http://asztal.net/szotar/images/quizletimporter.png]
+
+Search for and import vocabulary with the importer.
+
+[http://asztal.net/szotar/images/zbedicimporter.png]
+
+Import a zbedic dictionary with relative ease. The zbedic importer is still young.
