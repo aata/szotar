@@ -5,11 +5,11 @@ These screenshots were taken using the Windows.Forms version on Windows Vista.
 
 [http://asztal.net/szotar/images/lookup.png]
 
-The main interface for looking up words. The coloured rows indicate perfect matches and matches at the start of the English phrase.
+The main interface for looking up words.
 
 [http://asztal.net/szotar/images/infotips2.png]
 
-Info tips help to find out which of the translations is the most appropriate.
+Info tips help to find out which of the translations is the most appropriate. The coloured rows indicate perfect matches with the search phrase and matches at the start of the entry.
 
 [http://asztal.net/szotar/images/listbuilder.png]
 
