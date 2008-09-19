@@ -679,6 +679,9 @@ namespace Szotar.WindowsForms.Forms {
 		#region Dictionary Menu
 		private void editInformationToolStripMenuItem_Click(object sender, EventArgs e) {
 			new DictionaryInfoEditor(Dictionary, true).ShowDialog();
+			forwards.Text = Dictionary.ForwardsSection.Name;
+			backwards.Text = Dictionary.ReverseSection.Name;
+			UpdateResults();
 		}
 
 		private void importDictionary_Click(object sender, EventArgs e) {
