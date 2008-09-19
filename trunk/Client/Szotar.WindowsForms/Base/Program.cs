@@ -34,6 +34,10 @@ namespace Szotar.WindowsForms {
 					new Forms.PracticeWindow().Show();
 					RunUntilNoForms();
 					break;
+				case "ImportDictionary":
+					new Forms.DictionaryImport().Show();
+					RunUntilNoForms();
+					break;
 			}
 
 			return;

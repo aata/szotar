@@ -42,6 +42,7 @@ namespace Szotar.WindowsForms.Forms {
 			: this()
 		{			
 			components.Add(new DisposableComponent(new LookupFormFileIsInUse(this, dictionary.Path)));
+			components.Add(new DisposableComponent(dictionary));
 
 			Dictionary = dictionary;
 
