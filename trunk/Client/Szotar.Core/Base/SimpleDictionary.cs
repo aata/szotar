@@ -246,10 +246,11 @@ namespace Szotar {
 			if (pool == null)
 				pool = new StringPool();
 
+			//Note: f, b, and t don't need %20, so we can't use bits.
 			if (bits.Length > 0) {
 				switch (bits[0]) {
 					case "t":
-						bits[1] = pool.Pool(bits[1].Normalize());
+						bits[1] = pool.Pool(Uri.UnescapeDataString(line.Substring(2)).Normalize());
 						entry.Translations.Add(lastTranslation = new Translation(bits[1]));
 						break;
 
@@ -261,10 +262,10 @@ namespace Szotar {
 					//When called from Load, this doesn't actually get executed. Load special-cases those
 					//properties to load only the phrase, not the translation or metadata.
 					//Return true, I guess.
-					case "f": case "b":
-						bits[1] = pool.Pool(bits[1].Normalize());
-						entry = new Entry(bits[1], new List<Translation>());
-						break;
+					case "f": case "b": {
+						string headWord = pool.Pool(Uri.UnescapeDataString(line.Substring(2)).Normalize());
+						entry = new Entry(headWord, new List<Translation>());
+					} break;
 
 					//It couldn't be applied. Return false so that the caller can try applying file-level properties.
 					default:
