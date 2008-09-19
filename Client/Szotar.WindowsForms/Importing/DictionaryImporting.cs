@@ -347,9 +347,9 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 								string line = reader.ReadLine();
 								string[] bits = line.Split(new char[] { '\0' }, 2, StringSplitOptions.RemoveEmptyEntries);
-								List<Translation> translations = ParseTranslations(bits[0]);
+								List<Entry> senses = ParseSenses(bits[0], phrase);
 								if (bits.Length > 1) {
-									entries.Add(new Entry(phrase.Normalize(), translations));
+									entries.AddRange(senses);
 
 									if (showProgress) {
 										percentage = 100 * entries.Count / info.ItemCount.Value;
@@ -358,7 +358,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 										lastPercentage = percentage;
 									}
 
-									phrase = bits[1]; //Set phrase for next entry
+									phrase = bits[1].Normalize(); //Set phrase for next entry
 								} else {
 									break;
 								}
@@ -367,6 +367,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 					}
 				}
 
+				//This sort is needed because of the {hw} tag which can change the entry's headword.
 				entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
 				SimpleDictionary.Section section = new SimpleDictionary.Section(entries, null);
 				section.Name = info.Name;
@@ -454,34 +455,154 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				return info;
 			}
 
-			private List<Translation> ParseTranslations(string str) {
-				List<Translation> translations = new List<Translation>();
-				StringBuilder current = new StringBuilder();
+			//Returns the text that should be inserted in the element's place.
+			delegate string SubElementHandler(string tag);
 
-				for (int i = 0; i < str.Length; ++i) {
-					char c = str[i];
-					if (c == '{') {
-						StringBuilder tag = new StringBuilder();
-						while (i < str.Length && str[i] != '}') {
-							tag.Append(str[i]);
-							++i;
-						}
-
-						if (tag.ToString() == "{/ss") {
-							translations.Add(new Translation(current.ToString().Trim()));
-							current.Length = 0;
-						}
-					} else if (c == ',') {
-						translations.Add(new Translation(current.ToString().Trim()));
-						current.Length = 0;
-					} else {
-						current.Append(c);
-					}
+			//Returns null if the enumerator was at the end of the enumerable.
+			string Parse(IEnumerator<char> e, SubElementHandler subElementHandler, bool readStartTag, string expectedEndTag) {
+				if(!readStartTag && expectedEndTag == null) {
+					throw new ArgumentException("readStartTag is false and expectedEndTag is null.");
 				}
 
-				//The return point should be inside the for loop, but in malformed cases,
-				//we might end up here.
-				return translations;
+				//Hack, readStartTag is only set in top-level parse (ParseSenses)
+				if (readStartTag) {
+					if (!e.MoveNext())
+						return null;
+				}
+
+				if (readStartTag) {
+					if (e.Current != '{')
+						throw new InvalidDataException("Expected: {, found: " + e.Current);
+					StringBuilder tag = new StringBuilder("/");
+
+					bool closingBraceFound = false;
+					while(e.MoveNext()) {
+						if(e.Current == '}') {
+							closingBraceFound = true;
+							e.MoveNext();
+							break;
+						}
+						tag.Append(e.Current);
+					}
+
+					if (!closingBraceFound)
+						throw new InvalidDataException("Expected: }, reached end of entry");
+
+					expectedEndTag = tag.ToString();
+				}
+				
+				char last = default(char);
+				bool inTag = false;
+				StringBuilder 
+					textContent = new StringBuilder(),
+					tagName = new StringBuilder();
+
+				do {
+					char c = e.Current;
+					switch (last == '\\' ? '\0' : c) { //Use default case if last was backslash
+						case '{':
+							inTag = true;
+							break;
+						case '}':
+							if (tagName.Length > 0 && tagName[0] == '/') {
+								if (tagName.ToString() != expectedEndTag)
+									throw new InvalidDataException("Expected: {" + expectedEndTag + "}, Found: {" + tagName + "}");
+
+								return textContent.ToString();
+							}
+							string replacement = subElementHandler(tagName.ToString());
+							if (!string.IsNullOrEmpty(replacement))
+								textContent.Append(replacement);
+							tagName.Length = 0;
+							inTag = false;
+							break;
+						case '\\':
+							break;
+						default:
+							(inTag ? tagName : textContent).Append(c);
+							break;
+					}
+					last = c;
+				} while (e.MoveNext());
+
+				throw new InvalidDataException("Expected: {" + expectedEndTag + "}, reached end of entry");
+			}
+
+			//Parses an element that is known not to contain sub-elements.
+			//If a sub-element is encountered, its text is discarded.
+			string ParseStringElement(IEnumerator<char> e, string tag) {
+				return Parse(e, _ => null, false, "/" + tag).Normalize();
+			}
+
+			//This is a subsense in bedic terminology. It can contain {sa}, {hw}, {ex}, {ct},
+			//all of which are expected to contain only text, but we don't even need them anyway.
+			private IList<Translation>  ParseTranslation(IEnumerator<char> e, string headWord) {
+				string str = Parse(e, tag => {
+					if (tag == "hw")
+						return headWord;
+					if (tag == "em" || tag == "de")
+						return ParseStringElement(e, tag);
+					return null;
+				}, false, "/ss");
+
+				if (str == null)
+					throw new InvalidDataException("Expected {/ss}, reached end of entry");
+
+				//This bit should be disablable.
+				List<Translation> list = new List<Translation>();
+				foreach(string s in str.Split(','))
+					list.Add(new Translation(s.Trim().Normalize()));
+				
+				return list;
+			}
+
+			List<Entry> ParseSenses(string definitions, string headWord) {
+				List<Entry> senses = new List<Entry>();
+				IEnumerator<char> e = definitions.GetEnumerator();
+				while(true) {
+					Entry entry = new Entry(headWord, new List<Translation>());
+					string s = Parse(e, tag => {
+						if (tag == "pr") {
+							ParseStringElement(e, tag);
+							//Set sense pronunciation
+						} else if (tag == "ps") {
+							ParseStringElement(e, tag);
+							//Set sense part of speech
+						} else if (tag == "ss") {
+							foreach (Translation tr in ParseTranslation(e, tag)) {
+								foreach (Translation other in entry.Translations)
+									if (tr.Value == other.Value)
+										continue;
+								entry.Translations.Add(tr);
+							}
+							return null;
+						} else {
+							ParseStringElement(e, tag);
+						}
+						return null;
+					}, true, null);
+
+					//Check if the enumeration was finished.
+					if (s == null)
+						break;
+
+					//Combine senses when they're not substantially different.
+					//Senses with the same headword, part of speech and pronunciation are considered the same.
+					//TODO: update when Pr/PoS added to Entry
+					bool merged = false;
+					foreach(Entry other in senses) {
+						if(other.Phrase == entry.Phrase) {
+							merged = true;
+							foreach (Translation tr in entry.Translations)
+								other.Translations.Add(tr);
+							break;
+						}
+					}
+
+					if(!merged)
+						senses.Add(entry);
+				}
+				return senses;
 			}
 			#endregion
 

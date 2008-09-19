@@ -61,16 +61,16 @@ namespace Szotar {
 		public class Info : DictionaryInfo {
 			public Info(string path) {
 				Path = path;
-				SimpleDictionary dict = new SimpleDictionary(path, false, false);
-				
-				Name = dict.Name;
-				Author = dict.Author;
-				Url = dict.Url;
-				
-				SectionNames = dict.SectionNames;
-				if(dict.FirstLanguage != null || dict.SecondLanguage != null)
-					Languages = new string[] { dict.FirstLanguage, dict.SecondLanguage };
-				SectionSizes = dict.SectionSizes;
+				using (SimpleDictionary dict = new SimpleDictionary(path, false, false)) {
+					Name = dict.Name;
+					Author = dict.Author;
+					Url = dict.Url;
+
+					SectionNames = dict.SectionNames;
+					if (dict.FirstLanguage != null || dict.SecondLanguage != null)
+						Languages = new string[] { dict.FirstLanguage, dict.SecondLanguage };
+					SectionSizes = dict.SectionSizes;
+				}
 			}
 			
 			//TODO: Could (should?) be changed to store a WeakReference.
@@ -188,6 +188,11 @@ namespace Szotar {
 				forwardsEntries.Sort(comparer);
 				backwardsEntries.Sort(comparer);
 			}
+
+			if (!full && reader != null) {
+				reader.Dispose();
+				reader = null;
+			}
 		}
 
 		protected void OpenFile() {
@@ -274,8 +279,10 @@ namespace Szotar {
 		/// space URI encoding unicode values.</summary>
 		/// <param name="s">String to be encoded</param>
 		/// <returns>Encoded string, suitable for use with System.Uri.UnescapeDataString</returns>
-		private string Escape(string s) {
-			return s.Replace("\0", "%00").Replace("%", "%25").Replace(" ", "%20").Replace("\n", "%0D").Replace("\r", "%0A");
+		private string Escape(string s, bool escapeSpace) {
+			if (escapeSpace)
+				s = s.Replace(" ", "%20");
+			return s.Replace("\0", "%00").Replace("%", "%25").Replace("\n", "%0D").Replace("\r", "%0A");
 		}
 
 		/// <summary>
@@ -335,13 +342,13 @@ namespace Szotar {
 		/// <param name="type">Type of entry (usually 'b' or 'f')</param>
 		/// <param name="entry">Entry instance to be written</param>
 		void WriteEntry(TextWriter writer, string type, Entry entry) {
-			writer.WriteLine(type + " " + Escape(entry.Phrase));
+			writer.WriteLine(type + " " + Escape(entry.Phrase, false));
 			
 			foreach (Translation tr in entry.Translations) {
-				writer.WriteLine("t " + Escape(tr.Value));
+				writer.WriteLine("t " + Escape(tr.Value, false));
 				if (tr.PartOfSpeech != null) {
 					writer.Write("pos ");
-					writer.WriteLine(tr.PartOfSpeech);
+					writer.WriteLine(Escape(tr.PartOfSpeech, true));
 				}
 			}
 		}

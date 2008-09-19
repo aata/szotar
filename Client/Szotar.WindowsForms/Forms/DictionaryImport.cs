@@ -169,22 +169,29 @@ namespace Szotar.WindowsForms.Forms {
 				DataStore.UserDataStore.EnsureDirectoryExists("Dictionaries");
 
 				//Attempt to save with a sane name; failing that, use a GUID as the name; otherwise report the error.
-				//TODO: Remove invalid path characters before trying a GUID
-				try {
-					imported.Path = Path.Combine(Path.Combine(root, "Dictionaries"), name) + ".dict";
-					//We don't want to overwrite.
-					if (File.Exists(imported.Path))
-						throw new IOException();
-					imported.Save();
-				} catch (SystemException ex) {
-					//Oh, dear. I really don't want to duplicate the code into two catch blocks, though.
-					//ArgumentException is thrown if the path argument to Path.Combine contains invalid characters,
-					//and I assume SimpleDictionary.Save() will throw it too.
-					if (!(ex is ArgumentException || ex is IOException))
-						throw;
+				var ipc = Path.GetInvalidPathChars();
+				if (name.IndexOfAny(ipc) >= 0) {
+					//TODO: Sanitize file name!
+				}
+
+				imported.Path = Path.Combine(Path.Combine(root, "Dictionaries"), name) + ".dict";
+
+				//We don't want to overwrite.
+				if (File.Exists(imported.Path)) {
 					name = Guid.NewGuid().ToString("D");
 					imported.Path = Path.Combine(Path.Combine(root, "Dictionaries"), name) + ".dict";
 					imported.Save();
+				}
+
+				//If the dictionary can't save, we should delete the half-written file.
+				//TODO: this should probably avoid deleting the file if the error was caused
+				//by the file already existing (say, if it was created between calls). It would be
+				//kind of rare though.
+				try {
+					imported.Save();
+				} catch(SystemException) {
+					File.Delete(imported.Path);
+					throw;
 				}
 
 				new LookupForm(imported).Show();
