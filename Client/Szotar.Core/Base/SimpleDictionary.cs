@@ -154,11 +154,11 @@ namespace Szotar {
 								FirstLanguageCode = bits[1];
 								SecondLanguageCode = bits[2];
 								break;
-							case "sizes":
-								this.SectionSizes = new int[] { int.Parse(bits[1]), int.Parse(bits[2]) };
-								break;
 							case "sorted":
 								sorted = true;
+								break;
+							case "headwords-hint":
+								this.SectionSizes = new int[] { int.Parse(bits[1]), int.Parse(bits[2]) }; 
 								break;
 							default:
 								break;
@@ -241,8 +241,9 @@ namespace Szotar {
 						break;
 
 					//It may make more sense to have a separate string pool for PoS information.
-					case "pos":
-						lastTranslation.PartOfSpeech = pool.Pool(bits[1]);
+					case "ps":
+						//I've temporarily removed PoS, as it's going to be moved to Entry anyway. (Probably)
+						//lastTranslation.PartOfSpeech = pool.Pool(bits[1]);
 						break;
 
 					//When called from Load, this doesn't actually get executed. Load special-cases those
@@ -304,6 +305,7 @@ namespace Szotar {
 						writer.WriteLine("url " + Uri.EscapeDataString(Url));
 
 					//TODO: WritePairedProperty
+					writer.WriteLine(string.Format("headwords-hint {0} {1}", forwards.HeadWords, backwards.HeadWords));
 					if (FirstLanguage != null || SecondLanguage != null)
 						writer.WriteLine(string.Format("languages {0} {1}", Uri.EscapeDataString(FirstLanguage), Uri.EscapeDataString(SecondLanguage)));
 					if (FirstLanguageCode != null || SecondLanguageCode != null)
@@ -329,10 +331,10 @@ namespace Szotar {
 			
 			foreach (Translation tr in entry.Translations) {
 				writer.WriteLine("t " + Escape(tr.Value, false));
-				if (tr.PartOfSpeech != null) {
-					writer.Write("pos ");
-					writer.WriteLine(Escape(tr.PartOfSpeech, true));
-				}
+				//if (tr.PartOfSpeech != null) {
+				//    writer.Write("ps ");
+				//    writer.WriteLine(Escape(tr.PartOfSpeech, true));
+				//}
 			}
 		}
 

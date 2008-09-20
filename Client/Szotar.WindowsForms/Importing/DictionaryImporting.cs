@@ -538,8 +538,15 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 							break;
 						case '}':
 							if (tagName.Length > 0 && tagName[0] == '/') {
+								//This is a common error, it seems, and might be worth working around.
+								//Won't work yet. We need to be able to rewind to the {/ss} for the calling Parse.
+								//if (tagName.ToString() == "/ss" && expectedEndTag == "/ex")
+								//	return textContent.ToString();
+
 								if (tagName.ToString() != expectedEndTag)
 									throw new InvalidDataException("Expected: {" + expectedEndTag + "}, Found: {" + tagName + "}");
+
+								
 
 								//Don't forget to consume the closing brace!
 								e.MoveNext();
@@ -554,7 +561,6 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 								//Debugger.Break();
 								throw new InvalidDataException("Unexpected '}', no matching '{'.");
 							}
-								
 
 							if(!e.MoveNext())
 								throw new InvalidDataException("Expected {/" + tagName.ToString() +", found end of entry");
@@ -631,9 +637,24 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 					throw new InvalidDataException("Expected {/ss}, reached end of entry.");
 
 				//This bit should be optional.
+				//First, try ';', because it generally overrides ','. Thus, on the off chance that the 
+				//translations contain commas, the result will be better. Failing that, let's try commas 
+				//from other languages.
 				List<Translation> list = new List<Translation>();
-				foreach(string s in str.Split(','))
-					list.Add(new Translation(s.Trim().Normalize()));
+				string[] parts = str.Split(';');
+				if (parts.Length == 1)
+					parts = str.Split(',');
+				if (parts.Length == 1) {
+					char[] foreignCommas = new char[] { '\u060C' };
+					parts = str.Split(foreignCommas);
+				}
+
+				foreach (string s in parts) {
+					string trimmed = s.Trim();
+					if (trimmed.Length == 0)
+						continue;
+					list.Add(new Translation(trimmed.Normalize()));
+				}
 				
 				return list;
 			}

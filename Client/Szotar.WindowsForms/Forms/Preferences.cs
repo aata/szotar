@@ -28,6 +28,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			tree.TreeViewNodeSorter = new ComparePreferencePagesByOrder();
 			tree.Sort();
+			tree.ExpandAll();
 
 			tree.AfterSelect += new TreeViewEventHandler(tree_AfterSelect);
 		}
@@ -150,7 +151,7 @@ namespace Szotar.WindowsForms.Forms {
 			Close();
 		}
 
-		private void okButton_Click(object sender, EventArgs e) {
+		void Commit(bool close) {
 			if (commitList.IndexOf(displayedPage) == -1)
 				commitList.Add(displayedPage);
 
@@ -158,11 +159,24 @@ namespace Szotar.WindowsForms.Forms {
 				page.Commit();
 
 			Configuration.Save();
-			Close();
+
+			if(close)
+				Close();
+		}
+
+		private void okButton_Click(object sender, EventArgs e) {
+			Commit(true);
+		}
+
+		private void applyButton_Click(object sender, EventArgs e) {
+			Commit(false);
+			ClearCommitList();
 		}
 
 		public void ClearCommitList() {
 			commitList.Clear();
+			if (displayedPage != null)
+				commitList.Add(displayedPage);
 		}
 	}
 	
