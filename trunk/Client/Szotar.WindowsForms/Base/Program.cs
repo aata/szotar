@@ -8,6 +8,7 @@ namespace Szotar.WindowsForms {
 		static void Main() {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
+			Szotar.LocalizationProvider.Default = new LocalizationProvider();
 
 			ToolStripManager.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
 
@@ -66,8 +67,8 @@ namespace Szotar.WindowsForms {
 			SimpleDictionary sd = new SimpleDictionary(td.ForwardsSection, td.ReverseSection);
 			sd.Name = "English-Hungarian dictionary";
 			sd.Author = "freedict.org / Vonyó Attila";
-			sd.ForwardsSection.Name = "English-Hungarian";
-			sd.ReverseSection.Name = "Hungarian-English";
+			sd.FirstLanguage = "English";
+			sd.SecondLanguage = "Hungarian";
 			sd.Url = "http://almos.vein.hu/~vonyoa/";
 
 			//We're probably in Debug/bin.

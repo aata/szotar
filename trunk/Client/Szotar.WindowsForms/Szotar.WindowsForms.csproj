@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Base\DisposableComponent.cs" />
     <Compile Include="Base\GuiConfiguration.cs" />
+    <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\ThemeUtilities.cs" />
     <Compile Include="Controls\DictionaryGrid.cs">
       <SubType>UserControl</SubType>
@@ -249,16 +250,13 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Strings\DictionaryInfo.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Strings\Errors.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Strings\ImporterDescriptions.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Strings\LanguagePair.resx">
+    <EmbeddedResource Include="Resources\Strings\TypeDescriptions.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Strings\LookupForm.resx">
@@ -279,17 +277,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Resources\Strings\DictionaryInfo.Designer.cs">
-      <DependentUpon>DictionaryInfo.resx</DependentUpon>
-    </Compile>
     <Compile Include="Resources\Strings\Errors.Designer.cs">
       <DependentUpon>Errors.resx</DependentUpon>
     </Compile>
     <Compile Include="Resources\Strings\ImporterDescriptions.Designer.cs">
       <DependentUpon>ImporterDescriptions.resx</DependentUpon>
     </Compile>
-    <Compile Include="Resources\Strings\LanguagePair.Designer.cs">
-      <DependentUpon>LanguagePair.resx</DependentUpon>
+    <Compile Include="Resources\Strings\TypeDescriptions.Designer.cs">
+      <DependentUpon>TypeDescriptions.resx</DependentUpon>
     </Compile>
     <Compile Include="Resources\Strings\LookupForm.Designer.cs">
       <DependentUpon>LookupForm.resx</DependentUpon>

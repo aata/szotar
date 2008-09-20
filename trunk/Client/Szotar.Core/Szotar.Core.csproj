@@ -48,6 +48,7 @@
     <Compile Include="Base\Entry.cs" />
     <Compile Include="Base\LineReader.cs" />
     <Compile Include="Base\ListStore.cs" />
+    <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\NullWeakReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Base\Search.cs" />

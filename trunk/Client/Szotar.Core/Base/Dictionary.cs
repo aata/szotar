@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.ComponentModel;
 
 namespace Szotar {
 	public abstract class DictionaryInfo {
@@ -9,8 +10,11 @@ namespace Szotar {
 		public string Path { get; set; }
 		public string Url { get; set; }
 		
+		[Browsable(false)]
 		public string[] SectionNames { get; set; }
+		[Browsable(false)]
 		public string[] Languages { get; set; }
+		[Browsable(false)]
 		public int[] SectionSizes { get; set; }
 		
 		public abstract IBilingualDictionary GetFullInstance();
@@ -29,8 +33,6 @@ namespace Szotar {
 
 		string FirstLanguage { get; set; }
 		string SecondLanguage { get; set; }
-		string FirstLanguageReverse { get; set; }
-		string SecondLanguageReverse { get; set; }
 		string FirstLanguageCode { get; set; }
 		string SecondLanguageCode { get; set; }
 
@@ -52,7 +54,6 @@ namespace Szotar {
 	
 	public interface IDictionarySection : ISearchDataSource {
 		int HeadWords { get; }
-		string Name { get; set; }
 
 		void GetFullEntry(Entry entry);
 	}

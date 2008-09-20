@@ -117,67 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Author.Description" xml:space="preserve">
-    <value>The name of the person or people who made the dictionary.</value>
+  <data name="SimpleDictionary$Author$Description" xml:space="preserve">
+    <value>Whoever originally wrote or compiled the dictionary.</value>
   </data>
-  <data name="Author.DisplayName" xml:space="preserve">
+  <data name="SimpleDictionary$Author$Name" xml:space="preserve">
     <value>Author</value>
   </data>
-  <data name="Category.Information" xml:space="preserve">
-    <value>Information</value>
+  <data name="SimpleDictionary$FirstLanguage$Description" xml:space="preserve">
+    <value>The human readable name of the language of the “left” half of the dictionary.</value>
   </data>
-  <data name="Category.SourceInfo" xml:space="preserve">
-    <value>Source Information</value>
+  <data name="SimpleDictionary$FirstLanguage$Name" xml:space="preserve">
+    <value>First Language</value>
   </data>
-  <data name="Category.TargetInfo" xml:space="preserve">
-    <value>Target Information</value>
+  <data name="SimpleDictionary$Name$Description" xml:space="preserve">
+    <value>Name of the dictionary.</value>
   </data>
-  <data name="Encoding.Description" xml:space="preserve">
-    <value>The character encoding in which the dictionary is saved. Variable length encodings are supported, provided that the length of each record (in bytes) when encoded does not exceed the Entry Length.</value>
-  </data>
-  <data name="Encoding.DisplayName" xml:space="preserve">
-    <value>Character Encoding</value>
-  </data>
-  <data name="Name.Description" xml:space="preserve">
-    <value>The name of the dictionary.</value>
-  </data>
-  <data name="Name.DisplayName" xml:space="preserve">
+  <data name="SimpleDictionary$Name$Name" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="Path.Description" xml:space="preserve">
-    <value>The path of the actual file containing the dictionary entries. This is usually relative to the application directory or the Application Data directory.</value>
+  <data name="SimpleDictionary$SecondLanguage$Description" xml:space="preserve">
+    <value>The human readable name of the language of the “left” half of the dictionary.</value>
   </data>
-  <data name="Path.DisplayName" xml:space="preserve">
-    <value>Path</value>
+  <data name="SimpleDictionary$SecondLanguage$Name" xml:space="preserve">
+    <value>Second Language</value>
   </data>
-  <data name="SourceLanguage.Description" xml:space="preserve">
-    <value>The ISO-639-1 language code for the source language.</value>
+  <data name="SimpleDictionary$Url$Description" xml:space="preserve">
+    <value>A URL where the dictionary can be downloaded.</value>
   </data>
-  <data name="SourceLanguage.DisplayName" xml:space="preserve">
-    <value>Source Language</value>
-  </data>
-  <data name="SourceStride.Description" xml:space="preserve">
-    <value>The length of each record in the dictionary file (in bytes). Don't change unless you know what you're doing.</value>
-  </data>
-  <data name="SourceStride.DisplayName" xml:space="preserve">
-    <value>Source Entry Length</value>
-  </data>
-  <data name="TargetLanguage.Description" xml:space="preserve">
-    <value>The ISO-639-1 language code from the target language.</value>
-  </data>
-  <data name="TargetLanguage.DisplayName" xml:space="preserve">
-    <value>Target Language</value>
-  </data>
-  <data name="TargetStride.Description" xml:space="preserve">
-    <value>The length of each record in the dictionary file (in bytes). Don't change unless you know what you're doing.</value>
-  </data>
-  <data name="TargetStride.DisplayName" xml:space="preserve">
-    <value>Target Entry Length</value>
-  </data>
-  <data name="Url.Description" xml:space="preserve">
-    <value>The dictionary's or creator's website.</value>
-  </data>
-  <data name="Url.DisplayName" xml:space="preserve">
-    <value>Website</value>
+  <data name="SimpleDictionary$Url$Name" xml:space="preserve">
+    <value>URL</value>
   </data>
 </root>

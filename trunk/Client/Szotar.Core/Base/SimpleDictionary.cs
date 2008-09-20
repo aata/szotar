@@ -5,6 +5,7 @@ using System.IO;
 using System.ComponentModel;
 
 namespace Szotar {
+	[TypeDescriptionProvider(typeof(LocalizedTypeDescriptionProvider<SimpleDictionary>))]
 	public class SimpleDictionary : IBilingualDictionary {
 		Section forwards, backwards;
 		Utf8LineReader reader;
@@ -23,14 +24,8 @@ namespace Szotar {
 				get { return dictionary; }
 			}
 
-			[DisplayName("HeadWords"), Description("HeadWords")]
 			public int HeadWords {
 				get { return entries.Count; }
-			}
-
-			[DisplayName("Name"), Description("Name")]
-			public string Name {
-				get; set;
 			}
 
 			public IEnumerator<Entry> GetEnumerator() {
@@ -151,18 +146,9 @@ namespace Szotar {
 							case "url":
 								Url = bits[1];
 								break;
-							case "sections":
-								this.forwards.Name = bits[1];
-								this.backwards.Name = bits[2];
-								this.SectionNames = new string[] { bits[1], bits[2] };
-								break;
 							case "languages":
 								FirstLanguage = bits[1];
 								SecondLanguage = bits[2];
-								break;
-							case "languages-reverse":
-								FirstLanguageReverse = bits[1];
-								SecondLanguageReverse = bits[2];
 								break;
 							case "language-codes":
 								FirstLanguageCode = bits[1];
@@ -318,12 +304,8 @@ namespace Szotar {
 						writer.WriteLine("url " + Uri.EscapeDataString(Url));
 
 					//TODO: WritePairedProperty
-					if (ForwardsSection.Name != null || ReverseSection.Name != null)
-						writer.WriteLine(string.Format("sections {0} {1}", Uri.EscapeDataString(ForwardsSection.Name), Uri.EscapeDataString(ReverseSection.Name)));
 					if (FirstLanguage != null || SecondLanguage != null)
 						writer.WriteLine(string.Format("languages {0} {1}", Uri.EscapeDataString(FirstLanguage), Uri.EscapeDataString(SecondLanguage)));
-					if (FirstLanguageReverse != null || SecondLanguageReverse != null)
-						writer.WriteLine(string.Format("languages-reverse {0} {1}", Uri.EscapeDataString(FirstLanguageReverse), Uri.EscapeDataString(SecondLanguageReverse)));
 					if (FirstLanguageCode != null || SecondLanguageCode != null)
 						writer.WriteLine(string.Format("language-codes {0} {1}", Uri.EscapeDataString(FirstLanguageCode), Uri.EscapeDataString(SecondLanguageCode)));
 					writer.WriteLine("sorted");
@@ -359,14 +341,6 @@ namespace Szotar {
 			this.backwards = backwards;
 		}
 
-		/// <remarks>This method is preferable to the one taking IEnumerable because it preserves names.</remarks>
-		public SimpleDictionary(IDictionarySection forwards, IDictionarySection backwards) {
-			this.forwards = new Section(new List<Entry>(forwards), this);
-			this.forwards.Name = forwards.Name;
-			this.backwards = new Section(new List<Entry>(backwards), this);
-			this.backwards.Name = backwards.Name;
-		}
-
 		public SimpleDictionary(IEnumerable<Entry> forwards, IEnumerable<Entry> backwards) {
 			this.forwards = new Section(new List<Entry>(forwards), this);
 			this.backwards = new Section(new List<Entry>(backwards), this);
@@ -394,35 +368,16 @@ namespace Szotar {
 			get { return backwards; }
 		}
 
-		[DisplayName("Name"), Description("Name")]
 		public string Name { get; set; }
-
-		[DisplayName("Author"), Description("Author")]
 		public string Author { get; set; }
-
-		[DisplayName("Url"), Description("Url")]
 		public string Url { get; set; }
-
-		[DisplayName("FirstLanguage"), Description("FirstLanguage")]
 		public string FirstLanguage { get; set; }
-
-		[DisplayName("SecondLanguage"), Description("SecondLanguage")]
 		public string SecondLanguage { get; set; }
+		[Browsable(false)] public string FirstLanguageCode { get; set; }
+		[Browsable(false)] public string SecondLanguageCode { get; set; }
 
-		[DisplayName("FirstLanguage"), Description("FirstLanguageReverse")]
-		public string FirstLanguageReverse { get; set; }
-
-		[DisplayName("SecondLanguage"), Description("SecondLanguageReverse")]
-		public string SecondLanguageReverse { get; set; }
-
-		[DisplayName("FirstLanguageCode"), Description("FirstLanguageReverseCode")]
-		public string FirstLanguageCode { get; set; }
-
-		[DisplayName("SecondLanguageCode"), Description("SecondLanguageReverseCode")]
-		public string SecondLanguageCode { get; set; }
-		
-		public string[] SectionNames { get; protected set; }
-		public int[] SectionSizes { get; protected set; }
+		[Browsable(false)] public string[] SectionNames { get; protected set; }
+		[Browsable(false)] public int[] SectionSizes { get; protected set; }
 		#endregion
 
 		#region Dispose
