@@ -60,5 +60,21 @@ namespace Szotar.WindowsForms {
 			get { return Default.Get<string>("UserNickname", null); }
 			set { Default.Set("UserNickname", value); }
 		}
+
+		public static string ListFontName {
+			get { return Default.Get<string>("ListFontName", null); }
+			set { Default.Set("ListFontName", value); }
+		}
+
+		public static float ListFontSize {
+			get { return Default.Get<float>("ListFontSize", 9.0f); }
+			set { Default.Set("ListFontSize", value); }
+		}
+
+		public static System.Drawing.Font GetListFont() {
+			if (ListFontName == null)
+				return null;
+			return new System.Drawing.Font(ListFontName, ListFontSize);
+		}
 	}
 }

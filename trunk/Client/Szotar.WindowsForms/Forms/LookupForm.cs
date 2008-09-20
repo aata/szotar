@@ -19,6 +19,9 @@ namespace Szotar.WindowsForms.Forms {
 		IList<SearchResult> results;
 		bool ctrlHeld = false;
 
+		DisposableComponent listFontComponent;
+		Font defaultGridFont;
+
 		class LookupFormFileIsInUse : FileIsInUse {
 			LookupForm form;
 
@@ -45,6 +48,13 @@ namespace Szotar.WindowsForms.Forms {
 			components.Add(new DisposableComponent(dictionary));
 
 			Dictionary = dictionary;
+
+			Font listFont = GuiConfiguration.GetListFont();
+			if (listFont != null) {
+				components.Add(listFontComponent = new DisposableComponent(listFont));
+				defaultGridFont = grid.Font;
+				grid.Font = listFont;
+			}
 
 			//TODO: This really needs testing. It could make things completely unusable...
 			//I can't even remember if they're used...
@@ -84,6 +94,8 @@ namespace Szotar.WindowsForms.Forms {
 		private void InitialiseView() {
 			//Updates the mode switching button.
 			SearchMode = SearchMode;
+
+			AdjustGridRowHeight();
 
 			this.Closed += new EventHandler(LookupForm_Closed);
 			searchBox.TextChanged += new EventHandler(searchBox_TextChanged);
@@ -133,6 +145,17 @@ namespace Szotar.WindowsForms.Forms {
 					break;
 			}
 		}
+
+		void AdjustGridRowHeight() {
+			using (Graphics g = grid.CreateGraphics()) {
+				float inches = grid.Font.SizeInPoints / 72;
+				const double lineHeight = 1.9;
+				int pixels = (int)(Math.Round(lineHeight * inches * g.DpiY));
+				grid.RowTemplate.Height = pixels;
+			}
+			//Forces the grid to re-apply its template settings - there must be a better way.
+			UpdateResults();
+		}
 		#endregion
 
 		#region Settings Bindings
@@ -156,6 +179,25 @@ namespace Szotar.WindowsForms.Forms {
 
 				//We might want to skip this if nothing was actually changed.
 				UpdateResults();
+			} else if (e.SettingName == "ListFontName" || e.SettingName == "ListFontSize") {
+				//Note: this is slightly inefficient, if both are set at once it redisplays twice
+				Font disposeOf = null;
+				if (listFontComponent != null) {
+					components.Remove(listFontComponent);
+					disposeOf = grid.Font;
+				}
+				Font font = GuiConfiguration.GetListFont();
+				if (font != null) {
+					if (defaultGridFont == null)
+						defaultGridFont = grid.Font;
+					listFontComponent = new DisposableComponent(font);
+					grid.Font = font;
+				} else {
+					grid.Font = defaultGridFont;
+				}
+				if (disposeOf != null)
+					disposeOf.Dispose();
+				AdjustGridRowHeight();
 			}
 			/*else if (e.SettingName == "LookupFormColumn1FillWeight") {
 				grid.Columns[0].FillWeight = Properties.Settings.Default.LookupFormColumn1FillWeight;

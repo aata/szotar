@@ -105,7 +105,7 @@ namespace Szotar {
 	[System.Diagnostics.DebuggerDisplay("{Value} ({PartOfSpeech})")]
 	public class Translation {
 		public string Value { get; set; }
-		public string PartOfSpeech { get; set; }
+		//public string PartOfSpeech { get; set; }
 
 		public Translation(string value) {
 			Value = value;

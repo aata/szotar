@@ -27,6 +27,7 @@
 			this.content = new System.Windows.Forms.Panel();
 			this.cancelButton = new System.Windows.Forms.Button();
 			this.okButton = new System.Windows.Forms.Button();
+			this.applyButton = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// tree
@@ -64,7 +65,7 @@
 			// 
 			this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.okButton.Location = new System.Drawing.Point(428, 324);
+			this.okButton.Location = new System.Drawing.Point(336, 325);
 			this.okButton.Name = "okButton";
 			this.okButton.Size = new System.Drawing.Size(87, 27);
 			this.okButton.TabIndex = 3;
@@ -72,11 +73,23 @@
 			this.okButton.UseVisualStyleBackColor = true;
 			this.okButton.Click += new System.EventHandler(this.okButton_Click);
 			// 
+			// applyButton
+			// 
+			this.applyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.applyButton.Location = new System.Drawing.Point(429, 325);
+			this.applyButton.Name = "applyButton";
+			this.applyButton.Size = new System.Drawing.Size(87, 27);
+			this.applyButton.TabIndex = 3;
+			this.applyButton.Text = "&Apply";
+			this.applyButton.UseVisualStyleBackColor = true;
+			this.applyButton.Click += new System.EventHandler(this.applyButton_Click);
+			// 
 			// Preferences
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(624, 364);
+			this.Controls.Add(this.applyButton);
 			this.Controls.Add(this.okButton);
 			this.Controls.Add(this.cancelButton);
 			this.Controls.Add(this.tree);
@@ -95,5 +108,6 @@
 		private System.Windows.Forms.Panel content;
 		private System.Windows.Forms.Button cancelButton;
 		private System.Windows.Forms.Button okButton;
+		private System.Windows.Forms.Button applyButton;
 	}
 }

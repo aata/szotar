@@ -14,6 +14,7 @@ namespace Szotar.WindowsForms.Preferences {
 		}
 
 		private void resetButton_Click(object sender, EventArgs e) {
+			//TODO: Confirm that this will reset the collection *now* rather than on commit
 			Owner.ClearCommitList();
 			Configuration.Default.Reset();
 		}

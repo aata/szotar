@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,16 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="HeadWords.Description" xml:space="preserve">
-    <value>Number of entries present in the dictionary section.</value>
-  </data>
-  <data name="HeadWords.Name" xml:space="preserve">
-    <value>Headwords</value>
-  </data>
-  <data name="Name.Description" xml:space="preserve">
-    <value>Name of this section of the dictionary. The section names are seen when searching the dictionary.</value>
-  </data>
-  <data name="Name.Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
 </root>

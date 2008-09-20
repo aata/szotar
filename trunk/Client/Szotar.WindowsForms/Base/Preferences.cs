@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using System.Resources;
 
 namespace Szotar.WindowsForms.Preferences {
-	public class PreferencePage : System.Windows.Forms.UserControl {
-		public virtual void Commit() { 
-		}
-
-		public Forms.Preferences Owner { get; set; }
-	}
-
 	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	sealed class PreferencePageAttribute : Attribute {
 		static ResourceManager defaultResourceManager = new ResourceManager(typeof(PreferencePageAttribute));
@@ -86,5 +79,12 @@ namespace Szotar.WindowsForms.Preferences {
 
 		[PreferencePage("Advanced", Importance=30)]
 		public static class Advanced { }
+	}
+	
+	public class PreferencePage : System.Windows.Forms.UserControl {
+		public virtual void Commit() {
+		}
+
+		public Forms.Preferences Owner { get; set; }
 	}
 }
