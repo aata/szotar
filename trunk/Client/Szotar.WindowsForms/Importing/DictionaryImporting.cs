@@ -730,13 +730,16 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 							//Set sense part of speech
 						} else if (tag == "ss") {
 							foreach (Translation tr in ParseTranslation(e, headWord)) {
-								tr.Value = tr.Value.Trim();
-								if (tr.Value.Length == 0)
-									continue;
-								foreach (Translation other in entry.Translations)
-									if (tr.Value == other.Value)
-										continue;
-								entry.Translations.Add(tr);
+								//Strings have been trimmed and normalized by ParseTranslation.
+								bool duplicate = false;
+								foreach (Translation other in entry.Translations) {
+									if (tr.Value == other.Value) {
+										duplicate = true;
+										break;
+									}
+								}
+								if(!duplicate)
+									entry.Translations.Add(tr);
 							}
 							return null;
 						} else {
