@@ -46,10 +46,6 @@ namespace Szotar.WindowsForms.Forms {
 
 			Dictionary = dictionary;
 
-			//Set the menu items' Text to match the names of the dictionary sections.
-			forwards.Text = Dictionary.ForwardsSection.Name;
-			backwards.Text = Dictionary.ReverseSection.Name;
-
 			//TODO: This really needs testing. It could make things completely unusable...
 			//I can't even remember if they're used...
 			try {
@@ -225,15 +221,14 @@ namespace Szotar.WindowsForms.Forms {
 			grid.VirtualMode = true;
 			grid.DataSource = results;
 
-			grid.Columns[0].HeaderText = finalSearchMode == SearchMode.Forward ? Dictionary.FirstLanguage : (Dictionary.SecondLanguageReverse ?? Dictionary.SecondLanguage);
-			grid.Columns[1].HeaderText = finalSearchMode == SearchMode.Forward ? Dictionary.SecondLanguage : (Dictionary.FirstLanguageReverse ?? Dictionary.FirstLanguage);
-
 			if (foundAt >= 0) {
 				grid.FirstDisplayedScrollingRowIndex = foundAt;
 				grid.FirstDisplayedScrollingColumnIndex = 0;
 			}
 
 			displayedSearchMode = finalSearchMode;
+			UpdateButtonNames();
+
 			stopwatch.Stop();
 
 			grid.ClearSelection();
@@ -373,6 +368,13 @@ namespace Szotar.WindowsForms.Forms {
 			infoTip.ToolTipTitle = GetInfoTipTitle(hitTest.RowIndex);
 
 			int offset = grid.GetRowDisplayRectangle(hitTest.RowIndex, true).Height;
+
+			//This usually happens due to bugs and import errors. Either way, it's bad.
+			if (text.Length > 3000) {
+				infoTip.Hide(grid);
+				return;
+			}
+
 			infoTip.Show(text, grid, e.X + offset, e.Y + offset);
 		}
 
@@ -679,9 +681,17 @@ namespace Szotar.WindowsForms.Forms {
 		#region Dictionary Menu
 		private void editInformationToolStripMenuItem_Click(object sender, EventArgs e) {
 			new DictionaryInfoEditor(Dictionary, true).ShowDialog();
-			forwards.Text = Dictionary.ForwardsSection.Name;
-			backwards.Text = Dictionary.ReverseSection.Name;
-			UpdateResults();
+			UpdateButtonNames();
+		}
+
+		private void UpdateButtonNames() {
+			//Set the menu items' Text to match the names of the dictionary sections.
+			//The mode switch button is based on these.
+			forwards.Text = Dictionary.FirstLanguage + "-" + Dictionary.SecondLanguage;
+			backwards.Text = Dictionary.SecondLanguage + "-" + Dictionary.FirstLanguage;
+			switchMode.Text = SearchMode == SearchMode.Forward ? forwards.Text : backwards.Text;
+			grid.Columns[0].HeaderText = displayedSearchMode == SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+			grid.Columns[1].HeaderText = displayedSearchMode == SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
 		}
 
 		private void importDictionary_Click(object sender, EventArgs e) {
