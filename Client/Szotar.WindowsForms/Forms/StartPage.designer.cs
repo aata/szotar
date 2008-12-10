@@ -29,10 +29,10 @@
 			System.Windows.Forms.TabPage practiceTab;
 			this.dictionaries = new System.Windows.Forms.ListView();
 			this.imageList = new System.Windows.Forms.ImageList(this.components);
+			this.listSearch = new Szotar.WindowsForms.Controls.ListSearch();
 			this.tasks = new System.Windows.Forms.TabControl();
 			this.panel = new System.Windows.Forms.Panel();
 			this.logo = new System.Windows.Forms.PictureBox();
-			this.listSearch = new Controls.ListSearch();
 			dictionaryTab = new System.Windows.Forms.TabPage();
 			practiceTab = new System.Windows.Forms.TabPage();
 			dictionaryTab.SuspendLayout();
@@ -45,22 +45,22 @@
 			// dictionaryTab
 			// 
 			dictionaryTab.Controls.Add(this.dictionaries);
-			dictionaryTab.Location = new System.Drawing.Point(4, 32);
+			dictionaryTab.Location = new System.Drawing.Point(4, 22);
 			dictionaryTab.Name = "dictionaryTab";
 			dictionaryTab.Padding = new System.Windows.Forms.Padding(3);
-			dictionaryTab.Size = new System.Drawing.Size(509, 302);
+			dictionaryTab.Size = new System.Drawing.Size(509, 312);
 			dictionaryTab.TabIndex = 0;
 			dictionaryTab.Text = "Dictionary";
 			dictionaryTab.UseVisualStyleBackColor = true;
 			// 
-			// languagePairs
+			// dictionaries
 			// 
 			this.dictionaries.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.dictionaries.LargeImageList = this.imageList;
 			this.dictionaries.Location = new System.Drawing.Point(3, 3);
 			this.dictionaries.MultiSelect = false;
-			this.dictionaries.Name = "languagePairs";
-			this.dictionaries.Size = new System.Drawing.Size(503, 296);
+			this.dictionaries.Name = "dictionaries";
+			this.dictionaries.Size = new System.Drawing.Size(503, 306);
 			this.dictionaries.SmallImageList = this.imageList;
 			this.dictionaries.TabIndex = 0;
 			this.dictionaries.UseCompatibleStateImageBehavior = false;
@@ -76,13 +76,22 @@
 			// practiceTab
 			// 
 			practiceTab.Controls.Add(this.listSearch);
-			practiceTab.Location = new System.Drawing.Point(4, 32);
+			practiceTab.Location = new System.Drawing.Point(4, 22);
 			practiceTab.Name = "practiceTab";
 			practiceTab.Padding = new System.Windows.Forms.Padding(3);
-			practiceTab.Size = new System.Drawing.Size(509, 302);
+			practiceTab.Size = new System.Drawing.Size(509, 312);
 			practiceTab.TabIndex = 1;
 			practiceTab.Text = "Practice";
 			practiceTab.UseVisualStyleBackColor = true;
+			// 
+			// listSearch
+			// 
+			this.listSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.listSearch.Location = new System.Drawing.Point(3, 3);
+			this.listSearch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.listSearch.Name = "listSearch";
+			this.listSearch.Size = new System.Drawing.Size(503, 306);
+			this.listSearch.TabIndex = 0;
 			// 
 			// tasks
 			// 
@@ -111,6 +120,7 @@
 			// 
 			// logo
 			// 
+			this.logo.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
 			this.logo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.logo.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("logo.BackgroundImage")));
@@ -121,18 +131,9 @@
 			this.logo.TabIndex = 0;
 			this.logo.TabStop = false;
 			// 
-			// listSearch
-			// 
-			this.listSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.listSearch.Location = new System.Drawing.Point(3, 3);
-			this.listSearch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-			this.listSearch.Name = "listSearch";
-			this.listSearch.Size = new System.Drawing.Size(503, 299);
-			this.listSearch.TabIndex = 0;
-			// 
 			// StartPage
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 23F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(529, 412);
 			this.Controls.Add(this.panel);
