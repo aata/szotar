@@ -10,11 +10,12 @@ namespace Szotar.WindowsForms {
 		Toolbar,
 		MediaToolbar,
 		CommunicationsToolbar,
-		BrowserTabBar
+		BrowserTabBar,
+		HelpBar
 	}
 
 	/// <summary>
-	/// Renders a toolstrip using the UxTheme API via VisualStyleRenderer. Visual styles must be supported for this to work; if you need to support other operating systems use NativeToolStripRenderer.
+	/// Renders a toolstrip using the UxTheme API via VisualStyleRenderer and a specific style.
 	/// </summary>
 	public class ToolStripAeroRenderer : ToolStripSystemRenderer {
 		VisualStyleRenderer renderer;
@@ -168,6 +169,7 @@ namespace Szotar.WindowsForms {
 					case ToolbarTheme.MediaToolbar: return "Media::";
 					case ToolbarTheme.CommunicationsToolbar: return "Communications::";
 					case ToolbarTheme.BrowserTabBar: return "BrowserTabBar::";
+					case ToolbarTheme.HelpBar: return "Help::";
 					default: return string.Empty;
 				}
 			}
