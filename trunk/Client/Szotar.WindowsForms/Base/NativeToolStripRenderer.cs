@@ -189,12 +189,24 @@ namespace Szotar.WindowsForms {
 			return true;
 		}
 
+		//Gives parented ToolStrips a transparent background.
 		protected override void Initialize(ToolStrip toolStrip) {
-			toolStrip.Padding = new Padding(toolStrip.Padding.Left, 0, toolStrip.Padding.Right, 0);
 			if (toolStrip.Parent is ToolStripPanel)
 				toolStrip.BackColor = Color.Transparent;
 
 			base.Initialize(toolStrip);
+		}
+
+		//Using just ToolStripManager.Renderer without setting the Renderer individually per ToolStrip means
+		//that the ToolStrip is not passed to the Initialize method. ToolStripPanels, however, are. So we can 
+		//simply initialize it here too, and this should guarantee that the ToolStrip is initialized at least 
+		//once. Hopefully it isn't any more complicated than this.
+		protected override void InitializePanel(ToolStripPanel toolStripPanel) {
+			foreach (Control control in toolStripPanel.Controls)
+				if (control is ToolStrip)
+					Initialize((ToolStrip)control);
+			
+			base.InitializePanel(toolStripPanel);
 		}
 
 		protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e) {
@@ -226,10 +238,10 @@ namespace Szotar.WindowsForms {
 
 				Rectangle bgRect = e.Item.ContentRectangle;
 
+				//e.Item.Bounds is actually in the co-ordinate space of the owning toolstrip.
+				//It seems that, in this method, (0, 0) corresponds to the top left of that rectangle.
 				if (!e.Item.Owner.IsDropDown)
-					bgRect.Inflate(-1, 0);
-
-				//bgRect = renderer.GetBackgroundExtent(e.Graphics, bgRect);
+					bgRect = new Rectangle(new Point(), e.Item.Bounds.Size);
 
 				renderer.DrawBackground(e.Graphics, bgRect, bgRect);
 			} else {
