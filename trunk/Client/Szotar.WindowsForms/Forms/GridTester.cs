@@ -11,6 +11,8 @@ namespace Szotar.WindowsForms.Forms {
 		public GridTester() {
 			InitializeComponent();
 
+			menuStrip1.Renderer = toolStrip1.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
+
 			//dgrid.DataSource = new Controls.CustomDictionaryResultsSource(new CustomDictionary("../../../English_Hungarian.wb.custom.txt"));
 			BindingList<TranslationPair> list = new BindingList<TranslationPair>();
 			list.Add(new TranslationPair("one", "egy", true));
