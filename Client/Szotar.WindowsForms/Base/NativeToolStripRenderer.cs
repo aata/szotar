@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -191,7 +190,7 @@ namespace Szotar.WindowsForms {
 		}
 
 		protected override void Initialize(ToolStrip toolStrip) {
-			toolStrip.Padding = Padding.Empty;
+			toolStrip.Padding = new Padding(toolStrip.Padding.Left, 0, toolStrip.Padding.Right, 0);
 			if (toolStrip.Parent is ToolStripPanel)
 				toolStrip.BackColor = Color.Transparent;
 
@@ -227,15 +226,10 @@ namespace Szotar.WindowsForms {
 
 				Rectangle bgRect = e.Item.ContentRectangle;
 
-				Padding content = GetThemeMargins(e.Graphics, MarginTypes.Content),
-						sizing = GetThemeMargins(e.Graphics, MarginTypes.Sizing),
-						caption = GetThemeMargins(e.Graphics, MarginTypes.Caption);
+				if (!e.Item.Owner.IsDropDown)
+					bgRect.Inflate(-1, 0);
 
-				if (!e.Item.Owner.IsDropDown) {
-					bgRect.Y = 0;
-					bgRect.Height = e.ToolStrip.Height;
-					bgRect.Inflate(-1, -1); //GetMargins here perhaps?
-				}
+				//bgRect = renderer.GetBackgroundExtent(e.Graphics, bgRect);
 
 				renderer.DrawBackground(e.Graphics, bgRect, bgRect);
 			} else {
@@ -251,8 +245,6 @@ namespace Szotar.WindowsForms {
 					renderer.SetParameters(RebarClass, RebarBackground, 0);
 				} else {
 					renderer.SetParameters(RebarClass, 0, 0);
-					//renderer.SetParameters(VisualStyleElement.Taskbar.BackgroundBottom.Normal);
-					//renderer.SetParameters(Subclass(VisualStyleElement.Rebar.Band.Normal));
 				}
 
 				if (renderer.IsBackgroundPartiallyTransparent())
@@ -314,6 +306,8 @@ namespace Szotar.WindowsForms {
 			if (EnsureRenderer()) {
 				ToolStripSplitButton sb = (ToolStripSplitButton)e.Item;
 				base.OnRenderSplitButtonBackground(e);
+
+				//It doesn't matter what colour of arrow we tell it to draw. OnRenderArrow will compute it from the item anyway.
 				OnRenderArrow(new ToolStripArrowRenderEventArgs(e.Graphics, sb, sb.DropDownButtonBounds, Color.Red, ArrowDirection.Down));
 			} else {
 				base.OnRenderSplitButtonBackground(e);
@@ -333,7 +327,7 @@ namespace Szotar.WindowsForms {
 			base.OnRenderItemText(e);
 		}
 
-		//This is ugly. Need to get the actual grip bounds.
+		//This is ugly. Need to get the actual grip bounds. It seems to look OK with the default .NET style, anyway.
 		//protected override void OnRenderGrip(ToolStripGripRenderEventArgs e) {
 		//    if (EnsureRenderer()) {
 		//        if (e.GripStyle == ToolStripGripStyle.Visible) {
@@ -414,7 +408,6 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
-		//This is broken for RTL
 		protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e) {
 			//The default renderer will draw an arrow for us (the UXTheme API seems not to have one for all directions),
 			//but it will get the colour wrong in many cases. The text colour is probably the best colour to use.
@@ -431,11 +424,10 @@ namespace Szotar.WindowsForms {
 					rebarClass = "Rebar";
 
 				int state = VisualStyleElement.Rebar.Chevron.Normal.State;
-				if (e.Item.Pressed) {
+				if (e.Item.Pressed)
 					state = VisualStyleElement.Rebar.Chevron.Pressed.State;
-				} else if (e.Item.Selected) {
+				else if (e.Item.Selected)
 					state = VisualStyleElement.Rebar.Chevron.Hot.State;
-				}
 
 				renderer.SetParameters(rebarClass, VisualStyleElement.Rebar.Chevron.Normal.Part, state);
 				renderer.DrawBackground(e.Graphics, new Rectangle(Point.Empty, e.Item.Size));
