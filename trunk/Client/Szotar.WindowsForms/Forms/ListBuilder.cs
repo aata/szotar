@@ -151,11 +151,10 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void save_Click(object sender, EventArgs e) {
-			if (list.HasPath) {
+			if (list.HasPath)
 				SaveTo(list.Path);
-			} else {
+			else
 				SaveAs();
-			}
 		}
 
 		private void ListBuilder_Closing(object sender, CancelEventArgs e) {

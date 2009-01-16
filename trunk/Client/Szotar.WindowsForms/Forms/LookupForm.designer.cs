@@ -28,10 +28,8 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LookupForm));
 			System.Windows.Forms.ToolStripMenuItem copy;
 			System.Windows.Forms.ToolStripMenuItem reverseLookup;
-			System.Windows.Forms.ToolStripMenuItem fileMenu;
 			System.Windows.Forms.ToolStripMenuItem showStartPage;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-			System.Windows.Forms.ToolStripMenuItem exitMenuItem;
 			System.Windows.Forms.ToolStripMenuItem searchMenu;
 			System.Windows.Forms.ToolStripMenuItem switchModeMenuItem;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
@@ -54,11 +52,13 @@
 			System.Windows.Forms.ToolStripMenuItem toolsMenu;
 			System.Windows.Forms.ToolStripMenuItem options;
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.forwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.backwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreCaseMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.recentLists = new System.Windows.Forms.ToolStripMenuItem();
+			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.grid = new System.Windows.Forms.DataGridView();
 			this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.switchMode = new System.Windows.Forms.Button();
@@ -72,10 +72,8 @@
 			addToList = new System.Windows.Forms.ToolStripMenuItem();
 			copy = new System.Windows.Forms.ToolStripMenuItem();
 			reverseLookup = new System.Windows.Forms.ToolStripMenuItem();
-			fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			showStartPage = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			searchMenu = new System.Windows.Forms.ToolStripMenuItem();
 			switchModeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
@@ -122,15 +120,6 @@
 			resources.ApplyResources(reverseLookup, "reverseLookup");
 			reverseLookup.Click += new System.EventHandler(this.reverseLookupToolStripMenuItem_Click);
 			// 
-			// fileMenu
-			// 
-			fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            showStartPage,
-            toolStripSeparator2,
-            exitMenuItem});
-			fileMenu.Name = "fileMenu";
-			resources.ApplyResources(fileMenu, "fileMenu");
-			// 
 			// showStartPage
 			// 
 			showStartPage.Name = "showStartPage";
@@ -144,9 +133,9 @@
 			// 
 			// exitMenuItem
 			// 
-			exitMenuItem.Name = "exitMenuItem";
-			resources.ApplyResources(exitMenuItem, "exitMenuItem");
-			exitMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			this.exitMenuItem.Name = "exitMenuItem";
+			resources.ApplyResources(this.exitMenuItem, "exitMenuItem");
+			this.exitMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
 			// 
 			// searchMenu
 			// 
@@ -211,7 +200,7 @@
 			this.ignoreAccentsMenuItem.CheckOnClick = true;
 			this.ignoreAccentsMenuItem.Name = "ignoreAccentsMenuItem";
 			resources.ApplyResources(this.ignoreAccentsMenuItem, "ignoreAccentsMenuItem");
-			this.ignoreAccentsMenuItem.CheckedChanged += new System.EventHandler(this.ignoreAccentsMenuItem_CheckedChanged);
+			this.ignoreAccentsMenuItem.Click += new System.EventHandler(this.ignoreAccentsMenuItem_Click);
 			// 
 			// ignoreCaseMenuItem
 			// 
@@ -325,6 +314,15 @@
 			resources.ApplyResources(options, "options");
 			options.Click += new System.EventHandler(this.options_Click);
 			// 
+			// fileMenu
+			// 
+			this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            showStartPage,
+            toolStripSeparator2,
+            this.exitMenuItem});
+			this.fileMenu.Name = "fileMenu";
+			resources.ApplyResources(this.fileMenu, "fileMenu");
+			// 
 			// grid
 			// 
 			this.grid.AllowUserToAddRows = false;
@@ -408,7 +406,6 @@
 			this.ignoreCaseCheck.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.ignoreCaseCheck.Name = "ignoreCaseCheck";
 			this.ignoreCaseCheck.UseVisualStyleBackColor = true;
-			this.ignoreCaseCheck.CheckedChanged += new System.EventHandler(this.ignoreCaseCheck_CheckedChanged);
 			// 
 			// ignoreAccentsCheck
 			// 
@@ -428,7 +425,7 @@
 			// 
 			resources.ApplyResources(this.mainMenu, "mainMenu");
 			this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            fileMenu,
+            this.fileMenu,
             searchMenu,
             listMenu,
             dictionaryMenu,
@@ -476,6 +473,8 @@
 		private System.Windows.Forms.ToolStripMenuItem ignoreAccentsMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem ignoreCaseMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem recentLists;
+		private System.Windows.Forms.ToolStripMenuItem fileMenu;
+		private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
 	}
 }
 

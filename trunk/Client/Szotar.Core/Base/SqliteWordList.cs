@@ -4,21 +4,17 @@ using CultureInfo = System.Globalization.CultureInfo;
 
 namespace Szotar.Sqlite {
 	public class SqliteWordList : SyncWordList {
-		SqliteDataStore store;
 		Worker worker;
 		IList<WordListEntry> list;
 
 		public SqliteWordList(SqliteDataStore store, long setID) {
-			this.store = store;
+			DataStore = store;
 			SetID = setID;
 			worker = new Worker(store, this);
 			list = worker.GetAllEntries();
 		}
 
-		public SqliteDataStore DataStore {
-			get { return store; }
-		}
-		
+		public SqliteDataStore DataStore { get;	private set; }
 		public long SetID { get; private set; }
 
 		protected override void Dispose(bool disposing) {
@@ -305,7 +301,7 @@ namespace Szotar.Sqlite {
 			}
 
 			protected IList<WordListEntry> GetEntries(DbDataReader reader) {
-				List<WordListEntry> result = new List<WordListEntry>();
+				var result = new List<WordListEntry>();
 
 				while (reader.Read()) {
 					if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2) || reader.IsDBNull(3))
@@ -316,7 +312,7 @@ namespace Szotar.Sqlite {
 					long tried = (long)reader.GetValue(2);
 					long failed = (long)reader.GetValue(3);
 
-					WordListEntry entry = new WordListEntry(this.list, phrase, translation, tried, failed);
+					var entry = new WordListEntry(this.list, phrase, translation, tried, failed);
 					result.Add(entry);
 				}
 

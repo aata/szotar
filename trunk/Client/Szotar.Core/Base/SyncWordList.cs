@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Szotar {
-	public abstract class SyncWordList : System.ComponentModel.IBindingList, IList<WordListEntry>, IDisposable {
+	public abstract class SyncWordList : IBindingList, IList<WordListEntry>, IDisposable {
 		public SyncWordList() {
 			UndoList = new UndoList();
 		}

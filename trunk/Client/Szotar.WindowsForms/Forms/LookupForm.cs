@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
-using System.Windows.Forms;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Forms {
 	public partial class LookupForm : Form {
@@ -43,11 +43,15 @@ namespace Szotar.WindowsForms.Forms {
 
 		public LookupForm(IBilingualDictionary dictionary)
 			: this()
-		{			
+		{
 			components.Add(new DisposableComponent(new LookupFormFileIsInUse(this, dictionary.Path)));
 			components.Add(new DisposableComponent(dictionary));
 
 			Dictionary = dictionary;
+
+			var mru = GuiConfiguration.RecentDictionaries ?? new MruList(10);
+			mru.Update(dictionary.Path, dictionary.Name);
+			GuiConfiguration.RecentDictionaries = mru;
 
 			Font listFont = GuiConfiguration.GetListFont();
 			if (listFont != null) {
@@ -76,6 +80,11 @@ namespace Szotar.WindowsForms.Forms {
 
 		public LookupForm(DictionaryInfo dictionaryInfo)
 			: this(dictionaryInfo.GetFullInstance()) 
+		{
+		}
+
+		public LookupForm(string dictionaryPath)
+			: this(new SimpleDictionary(dictionaryPath)) 
 		{
 		}
 
@@ -115,12 +124,13 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Columns[0].FillWeight = GuiConfiguration.LookupFormColumn1FillWeight;
 			grid.Columns[1].Resizable = DataGridViewTriState.False;
 
-			ignoreAccentsCheck.CheckedChanged += new EventHandler(ignoreAccentsCheck_CheckedChanged);
-			ignoreCaseCheck.CheckedChanged += new EventHandler(ignoreCaseCheck_CheckedChanged);
+			ignoreAccentsCheck.Click += new EventHandler(ignoreAccentsCheck_Click);
+			ignoreCaseCheck.Click += new EventHandler(ignoreCaseCheck_Click);
 
 			this.Shown += new EventHandler(LookupForm_Shown);
 			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
 			this.KeyUp += (s, e) => { if(e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
+			fileMenu.DropDownOpening += new EventHandler(fileMenu_DropDownOpening);
 		}
 
 		void LookupForm_Shown(object sender, EventArgs e) {
@@ -276,7 +286,7 @@ namespace Szotar.WindowsForms.Forms {
 			grid.ClearSelection();
 			grid.PerformLayout();
 
-			Text = string.Format(CultureInfo.CurrentUICulture, "{0} - {1} results ({2} ms)", Application.ProductName, results.Count, stopwatch.ElapsedMilliseconds);
+			Text = string.Format(CultureInfo.CurrentUICulture, "{0} - {1} results ({2} ms)", Dictionary.Name, results.Count, stopwatch.ElapsedMilliseconds);
 		}
 
 		private void SwitchMode() {
@@ -412,7 +422,7 @@ namespace Szotar.WindowsForms.Forms {
 			int offset = grid.GetRowDisplayRectangle(hitTest.RowIndex, true).Height;
 
 			//This usually happens due to bugs and import errors. Either way, it's bad.
-			if (text.Length > 3000) {
+			if (text.Length > 5000) {
 				infoTip.Hide(grid);
 				return;
 			}
@@ -605,8 +615,49 @@ namespace Szotar.WindowsForms.Forms {
 		private void showStartPage_Click(object sender, EventArgs e) {
 			StartPage.ShowStartPage();
 		}
+
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
-			Close();
+			Application.Exit();
+		}
+
+		void fileMenu_DropDownOpening(object sender, EventArgs e) {
+			//Remove existing entries
+			var items = fileMenu.DropDownItems;
+			for (int i = 0; i < items.Count; ) {
+				if ((string)(items[i].Tag) == "MRU")
+					items.RemoveAt(i);
+				else
+					i++;
+			}
+
+			//Add new entries
+			var mru = GuiConfiguration.RecentDictionaries;
+			var index = items.IndexOf(exitMenuItem);
+			if (index == -1)
+				index = items.Count;
+
+			int count = 0;
+			for (int i = 0; i < mru.Entries.Count; ++i) {
+				var path = mru.Entries[i].Path;
+				if (path != Dictionary.Path) {
+					var item = new ToolStripMenuItem(mru.Entries[i].Title, null, 
+						new EventHandler((s, ev) => OpenDictionary(path)));
+					item.Tag = "MRU";
+					items.Insert(index, item);
+					count++;
+					index++;
+				}
+			}
+
+			if (count > 0) {
+				var item = new ToolStripSeparator();
+				item.Tag = "MRU";
+				items.Insert(index, item);
+			}
+		}
+
+		void OpenRecentDictionary(string path) {
+			MessageBox.Show(path);
 		}
 		#endregion
 
@@ -634,7 +685,7 @@ namespace Szotar.WindowsForms.Forms {
 			searchBox.Text = String.Empty;
 		}
 
-		private void ignoreAccentsMenuItem_CheckedChanged(object sender, EventArgs e) {
+		private void ignoreAccentsMenuItem_Click(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreAccents = ignoreAccentsMenuItem.Checked;
 		}
 
@@ -642,11 +693,11 @@ namespace Szotar.WindowsForms.Forms {
 			GuiConfiguration.IgnoreCase = ignoreCaseMenuItem.Checked;
 		}
 
-		void ignoreCaseCheck_CheckedChanged(object sender, EventArgs e) {
+		void ignoreCaseCheck_Click(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreCase = ignoreCaseCheck.Checked;
 		}
 
-		void ignoreAccentsCheck_CheckedChanged(object sender, EventArgs e) {
+		void ignoreAccentsCheck_Click(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreAccents = ignoreAccentsCheck.Checked;
 		}
 
@@ -801,6 +852,36 @@ namespace Szotar.WindowsForms.Forms {
 		}
 		#endregion
 		#endregion
+
+		private static LookupForm FindExisting(string path) {
+			//Look for an existing form using this dictionary before opening it again.
+			foreach (Form form in Application.OpenForms) {
+				LookupForm lookupForm = form as LookupForm;
+				if (lookupForm != null && lookupForm.Dictionary.Path == path)
+					return lookupForm;
+			}
+			return null;
+		}
+
+		public static void OpenDictionary(DictionaryInfo dict) {
+			var existing = FindExisting(dict.Path);
+			if(existing != null) {
+				existing.BringToFront();
+				return;
+			}
+
+			new LookupForm(dict).Show();
+		}
+
+		public static void OpenDictionary(string path) {
+			var existing = FindExisting(path);
+			if(existing != null) {
+				existing.BringToFront();
+				return;
+			}
+			
+			new LookupForm(path).Show();
+		}
 	}
 
 	public enum SearchMode {

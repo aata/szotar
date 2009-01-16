@@ -144,7 +144,7 @@ namespace Szotar.Sqlite {
 
 		protected void UpgradeSchemaInIncrements(int fromVersion, int toVersion) {
 			if (fromVersion >= toVersion)
-				throw new ArgumentException(new ArgumentException().Message, "fromVersion");
+				throw new ArgumentException("Can't downgrade the application database. What is happening?", "fromVersion");
 
 			for (; fromVersion < toVersion; ++fromVersion)
 				IncrementalUpgradeSchema(fromVersion + 1);
@@ -169,6 +169,10 @@ namespace Szotar.Sqlite {
 			this.conn = connection;
 		}
 
+		/// <summary>
+		/// Get the ID of the last inserted row. This is equal to the primary key of that row, if one exists.
+		/// If multiple threads are modifying the database, this value is unpredictable. So, please, don't do that.
+		/// </summary>
 		protected long GetLastInsertRowID() {
 			var lastInsertCommand = conn.CreateCommand();
 			lastInsertCommand.CommandText = "SELECT last_insert_rowid()";
@@ -218,9 +222,7 @@ namespace Szotar.Sqlite {
 			command.Parameters.Add(param);
 		}
 
-		#region Accessors
 		protected DbConnection Connection { get { return conn; } }
-		#endregion
 
 		public void Dispose() {
 			Dispose(true);
@@ -463,24 +465,30 @@ namespace Szotar.Sqlite {
 		protected override void IncrementalUpgradeSchema(int toVersion) {
 			if (toVersion == 1)
 				InitDatabase();
+			else
+				throw new ArgumentOutOfRangeException("toVersion");
 		}
 
 		private void InitDatabase() {
-			ExecuteSQL("CREATE TABLE VocabItems (id INTEGER PRIMARY KEY AUTOINCREMENT, Phrase TEXT NOT NULL, Translation TEXT NOT NULL, SetID INTEGER NOT NULL, ListPosition INTEGER NOT NULL, TimesTried INTEGER NOT NULL, TimesFailed INTEGER NOT NULL)");
-			ExecuteSQL("CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase)");
-			ExecuteSQL("CREATE INDEX VocabItems_IndexT ON VocabItems (Translation)");
-			ExecuteSQL("CREATE INDEX VocabItems_IndexS ON VocabItems (SetID)");
-			ExecuteSQL("CREATE INDEX VocabItems_IndexSO ON VocabItems (SetID, ListPosition)");
-			//ExecuteSQL("CREATE INDEX VocabItems_IndexK ON VocabItems (Knowledge)");
+			using (var txn = conn.BeginTransaction()) {
+				ExecuteSQL("CREATE TABLE VocabItems (id INTEGER PRIMARY KEY AUTOINCREMENT, Phrase TEXT NOT NULL, Translation TEXT NOT NULL, SetID INTEGER NOT NULL, ListPosition INTEGER NOT NULL, TimesTried INTEGER NOT NULL, TimesFailed INTEGER NOT NULL)");
+				ExecuteSQL("CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase)");
+				ExecuteSQL("CREATE INDEX VocabItems_IndexT ON VocabItems (Translation)");
+				ExecuteSQL("CREATE INDEX VocabItems_IndexS ON VocabItems (SetID)");
+				ExecuteSQL("CREATE INDEX VocabItems_IndexSO ON VocabItems (SetID, ListPosition)");
+				//ExecuteSQL("CREATE INDEX VocabItems_IndexK ON VocabItems (Knowledge)");
 
-			ExecuteSQL("CREATE TABLE Sets (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Author TEXT, Language TEXT)");
-			ExecuteSQL("CREATE INDEX Sets_Index ON Sets (id)");
+				ExecuteSQL("CREATE TABLE Sets (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Author TEXT, Language TEXT)");
+				ExecuteSQL("CREATE INDEX Sets_Index ON Sets (id)");
 
-			ExecuteSQL("CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT)");
-			ExecuteSQL("CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property)");
+				ExecuteSQL("CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT)");
+				ExecuteSQL("CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property)");
 
-			ExecuteSQL("CREATE TABLE SetMemberships (ChildID INTEGER NOT NULL, ParentID INTEGER NOT NULL)");
-			ExecuteSQL("CREATE INDEX SetMemberships_Index ON SetMemberships (ChildID, ParentID)");
+				ExecuteSQL("CREATE TABLE SetMemberships (ChildID INTEGER NOT NULL, ParentID INTEGER NOT NULL)");
+				ExecuteSQL("CREATE INDEX SetMemberships_Index ON SetMemberships (ChildID, ParentID)");
+
+				txn.Commit();
+			}
 		}
 
 		/// <param name="setID">The SetID of the word list</param>
@@ -488,9 +496,9 @@ namespace Szotar.Sqlite {
 		public SqliteWordList GetWordList(long setID) {
 			SqliteWordList wl = null;
 			NullWeakReference<SqliteWordList> list;
-			if (wordLists.TryGetValue(setID, out list)) {
+
+			if (wordLists.TryGetValue(setID, out list))
 				wl = list.Target;
-			}
 
 			if(wl != null)
 				return wl;
@@ -501,14 +509,17 @@ namespace Szotar.Sqlite {
 		}
 
 		public long CreateSet(string name, string author, string language) {
+			long setID;
+
 			using (var txn = Connection.BeginTransaction()) {
 				ExecuteSQL("INSERT INTO Sets (Name, Author, Language) VALUES (?, ?, ?)",
 					name, author, language);
 
+				setID = GetLastInsertRowID();
 				txn.Commit();
 			}
 
-			return Convert.ToInt32(GetLastInsertRowID());
+			return setID;
 		}
 	}
 }

@@ -176,10 +176,12 @@ namespace Szotar {
 		//Thus, the settings are serialized as a List<Entry> (since KeyValuePair's Key/Value don't have a setter,
 		//the Key and Value properties aren't actually serialized... how useless).
 		protected XmlSerializer CreateSerializer() {
-			return new System.Xml.Serialization.XmlSerializer(typeof(List<Entry>));
+			return new System.Xml.Serialization.XmlSerializer(typeof(List<Entry>),
+				new Type[] { typeof(List<MruEntry>), typeof(MruEntry), typeof(MruList) }
+				);
 		}
 		
-		public void Save() {			
+		public void Save() {
 			XmlSerializer serializer = CreateSerializer();
 			
 			var pairs = new List<Entry>();
@@ -189,11 +191,19 @@ namespace Szotar {
 				}
 			}
 
+			string tempPath = Path.GetTempFileName();
+
+			using(StreamWriter sw = new StreamWriter(tempPath))
+				serializer.Serialize(sw, pairs);
+
+			//Ensure that the target directory exists.
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-			using(StreamWriter sw = new StreamWriter(path)) {
-				serializer.Serialize(sw, pairs);
-			}
+			try {
+				File.Copy(path, path + ".backup", true);
+			} catch (FileNotFoundException) { }
+			File.Delete(path);
+			File.Move(tempPath, path);
 			
 			NeedsSaving = false;
 		}
