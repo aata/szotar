@@ -28,15 +28,7 @@ namespace Szotar.WindowsForms.Forms {
 			DictionaryInfo dict = dictionaries.SelectedItems[0].Tag as DictionaryInfo;
 
 			try {
-				//Look for an existing form using this dictionary before opening it again.
-				foreach (Form form in Application.OpenForms) {
-					LookupForm lookupForm = form as LookupForm;
-					if (lookupForm != null && lookupForm.Dictionary.Path == dict.Path) {
-						lookupForm.BringToFront();
-						return;
-					}
-				}
-				new LookupForm(dict).Show();
+				LookupForm.OpenDictionary(dict);
 				this.Close();
 			} catch (DictionaryLoadException ex) {
 				MessageBox.Show(this,

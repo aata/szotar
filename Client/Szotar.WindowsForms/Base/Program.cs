@@ -19,12 +19,12 @@ namespace Szotar.WindowsForms {
 						try {
 							DictionaryInfo info = new SimpleDictionary.Info(dict);
 							new Forms.LookupForm(info).Show();
-							RunUntilNoForms();
-							break;
 						} catch (System.IO.IOException) { //TODO: Access/permission exceptions?
 						} catch (DictionaryLoadException) {
 							//Maybe there should be some UI for this (it's there, but not loadable?)...
 						}
+						RunUntilNoForms();
+						break;
 					}
 					goto case "StartPage";
 				case "StartPage":

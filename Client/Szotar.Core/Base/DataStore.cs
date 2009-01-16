@@ -55,7 +55,7 @@ namespace Szotar {
 			if (Writable == false)
 				throw new InvalidOperationException();
 
-			DirectoryInfo di = new IO.DirectoryInfo(IO.Path.Combine(Path, relativePath));
+			DirectoryInfo di = new DirectoryInfo(IO.Path.Combine(Path, relativePath));
 			if(!di.Exists)
 				di.Create();
 		}
@@ -99,6 +99,15 @@ namespace Szotar {
 				if (combinedDataStore != null)
 					return combinedDataStore;
 				return combinedDataStore = new CombinedDataStore(UserDataStore, ProgramDataStore);
+			}
+		}
+
+		private static Sqlite.SqliteDataStore database;
+		public static Sqlite.SqliteDataStore Database {
+			get {
+				if (database != null)
+					return database;
+				return database = new Sqlite.SqliteDataStore(IO.Path.Combine(UserDataStore.Path, "database.sqlite"));
 			}
 		}
 		#endregion
