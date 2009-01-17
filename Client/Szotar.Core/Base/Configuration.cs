@@ -90,8 +90,13 @@ namespace Szotar {
 			Default.Reset();
 		}
 
+		public static List<ListInfo> RecentLists {
+			get { return Default.Get<List<ListInfo>>("RecentLists", null); }
+			set { Default.Set("RecentLists", value); }
+		}
+
 		public static int RecentListsSize {
-			get { return Default.Get("RecentListsSize", 10); }
+			get { return Default.Get<int>("RecentListsSize", 10); }
 			set { Default.Set("RecentListsSize", value); }
 		}
 
@@ -103,11 +108,6 @@ namespace Szotar {
 		public static string UserListsStore {
 			get { return Default.Get("UserListsStore", Path.Combine(UserDataStore, "Lists")); }
 			set { Default.Set("UserListsStore", value); }
-		}
-
-		public static ListInfo[] RecentLists {
-			get { return Default.Get<ListInfo[]>("RecentLists"); }
-			set { Default.Set("RecentLists", value); }
 		}
 	}
 	
@@ -177,7 +177,7 @@ namespace Szotar {
 		//the Key and Value properties aren't actually serialized... how useless).
 		protected XmlSerializer CreateSerializer() {
 			return new System.Xml.Serialization.XmlSerializer(typeof(List<Entry>),
-				new Type[] { typeof(List<MruEntry>), typeof(MruEntry), typeof(MruList) }
+				new Type[] { typeof(List<MruEntry>), typeof(MruEntry), typeof(MruList), typeof(ListInfo), typeof(List<ListInfo>) }
 				);
 		}
 		

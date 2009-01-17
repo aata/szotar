@@ -1,21 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
 using CultureInfo = System.Globalization.CultureInfo;
+using System;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace Szotar.Sqlite {
-	public class SqliteWordList : SyncWordList {
+	public class SqliteWordList : WordList {
 		Worker worker;
-		IList<WordListEntry> list;
+		BindingList<WordListEntry> list;
+		long? id;
 
 		public SqliteWordList(SqliteDataStore store, long setID) {
 			DataStore = store;
-			SetID = setID;
+			id = setID;
 			worker = new Worker(store, this);
-			list = worker.GetAllEntries();
+			list = new BindingList<WordListEntry>(worker.GetAllEntries());
+
+			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
+		}
+
+		//Re-raise the ListChanged event with the SqliteWordList as the originator.
+		//Using BindingList as the in-memory list makes this very easy.
+		void list_ListChanged(object sender, ListChangedEventArgs e) {
+			RaiseListChanged(e);
 		}
 
 		public SqliteDataStore DataStore { get;	private set; }
-		public long SetID { get; private set; }
+		public override long? ID {
+			get { return id; }
+		}
 
 		protected override void Dispose(bool disposing) {
 			if (disposing)
@@ -24,39 +38,76 @@ namespace Szotar.Sqlite {
 			base.Dispose(disposing);
 		}
 
-		public string Author {
+		//Delete first then raise seems the more sensible option, given the name, but still...
+		//What if something wants to use the list before it's deleted?
+		public override void DeleteWordList() {
+			DataStore.DeleteWordList(ID.Value);
+
+			//RaiseDeleted() not needed. SqliteDataStore will do that for us.
+			//It's just an extra safety measure for if DeleteWordList is called without 
+			//calling DeleteWordList on the WordList itself.
+		}
+
+		public override string Author {
 			get { return (string)worker.GetWordListProperty("Author"); }
 			set {
 				if (value == null)
-					throw new System.ArgumentNullException();
+					throw new ArgumentNullException();
 				worker.SetWordListProperty("Author", value);
+				RaisePropertyChanged("Author");
 			}
 		}
 
-		public string Name {
+		public override string Name {
 			get { return (string)worker.GetWordListProperty("Name"); }
 			set {
 				if (value == null)
-					throw new System.ArgumentNullException();
+					throw new ArgumentNullException();
 				worker.SetWordListProperty("Name", value);
+				RaisePropertyChanged("Name");
 			}
 		}
 
-		public string Language {
+		public override string Language {
 			get { return (string)worker.GetWordListProperty("Language"); }
 			set {
 				if (value == null)
-					throw new System.ArgumentNullException();
+					throw new ArgumentNullException();
 				worker.SetWordListProperty("Language", value);
+				RaisePropertyChanged("Language");
 			}
 		}
 
-		public override T GetProperty<T>(WordListEntry entry, SyncWordList.EntryProperty property) {
-			return (T)worker.GetProperty(IndexOf(entry), property.ToString());
+		public override string Url {
+			get { return (string)worker.GetWordListProperty("Url"); }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+				worker.SetWordListProperty("Url", value);
+				RaisePropertyChanged("Url");
+			}
 		}
 
-		public override void SetProperty<T>(WordListEntry entry, SyncWordList.EntryProperty property, T value) {
-			worker.SetProperty(IndexOf(entry), property.ToString(), value);
+		public override System.DateTime? Date {
+			get { return (DateTime?)worker.GetWordListProperty("Created"); }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+				worker.SetWordListProperty("Created", value);
+				RaisePropertyChanged("Date");
+			}
+		}
+
+		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
+			int index = IndexOf(entry);
+			Debug.Assert(index >= 0);
+			return (T)worker.GetProperty(index, property.ToString());
+		}
+
+		public override void SetProperty(WordListEntry entry, WordList.EntryProperty property, object value) {
+			int index = IndexOf(entry);
+			Debug.Assert(index >= 0);
+			worker.SetProperty(index, property.ToString(), value);
 		}
 
 		public override void Add(WordListEntry item) {
@@ -64,10 +115,14 @@ namespace Szotar.Sqlite {
 		}
 
 		public override void Insert(int index, WordListEntry item) {
+			if (index > Count || index < 0)
+				throw new ArgumentOutOfRangeException("index");
 			UndoList.Do(new Insertion(this, index, item));
 		}
 
-		public void Insert(int index, IList<WordListEntry> items) {
+		public override void Insert(int index, IList<WordListEntry> items) {
+			if (index > Count || index < 0)
+				throw new ArgumentOutOfRangeException("index");
 			UndoList.Do(new MultipleInsertion(this, index, items));
 		}
 
@@ -78,6 +133,8 @@ namespace Szotar.Sqlite {
 		}
 
 		public override void RemoveAt(int index) {
+			if (index >= Count || index < 0)
+				throw new ArgumentOutOfRangeException("index");
 			UndoList.Do(new Deletion(this, index));
 		}
 
@@ -142,7 +199,7 @@ namespace Szotar.Sqlite {
 
 				insertCommandSetID = insertCommand.CreateParameter();
 				insertCommandSetID.ParameterName = "SetID";
-				insertCommandSetID.Value = list.SetID;
+				insertCommandSetID.Value = list.ID;
 				insertCommand.Parameters.Add(insertCommandSetID);
 
 				insertCommandListPosition = insertCommand.CreateParameter();
@@ -175,8 +232,8 @@ namespace Szotar.Sqlite {
 			public void Insert(int index, WordListEntry item) {
 				if (item == null)
 					throw new System.ArgumentNullException();
-				if (index < 0)
-					throw new System.ArgumentOutOfRangeException();
+				if (index < 0 || index > list.Count)
+					throw new System.ArgumentOutOfRangeException("index");
 
 				using (var txn = Connection.BeginTransaction()) {
 					//ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition + 1 WHERE SetID = ? AND ListPosition >= ?", list.SetID, index);
@@ -220,8 +277,8 @@ namespace Szotar.Sqlite {
 
 			public void RemoveAt(int index) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition = ?", list.SetID, index);
-					ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition - 1 WHERE ListPosition > ?", list.SetID, index);
+					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition = ?", list.ID, index);
+					ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition - 1 WHERE ListPosition > ?", list.ID, index);
 
 					txn.Commit();
 				}
@@ -229,8 +286,8 @@ namespace Szotar.Sqlite {
 
 			public void RemoveAt(int index, int count) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", list.SetID, index, index + count - 1);
-					ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition - ? WHERE SetID = ? AND ListPosition > ?", count, list.SetID, index);
+					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", list.ID, index, index + count - 1);
+					ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition - ? WHERE SetID = ? AND ListPosition > ?", count, list.ID, index);
 
 					txn.Commit();
 				}
@@ -244,7 +301,7 @@ namespace Szotar.Sqlite {
 					using (DbCommand delete = Connection.CreateCommand()) {
 						delete.CommandText = "DELETE From VocabItems WHERE SetID = ? AND ListPosition = ?";
 						var setIDParam = delete.CreateParameter();
-						setIDParam.Value = list.SetID;
+						setIDParam.Value = list.ID;
 						delete.Parameters.Add(setIDParam);
 
 						var deleteIndexParam = delete.CreateParameter();
@@ -294,7 +351,7 @@ namespace Szotar.Sqlite {
 			public IList<WordListEntry> GetAllEntries() {
 				using (var command = Connection.CreateCommand()) {
 					command.CommandText = @"TYPES Text, Text, Integer, Integer; SELECT Phrase, Translation, TimesTried, TimesFailed FROM VocabItems WHERE SetID = ? ORDER BY ListPosition ASC";
-					AddParameter(command, list.SetID);
+					AddParameter(command, list.ID);
 					using (var reader = command.ExecuteReader())
 						return GetEntries(reader);
 				}
@@ -322,7 +379,7 @@ namespace Szotar.Sqlite {
 			public object GetProperty(int index, string name) {
 				using (var cmd = Connection.CreateCommand()) {
 					cmd.CommandText = string.Format(CultureInfo.InvariantCulture, "SELECT {0} FROM VocabItems WHERE SetID = ? AND ListPosition = ?");
-					AddParameter(cmd, list.SetID);
+					AddParameter(cmd, list.ID);
 					AddParameter(cmd, index);
 
 					return cmd.ExecuteScalar();
@@ -331,7 +388,7 @@ namespace Szotar.Sqlite {
 
 			public void SetProperty(int index, string name, object value) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL(string.Format(CultureInfo.InvariantCulture, "UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", name), value, list.SetID, index);
+					ExecuteSQL(string.Format(CultureInfo.InvariantCulture, "UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", name), value, list.ID, index);
 
 					txn.Commit();
 				}
@@ -340,7 +397,7 @@ namespace Szotar.Sqlite {
 			public void SetEntry(int index, WordListEntry item) {
 				using (var txn = Connection.BeginTransaction()) {
 					ExecuteSQL("UPDATE VocabItems Set Phrase = ?, Translation = ?, TimesTried = ?, TimesFailed = ? WHERE SetID = ? AND ListPosition = ?",
-						item.Phrase, item.Translation, item.TimesTried, item.TimesFailed, list.SetID, index);
+						item.Phrase, item.Translation, item.TimesTried, item.TimesFailed, list.ID, index);
 
 					txn.Commit();
 				}
@@ -348,14 +405,14 @@ namespace Szotar.Sqlite {
 
 			public void SetWordListProperty(string property, object value) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL(string.Format(CultureInfo.InvariantCulture, "UPDATE Sets SET {0} = ? WHERE id = ?", property), value, list.SetID);
+					ExecuteSQL(string.Format(CultureInfo.InvariantCulture, "UPDATE Sets SET {0} = ? WHERE id = ?", property), value, list.ID);
 
 					txn.Commit();
 				}
 			}
 
 			public object GetWordListProperty(string property) {
-				return Select(string.Format(CultureInfo.InvariantCulture, "SELECT {0} FROM Sets WHERE id = ?", property), list.SetID);
+				return Select(string.Format(CultureInfo.InvariantCulture, "SELECT {0} FROM Sets WHERE id = ?", property), list.ID);
 			}
 		}
 
@@ -403,7 +460,7 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return "(Internal Operation)"; }
+				get { return LocalizationProvider.Default.Strings["InternalOperation"] ?? "(Internal Operation)"; }
 			}
 		}
 
@@ -430,7 +487,7 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return "Inserted 1 item"; }
+				get { return LocalizationProvider.Default.Strings["Inserted1Item"] ?? "Inserted 1 item"; }
 			}
 		}
 
@@ -459,16 +516,20 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return string.Format(CultureInfo.CurrentUICulture, "Inserted {0} items", items.Count); }
+				get { 
+					return string.Format(CultureInfo.CurrentUICulture, 
+						LocalizationProvider.Default.Strings["InsertedNItems"] ?? "Inserted {0} items", 
+						items.Count); 
+				}
 			}
 		}
 
 		protected class SetValue<T> : Command {
 			int index;
 			T oldValue, newValue;
-			SyncWordList.EntryProperty property;
+			WordList.EntryProperty property;
 
-			public SetValue(SqliteWordList owner, int index, SyncWordList.EntryProperty property, T oldValue, T newValue)
+			public SetValue(SqliteWordList owner, int index, WordList.EntryProperty property, T oldValue, T newValue)
 				: base(owner) {
 				this.index = index;
 				this.oldValue = oldValue;
@@ -478,7 +539,7 @@ namespace Szotar.Sqlite {
 
 			private void SetTo(T value) {
 				worker.SetProperty(index, property.ToString(), value);
-				list[index].SetProperty<T>(property, value);
+				list[index].SetProperty(property, value);
 			}
 
 			public override void Do() {
@@ -494,7 +555,9 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return string.Format("Changed \"{0}\" to \"{1}\"", oldValue, newValue); }
+				get { return string.Format(
+					LocalizationProvider.Default.Strings["ChangedXToY"] ?? "Changed \"{0}\" to \"{1}\"", oldValue, newValue);
+				}
 			}
 		}
 
@@ -559,7 +622,7 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return string.Format("Deleted {0} items", items.Count); }
+				get { return string.Format(LocalizationProvider.Default.Strings["DeletedNItems"] ?? "Deleted {0} items", items.Count); }
 			}
 		}
 	}

@@ -171,12 +171,6 @@
   <data name="toolStripSeparator2.Size" type="System.Drawing.Size, System.Drawing">
     <value>156, 6</value>
   </data>
-  <data name="exitMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>159, 22</value>
-  </data>
-  <data name="exitMenuItem.Text" xml:space="preserve">
-    <value>E&amp;xit</value>
-  </data>
   <metadata name="searchMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
@@ -307,7 +301,7 @@
     <value>False</value>
   </metadata>
   <data name="newList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="newList.Text" xml:space="preserve">
     <value>&amp;New</value>
@@ -316,7 +310,7 @@
     <value>False</value>
   </metadata>
   <data name="openList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="openList.Text" xml:space="preserve">
     <value>&amp;Open...</value>
@@ -325,7 +319,7 @@
     <value>False</value>
   </metadata>
   <data name="importList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="importList.Text" xml:space="preserve">
     <value>&amp;Import...</value>
@@ -334,7 +328,7 @@
     <value>False</value>
   </metadata>
   <data name="toolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>133, 6</value>
+    <value>149, 6</value>
   </data>
   <metadata name="dummyItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
@@ -346,7 +340,7 @@
     <value>Dummy Item</value>
   </data>
   <data name="recentLists.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="recentLists.Text" xml:space="preserve">
     <value>&amp;Recent Lists</value>
@@ -410,6 +404,12 @@
   </data>
   <data name="toolsMenu.Text" xml:space="preserve">
     <value>&amp;Tools</value>
+  </data>
+  <data name="exitMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>159, 22</value>
+  </data>
+  <data name="exitMenuItem.Text" xml:space="preserve">
+    <value>E&amp;xit</value>
   </data>
   <data name="fileMenu.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 20</value>
@@ -738,12 +738,6 @@
   <data name="&gt;&gt;toolStripSeparator2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;exitMenuItem.Name" xml:space="preserve">
-    <value>exitMenuItem</value>
-  </data>
-  <data name="&gt;&gt;exitMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;searchMenu.Name" xml:space="preserve">
     <value>searchMenu</value>
   </data>
@@ -898,6 +892,12 @@
     <value>options</value>
   </data>
   <data name="&gt;&gt;options.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;exitMenuItem.Name" xml:space="preserve">
+    <value>exitMenuItem</value>
+  </data>
+  <data name="&gt;&gt;exitMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;fileMenu.Name" xml:space="preserve">

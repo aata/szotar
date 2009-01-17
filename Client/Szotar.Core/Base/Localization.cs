@@ -10,6 +10,7 @@ namespace Szotar {
 
 	public abstract class LocalizationProvider {
 		public abstract IStringTable ErrorStringTable { get; }
+		public abstract IStringTable Strings { get; }
 		public abstract IStringTable GetTypeDescriptionStringTable(Type type);
 
 		public static LocalizationProvider Default { get; set; }

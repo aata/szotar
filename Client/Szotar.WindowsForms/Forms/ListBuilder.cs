@@ -9,25 +9,21 @@ using System.Windows.Forms;
 namespace Szotar.WindowsForms.Forms {
 	public partial class ListBuilder : Form {
 		WordList list;
-		BindingList<TranslationPair> editingList;
 		bool saved;
 
-		public ListBuilder()
-			: this(new WordList()) 
+		public ListBuilder() : 
+			this(DataStore.Database.CreateSet(Properties.Resources.DefaultListName, 
+			GuiConfiguration.UserNickname, null, null, DateTime.Now))
 		{
+			saved = false;
 		}
 
 		public ListBuilder(WordList wordList) {
 			InitializeComponent();
 
 			this.list = wordList;
-			editingList = new BindingList<TranslationPair>(list);
-			editingList.AllowNew = true;
-			editingList.AllowEdit = true;
-			editingList.AllowRemove = true;
-			editingList.RaiseListChangedEvents = true;
+			grid.DataSource = wordList;
 
-			grid.DataSource = editingList;
 			this.UpdateTitle();
 			name.Text = list.Name;
 			author.Text = list.Author;
@@ -35,59 +31,103 @@ namespace Szotar.WindowsForms.Forms {
 
 			meta.Height = GuiConfiguration.ListBuilderMetadataSectionHeight;
 
-			editingList.ListChanged += new ListChangedEventHandler(editingList_ListChanged);
 			this.Layout += new LayoutEventHandler(ListBuilder_Layout);
 			this.Closing += new CancelEventHandler(ListBuilder_Closing);
 			editMetadata.Click += new EventHandler(editMetadata_Click);
 			copyAsCsv.Click += new EventHandler(copyAsCsv_Click);
-			save.Click += new EventHandler(save_Click);
-			saveAs.Click += new EventHandler(saveAs_Click);
 			sort.Click += new EventHandler(sort_Click);
 			swapAll.Click += new EventHandler(swapAll_Click);
 			shadow.MouseDown += new MouseEventHandler(shadow_MouseDown);
 			shadow.MouseMove += new MouseEventHandler(shadow_MouseMove);
-			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
 			name.TextChanged += new EventHandler(name_TextChanged);
 			author.TextChanged += new EventHandler(author_TextChanged);
 			url.TextChanged += new EventHandler(url_TextChanged);
+			close.Click += new EventHandler(close_Click);
+			deleteList.Click += new EventHandler(deleteList_Click);
 
 			swap.Click += new EventHandler(swap_Click);
 			remove.Click += new EventHandler(remove_Click);
 
+			WireListEvents();
+
 			saved = true;
+
+			MakeRecent();
+		}
+
+		private void WireListEvents() {
+			list.ListChanged += new ListChangedEventHandler(OnListChanged);
+			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
+			list.ListDeleted += new EventHandler(list_ListDeleted);
+		}
+
+		private void UnwireListEvents() {
+			list.ListChanged -= new ListChangedEventHandler(OnListChanged);
+			list.PropertyChanged -= new PropertyChangedEventHandler(list_PropertyChanged);
+			list.ListDeleted -= new EventHandler(list_ListDeleted);
+		}
+
+		void list_ListDeleted(object sender, EventArgs e) {
+			Close();
+		}
+
+		void MakeRecent() {
+			var recent = Configuration.RecentLists ?? new List<ListInfo>();
+
+			recent.RemoveAll(e => e.ID == list.ID);
+
+			recent.Insert(0, new ListInfo() {
+				Name = list.Name,
+				Author = list.Author,
+				Url = list.Url,
+				Date = list.Date,
+				ID = list.ID,
+				Language = list.Language
+			});
+
+			var max = Configuration.RecentListsSize;
+			if (recent.Count > max)
+				recent.RemoveRange(max, recent.Count - max);
+
+			Configuration.RecentLists = recent;
 		}
 
 		void remove_Click(object sender, EventArgs e) {
 			foreach (int i in grid.SelectedIndices)
-				editingList[i] = null;
-			while (editingList.Remove(null))
+				list[i] = null;
+
+			while (list.Remove(null))
 				;
 		}
 
 		void swap_Click(object sender, EventArgs e) {
 			foreach (int i in grid.SelectedIndices) {
-				TranslationPair p = editingList[i];
-				editingList[i] = new TranslationPair(p.Translation, p.Phrase);
+				var p = list[i];
+				list[i] = new WordListEntry(list, p.Translation, p.Phrase, p.TimesTried, p.TimesFailed);
 			}
+			//grid.Refresh();
 		}
 
 		void swapAll_Click(object sender, EventArgs e) {
 			//Swap whole list
-			for (int i = 0; i < editingList.Count; ++i) {
-				TranslationPair p = editingList[i];
-				editingList[i] = new TranslationPair(p.Translation, p.Phrase);
-			}	
+			for (int i = 0; i < list.Count; ++i) {
+				var p = list[i];
+				list[i] = new WordListEntry(list, p.Translation, p.Phrase, p.TimesTried, p.TimesFailed);
+			}
+			//grid.Refresh();
 		}
 
+		//TODO: Get this working.
+		//Presumably using the underlying database's sort is easiest.
 		void sort_Click(object sender, EventArgs e) {
-			List<TranslationPair> items = new List<TranslationPair>(editingList);
-			items.Sort();
-			editingList.RaiseListChangedEvents = false;
-			editingList.Clear();
-			foreach (TranslationPair pair in items)
-				editingList.Add(pair);
-			editingList.RaiseListChangedEvents = true;
-			editingList.ResetBindings();
+			//List<TranslationPair> items = new List<TranslationPair>(list);
+			//items.Sort();
+			//editingList.RaiseListChangedEvents = false;
+			//editingList.Clear();
+			//foreach (TranslationPair pair in items)
+			//    editingList.Add(pair);
+			//editingList.RaiseListChangedEvents = true;
+			//editingList.ResetBindings();
 		}
 
 		private void UpdateTitle() {
@@ -132,8 +172,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void shadow_MouseMove(object sender, MouseEventArgs e) {
-			if (e.Button == MouseButtons.Left) {
-				ShadowTag tag = (ShadowTag)shadow.Tag;
+			ShadowTag tag = (ShadowTag)shadow.Tag;
+			if (e.Button == MouseButtons.Left && tag != null) {
 				System.Drawing.Point down = tag.Down;
 				int delta = down.Y - e.Y;
 				meta.Height += delta;
@@ -146,69 +186,21 @@ namespace Szotar.WindowsForms.Forms {
 			shadow.Tag = new ShadowTag { Down = e.Location, OriginalHeight = shadow.Height };
 		}
 
-		private void saveAs_Click(object sender, EventArgs e) {
-			SaveAs();
-		}
-
-		private void save_Click(object sender, EventArgs e) {
-			if (list.HasPath)
-				SaveTo(list.Path);
-			else
-				SaveAs();
-		}
-
 		private void ListBuilder_Closing(object sender, CancelEventArgs e) {
 			if (!saved) {
-				if (list.HasPath) {
-					list.Save();
+				//Choosing Yes as the default based on what Notepad does.
+				DialogResult result = MessageBox.Show(Properties.Resources.WouldYouLikeToSaveThisList, Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+				if (result == DialogResult.Cancel) {
+					e.Cancel = true;
+					return;
+				} else if (result == DialogResult.No) {
+					list.DeleteWordList();
 				} else {
-					//Choosing Yes as the default based on what Notepad does.
-					DialogResult result = MessageBox.Show(Properties.Resources.WouldYouLikeToSaveThisList, Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-					if (result == DialogResult.Cancel) {
-						e.Cancel = true;
-						return;
-					} else if (result == DialogResult.Yes) {
-						list.Save();
-					}
+					MakeRecent();
 				}
 			}
 
-			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
-		}
-
-		private void SaveAs() {
-			if (DialogResult.OK == saveFileDialog.ShowDialog()) {
-				if (SaveTo(saveFileDialog.FileName)) {
-					saved = true;
-
-					List<ListInfo> recentLists =
-						GuiConfiguration.RecentLists;
-					if (recentLists == null)
-						recentLists = new List<ListInfo>();
-
-					list.Path = saveFileDialog.FileName;
-
-					recentLists.Insert(0, list.GetInfo());
-
-					int max = GuiConfiguration.RecentListsSize;
-					if (recentLists.Count >= max)
-						recentLists.RemoveAt(max - 1);
-
-					GuiConfiguration.RecentLists = recentLists;
-					GuiConfiguration.Save();
-				}
-			}
-		}
-
-		private bool SaveTo(string path) {
-			try {
-				list.Save(path);
-				return true;
-			} catch (IOException e) {
-				string msg = String.Format(CultureInfo.CurrentUICulture, Resources.Errors.CouldNotSaveListMessage, path, "\n\n", e.Message);
-				RtlAwareMessageBox.Show(this, msg, Resources.Errors.CouldNotSaveListCaption, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
-				return false;
-			}
+			UnwireListEvents();
 		}
 
 		private void editMetadata_Click(object sender, EventArgs e) {
@@ -222,12 +214,15 @@ namespace Szotar.WindowsForms.Forms {
 		private void copyAsCsv_Click(object sender, EventArgs e) {
 			var sb = new StringBuilder();
 
-			foreach (TranslationPair pair in editingList) {
-				bool quotePhrase = pair.Phrase.Contains("\"") || pair.Phrase.Contains(",") || pair.Phrase.Contains("\n"),
-					quoteTranslation = pair.Translation.Contains("\"") || pair.Translation.Contains(",") || pair.Translation.Contains("\n");
+			foreach (WordListEntry pair in list) {
+				var phrase = pair.Phrase;
+				var translation = pair.Translation;
+
+				bool quotePhrase = phrase.Contains("\"") || phrase.Contains(",") || phrase.Contains("\n"),
+					quoteTranslation = translation.Contains("\"") || translation.Contains(",") || translation.Contains("\n");
 				if (quotePhrase)
 					sb.Append('"');
-				sb.Append(pair.Phrase.Replace("\"", "\"\""));
+				sb.Append(phrase.Replace("\"", "\"\""));
 				if (quotePhrase)
 					sb.Append('"');
 
@@ -235,7 +230,7 @@ namespace Szotar.WindowsForms.Forms {
 
 				if (quoteTranslation)
 					sb.Append('"');
-				sb.Append(pair.Translation.Replace("\"", "\"\""));
+				sb.Append(translation.Replace("\"", "\"\""));
 				if (quoteTranslation)
 					sb.Append('"');
 
@@ -256,7 +251,7 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Height = ClientSize.Height - grid.Top - (meta.Visible ? meta.Height : 0);
 		}
 
-		private void editingList_ListChanged(object sender, ListChangedEventArgs e) {
+		private void OnListChanged(object sender, ListChangedEventArgs e) {
 			this.saved = false;
 		}
 
@@ -275,16 +270,20 @@ namespace Szotar.WindowsForms.Forms {
 		public void AddPair(string phrase, string translation) {
 			System.Diagnostics.Debug.Assert(!InvokeRequired);
 
-			editingList.Add(new TranslationPair(phrase, translation, true));
-			grid.DataSource = editingList;
+			list.Add(new WordListEntry(list, phrase, translation, 0, 0));
+			grid.DataSource = list;
 		}
 
-		public void AddPair(TranslationPair pair) {
+		public void AddEntries(IEnumerable<TranslationPair> entries) {
 			System.Diagnostics.Debug.Assert(!InvokeRequired);
-			System.Diagnostics.Debug.Assert(pair.Mutable);
 
-			editingList.Add(pair);
-			grid.DataSource = editingList;
+			var realEntries = new List<WordListEntry>();
+			foreach (var entry in entries)
+				realEntries.Add(new WordListEntry(list, entry.Phrase, entry.Translation, 0, 0));
+
+			list.Insert(list.Count, realEntries);
+
+			grid.DataSource = list;
 		}
 
 		public bool ShowMetadata {
@@ -299,6 +298,102 @@ namespace Szotar.WindowsForms.Forms {
 						HideMeta();
 				}
 			}
+		}
+
+		public void ScrollToPosition(int position) {
+			grid.ScrollToIndex(position);
+		}
+
+		private void deleteList_Click(object sender, EventArgs e) {
+			list.DeleteWordList();
+		}
+
+		private void close_Click(object sender, EventArgs e) {
+			Close();
+		}
+
+		//The 'valid' count is the count of rows which produced two columns when parsed.
+		List<List<string>> ParseCSV(char delim, string text, out int validCount) {
+			validCount = 0;
+			var lines = new List<List<string>>();
+			var line = new List<string>();
+
+			using (var reader = new StringReader(text)) {
+				char last = '\0', c;
+				int read;
+				bool escaped = false;
+				var cur = new StringBuilder();
+				while ((read = reader.Read()) != -1) {
+					c = (char)read;
+					if (c == '"') {
+						if (last == '"')
+							cur.Append(c);
+						else if (last == delim)
+							escaped = !escaped;
+						else
+							cur.Append(c);
+					} else if (c == '\r') {
+					} else if (c == '\n') {
+						if (escaped) {
+							//Newlines aren't useful to us. Replace them with spaces instead.
+							cur.Append(' ');
+						} else {
+							line.Add(cur.ToString());
+							lines.Add(line);
+							line = new List<string>();
+						}
+					} else if (c == delim) {
+						if (escaped) {
+							cur.Append(c);
+						} else {
+							line.Add(cur.ToString());
+							cur.Length = 0;
+						}
+					} else {
+						cur.Append(c);
+					}
+
+					last = c;
+				}
+			}
+
+			if (line.Count > 0)
+				lines.Add(line);
+
+			foreach (var x in lines)
+				if (x.Count >= 2)
+					validCount++;
+
+			return lines;
+		}
+
+		//For now, simply insert the new items at the end of the list.
+		//There might be a better way to do this.
+		void Paste(List<List<string>> lines) {
+			var entries = new List<WordListEntry>();
+
+			foreach (var line in lines)
+				if (line.Count >= 2)
+					entries.Add(new WordListEntry(list, line[0], line[1], 0, 0));
+
+			if (entries.Count > 0) {
+				list.Insert(list.Count, entries);
+				grid.Refresh();
+			}
+		}
+
+		//Detect comma-separated/tab-separated based on the paste content.
+		private void pasteCSV_Click(object sender, EventArgs e) {
+			int validCSV, validTSV;
+			List<List<string>> csv, tsv;
+			string text = Clipboard.GetText();
+			csv = ParseCSV(',', text, out validCSV);
+			tsv = ParseCSV('\t', text, out validTSV);
+
+			if (validCSV >= validTSV)
+				Paste(csv);
+			else
+				Paste(tsv);
 		}
 	}
 }

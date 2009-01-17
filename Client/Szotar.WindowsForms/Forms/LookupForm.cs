@@ -106,11 +106,8 @@ namespace Szotar.WindowsForms.Forms {
 
 			AdjustGridRowHeight();
 
-			this.Closed += new EventHandler(LookupForm_Closed);
 			searchBox.TextChanged += new EventHandler(searchBox_TextChanged);
-			this.InputLanguageChanged += new InputLanguageChangedEventHandler(LookupForm_InputLanguageChanged);
-			grid.CellFormatting += new DataGridViewCellFormattingEventHandler(grid_CellFormatting);
-			grid.ColumnWidthChanged += new DataGridViewColumnEventHandler(grid_ColumnWidthChanged);
+			
 			
 			//Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
@@ -122,14 +119,21 @@ namespace Szotar.WindowsForms.Forms {
 			//By now, the columns should have been created.
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 			grid.Columns[0].FillWeight = GuiConfiguration.LookupFormColumn1FillWeight;
-			grid.Columns[1].Resizable = DataGridViewTriState.False;
+			grid.Columns[1].Resizable = DataGridViewTriState.False; 
+			grid.CellFormatting += new DataGridViewCellFormattingEventHandler(grid_CellFormatting);
+			grid.ColumnWidthChanged += new DataGridViewColumnEventHandler(grid_ColumnWidthChanged);
 
+			ignoreAccentsCheck.Checked = ignoreAccentsMenuItem.Checked = GuiConfiguration.IgnoreAccents;
 			ignoreAccentsCheck.Click += new EventHandler(ignoreAccentsCheck_Click);
+			ignoreCaseCheck.Checked = ignoreCaseMenuItem.Checked = GuiConfiguration.IgnoreCase;
 			ignoreCaseCheck.Click += new EventHandler(ignoreCaseCheck_Click);
 
 			this.Shown += new EventHandler(LookupForm_Shown);
+			this.Closed += new EventHandler(LookupForm_Closed);
+			this.InputLanguageChanged += new InputLanguageChangedEventHandler(LookupForm_InputLanguageChanged);
 			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
 			this.KeyUp += (s, e) => { if(e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
+
 			fileMenu.DropDownOpening += new EventHandler(fileMenu_DropDownOpening);
 		}
 
@@ -613,7 +617,7 @@ namespace Szotar.WindowsForms.Forms {
 		/// Shows the start page. Attempt to find an existing start page, or create one if none exists.
 		/// </summary>
 		private void showStartPage_Click(object sender, EventArgs e) {
-			StartPage.ShowStartPage();
+			StartPage.ShowStartPage(null);
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -763,8 +767,11 @@ namespace Szotar.WindowsForms.Forms {
 		private void OpenRecentFile(object sender, EventArgs e) {
 			try {
 				ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
-				var list = new WordList(info.Path);
-				new ListBuilder(list).Show();
+				if(info.ID.HasValue) {
+					//TODO: find existing window first
+					var list = DataStore.Database.GetWordList(info.ID.Value);
+					new ListBuilder(list).Show();
+				}
 			} catch (System.IO.IOException x) {
 				MessageBox.Show(x.Message);
 			}
@@ -799,24 +806,18 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Context Menu
-		//Yay for hiding bugs instead of fixing them.
 		private void addToList_Click(object sender, EventArgs e) {
-			WordList list = new WordList();
-			list.Capacity = grid.SelectedRows.Count;
+			var entries = new List<TranslationPair>();
+			foreach(DataGridViewRow row in grid.SelectedRows)
+				entries.Add(new TranslationPair(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), true));
 
-			foreach (DataGridViewRow row in grid.SelectedRows) {
-				list.Add(new TranslationPair(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), true));
-			}
-
-			if (listBuilder != null) {
-				foreach (TranslationPair pair in list)
-					listBuilder.AddPair(pair);
-			} else {
-				list.Author = GuiConfiguration.UserRealName;
-				listBuilder = new ListBuilder(list);
+			if (listBuilder == null) {
+				listBuilder = new ListBuilder();
 				listBuilder.Closed += new EventHandler(listBuilder_Closed);
 				listBuilder.Show();
 			}
+
+			listBuilder.AddEntries(entries);
 		}
 
 		private void copy_Click(object sender, EventArgs e) {
@@ -881,6 +882,10 @@ namespace Szotar.WindowsForms.Forms {
 			}
 			
 			new LookupForm(path).Show();
+		}
+
+		private void openList_Click(object sender, EventArgs e) {
+			StartPage.ShowStartPage(StartPageTab.Practice);
 		}
 	}
 

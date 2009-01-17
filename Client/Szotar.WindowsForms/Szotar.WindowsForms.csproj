@@ -305,6 +305,7 @@
   <ItemGroup>
     <Content Include="Resources\Images\dictionary.ico" />
     <Content Include="Resources\Images\floppy.png" />
+    <Content Include="Resources\Images\genericdocument.ico" />
     <Content Include="Resources\Images\genericdocument.png" />
     <Content Include="Resources\Images\genericdocument16.png" />
     <Content Include="Resources\Images\list.png" />

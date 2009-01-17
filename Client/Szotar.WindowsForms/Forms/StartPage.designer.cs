@@ -65,7 +65,7 @@
 			this.dictionaries.TabIndex = 0;
 			this.dictionaries.UseCompatibleStateImageBehavior = false;
 			this.dictionaries.View = System.Windows.Forms.View.Tile;
-			this.dictionaries.ItemActivate += new System.EventHandler(this.languagePairs_ItemActivate);
+			this.dictionaries.ItemActivate += new System.EventHandler(this.OnItemActivate);
 			// 
 			// imageList
 			// 

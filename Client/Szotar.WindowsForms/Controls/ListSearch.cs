@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
+using WordSearchResult = Szotar.Sqlite.SqliteDataStore.WordSearchResult;
+
 namespace Szotar.WindowsForms.Controls {
 	public partial class ListSearch : UserControl {
 		private List<IListStore> listStores = new List<IListStore>();
@@ -12,18 +14,46 @@ namespace Szotar.WindowsForms.Controls {
 		public ListSearch() {
 			InitializeComponent();
 
-			listStores.Add(new RecentListStore());
-			listStores.Add(new DefaultListStore());
+			if (!DesignMode) {
+				listStores.Add(new RecentListStore());
+				listStores.Add(new SqliteListStore(DataStore.Database));
+			}
 
-			searchBox.TextChanged += new EventHandler(searchBox_TextChanged);
+			search.Click += (s, e) => UpdateResults();
+			searchBox.TextChanged += (s, e) => UpdateResults();
+			results.Resize += (s, e) => ResizeColumns();
+			Disposed += (s, e) => UnwireDBEvents();
 			ThemeHelper.UseExplorerTheme(results);
-		}
 
-		void searchBox_TextChanged(object sender, EventArgs e) {
+			WireDBEvents();
 			UpdateResults();
 		}
 
+		void WireDBEvents() {
+			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
+		}
+
+		void UnwireDBEvents() {
+			DataStore.Database.WordListDeleted -= new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
+		}
+
+		//When a word list is deleted, remove it from the results view.
+		void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
+			for (int i = 0; i < results.Items.Count; ) {
+				var tag = results.Items[i].Tag;
+				if (tag is ListInfo && ((ListInfo)tag).ID == e.SetID)
+					results.Items.RemoveAt(i);
+				else if (tag is WordSearchResult && ((WordSearchResult)tag).SetID == e.SetID)
+					results.Items.RemoveAt(i);
+				else
+					i++;
+			}
+		}
+
 		private void UpdateResults() {
+			if (DesignMode)
+				return;
+
 			results.BeginUpdate();
 			results.Items.Clear();
 
@@ -37,15 +67,40 @@ namespace Szotar.WindowsForms.Controls {
 					if (searchBox.RealText.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
 						continue;
 
-					ListViewItem item = new ListViewItem(new string[] { list.Name, list.Path, storeName });
+					ListViewItem item = new ListViewItem(
+						new string[] { list.Name, 
+						               list.Date.HasValue ? list.Date.Value.ToString() : string.Empty, 
+									   string.Empty });
 					item.Tag = list;
 					item.Group = group;
 					results.Items.Add(item);
 				}
 			}
 
-			results.EndUpdate();
+			if(!string.IsNullOrEmpty(searchBox.RealText)) {
+				var group = new ListViewGroup(Properties.Resources.SearchResults);
+				results.Groups.Add(group);
+				foreach (var wsr in DataStore.Database.SearchAllEntries(searchBox.RealText)) {
+					ListViewItem item = new ListViewItem(
+							new string[] { wsr.Phrase, 
+						               wsr.Translation, 
+									   wsr.SetName });
+					item.Tag = wsr;
+					item.Group = group;
+					results.Items.Add(item);
+				}
+			}
 
+			thirdColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+			ResizeColumns();
+
+			results.EndUpdate();
+		}
+
+		public void ResizeColumns() {
+			var available = results.ClientSize.Width - thirdColumn.Width;
+			firstColumn.Width = available / 2;
+			secondColumn.Width = results.ClientSize.Width - thirdColumn.Width - firstColumn.Width;
 		}
 
 		[Localizable(true)]
@@ -74,9 +129,17 @@ namespace Szotar.WindowsForms.Controls {
 			if (results.SelectedItems.Count == 0)
 				return;
 
-			List<string> lists = new List<string>();
-			foreach (ListViewItem item in results.SelectedItems)
-				lists.Add(((ListInfo)item.Tag).Path);
+			List<ListOpen> lists = new List<ListOpen>();
+			foreach (ListViewItem item in results.SelectedItems) {
+				object tag = item.Tag;
+				if (tag is ListInfo) {
+					var list = (ListInfo)tag;
+					lists.Add(new ListOpen { SetID = list.ID.Value });
+				} else if(tag is Szotar.Sqlite.SqliteDataStore.WordSearchResult) {
+					var wsr = (Szotar.Sqlite.SqliteDataStore.WordSearchResult)tag;
+					lists.Add(new ListOpen { SetID = wsr.SetID, Position = wsr.ListPosition });
+				}
+			}
 
 			EventHandler<ListsChosenEventArgs> handler = ListsChosen;
 			if (handler != null)
@@ -86,16 +149,16 @@ namespace Szotar.WindowsForms.Controls {
 		public event EventHandler<ListsChosenEventArgs> ListsChosen;
 	}
 
+	public struct ListOpen {
+		public long SetID { get; set; }
+		public int Position { get; set; }
+	}
+
 	public class ListsChosenEventArgs : EventArgs {
-		IList<string> paths;
+		public IList<ListOpen> Chosen { get; set; }
 
-		public IList<string> Paths {
-			get { return paths; }
-			private set { paths = value; }
-		}
-
-		public ListsChosenEventArgs(IList<string> paths) {
-			Paths = paths;
+		public ListsChosenEventArgs(IList<ListOpen> ids) {
+			Chosen = ids;
 		}
 	}
 

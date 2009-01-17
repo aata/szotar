@@ -56,10 +56,9 @@
     <Compile Include="Base\SimpleDictionary.cs" />
     <Compile Include="Base\Sqlite.cs" />
     <Compile Include="Base\SqliteWordList.cs" />
-    <Compile Include="Base\SyncWordList.cs" />
+    <Compile Include="Base\WordList.cs" />
     <Compile Include="Base\TeiDictionary.cs" />
     <Compile Include="Base\Undo.cs" />
-    <Compile Include="Base\WordList.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
