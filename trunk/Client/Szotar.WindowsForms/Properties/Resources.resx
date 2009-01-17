@@ -183,4 +183,28 @@
   <data name="TopInwardShadow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\images\topinwardshadow.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ChangedXToY" xml:space="preserve">
+    <value>Changed {0} to {1}</value>
+    <comment>Undo stuff</comment>
+  </data>
+  <data name="DeletedNItems" xml:space="preserve">
+    <value>Deleted {0} items</value>
+    <comment>Undo stuff (NB: there is no "Deleted 1 Item" yet)</comment>
+  </data>
+  <data name="Inserted1Item" xml:space="preserve">
+    <value>Inserted 1 item</value>
+    <comment>Undo stuff</comment>
+  </data>
+  <data name="InsertedNItems" xml:space="preserve">
+    <value>Inserted {0} items</value>
+    <comment>Undo stuff</comment>
+  </data>
+  <data name="InternalOperation" xml:space="preserve">
+    <value>(Internal Operation)</value>
+    <comment>Undo stuff</comment>
+  </data>
+  <data name="SearchResults" xml:space="preserve">
+    <value>Search Results</value>
+    <comment>Shown when searching for lists.</comment>
+  </data>
 </root>

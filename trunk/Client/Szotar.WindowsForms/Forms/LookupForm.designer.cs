@@ -52,12 +52,12 @@
 			System.Windows.Forms.ToolStripMenuItem toolsMenu;
 			System.Windows.Forms.ToolStripMenuItem options;
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-			this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.forwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.backwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreCaseMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.recentLists = new System.Windows.Forms.ToolStripMenuItem();
+			this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.grid = new System.Windows.Forms.DataGridView();
 			this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -130,12 +130,6 @@
 			// 
 			toolStripSeparator2.Name = "toolStripSeparator2";
 			resources.ApplyResources(toolStripSeparator2, "toolStripSeparator2");
-			// 
-			// exitMenuItem
-			// 
-			this.exitMenuItem.Name = "exitMenuItem";
-			resources.ApplyResources(this.exitMenuItem, "exitMenuItem");
-			this.exitMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
 			// 
 			// searchMenu
 			// 
@@ -250,6 +244,7 @@
 			// 
 			openList.Name = "openList";
 			resources.ApplyResources(openList, "openList");
+			openList.Click += new System.EventHandler(this.openList_Click);
 			// 
 			// importList
 			// 
@@ -313,6 +308,12 @@
 			options.Name = "options";
 			resources.ApplyResources(options, "options");
 			options.Click += new System.EventHandler(this.options_Click);
+			// 
+			// exitMenuItem
+			// 
+			this.exitMenuItem.Name = "exitMenuItem";
+			resources.ApplyResources(this.exitMenuItem, "exitMenuItem");
+			this.exitMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
 			// 
 			// fileMenu
 			// 

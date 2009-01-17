@@ -6,13 +6,12 @@ using System.Text;
 namespace Szotar {
 	[Serializable]
 	public class ListInfo {
-		public string Path { get; set; }
+		public long? ID { get; set; }
 		public string Name { get; set; }
-
-		public ListInfo(string path, string name) {
-			Path = path;
-			Name = name;
-		}
+		public string Author { get; set; }
+		public string Language { get; set; }
+		public string Url { get; set; }
+		public DateTime? Date { get; set; }
 
 		public ListInfo() {
 		}
@@ -31,7 +30,7 @@ namespace Szotar {
 		}
 
 		public IEnumerable<ListInfo> GetLists() {
-			ListInfo[] recent = Configuration.RecentLists;
+			var recent = Configuration.RecentLists;
 
 			if (recent == null)
 				yield break;
@@ -42,44 +41,19 @@ namespace Szotar {
 		}
 	}
 
-	public class DefaultListStore : IListStore {
-		public string Name {
-			get {
-				return "Untitled List"; //FIXME Properties.Resources.DefaultListStoreName;
-			}
+	public class SqliteListStore : IListStore {
+		Sqlite.SqliteDataStore database;
+
+		public SqliteListStore(Sqlite.SqliteDataStore database) {
+			this.database = database;
 		}
 
-		public string DefaultDirectory {
-			get {
-				return Configuration.UserListsStore;
-			}
-
-			set {
-				DirectoryInfo di = new DirectoryInfo(value);
-				if (!di.Exists)
-					di.Create();
-				
-				Configuration.UserListsStore = value;
-			}
+		public string Name {
+			get { return "All Lists"; }
 		}
 
 		public IEnumerable<ListInfo> GetLists() {
-			DirectoryInfo di = new DirectoryInfo(DefaultDirectory);
-			FileInfo[] files;
-
-			try {
-				files = di.GetFiles();
-			} catch (DirectoryNotFoundException) {
-				yield break;
-			}
-
-			foreach (FileInfo fi in files) {
-				yield return new ListInfo
-				{
-					Path = fi.FullName,
-					Name = Path.GetFileNameWithoutExtension(fi.FullName)
-				};
-			}
+			return database.GetAllSets();
 		}
 	}
 }

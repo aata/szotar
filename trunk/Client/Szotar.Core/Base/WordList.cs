@@ -1,236 +1,254 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
-using System.Text;
+using System.Diagnostics;
 
 namespace Szotar {
-	public interface IWordListEditor {
-		void BringToFront();
-		void Close();
-	}
-	
-	//TODO: Ascertain which members are necessary at this level.
-	/// <summary>
-	/// Supports all metadata pertaining to a wordlist, but demands no specific	storage policy.
-	/// Hence, there is no 'Path' member of IWordList, because that is specific to file-based storage.
-	/// </summary>
-	public interface IWordList : INotifyPropertyChanged {
-		string Author { get; set; }
-		string Name { get; set; }
-		string Url { get; set; }
-		IWordListEditor CurrentEditor { get; set; }
-	}
-	
-	public abstract class BaseWordList : List<TranslationPair>, IWordList {
-		string name, author, url;
-		IList<string> tags;
-		NullWeakReference<IWordListEditor> currentEditor;
-		
-		//TODO: Constructors accepting IEnumerable<TranslationPair>?
-		public BaseWordList() {
-			name = "Untitled List"; //;Properties.Resources.DefaultListName;
-			author = "User Real Name"; //Properties.Settings.Default.UserRealName;
-			if (string.IsNullOrEmpty(author))
-				author = "User Nickname"; //Properties.Settings.Default.UserNickname;
-			if (string.IsNullOrEmpty(author))
-				author = Environment.UserName;
+	public abstract class WordList : IBindingList, IList<WordListEntry>, IDisposable, INotifyPropertyChanged {
+		public WordList() {
+			UndoList = new UndoList();
 		}
-		
+
+		public UndoList UndoList { get; private set; }
+
+		#region Unneeded or redundant crap
+		bool IBindingList.AllowEdit { get { return true; } }
+		bool IBindingList.AllowNew { get { return false; } }
+		bool IBindingList.AllowRemove { get { return true; } }
+		bool IBindingList.IsSorted { get { return false; } }
+		bool IBindingList.SupportsChangeNotification { get { return true; } }
+		bool IBindingList.SupportsSearching { get { return false; } }
+		bool IBindingList.SupportsSorting { get { return false; } }
+		ListSortDirection IBindingList.SortDirection { get { throw new NotSupportedException(); } }
+		PropertyDescriptor IBindingList.SortProperty { get { throw new NotSupportedException(); } }
+		void IBindingList.AddIndex(PropertyDescriptor property) { throw new NotSupportedException(); }
+		void IBindingList.RemoveIndex(PropertyDescriptor property) { throw new NotSupportedException(); }
+		void IBindingList.ApplySort(PropertyDescriptor property, ListSortDirection direction) { throw new NotSupportedException(); }
+		void IBindingList.RemoveSort() { throw new NotSupportedException(); }
+		int IBindingList.Find(PropertyDescriptor property, object key) { throw new NotSupportedException(); }
+		object IBindingList.AddNew() { throw new NotSupportedException(); }
+		bool IList.IsFixedSize { get { return true; } }
+		bool IList.IsReadOnly { get { return false; } }
+		object IList.this[int index] {
+			get { return this[index]; }
+			set { this[index] = (WordListEntry)value; }
+		}
+		System.Collections.IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+		int IList.Add(object value) { Add((WordListEntry)value); return Count - 1; }
+		void IList.Clear() { Clear(); }
+		bool IList.Contains(object value) { return Contains((WordListEntry)value); }
+		int IList.IndexOf(object value) { return IndexOf((WordListEntry)value); }
+		void IList.Remove(object value) { Remove((WordListEntry)value); }
+		void IList.RemoveAt(int index) { RemoveAt(index); }
+		void IList.Insert(int index, object value) { Insert(index, (WordListEntry)value); }
+		void ICollection.CopyTo(Array array, int index) { throw new NotSupportedException(); }
+		object ICollection.SyncRoot { get { return null; } }
+		bool ICollection.IsSynchronized { get { return false; } }
+		int ICollection.Count { get { return Count; } }
+		#endregion
+
+		public abstract WordListEntry this[int index] { get; set; }
+		public abstract int IndexOf(WordListEntry item);
+		public abstract void Insert(int index, WordListEntry item);
+		public abstract void RemoveAt(int index);
+		public abstract int Count { get; }
+		public abstract bool IsReadOnly { get; }
+		public abstract void Add(WordListEntry item);
+		public abstract void Clear();
+		public abstract bool Contains(WordListEntry item);
+		public abstract void CopyTo(WordListEntry[] array, int arrayIndex);
+		public abstract bool Remove(WordListEntry item);
+		public abstract IEnumerator<WordListEntry> GetEnumerator();
+
+		public event ListChangedEventHandler ListChanged;
+		protected void RaiseListChanged(ListChangedEventArgs eventArgs) {
+			var handler = ListChanged;
+			if (handler != null)
+				handler(this, eventArgs);
+		}
+
+		public enum EntryProperty {
+			Phrase,
+			Translation,
+			TimesTried,
+			TimesFailed
+		}
+
+		public abstract T GetProperty<T>(WordListEntry entry, EntryProperty property);
+		public abstract void SetProperty(WordListEntry entry, EntryProperty property, object value);
+
+		public void Dispose() {
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing) {
+		}
+
+		public abstract long? ID { get; }
+		public abstract string Name { get; set; }
+		public abstract string Author { get; set; }
+		public abstract string Language { get; set; }
+		public abstract string Url { get; set; }
+		public abstract DateTime? Date { get; set; }
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		protected void RaisePropertyChanged(string propertyName) {
+			var handler = PropertyChanged;
+			if (handler != null)
+				handler(this, new PropertyChangedEventArgs(propertyName));
+		}
+
+		public abstract void DeleteWordList();
+		public abstract void Insert(int index, IList<WordListEntry> range);
+
+		public event EventHandler ListDeleted;
+		internal void RaiseDeleted() {
+			var handler = ListDeleted;
+			if (handler != null)
+				handler(this, new EventArgs());
+		}
+	}
+
+	public class WordListEntry : System.ComponentModel.INotifyPropertyChanged {
+		WordList owner;
+		string phrase;
+		string translation;
+		long tried, failed;
+
+		public WordListEntry(WordList owner) {
+			this.owner = owner;
+			phrase = translation = string.Empty;
+		}
+
+		public WordListEntry(WordList owner, string phrase, string translation, long tried, long failed) {
+			this.owner = owner;
+			this.phrase = phrase;
+			this.translation = translation;
+			this.tried = tried;
+			this.failed = failed;
+
+			//This is really the wrong place to put this, but it's better to have it not break than break.
+			if (phrase == null)
+				phrase = string.Empty;
+			if (translation == null)
+				translation = string.Empty;
+		}
+
+		public void AddTo(WordList owner, int index) {
+			Owner = owner;
+			owner.Insert(index, this);
+		}
+
+		public string Phrase {
+			get { return phrase; }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+
+				SetPhrase(value);
+				if(owner != null)
+					owner.SetProperty(this, WordList.EntryProperty.Phrase, value);
+			}
+		}
+
+		public void SetPhrase(string value) {
+			if (value == null)
+				throw new ArgumentNullException();
+
+			phrase = value;
+			RaisePropertyChanged("Phrase");
+		}
+
+		public string Translation {
+			get { return translation; }
+			set {
+				if (value == null) 
+					throw new ArgumentNullException();
+
+				SetTranslation(value);
+				if(owner != null)
+					owner.SetProperty(this, WordList.EntryProperty.Translation, value);
+			}
+		}
+
+		public void SetTranslation(string value) {
+			if (value == null)
+				throw new ArgumentNullException();
+
+			translation = value;
+			RaisePropertyChanged("Translation");
+		}
+
+		public long TimesTried {
+			get { return tried; }
+			set {
+				SetTimesTried(value);
+				if (owner != null)
+					owner.SetProperty(this, WordList.EntryProperty.TimesTried, value);
+			}
+		}
+
+		public void SetTimesTried(long value) {
+			if (value < 0)
+				throw new ArgumentOutOfRangeException();
+
+			tried = value;
+			RaisePropertyChanged("TimesTried");
+		}
+
+		public long TimesFailed {
+			get { return failed; }
+			set {
+				SetTimesFailed(value);
+				if (owner != null)
+					owner.SetProperty(this, WordList.EntryProperty.TimesFailed, value);
+			}
+		}
+
+		public void SetTimesFailed(long value) {
+			if (value < 0)
+				throw new ArgumentOutOfRangeException();
+
+			failed = value;
+			RaisePropertyChanged("TimesFailed");
+		}
+
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		protected void RaisePropertyChanged(string property) {
-			PropertyChangedEventHandler temp = PropertyChanged;
-			if (temp != null) {
-				temp(this, new PropertyChangedEventArgs(property));
+		private void RaisePropertyChanged(string property) {
+			var handler = PropertyChanged;
+			if (handler != null) {
+				handler(this, new PropertyChangedEventArgs(property));
 			}
 		}
-		
-		public void Add(string phrase, string translation) {
-			base.Add(new TranslationPair(phrase, translation, true));
+
+		public void SetProperty(WordList.EntryProperty property, object newValue) {
+			switch (property) {
+				case WordList.EntryProperty.Phrase:
+					SetPhrase((string)newValue);
+					break;
+				case WordList.EntryProperty.Translation:
+					SetTranslation((string)newValue);
+					break;
+				case WordList.EntryProperty.TimesTried:
+					SetTimesTried((long)newValue);
+					break;
+				case WordList.EntryProperty.TimesFailed:
+					SetTimesFailed((long)newValue);
+					break;
+			}
 		}
 
-		public string Name {
-			get { return name; }
+		public WordList Owner {
+			get { return owner; }
 			set {
-				name = value;
-				RaisePropertyChanged("Name");
+				if(owner == value)
+					return;
+				owner = value;
+				Debug.Assert(value.IndexOf(this) == -1);
 			}
-		}
-
-		public string Author {
-			get { return author; }
-			set {
-				author = value;
-				RaisePropertyChanged("Author");
-			}
-		}
-
-		public string Url {
-			get { return url; }
-			set {
-				url = value;
-				RaisePropertyChanged("Url");
-			}
-		}
-
-		public IList<string> Tags {
-			get { return tags; }
-			set {
-				tags = value;
-				RaisePropertyChanged("Tags");
-			}
-		}
-
-		public IWordListEditor CurrentEditor {
-			get {
-				return currentEditor.Target;
-			}
-			set {
-				currentEditor = new NullWeakReference<IWordListEditor>(value);
-				RaisePropertyChanged("CurrentEditor");
-			}
-		}
-
-		public IWordListEditor OpenEditor() {
-			var lb = currentEditor.Target;
-			if (lb != null) {
-				lb.BringToFront();
-				return lb;
-			} else {
-				//TODO: some way of obtaining an IWordListEditor for this instance
-				return null;
-			}
-		}
-	}
-	
-	/// <summary>
-	/// The default word list, using a file-based storage mechanism.
-	/// </summary>
-	public class WordList : BaseWordList, INotifyPropertyChanged {
-		private string path;
-
-		public WordList(string path)
-			: this() {
-			Path = path;
-			using (FileStream fs = File.OpenRead(path)) {
-				Load(fs);
-			}
-		}
-
-		public WordList(Stream stream)
-			: this() {
-			Load(stream);
-		}
-
-		public WordList() {
-		}
-
-		//Is this method necessary?
-		//Seems wrong to have UI code at this level.
-		public void Save() {
-			if (Path != null) {
-				Save(Path);
-			} else {
-				//TODO: Move this part elsewhere, throw an exception here.
-				
-				throw new NotImplementedException();
-				/*System.Windows.Forms.SaveFileDialog dialog = new System.Windows.Forms.SaveFileDialog();
-				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-					Path = dialog.FileName;
-					Save(Path);
-				}*/
-			}
-		}
-
-		protected void Save(Stream stream) {
-			using (var writer = new StreamWriter(stream)) {
-				writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "info {0} {1}", Uri.EscapeDataString(this.Name), this.Count));
-				if (!string.IsNullOrEmpty(Author))
-					writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "author {0}", Uri.EscapeDataString(this.Author)));
-				if (!string.IsNullOrEmpty(Url))
-					writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "url {0}", Uri.EscapeDataString(this.Url)));
-
-				foreach (TranslationPair pair in this) {
-					writer.Write("e ");
-					writer.Write(Uri.EscapeDataString(pair.Phrase));
-					writer.Write(' ');
-					writer.Write(Uri.EscapeDataString(pair.Translation));
-					writer.WriteLine();
-				}
-			}
-		}
-
-		protected void Load(Stream stream) {
-			using (var reader = new StreamReader(stream)) {
-				while (!reader.EndOfStream) {
-					string[] bits = reader.ReadLine().Split(' ');
-					for (int i = 0; i < bits.Length; ++i)
-						bits[i] = Uri.UnescapeDataString(bits[i]);
-
-					if (bits.Length > 0) {
-						switch (bits[0]) {
-							case "e":
-								Add(bits[1], bits[2]);
-								break;
-
-							case "info":
-								Name = bits[1];
-								//TODO: support info section
-								break;
-
-							case "meta":
-							case "author":
-								Author = bits[1];
-								break;
-
-							case "url":
-								Url = bits[1];
-								break;
-
-							default:
-								//Unknown or comment; ignore
-								break;
-						}
-					}
-				}
-			}
-		}
-
-		public void Save(string path) {
-			using (Stream stream = File.Open(path, FileMode.Create, FileAccess.Write)) {
-				Save(stream);
-			}
-		}
-
-		//It's not the end of the world if the original List<T> version of this
-		//gets called, but I'd prefer this one did.
-		public new void Add(TranslationPair pair) {
-			if (pair == null)
-				throw new ArgumentNullException("pair");
-			if (pair.Mutable == false)
-				throw new ArgumentException("TranslationPairs in a WordList must be mutable.", "pair");
-			base.Add(pair);
-		}
-
-		public string Path {
-			get { return path; }
-			set {
-				bool hasPathChanged = (path != null && value == null) || (path == null && value != null);
-				path = value;
-				RaisePropertyChanged("Path");
-				if (hasPathChanged)
-					RaisePropertyChanged("HasPath");
-			}
-		}
-
-		public bool HasPath {
-			get { return Path != null; }
-		}
-
-		public ListInfo GetInfo() {
-			return new ListInfo(Path, Name);
 		}
 	}
 }

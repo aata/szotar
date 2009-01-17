@@ -12,6 +12,8 @@ namespace Szotar.WindowsForms {
 
 			ToolStripManager.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
 
+			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
+
 			switch (GuiConfiguration.StartupAction) {
 				case "Dictionary":
 					string dict = GuiConfiguration.StartupDictionary;
@@ -44,24 +46,21 @@ namespace Szotar.WindowsForms {
 			return;
 		}
 
+		static void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
+			var recent = Configuration.RecentLists;
+			if (recent != null) {
+				recent.RemoveAll(r => r.ID == e.SetID);
+				Configuration.RecentLists = recent;
+				Configuration.Save();
+			}
+		}
+
 		private static void RunUntilNoForms() {
 			Application.Run(new SzotarContext());
 		}
 
-		//TODO: Get working with Dictionary.GetAll
-		//static void OpenFirstLanguagePair() {
-		//    //For now, just load the first language pair and open a dictionary for it.
-		//    foreach (LanguagePair p in LanguagePair.GetAllLanguagePairs()) {
-		//        //Hack (but it's only for debugging anyway)
-		//        if (p.Name.Contains("abridged"))
-		//            continue;
-		//        Application.Run(new Forms.LookupForm(p));
-		//        break;
-		//    }
-		//}
-
 		//Used to convert a TEI dictionary into a SimpleDictionary.
-		//Whenever possible, this should be moved to the Tools solution.
+		//Whenever possible, this should be moved to the Tools project.
 		static void ConvertFromTei() {
 			IBilingualDictionary td = new TeiDictionary(@"..\..\eng-hun-huge.xml");
 			SimpleDictionary sd = new SimpleDictionary(td.ForwardsSection, td.ReverseSection);

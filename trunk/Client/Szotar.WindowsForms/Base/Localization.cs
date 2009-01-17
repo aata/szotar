@@ -13,6 +13,10 @@ namespace Szotar.WindowsForms {
 		public override IStringTable ErrorStringTable {
 			get { return new StringTable("Errors"); }
 		}
+
+		public override IStringTable Strings {
+			get { return new StringTable(Properties.Resources.ResourceManager); }
+		}
 	}
 
 	public class TypeStringTable : StringTable {
@@ -33,6 +37,10 @@ namespace Szotar.WindowsForms {
 
 	public class StringTable : IStringTable {
 		ResourceManager resourceManager;
+
+		public StringTable(ResourceManager resourceManager) {
+			this.resourceManager = resourceManager;
+		}
 
 		public StringTable(string name) {
 			resourceManager = new ResourceManager("Szotar.WindowsForms.Resources.Strings." + name, System.Reflection.Assembly.GetExecutingAssembly());

@@ -13,6 +13,7 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 	[ImporterAttribute("Quizlet", typeof(WordList))]
 	public class QuizletImporter : IImporter<WordList> {
 		int? setID;
+		Uri uri;
 		System.Net.WebRequest request;
 		IAsyncResult requestAsyncResult;
 		AsyncOperation operation;
@@ -44,8 +45,9 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 			operation = AsyncOperationManager.CreateOperation(null);
 
 			OnProgressChanged(string.Format(CultureInfo.CurrentUICulture, Resources.Quizlet.ContactingServer, "quizlet.com"), null);
-			request = System.Net.WebRequest.Create(
-				new Uri(String.Format(CultureInfo.InvariantCulture, "http://quizlet.com/set/{0}/", setID)));
+
+			uri = new Uri(String.Format(CultureInfo.InvariantCulture, "http://quizlet.com/set/{0}/", setID));
+			request = System.Net.WebRequest.Create(uri);
 
 			requestAsyncResult = request.BeginGetResponse(new AsyncCallback(this.GotResponse), null);
 		}
@@ -55,7 +57,8 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 		}
 
 		private WordList GetResult(IAsyncResult result) {
-			WordList wordList = new WordList();
+			var info = new ListInfo();
+			WordList wordList;
 
 			try {
 				WebResponse response = request.EndGetResponse(result);
@@ -80,9 +83,9 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 						if (eval is string) {
 							object eval2 = nav.Evaluate("string(//html:h2[1]/html:span[1])", nsm);
 							if (eval2 is string) {
-								wordList.Name = ((string)eval).Substring(Math.Min(((string)eval).Length - 1, ((string)eval2).Length));
+								info.Name = ((string)eval).Substring(Math.Min(((string)eval).Length - 1, ((string)eval2).Length));
 							} else {
-								wordList.Name = (string)eval;
+								info.Name = (string)eval;
 							}
 						}
 					}
@@ -91,24 +94,26 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 						//This is almost as bad as that bloody regex.
 						object eval = nav.Evaluate("string(//html:h3[1]/../html:table[1]/html:tr[string(html:td[1])='Creator']/html:td[2]/html:a)", nsm);
 						if (eval is string)
-							wordList.Author = (string)eval;
+							info.Author = (string)eval;
 					}
 
-					TranslationPair pair = null;
+					wordList = DataStore.Database.CreateSet(info.Name, info.Author, null, uri.ToString(), DateTime.Now);
+
+					WordListEntry entry = null;
 					XPathNodeIterator iterator = nav.Select("//html:div[@id='words-normal']//html:tr/html:td", nsm);
 					foreach (XPathNavigator td in iterator) {
 						string value = (string)td.Evaluate("string(.)");
-						if (pair == null) {
+						if (entry == null) {
 							//First TD: Search button
-							pair = new TranslationPair(null, null, true);
-						} else if (pair.Phrase == null) {
+							entry = new WordListEntry(wordList, null, null, 0, 0);
+						} else if (entry.Phrase == null) {
 							//Second TD: Phrase
-							pair.Phrase = value;
-						} else if (pair.Translation == null) {
+							entry.Phrase = value;
+						} else if (entry.Translation == null) {
 							//Third TD: Translation
-							pair.Translation = value;
-							wordList.Add(pair);
-							pair = null;
+							entry.Translation = value;
+							wordList.Add(entry);
+							entry = null;
 						}
 					}
 				}

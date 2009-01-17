@@ -11,12 +11,12 @@ using System.Diagnostics;
 namespace Szotar.WindowsForms.Controls {
 	[ToolboxBitmap(typeof(System.Windows.Forms.DataGridView))]
 	public partial class DictionaryGrid : UserControl {
-		IList<TranslationPair> source;
+		WordList source;
 		bool showMutableRows;
 		bool allowNewRows;
 		bool ignoreNextListChangedEvent = false;
 
-		TranslationPair pairInEdit = null;
+		WordListEntry pairInEdit = null;
 		int? rowInEdit = null;
 
 		public DictionaryGrid() {
@@ -25,7 +25,7 @@ namespace Szotar.WindowsForms.Controls {
 			InitializeVirtualMode();
 		}
 
-		public DictionaryGrid(IList<TranslationPair> dataSource)
+		public DictionaryGrid(WordList dataSource)
 			: this() {
 			DataSource = dataSource;
 		}
@@ -35,7 +35,7 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		public void UpdateData() {
-			IList<TranslationPair> x = DataSource;
+			var x = DataSource;
 			DataSource = null;
 			DataSource = x;
 		}
@@ -105,7 +105,7 @@ namespace Szotar.WindowsForms.Controls {
 		#endregion
 
 		#region Virtual Mode implementation
-		public IList<TranslationPair> DataSource {
+		public WordList DataSource {
 			get { return source; }
 			set {
 				if (value == null) {
@@ -159,7 +159,8 @@ namespace Szotar.WindowsForms.Controls {
 				//corresponding TranslationPair object from the data source.
 				//Suppress the ListChangedType.ItemRemoved event.
 				ignoreNextListChangedEvent = true;
-				source.RemoveAt(e.Row.Index);
+				if(e.Row.Index < source.Count) //We can't remove the editing row from the data source!
+					source.RemoveAt(e.Row.Index);
 			} else {
 				//If the user has deleted a newly created row, release
 				//the corresponding TranslationPair object.
@@ -177,7 +178,7 @@ namespace Szotar.WindowsForms.Controls {
 			if (rowInEdit == grid.Rows.Count - 2 && rowInEdit == source.Count) {
 				// If the user has canceled the edit of a newly created row, 
 				// replace the corresponding TranslationPair object with a new, empty one.
-				pairInEdit = new TranslationPair();
+				pairInEdit = new WordListEntry(null);
 			} else {
 				// If the user has canceled the edit of an existing row, 
 				// release the corresponding TranslationPair object.
@@ -194,12 +195,13 @@ namespace Szotar.WindowsForms.Controls {
 			if (e.RowIndex >= source.Count && e.RowIndex != grid.Rows.Count - 1) {
 				//Suppress the ListChangedType.ItemAdded event.
 				ignoreNextListChangedEvent = true;
-				source.Add(pairInEdit);
+				pairInEdit.AddTo(source, source.Count);
 				pairInEdit = null;
 				rowInEdit = null;
 			} else if (pairInEdit != null && e.RowIndex < source.Count) {
 				//Suppress the ListChangedType.ItemChanged event.
 				ignoreNextListChangedEvent = true;
+				pairInEdit.Owner = source;
 				source[e.RowIndex] = pairInEdit;
 				pairInEdit = null;
 				rowInEdit = null;
@@ -211,7 +213,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		//Create a new TranslationPair when the user edits the row for new records.
 		void grid_NewRowNeeded(object sender, DataGridViewRowEventArgs e) {
-			pairInEdit = new TranslationPair();
+			pairInEdit = new WordListEntry(null);
 			rowInEdit = grid.Rows.Count - 1;
 		}
 
@@ -219,14 +221,15 @@ namespace Szotar.WindowsForms.Controls {
 		//Stores the edited value in the TranslationPair representing the edited row.
 		//This TranslationPair will be committed when the row is left.
 		void grid_CellValuePushed(object sender, DataGridViewCellValueEventArgs e) {
-			TranslationPair rowSource;
+			WordListEntry rowSource;
 
 			if (source == null)
 				return;
 
 			if (e.RowIndex < source.Count) {
 				if (pairInEdit == null) {
-					pairInEdit = (TranslationPair)source[e.RowIndex].Clone();
+					var we = source[e.RowIndex];
+					pairInEdit = new WordListEntry(null, we.Phrase, we.Translation, we.TimesTried, we.TimesFailed);
 				}
 				rowSource = pairInEdit;
 				rowInEdit = e.RowIndex;
@@ -234,7 +237,7 @@ namespace Szotar.WindowsForms.Controls {
 				//If the user previously deleted the row for new data (for example, by
 				//cancelling the row edit) the pairInEdit will be null.
 				if (pairInEdit == null) {
-					pairInEdit = new TranslationPair();
+					pairInEdit = new WordListEntry(null);
 					rowInEdit = e.RowIndex;
 				}
 				rowSource = pairInEdit;
@@ -249,7 +252,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		//Called when the DataGridView requests the data for a cell.
 		void grid_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e) {
-			TranslationPair rowSource = RowSource(e.RowIndex);
+			var rowSource = RowSource(e.RowIndex);
 
 			if (rowSource != null) {
 				if (e.ColumnIndex == 0)
@@ -259,7 +262,7 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-		private TranslationPair RowSource(int row) {
+		private WordListEntry RowSource(int row) {
 			if (source == null || row > source.Count)
 				return null;
 
@@ -384,20 +387,18 @@ namespace Szotar.WindowsForms.Controls {
 				return;
 			}
 
-			TranslationPair rowSource = null;
+			WordListEntry rowSource = null;
 			if (source != null)
 				rowSource = source[e.RowIndex];
 
-			if (rowSource != null && rowSource.Mutable && ShowMutableRows) {
-				e.CellStyle.BackColor = (e.RowIndex % 2 == 0) ? Color.LightGoldenrodYellow : Color.PaleGoldenrod;
-
-			} else {
-				e.CellStyle.BackColor = (e.RowIndex % 2 == 0) ? SystemColors.Control : SystemColors.ControlLightLight;
-			}
-
+			e.CellStyle.BackColor = (e.RowIndex % 2 == 0) ? SystemColors.Control : SystemColors.ControlLightLight;
 			e.CellStyle.SelectionBackColor = (e.RowIndex % 2 == 0) ? Color.SteelBlue : Color.DeepSkyBlue;
 			e.CellStyle.SelectionForeColor = Color.Black;
 		}
 		#endregion
+
+		public void ScrollToIndex(int position) {
+			grid.FirstDisplayedScrollingRowIndex = Math.Max(0, Math.Min(position, grid.RowCount - 1));
+		}
 	}
 }

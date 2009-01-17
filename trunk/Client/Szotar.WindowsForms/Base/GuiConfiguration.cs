@@ -31,16 +31,6 @@ namespace Szotar.WindowsForms {
 			set { Default.Set("RecentDictionaries", value); }
 		}
 
-		public static List<ListInfo> RecentLists {
-			get { return Default.Get<List<ListInfo>>("RecentLists", null); }
-			set { Default.Set("RecentLists", value); }
-		}
-
-		public static int RecentListsSize {
-			get { return Default.Get<int>("RecentListsSize", 10); }
-			set { Default.Set("RecentListsSize", value); }
-		}
-
 		public static bool IgnoreAccents {
 			get { return Default.Get<bool>("IgnoreAccents", false); }
 			set { Default.Set("IgnoreAccents", value); }

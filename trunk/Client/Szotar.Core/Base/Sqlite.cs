@@ -7,58 +7,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
 
+using System.Data.SQLite;
+using System.Text;
+
 namespace Szotar.Sqlite {
-	static class SqliteFactory {
-		static Type type;
-		static Assembly assembly;
-
-		public static DbConnection CreateConnection(string path) {
-			Reflect();
-
-			DbConnection conn = (DbConnection)Activator.CreateInstance(type);
-			conn.ConnectionString = "Data Source=" + path;
-			return conn;
-		}
-
-		private static void Reflect() {
-			if (type != null)
-				return;
-
-			string relativePath;
-			string typeName;
-
-			switch (Environment.OSVersion.Platform) {
-				case PlatformID.Win32NT:
-					if (IntPtr.Size == 8) {
-						//IA64 is currently not supported by Szótár.
-						relativePath = "Dependencies/x64/System.Data.SQLite.dll";
-					} else {
-						relativePath = "Dependencies/x86/System.Data.SQLite.dll";
-					}
-
-					string exePath = Assembly.GetExecutingAssembly().Location;
-					string dependenciesDirectory;
-					if(!string.IsNullOrEmpty(exePath))
-						dependenciesDirectory = Path.GetDirectoryName(exePath);
-					else
-						dependenciesDirectory = Environment.CurrentDirectory;
-					
-					string path = Path.Combine(dependenciesDirectory, relativePath);
-					assembly = Assembly.LoadFile(path);
-					
-					typeName = "System.Data.SQLite.SQLiteConnection";
-					break;
-				default:
-					//FIXME Should probably use full assembly name
-					assembly = Assembly.LoadWithPartialName("Mono.Data.SqliteClient");
-					typeName = "Mono.Data.SqliteClient.SqliteConnection";
-					break;
-			}
-			
-			type = assembly.GetType(typeName);
-		}
-	}
-
 	[global::System.Serializable]
 	public class DatabaseVersionException : Exception {
 		public DatabaseVersionException() { }
@@ -74,7 +26,8 @@ namespace Szotar.Sqlite {
 		string path;
 
 		public SqliteDatabase(string path)
-			: base(SqliteFactory.CreateConnection(path)) {
+			: base(new SQLiteConnection("Data Source=" + path)) {
+			
 			this.path = path;
 			conn.Open();
 
@@ -198,7 +151,10 @@ namespace Szotar.Sqlite {
 				foreach (object p in parameters)
 					AddParameter(command, p);
 
-				return command.ExecuteScalar();
+				var res = command.ExecuteScalar();
+				if (res is DBNull)
+					return null;
+				return res;
 			}
 		}
 		
@@ -209,7 +165,7 @@ namespace Szotar.Sqlite {
 				foreach (object p in parameters) {
 					var param = command.CreateParameter();
 					param.Value = p;
-					command.Parameters.Add(p);
+					command.Parameters.Add(param);
 				}
 
 				return command.ExecuteReader();
@@ -232,219 +188,9 @@ namespace Szotar.Sqlite {
 		protected virtual void Dispose(bool disposing) {
 		}
 	}
-	
-	public class SqliteDictionary : SqliteDatabase, IBilingualDictionary {
-		protected override void UpgradeSchema(int fromVersion, int toVersion) {
-			UpgradeSchemaInIncrements(fromVersion, toVersion);
-		}
 
-		protected override void IncrementalUpgradeSchema(int version) {
-			switch (version) {
-				case 1:
-					InitialiseDatabase();
-					break;
-				default:
-					//FIXME Resources.Errors.CannotUpgradeDatabaseToVersion
-					throw new ArgumentException(string.Format("Can't upgrade to database version {0}", version), "version");
-			}
-		}
-
-		private void InitialiseDatabase() {
-			using (var cmd = Connection.CreateCommand()) {
-				cmd.CommandText = "CREATE TABLE Entries(id INTEGER PRIMARY KEY AUTOINCREMENT, Section INTEGER NOT NULL, Phrase TEXT NOT NULL, PhraseWithoutAccents TEXT)";
-				cmd.ExecuteNonQuery();
-				cmd.CommandText = "CREATE INDEX Entries_Phrase ON Entries (Phrase, Section)";
-				cmd.ExecuteNonQuery();
-				cmd.CommandText = "CREATE INDEX Entries_PhraseWithoutAccents ON Entries (PhraseWithoutAccents, Section)";
-				cmd.ExecuteNonQuery();
-				cmd.CommandText = "CREATE TABLE Translations(id INTEGER PRIMARY KEY AUTOINCREMENT, phraseID INTEGER NOT NULL, Value TEXT NOT NULL)";
-				cmd.ExecuteNonQuery();
-			}
-		}
-
-		protected override int ApplicationSchemaVersion() {
-			return 1;
-		}
-
-		public SqliteDictionary(string path) : base(path) { }
-
-		public SqliteDictionary(string path, IDictionarySection forward, IDictionarySection backward)
-			: base(path) {
-			using (var txn = Connection.BeginTransaction()) {
-				InsertEntriesFromSource(ForwardSectionID, forward);
-				InsertEntriesFromSource(BackwardSectionID, forward);
-
-				txn.Commit();
-			}
-
-			ForwardsSection = new Section(this, ForwardSectionID);
-			ReverseSection = new Section(this, BackwardSectionID);
-		}
-
-		protected void InsertEntriesFromSource(int section, IDictionarySection source) {
-			using (var insertEntryCommand = Connection.CreateCommand()) {
-				insertEntryCommand.CommandText = "INSERT INTO Entries (Section, Phrase, PhraseWithoutAccents) VALUES (?, ?, ?)";
-				insertEntryCommand.Parameters.Add(insertEntryCommand.CreateParameter());
-				insertEntryCommand.Parameters.Add(insertEntryCommand.CreateParameter());
-				insertEntryCommand.Parameters.Add(insertEntryCommand.CreateParameter());
-				insertEntryCommand.Parameters[0].Value = section;
-
-				using (var insertTranslationCommand = Connection.CreateCommand()) {
-					insertTranslationCommand.CommandText = "INSERT INTO TRANSLATIONS(phraseID, Value) VALUES (?, ?)";
-					insertTranslationCommand.Parameters.Add(insertTranslationCommand.CreateParameter());
-					insertTranslationCommand.Parameters.Add(insertTranslationCommand.CreateParameter());
-					foreach (Entry e in source) {
-						insertEntryCommand.Parameters[1].Value = e.Phrase;
-						insertEntryCommand.Parameters[2].Value = e.PhraseNoAccents;
-
-						insertEntryCommand.ExecuteNonQuery();
-						insertTranslationCommand.Parameters[0].Value = this.GetLastInsertRowID();
-
-						foreach (Translation t in e.Translations) {
-							insertTranslationCommand.Parameters[1].Value = t.Value;
-							insertTranslationCommand.ExecuteNonQuery();
-						}
-					}
-				}
-			}
-		}
-
-		public string GetStringOption(string name) {
-			if (TableExists("Info")) {
-				using (var cmd = Connection.CreateCommand()) {
-					cmd.CommandText = "TYPES text; SELECT Info.Value FROM Info WHERE Info.Name = ?";
-					cmd.Parameters.Add(cmd.CreateParameter());
-					cmd.Parameters[0].Value = name;
-
-					return (string)cmd.ExecuteScalar();
-				}
-			} else {
-				return null;
-			}
-		}
-
-		public void SetStringOption(string name, string value) {
-			using (var cmd = Connection.CreateCommand()) {
-				cmd.CommandText = "UPDATE Info SET Info.Value = ? WHERE Info.Name = ?";
-				cmd.Parameters.Add(cmd.CreateParameter());
-				cmd.Parameters[0].Value = value;
-				cmd.Parameters.Add(cmd.CreateParameter());
-				cmd.Parameters[0].Value = name;
-
-				cmd.ExecuteNonQuery();
-			}
-		}
-
-		protected static int ForwardSectionID {
-			get { return 0; }
-		}
-
-		protected static int BackwardSectionID {
-			get { return 1; }
-		}
-
-		public IDictionarySection ForwardsSection { get; private set; }
-		public IDictionarySection ReverseSection { get; private set; }
-
-		public string Name {
-			get { return GetStringOption("Name"); }
-			set { SetStringOption("Name", value); }
-		}
-
-		public string Author {
-			get { return GetStringOption("Author"); }
-			set { SetStringOption("Author", value); }
-		}
-
-		string IBilingualDictionary.Path {
-			get { return base.Path; }
-			set { throw new InvalidOperationException(); }
-		}
-
-		public string FirstLanguage {
-			get { return GetStringOption("FirstLanguage"); }
-			set { SetStringOption("FirstLanguage", value); }
-		}
-
-		public string SecondLanguage {
-			get { return GetStringOption("SecondLanguage"); }
-			set { SetStringOption("SecondLanguage", value); }
-		}
-
-		public string FirstLanguageReverse {
-			get { return GetStringOption("FirstLanguageReverse"); }
-			set { SetStringOption("FirstLanguageReverse", value); }
-		}
-
-		public string SecondLanguageReverse {
-			get { return GetStringOption("SecondLanguageReverse"); }
-			set { SetStringOption("SecondLanguageReverse", value); }
-		}
-
-		public string FirstLanguageCode {
-			get { return GetStringOption("FirstLanguageCode"); }
-			set { SetStringOption("FirstLanguageCode", value); }
-		}
-
-		public string SecondLanguageCode {
-			get { return GetStringOption("SecondLanguageCode"); }
-			set { SetStringOption("SecondLanguageCode", value); }
-		}
-
-		void IBilingualDictionary.Save() {
-			//Nothing needed.
-		}
-
-		public class Section : IDictionarySection {
-			SqliteDictionary dict;
-			int sectionID;
-
-			public Section(SqliteDictionary dict, int sectionID) {
-				if (sectionID != SqliteDictionary.BackwardSectionID && sectionID != SqliteDictionary.ForwardSectionID)
-					throw new ArgumentException();
-
-				this.dict = dict;
-				this.sectionID = sectionID;
-			}
-
-			private string MakeOptionName(string baseName) {
-				return baseName + sectionID;
-			}
-
-			public string Name {
-				get { return dict.GetStringOption(MakeOptionName("SectionName")); }
-				set { dict.SetStringOption(MakeOptionName("SectionName"), value); }
-			}
-
-			public string Author {
-				get { return dict.GetStringOption(MakeOptionName("SectionAuthor")); }
-				set { dict.SetStringOption(MakeOptionName("SectionAuthor"), value); }
-			}
-
-			public int HeadWords {
-				get {
-					using (DbCommand cmd = dict.Connection.CreateCommand()) {
-						cmd.CommandText = "SELECT Count(*) FROM Info";
-						return Convert.ToInt32(cmd.ExecuteScalar());
-					}
-				}
-			}
-
-			public IEnumerable<SearchResult> Search(string terms, bool ignoreAccents, bool ignoreCase) {
-				return new List<SearchResult>(new SearchResult[] { new SearchResult(new Entry("hello", new List<Translation>(new Translation[] { new Translation("szervusz") })), MatchType.NormalMatch) });
-			}
-
-			public IEnumerator<Entry> GetEnumerator() {
-				return new List<Entry>(new Entry[] { new Entry("to try sg out", new List<Translation>(new Translation[] { new Translation("kiprobalni") })) }).GetEnumerator();
-			}
-
-			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-				return new Entry[] { new Entry("to try sg out", new List<Translation>(new Translation[] { new Translation("kiprobalni") })) }.GetEnumerator();
-			}
-
-			void IDictionarySection.GetFullEntry(Entry entry) {
-			}
-		}
+	public class WordListDeletedEventArgs : EventArgs {
+		public long SetID { get; set; }
 	}
 
 	public class SqliteDataStore : SqliteDatabase {
@@ -478,7 +224,7 @@ namespace Szotar.Sqlite {
 				ExecuteSQL("CREATE INDEX VocabItems_IndexSO ON VocabItems (SetID, ListPosition)");
 				//ExecuteSQL("CREATE INDEX VocabItems_IndexK ON VocabItems (Knowledge)");
 
-				ExecuteSQL("CREATE TABLE Sets (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Author TEXT, Language TEXT)");
+				ExecuteSQL("CREATE TABLE Sets (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Author TEXT, Language TEXT, Url TEXT, Created Date)");
 				ExecuteSQL("CREATE INDEX Sets_Index ON Sets (id)");
 
 				ExecuteSQL("CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT)");
@@ -508,18 +254,117 @@ namespace Szotar.Sqlite {
 			return wl;
 		}
 
-		public long CreateSet(string name, string author, string language) {
+		public SqliteWordList CreateSet(string name, string author, string language, string url, DateTime? date) {
 			long setID;
 
 			using (var txn = Connection.BeginTransaction()) {
-				ExecuteSQL("INSERT INTO Sets (Name, Author, Language) VALUES (?, ?, ?)",
-					name, author, language);
+				ExecuteSQL("INSERT INTO Sets (Name, Author, Language, Url, Created) VALUES (?, ?, ?, ?, ?)",
+					name, author, language, url, date.HasValue ? (object)date.Value : (object)DBNull.Value);
 
 				setID = GetLastInsertRowID();
 				txn.Commit();
 			}
 
-			return setID;
+			var wl = new SqliteWordList(this, setID);
+			wordLists[setID] = new NullWeakReference<SqliteWordList>(wl);
+			return wl;
 		}
+
+		public IEnumerable<ListInfo> GetAllSets() {			
+			using (var reader = this.SelectReader("TYPES Integer, Text, Text, Text, Text, Date; SELECT id, Name, Author, Language, Url, Created FROM Sets ORDER BY id ASC")) {
+				while (reader.Read()) {
+					var list = new ListInfo();
+					list.ID = reader.GetInt64(0);
+					list.Name = reader.GetString(1); //Can't be null
+					if (!reader.IsDBNull(2))
+						list.Author = reader.GetString(2);
+					if (!reader.IsDBNull(3))
+						list.Language = reader.GetString(3);
+					if (!reader.IsDBNull(4))
+						list.Url = reader.GetString(4);
+					if (!reader.IsDBNull(5))
+						list.Date = reader.GetDateTime(5);
+
+					yield return list;
+				}
+			}
+		}
+
+		public class WordSearchResult {
+			public string Phrase { get; set; }
+			public string Translation { get; set; }
+			public string SetName { get; set; }
+			public long SetID { get; set; }
+			public int ListPosition { get; set; }
+		}
+
+		public IEnumerable<WordSearchResult> SearchAllEntries(string query) {
+			var sb = new StringBuilder();
+
+			if (string.IsNullOrEmpty(query)) {
+				sb.Append("%");
+			} else {
+				sb.Append("%");
+				foreach (char c in query) {
+					switch (c) {
+						//']' on its own doesn't need to be escaped.
+						case '%':
+						case '_':
+						case '[':
+							sb.Append('[').Append(c).Append(']');
+							break;
+						default:
+							sb.Append(c);
+							break;
+					}
+				}
+				sb.Append("%");
+			}
+
+			using (var reader = this.SelectReader(
+				"TYPES Integer, Text, Text, Text, Integer;" +
+				"SELECT SetID, Name, Phrase, Translation, ListPosition FROM VocabItems JOIN Sets ON (VocabItems.SetID = Sets.id)" +
+				"WHERE Phrase LIKE ? OR Translation LIKE ? ORDER BY SetID ASC, Phrase ASC", sb.ToString(), sb.ToString())) 
+			{
+
+				while (reader.Read()) {
+					var wsr = new WordSearchResult();
+					wsr.SetID = reader.GetInt64(0);
+					wsr.SetName = reader.GetString(1);
+					wsr.Phrase = reader.GetString(2);
+					wsr.Translation = reader.GetString(3);
+					wsr.ListPosition = reader.GetInt32(4);
+
+					yield return wsr;
+				}
+			}
+		}
+
+		//This function also raised the ListDeleted event on the WordList, if one exists.
+		public void DeleteWordList(long setID) {
+			NullWeakReference<SqliteWordList> wlr;
+			if (wordLists.TryGetValue(setID, out wlr))
+				wordLists.Remove(setID);
+
+			using (var txn = Connection.BeginTransaction()) {
+				ExecuteSQL("DELETE FROM Sets WHERE id = ?", setID);
+				ExecuteSQL("DELETE FROM VocabItems WHERE SetID = ?", setID);
+				ExecuteSQL("DELETE FROM SetProperties WHERE SetID = ?", setID);
+				ExecuteSQL("DELETE FROM SetMemberships WHERE ChildID = ? OR ParentID = ?", setID, setID);
+
+				txn.Commit();
+			}
+
+			var handler = WordListDeleted;
+			if (handler != null)
+				handler(this, new WordListDeletedEventArgs { SetID = setID });
+
+			var wl = wlr.Target;
+			if (wl != null)
+				wl.RaiseDeleted();
+		}
+
+		//Note: there's also a ListDeleted event on the WordList itself, which may be preferable.
+		public event EventHandler<WordListDeletedEventArgs> WordListDeleted;
 	}
 }

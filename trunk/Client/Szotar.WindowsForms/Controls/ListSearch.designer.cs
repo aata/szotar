@@ -25,11 +25,11 @@
 		private void InitializeComponent() {
 			this.search = new System.Windows.Forms.Button();
 			this.results = new System.Windows.Forms.ListView();
-			this.nameColumn = new System.Windows.Forms.ColumnHeader();
-			this.dateColumn = new System.Windows.Forms.ColumnHeader();
-			this.termsColumn = new System.Windows.Forms.ColumnHeader();
+			this.firstColumn = new System.Windows.Forms.ColumnHeader();
+			this.secondColumn = new System.Windows.Forms.ColumnHeader();
+			this.thirdColumn = new System.Windows.Forms.ColumnHeader();
 			this.acceptButton = new System.Windows.Forms.Button();
-			this.searchBox = new Controls.SearchBox();
+			this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
 			this.SuspendLayout();
 			// 
 			// search
@@ -48,10 +48,11 @@
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.results.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.nameColumn,
-            this.dateColumn,
-            this.termsColumn});
+            this.firstColumn,
+            this.secondColumn,
+            this.thirdColumn});
 			this.results.FullRowSelect = true;
+			this.results.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.results.Location = new System.Drawing.Point(4, 30);
 			this.results.Name = "results";
 			this.results.Size = new System.Drawing.Size(486, 311);
@@ -61,20 +62,20 @@
 			this.results.View = System.Windows.Forms.View.Details;
 			this.results.ItemActivate += new System.EventHandler(this.results_ItemActivate);
 			// 
-			// nameColumn
+			// firstColumn
 			// 
-			this.nameColumn.Text = "Name";
-			this.nameColumn.Width = 236;
+			this.firstColumn.Text = "";
+			this.firstColumn.Width = 177;
 			// 
-			// dateColumn
+			// secondColumn
 			// 
-			this.dateColumn.Text = "Date Modified";
-			this.dateColumn.Width = 101;
+			this.secondColumn.Text = "";
+			this.secondColumn.Width = 183;
 			// 
-			// termsColumn
+			// thirdColumn
 			// 
-			this.termsColumn.Text = "Terms";
-			this.termsColumn.Width = 61;
+			this.thirdColumn.Text = "";
+			this.thirdColumn.Width = 121;
 			// 
 			// acceptButton
 			// 
@@ -91,7 +92,8 @@
 			// 
 			this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
+			this.searchBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.searchBox.ForeColor = System.Drawing.SystemColors.ControlText;
 			this.searchBox.Location = new System.Drawing.Point(4, 3);
 			this.searchBox.Name = "searchBox";
 			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
@@ -120,9 +122,9 @@
 
 		private System.Windows.Forms.Button search;
 		private System.Windows.Forms.ListView results;
-		private System.Windows.Forms.ColumnHeader nameColumn;
-		private System.Windows.Forms.ColumnHeader dateColumn;
-		private System.Windows.Forms.ColumnHeader termsColumn;
+		private System.Windows.Forms.ColumnHeader firstColumn;
+		private System.Windows.Forms.ColumnHeader secondColumn;
+		private System.Windows.Forms.ColumnHeader thirdColumn;
 		private Szotar.WindowsForms.Controls.SearchBox searchBox;
 		private System.Windows.Forms.Button acceptButton;
 	}
