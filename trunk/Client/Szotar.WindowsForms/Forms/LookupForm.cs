@@ -106,8 +106,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			AdjustGridRowHeight();
 
-			searchBox.TextChanged += new EventHandler(searchBox_TextChanged);
-			
+			searchBox.RealTextChanged += new EventHandler(searchBox_RealTextChanged);
 			
 			//Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
@@ -449,6 +448,8 @@ namespace Szotar.WindowsForms.Forms {
 		public SearchMode SearchMode {
 			get { return searchMode; }
 			set {
+				if (searchMode == value)
+					return;
 				searchMode = value;
 				if (SearchMode == SearchMode.Forward)
 					switchMode.Text = forwards.Text;
@@ -475,7 +476,7 @@ namespace Szotar.WindowsForms.Forms {
 		/// <summary>
 		/// Updates the current search results to reflect the new search terms.
 		/// </summary>
-		private void searchBox_TextChanged(object sender, EventArgs e) {
+		private void searchBox_RealTextChanged(object sender, EventArgs e) {
 			UpdateResults();
 		}
 
@@ -590,8 +591,7 @@ namespace Szotar.WindowsForms.Forms {
 		void LookupForm_Closed(object sender, EventArgs e) {
 			if (listBuilder != null)
 				listBuilder.Close();
-			GuiConfiguration.IgnoreCase = ignoreCaseCheck.Checked;
-			GuiConfiguration.IgnoreAccents = ignoreAccentsCheck.Checked;
+			
 			GuiConfiguration.Save();
 
 			RemoveEventHandlers();
@@ -599,7 +599,8 @@ namespace Szotar.WindowsForms.Forms {
 			//This is done as a hint to the GC, because forms which are open for a long time 
 			//might not trigger a gen2 collection when closing. 
 			//We want to reclaim the memory in case there are other windows open.
-			GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+			//GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+			GC.Collect(GC.MaxGeneration); //force it
 		}
 
 		void LookupForm_InputLanguageChanged(object sender, InputLanguageChangedEventArgs e) {
@@ -738,6 +739,10 @@ namespace Szotar.WindowsForms.Forms {
 			new ListBuilder().Show();
 		}
 
+		private void openList_Click(object sender, EventArgs e) {
+			StartPage.ShowStartPage(StartPageTab.WordLists);
+		}
+
 		private void importList_Click(object sender, EventArgs e) {
 			new Forms.ImportForm().Show();
 		}
@@ -767,11 +772,8 @@ namespace Szotar.WindowsForms.Forms {
 		private void OpenRecentFile(object sender, EventArgs e) {
 			try {
 				ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
-				if(info.ID.HasValue) {
-					//TODO: find existing window first
-					var list = DataStore.Database.GetWordList(info.ID.Value);
-					new ListBuilder(list).Show();
-				}
+				if(info.ID.HasValue)
+					ListBuilder.Open(info.ID.Value);
 			} catch (System.IO.IOException x) {
 				MessageBox.Show(x.Message);
 			}
@@ -800,24 +802,66 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Tools Menu
+		private void dictsFolder_Click(object sender, EventArgs e) {
+			DataStore.UserDataStore.EnsureDirectoryExists("Dictionaries");
+			string path = System.IO.Path.Combine(DataStore.UserDataStore.Path, "Dictionaries");
+			System.Diagnostics.Process.Start(path);
+		}
+
+		private void charMap_Click(object sender, EventArgs e) {
+			System.Diagnostics.Process.Start("charmap.exe");
+		}
+
 		private void options_Click(object sender, EventArgs e) {
 			new Forms.Preferences().ShowDialog();
 		}
 		#endregion
 
 		#region Context Menu
-		private void addToList_Click(object sender, EventArgs e) {
-			var entries = new List<TranslationPair>();
-			foreach(DataGridViewRow row in grid.SelectedRows)
-				entries.Add(new TranslationPair(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), true));
+		private void contextMenu_Opening(object sender, CancelEventArgs _) {
+			var open = new List<long>();
 
-			if (listBuilder == null) {
-				listBuilder = new ListBuilder();
-				listBuilder.Closed += new EventHandler(listBuilder_Closed);
-				listBuilder.Show();
+			addTo.DropDownItems.Clear();
+
+			foreach (Form f in Application.OpenForms) {
+				var lb = f as ListBuilder;
+				if (lb != null) {
+					open.Add(lb.WordList.ID.Value);
+					var item = new ToolStripMenuItem(lb.WordList.Name, null, new EventHandler((s, e) => AddToExistingList(lb.WordList.ID.Value)));
+					addTo.DropDownItems.Add(item);
+				}
 			}
 
-			listBuilder.AddEntries(entries);
+			var recent = new List<ListInfo>(Configuration.RecentLists);
+			recent.RemoveAll(r => open.IndexOf(r.ID.Value) > -1);
+
+			if (recent.Count > 0 && open.Count > 0)
+				addTo.DropDownItems.Add(new ToolStripSeparator());
+
+			foreach (var info in recent) {
+				var item = new ToolStripMenuItem(info.Name, null, new EventHandler((s, e) => AddToExistingList(info.ID.Value)));
+				addTo.DropDownItems.Add(item);
+			}
+
+			addTo.Visible = addTo.DropDownItems.Count > 0;
+		}
+
+		private void AddToExistingList(long listID) {
+			AddEntries(ListBuilder.Open(listID));
+		}
+
+		private void AddEntries(ListBuilder lb) {
+			var entries = new List<TranslationPair>();
+			foreach (DataGridViewRow row in grid.SelectedRows)
+				entries.Add(new TranslationPair(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), true));
+
+			lb.AddEntries(entries);
+		}
+
+		private void addToList_Click(object sender, EventArgs e) {
+			var lb = new ListBuilder();
+			AddEntries(lb);
+			lb.Show();
 		}
 
 		private void copy_Click(object sender, EventArgs e) {
@@ -844,7 +888,8 @@ namespace Szotar.WindowsForms.Forms {
 				DataGridViewCell cell = grid.SelectedCells[0];
 				searchMode = DisplayedSearchMode == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward;
 
-				//Why I can't just access it on the cell itself, I have NO idea. But it seems to work.
+				//HACK I can't just access it on the cell itself, I have NO idea why
+				//But it seems to work like this.
 				searchBox.Text = cell.OwningRow.Cells[1].Value.ToString();
 
 				//Update the UI
@@ -864,28 +909,28 @@ namespace Szotar.WindowsForms.Forms {
 			return null;
 		}
 
-		public static void OpenDictionary(DictionaryInfo dict) {
+		public static LookupForm OpenDictionary(DictionaryInfo dict) {
 			var existing = FindExisting(dict.Path);
 			if(existing != null) {
 				existing.BringToFront();
-				return;
+				return existing;
 			}
 
-			new LookupForm(dict).Show();
+			existing = new LookupForm(dict);
+			existing.Show();
+			return existing;
 		}
 
-		public static void OpenDictionary(string path) {
+		public static LookupForm OpenDictionary(string path) {
 			var existing = FindExisting(path);
 			if(existing != null) {
 				existing.BringToFront();
-				return;
+				return existing;
 			}
-			
-			new LookupForm(path).Show();
-		}
 
-		private void openList_Click(object sender, EventArgs e) {
-			StartPage.ShowStartPage(StartPageTab.Practice);
+			existing = new LookupForm(path);
+			existing.Show();
+			return existing;
 		}
 	}
 

@@ -24,7 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.search = new System.Windows.Forms.Button();
-			this.results = new System.Windows.Forms.ListView();
+			this.results = new Szotar.WindowsForms.Controls.ListViewNF();
 			this.firstColumn = new System.Windows.Forms.ColumnHeader();
 			this.secondColumn = new System.Windows.Forms.ColumnHeader();
 			this.thirdColumn = new System.Windows.Forms.ColumnHeader();
@@ -55,6 +55,7 @@
 			this.results.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.results.Location = new System.Drawing.Point(4, 30);
 			this.results.Name = "results";
+			this.results.ShowItemToolTips = true;
 			this.results.Size = new System.Drawing.Size(486, 311);
 			this.results.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.results.TabIndex = 2;
@@ -83,7 +84,7 @@
 			this.acceptButton.Location = new System.Drawing.Point(373, 347);
 			this.acceptButton.Name = "acceptButton";
 			this.acceptButton.Size = new System.Drawing.Size(117, 23);
-			this.acceptButton.TabIndex = 4;
+			this.acceptButton.TabIndex = 3;
 			this.acceptButton.Text = "&Practice";
 			this.acceptButton.UseVisualStyleBackColor = true;
 			this.acceptButton.Click += new System.EventHandler(this.acceptButton_Click);
@@ -100,7 +101,7 @@
 			this.searchBox.PromptFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic);
 			this.searchBox.PromptText = "Search";
 			this.searchBox.Size = new System.Drawing.Size(380, 20);
-			this.searchBox.TabIndex = 3;
+			this.searchBox.TabIndex = 0;
 			// 
 			// ListSearch
 			// 
@@ -121,7 +122,7 @@
 		#endregion
 
 		private System.Windows.Forms.Button search;
-		private System.Windows.Forms.ListView results;
+		private Szotar.WindowsForms.Controls.ListViewNF results;
 		private System.Windows.Forms.ColumnHeader firstColumn;
 		private System.Windows.Forms.ColumnHeader secondColumn;
 		private System.Windows.Forms.ColumnHeader thirdColumn;

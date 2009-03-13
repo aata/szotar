@@ -15,6 +15,8 @@ namespace Szotar.WindowsForms.Controls {
 		internal Color promptColor;
 		internal bool isPrompting = true;
 
+		internal bool wasPrompting = false;
+
 		public SearchBox() {
 			InitializeComponent();
 
@@ -27,6 +29,17 @@ namespace Szotar.WindowsForms.Controls {
 
 				Text = string.Empty;
 				SetPrompt();
+
+				TextChanged += (s, e) => {
+					// Don't raise the RealTextChanged event when the text is changing due to the
+					// prompt being set or unset. This is shitty, but it works.
+					if (wasPrompting == IsPrompting) {
+						var h = RealTextChanged;
+						if (h != null)
+							h(s, e);
+					}
+					wasPrompting = IsPrompting;
+				};
 			}
 		}
 
@@ -144,5 +157,7 @@ namespace Szotar.WindowsForms.Controls {
 			}
 			set { promptText = value; SetPrompt(); }
 		}
+
+		public EventHandler RealTextChanged;
 	}
 }

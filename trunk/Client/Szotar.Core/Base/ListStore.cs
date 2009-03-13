@@ -12,9 +12,7 @@ namespace Szotar {
 		public string Language { get; set; }
 		public string Url { get; set; }
 		public DateTime? Date { get; set; }
-
-		public ListInfo() {
-		}
+		public long? TermCount { get; set; }
 	}
 	
 	public interface IListStore {

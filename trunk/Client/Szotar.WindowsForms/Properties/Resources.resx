@@ -185,7 +185,7 @@
   </data>
   <data name="ChangedXToY" xml:space="preserve">
     <value>Changed {0} to {1}</value>
-    <comment>Undo stuff</comment>
+    <comment>Undo item description</comment>
   </data>
   <data name="DeletedNItems" xml:space="preserve">
     <value>Deleted {0} items</value>
@@ -193,18 +193,32 @@
   </data>
   <data name="Inserted1Item" xml:space="preserve">
     <value>Inserted 1 item</value>
-    <comment>Undo stuff</comment>
+    <comment>Undo item description</comment>
   </data>
   <data name="InsertedNItems" xml:space="preserve">
     <value>Inserted {0} items</value>
-    <comment>Undo stuff</comment>
+    <comment>Undo item description</comment>
   </data>
   <data name="InternalOperation" xml:space="preserve">
     <value>(Internal Operation)</value>
-    <comment>Undo stuff</comment>
+    <comment>Undo item description</comment>
   </data>
   <data name="SearchResults" xml:space="preserve">
     <value>Search Results</value>
     <comment>Shown when searching for lists.</comment>
+  </data>
+  <data name="SwappedNRows" xml:space="preserve">
+    <value>Swapped {0} rows</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="NTerms" xml:space="preserve">
+    <value>{0} terms</value>
+    <comment>Used to denote how many items a word list contains.</comment>
+  </data>
+  <data name="OnlyNResultsShown" xml:space="preserve">
+    <value>Only {0} results are shown. Double-click here to show more.</value>
+  </data>
+  <data name="ShowMore" xml:space="preserve">
+    <value>Show more</value>
   </data>
 </root>

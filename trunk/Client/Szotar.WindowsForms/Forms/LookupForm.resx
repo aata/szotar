@@ -125,7 +125,7 @@
     <value>198, 22</value>
   </data>
   <data name="addToList.Text" xml:space="preserve">
-    <value>&amp;Add to List</value>
+    <value>&amp;Add to new word list</value>
   </data>
   <metadata name="copy.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
@@ -301,7 +301,7 @@
     <value>False</value>
   </metadata>
   <data name="newList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>136, 22</value>
   </data>
   <data name="newList.Text" xml:space="preserve">
     <value>&amp;New</value>
@@ -310,7 +310,7 @@
     <value>False</value>
   </metadata>
   <data name="openList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>136, 22</value>
   </data>
   <data name="openList.Text" xml:space="preserve">
     <value>&amp;Open...</value>
@@ -319,7 +319,7 @@
     <value>False</value>
   </metadata>
   <data name="importList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>136, 22</value>
   </data>
   <data name="importList.Text" xml:space="preserve">
     <value>&amp;Import...</value>
@@ -328,7 +328,7 @@
     <value>False</value>
   </metadata>
   <data name="toolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>149, 6</value>
+    <value>133, 6</value>
   </data>
   <metadata name="dummyItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
@@ -340,7 +340,7 @@
     <value>Dummy Item</value>
   </data>
   <data name="recentLists.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>136, 22</value>
   </data>
   <data name="recentLists.Text" xml:space="preserve">
     <value>&amp;Recent Lists</value>
@@ -390,11 +390,35 @@
   <metadata name="toolsMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="dictsFolder.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="dictsFolder.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="dictsFolder.Text" xml:space="preserve">
+    <value>Open &amp;Dictionaries folder</value>
+  </data>
+  <metadata name="charMap.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="charMap.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="charMap.Text" xml:space="preserve">
+    <value>Character &amp;Map</value>
+  </data>
+  <metadata name="toolStripSeparator3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripSeparator3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 6</value>
+  </data>
   <metadata name="options.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
   <data name="options.Size" type="System.Drawing.Size, System.Drawing">
-    <value>116, 22</value>
+    <value>202, 22</value>
   </data>
   <data name="options.Text" xml:space="preserve">
     <value>&amp;Options</value>
@@ -423,8 +447,14 @@
   <metadata name="contextMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>128, 12</value>
   </metadata>
+  <data name="addTo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="addTo.Text" xml:space="preserve">
+    <value>A&amp;dd to</value>
+  </data>
   <data name="contextMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>199, 70</value>
+    <value>199, 92</value>
   </data>
   <data name="&gt;&gt;contextMenu.Name" xml:space="preserve">
     <value>contextMenu</value>
@@ -888,6 +918,18 @@
   <data name="&gt;&gt;toolsMenu.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;dictsFolder.Name" xml:space="preserve">
+    <value>dictsFolder</value>
+  </data>
+  <data name="&gt;&gt;dictsFolder.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator3.Name" xml:space="preserve">
+    <value>toolStripSeparator3</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;options.Name" xml:space="preserve">
     <value>options</value>
   </data>
@@ -904,6 +946,18 @@
     <value>fileMenu</value>
   </data>
   <data name="&gt;&gt;fileMenu.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;addTo.Name" xml:space="preserve">
+    <value>addTo</value>
+  </data>
+  <data name="&gt;&gt;addTo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;charMap.Name" xml:space="preserve">
+    <value>charMap</value>
+  </data>
+  <data name="&gt;&gt;charMap.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

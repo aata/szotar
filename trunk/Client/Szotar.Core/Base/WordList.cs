@@ -61,6 +61,10 @@ namespace Szotar {
 		public abstract bool Remove(WordListEntry item);
 		public abstract IEnumerator<WordListEntry> GetEnumerator();
 
+		//Specific to WordList
+		public abstract void RemoveAt(IEnumerable<int> indices);
+		public abstract void SwapRows(IEnumerable<int> indices);
+
 		public event ListChangedEventHandler ListChanged;
 		protected void RaiseListChanged(ListChangedEventArgs eventArgs) {
 			var handler = ListChanged;
@@ -108,6 +112,14 @@ namespace Szotar {
 			var handler = ListDeleted;
 			if (handler != null)
 				handler(this, new EventArgs());
+		}
+
+		//This is getting to be quite a complex interface!
+		public abstract void Undo();
+		public abstract void Redo();
+
+		public void GetListInfo() {
+			throw new NotImplementedException();
 		}
 	}
 
@@ -224,6 +236,21 @@ namespace Szotar {
 			}
 		}
 
+		//You know, I don't think this type parameter is particularly useful.
+		internal T GetProperty<T>(WordList.EntryProperty property) {
+			switch (property) {
+				case WordList.EntryProperty.Phrase:
+					return (T)(object)phrase;
+				case WordList.EntryProperty.Translation:
+					return (T)(object)translation;
+				case WordList.EntryProperty.TimesTried:
+					return (T)(object)tried;
+				case WordList.EntryProperty.TimesFailed:
+					return (T)(object)failed;
+			}
+			throw new ArgumentException("property");
+		}
+
 		public void SetProperty(WordList.EntryProperty property, object newValue) {
 			switch (property) {
 				case WordList.EntryProperty.Phrase:
@@ -239,6 +266,7 @@ namespace Szotar {
 					SetTimesFailed((long)newValue);
 					break;
 			}
+			throw new ArgumentException("property");
 		}
 
 		public WordList Owner {

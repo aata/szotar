@@ -189,7 +189,7 @@ namespace Szotar.WindowsForms.Forms {
 				//kind of rare though.
 				try {
 					imported.Save();
-				} catch(SystemException) {
+				} catch(SystemException) { //XXX Lazy.
 					File.Delete(imported.Path);
 					throw;
 				}

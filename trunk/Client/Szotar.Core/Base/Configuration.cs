@@ -115,7 +115,6 @@ namespace Szotar {
 		string path;
 		Dictionary<string, object> settings;
 		
-		//TODO: raise event when necessary
 		//FUTURE: watch file for changes?
 		public event EventHandler<SettingChangedEventArgs> SettingChanged;
 		

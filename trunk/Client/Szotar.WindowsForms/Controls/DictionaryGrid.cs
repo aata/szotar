@@ -18,11 +18,14 @@ namespace Szotar.WindowsForms.Controls {
 
 		WordListEntry pairInEdit = null;
 		int? rowInEdit = null;
+		bool dirty = false;
 
 		public DictionaryGrid() {
 			InitializeComponent();
 			InitializeGridStyles();
 			InitializeVirtualMode();
+
+			this.Disposed += (s, e) => UnwireDataSourceEvents();
 		}
 
 		public DictionaryGrid(WordList dataSource)
@@ -42,15 +45,13 @@ namespace Szotar.WindowsForms.Controls {
 
 		#region Data Binding
 		private void WireDataSourceEvents() {
-			if (source is IBindingList) {
+			if (source is IBindingList)
 				((IBindingList)source).ListChanged += new ListChangedEventHandler(source_ListChanged);
-			}
 		}
 
 		private void UnwireDataSourceEvents() {
-			if (source is IBindingList) {
+			if (source is IBindingList) 
 				((IBindingList)source).ListChanged -= new ListChangedEventHandler(source_ListChanged);
-			}
 		}
 
 		void source_ListChanged(object sender, ListChangedEventArgs e) {
@@ -61,7 +62,7 @@ namespace Szotar.WindowsForms.Controls {
 
 			switch (e.ListChangedType) {
 				case ListChangedType.ItemAdded:
-					if (rowInEdit != null && rowInEdit > e.NewIndex)
+					if (rowInEdit != null && rowInEdit >= e.NewIndex)
 						rowInEdit++;
 					grid.Rows.Insert(e.NewIndex, 1);
 					grid.InvalidateRow(e.NewIndex);
@@ -134,6 +135,7 @@ namespace Szotar.WindowsForms.Controls {
 			grid.RowDirtyStateNeeded += new QuestionEventHandler(grid_RowDirtyStateNeeded);
 			grid.CancelRowEdit += new QuestionEventHandler(grid_CancelRowEdit);
 			grid.UserDeletingRow += new DataGridViewRowCancelEventHandler(grid_UserDeletingRow);
+			grid.KeyUp += new KeyEventHandler(grid_KeyUp);
 
 			DataGridViewColumn phraseColumn = new DataGridViewTextBoxColumn();
 			phraseColumn.HeaderText = Properties.Resources.PhraseDefaultHeader;
@@ -150,7 +152,26 @@ namespace Szotar.WindowsForms.Controls {
 			DataSource = null;
 		}
 
+		void grid_KeyUp(object sender, KeyEventArgs e) {
+			if (e.KeyCode == Keys.Delete && e.Modifiers == Keys.None) {
+				source.RemoveAt(SelectedIndices);
+				e.Handled = true;
+			} else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control) {
+				source.Undo();
+				e.Handled = true;
+			} else if (
+				(e.KeyCode == Keys.Z && e.Modifiers == (Keys.Control | Keys.Shift)) ||
+				(e.KeyCode == Keys.Y && e.Modifiers == Keys.Control))
+			{
+				source.Redo();
+				e.Handled = true;
+			}
+		}
+
 		void grid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e) {
+			e.Cancel = true; //Handled by KeyUp event
+			return;
+
 			if (source == null)
 				return;
 
@@ -188,27 +209,57 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		void grid_RowDirtyStateNeeded(object sender, QuestionEventArgs e) {
+			e.Response = dirty;
+			Debug.WriteLine(string.Format("Queried dirty state for R{0}C{1}: {2}", grid.CurrentCell.RowIndex, grid.CurrentCell.ColumnIndex, dirty));
 		}
 
 		//This event occurs whenever the user changes the current row.
 		void grid_RowValidated(object sender, DataGridViewCellEventArgs e) {
+			Debug.WriteLine(string.Format("Row R{0}C{1} validated", e.RowIndex, e.ColumnIndex));
+
 			if (e.RowIndex >= source.Count && e.RowIndex != grid.Rows.Count - 1) {
-				//Suppress the ListChangedType.ItemAdded event.
-				ignoreNextListChangedEvent = true;
-				pairInEdit.AddTo(source, source.Count);
-				pairInEdit = null;
-				rowInEdit = null;
+				Debug.WriteLine(string.Format("  This is a new row."));
+
+				//This could happen if either the last row was deleted or the editing row was committed to the list.
+				//In the case of a deleted row, is doing nothing the correct behaviour?
+				if (pairInEdit != null) {
+					//Suppress the ListChangedType.ItemAdded event.
+					//(But only if we're actually doing something! Don't move this back out of the if statement!)
+					ignoreNextListChangedEvent = true;
+
+					pairInEdit.AddTo(source, source.Count);
+					pairInEdit = null;
+					rowInEdit = null;
+				} else
+					Debug.Assert(rowInEdit == null);
 			} else if (pairInEdit != null && e.RowIndex < source.Count) {
-				//Suppress the ListChangedType.ItemChanged event.
-				ignoreNextListChangedEvent = true;
-				pairInEdit.Owner = source;
-				source[e.RowIndex] = pairInEdit;
+				Debug.WriteLine(string.Format("  This is a normal row."));
+				//A normal row was edited, and the changes were committed.
+
+				//This check is absolutely necessary. RowValidated is often called spuriously by the DataGridView
+				//even when the user hasn't done anything. It could also happen when inserting a group of rows.
+				//In that case, we certainly don't want to set the i'th element because that incurs a database
+				//access in SqliteWordList - and what's more, currently, the command is re-created every time.
+				//In short, it's weird.
+				if (grid.IsCurrentRowDirty) {
+					Debug.WriteLine(string.Format("  Row was dirty.", e.RowIndex, e.ColumnIndex));
+					//Suppress the ListChangedType.ItemChanged event.
+					ignoreNextListChangedEvent = true;
+
+					pairInEdit.Owner = source;
+					source[e.RowIndex] = pairInEdit;
+				} else
+					Debug.WriteLine(string.Format("  Row was not dirty.", e.RowIndex, e.ColumnIndex));
 				pairInEdit = null;
 				rowInEdit = null;
 			} else if (grid.ContainsFocus) {
+				Debug.WriteLine(string.Format("  No row was being edited."));
+
 				pairInEdit = null;
 				rowInEdit = null;
 			}
+
+			dirty = false;
 		}
 
 		//Create a new TranslationPair when the user edits the row for new records.
@@ -226,20 +277,30 @@ namespace Szotar.WindowsForms.Controls {
 			if (source == null)
 				return;
 
+			Debug.WriteLine(string.Format("Cell value pushed at R{0}C{1}: {2}", e.RowIndex, e.ColumnIndex, e.Value));
+
 			if (e.RowIndex < source.Count) {
+				Debug.WriteLine(string.Format("  Normal row."));
+
 				if (pairInEdit == null) {
+					Debug.WriteLine(string.Format("  pairInEdit was null"));
 					var we = source[e.RowIndex];
 					pairInEdit = new WordListEntry(null, we.Phrase, we.Translation, we.TimesTried, we.TimesFailed);
+				} else {
+					Debug.WriteLine(string.Format("  pairInEdit was non-null"));
 				}
 				rowSource = pairInEdit;
 				rowInEdit = e.RowIndex;
 			} else {
+				Debug.WriteLine(string.Format("  New row."));
 				//If the user previously deleted the row for new data (for example, by
 				//cancelling the row edit) the pairInEdit will be null.
 				if (pairInEdit == null) {
 					pairInEdit = new WordListEntry(null);
 					rowInEdit = e.RowIndex;
-				}
+					Debug.WriteLine(string.Format("  pairInEdit was null"));
+				} else
+					Debug.WriteLine(string.Format("  pairInEdit was non-null"));
 				rowSource = pairInEdit;
 			}
 
@@ -248,6 +309,8 @@ namespace Szotar.WindowsForms.Controls {
 				rowSource.Phrase = e.Value != null ? e.Value.ToString() : "";
 			else
 				rowSource.Translation = e.Value != null ? e.Value.ToString() : "";
+
+			dirty = true;
 		}
 
 		//Called when the DataGridView requests the data for a cell.
@@ -320,7 +383,7 @@ namespace Szotar.WindowsForms.Controls {
 		public IEnumerable<int> SelectedIndices {
 			get {
 				foreach (DataGridViewRow row in grid.SelectedRows)
-					if (row.Index != grid.RowCount - 1)
+					if (row.Index < source.Count)
 						yield return row.Index;
 			}
 		}
@@ -328,7 +391,8 @@ namespace Szotar.WindowsForms.Controls {
 		public int SelectionSize {
 			get {
 				int count = grid.SelectedRows.Count;
-				if (grid.Rows.Count > 0 && grid.Rows[grid.RowCount - 1].Selected)
+				//TODO: Test.
+				if (grid.Rows.Count > 0 && grid.AllowUserToAddRows && grid.Rows[grid.RowCount - 1].Selected)
 					count--;
 				Debug.Assert(count >= 0);
 				return count;
