@@ -9,13 +9,14 @@ using System.Windows.Forms;
 namespace Szotar.WindowsForms.Forms {
 	public partial class ListBuilder : Form {
 		WordList list;
-		bool saved;
+		
+		public WordList WordList { get { return list; } }
 
 		public ListBuilder() : 
 			this(DataStore.Database.CreateSet(Properties.Resources.DefaultListName, 
 			GuiConfiguration.UserNickname, null, null, DateTime.Now))
 		{
-			saved = false;
+			MakeRecent();
 		}
 
 		public ListBuilder(WordList wordList) {
@@ -49,20 +50,34 @@ namespace Szotar.WindowsForms.Forms {
 			remove.Click += new EventHandler(remove_Click);
 
 			WireListEvents();
-
-			saved = true;
-
 			MakeRecent();
 		}
 
+		/// <summary>Opens a ListBuilder for the given Word List, or focusses an existing ListBuilder 
+		/// if one exists.</summary>
+		public static ListBuilder Open(long setID) {
+			foreach(Form f in Application.OpenForms) {
+				var lb = f as ListBuilder;
+				if(lb != null && lb.WordList.ID == setID) {
+					lb.BringToFront();
+					return lb;
+				}
+			}
+
+			var list = DataStore.Database.GetWordList(setID);
+			var form = new ListBuilder(list);
+			form.Show();
+			return form;
+		}
+
 		private void WireListEvents() {
-			list.ListChanged += new ListChangedEventHandler(OnListChanged);
+			//list.ListChanged += new ListChangedEventHandler(OnListChanged);
 			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted += new EventHandler(list_ListDeleted);
 		}
 
 		private void UnwireListEvents() {
-			list.ListChanged -= new ListChangedEventHandler(OnListChanged);
+			//list.ListChanged -= new ListChangedEventHandler(OnListChanged);
 			list.PropertyChanged -= new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted -= new EventHandler(list_ListDeleted);
 		}
@@ -82,7 +97,8 @@ namespace Szotar.WindowsForms.Forms {
 				Url = list.Url,
 				Date = list.Date,
 				ID = list.ID,
-				Language = list.Language
+				Language = list.Language,
+				TermCount = list.Count
 			});
 
 			var max = Configuration.RecentListsSize;
@@ -101,20 +117,15 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void swap_Click(object sender, EventArgs e) {
-			foreach (int i in grid.SelectedIndices) {
-				var p = list[i];
-				list[i] = new WordListEntry(list, p.Translation, p.Phrase, p.TimesTried, p.TimesFailed);
-			}
-			//grid.Refresh();
+			list.SwapRows(grid.SelectedIndices);
 		}
 
 		void swapAll_Click(object sender, EventArgs e) {
-			//Swap whole list
-			for (int i = 0; i < list.Count; ++i) {
-				var p = list[i];
-				list[i] = new WordListEntry(list, p.Translation, p.Phrase, p.TimesTried, p.TimesFailed);
-			}
-			//grid.Refresh();
+			var rows = new List<int>();
+			for(int i = 0; i < list.Count; ++i)
+				rows.Add(i);
+
+			list.SwapRows(rows);
 		}
 
 		//TODO: Get this working.
@@ -145,6 +156,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		void name_TextChanged(object sender, EventArgs e) {
 			list.Name = name.Text;
+			MakeRecent();
 		}
 
 		void list_PropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -172,7 +184,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void shadow_MouseMove(object sender, MouseEventArgs e) {
-			ShadowTag tag = (ShadowTag)shadow.Tag;
+			ShadowTag tag = shadow.Tag as ShadowTag;
 			if (e.Button == MouseButtons.Left && tag != null) {
 				System.Drawing.Point down = tag.Down;
 				int delta = down.Y - e.Y;
@@ -187,19 +199,6 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void ListBuilder_Closing(object sender, CancelEventArgs e) {
-			if (!saved) {
-				//Choosing Yes as the default based on what Notepad does.
-				DialogResult result = MessageBox.Show(Properties.Resources.WouldYouLikeToSaveThisList, Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-				if (result == DialogResult.Cancel) {
-					e.Cancel = true;
-					return;
-				} else if (result == DialogResult.No) {
-					list.DeleteWordList();
-				} else {
-					MakeRecent();
-				}
-			}
-
 			UnwireListEvents();
 		}
 
@@ -251,10 +250,6 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Height = ClientSize.Height - grid.Top - (meta.Visible ? meta.Height : 0);
 		}
 
-		private void OnListChanged(object sender, ListChangedEventArgs e) {
-			this.saved = false;
-		}
-
 		//Metadata
 		private void ShowMeta() {
 			meta.Visible = true;
@@ -291,6 +286,7 @@ namespace Szotar.WindowsForms.Forms {
 				return meta.Visible;
 			}
 			set {
+				//Don't do anything it if it hasn't changed since Show/HideMeta will break in such cases.
 				if (value != ShowMetadata) {
 					if (value)
 						ShowMeta();
@@ -306,6 +302,9 @@ namespace Szotar.WindowsForms.Forms {
 
 		private void deleteList_Click(object sender, EventArgs e) {
 			list.DeleteWordList();
+
+			//The form will close automatically, because deleting the list will 
+			//fire the list's ListDeleted event, which this form subscribes to.
 		}
 
 		private void close_Click(object sender, EventArgs e) {
@@ -339,6 +338,7 @@ namespace Szotar.WindowsForms.Forms {
 							cur.Append(' ');
 						} else {
 							line.Add(cur.ToString());
+							cur.Length = 0;
 							lines.Add(line);
 							line = new List<string>();
 						}
@@ -378,7 +378,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			if (entries.Count > 0) {
 				list.Insert(list.Count, entries);
-				grid.Refresh();
+				grid.Refresh(); //XXX Is this necessary?
 			}
 		}
 

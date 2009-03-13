@@ -50,8 +50,11 @@
 			System.Windows.Forms.ToolStripMenuItem editEntries;
 			System.Windows.Forms.ToolStripMenuItem importDictionary;
 			System.Windows.Forms.ToolStripMenuItem toolsMenu;
+			System.Windows.Forms.ToolStripMenuItem dictsFolder;
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 			System.Windows.Forms.ToolStripMenuItem options;
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.ToolStripMenuItem charMap;
 			this.forwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.backwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,6 +64,7 @@
 			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.grid = new System.Windows.Forms.DataGridView();
 			this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.addTo = new System.Windows.Forms.ToolStripMenuItem();
 			this.switchMode = new System.Windows.Forms.Button();
 			this.ignoreLabel = new System.Windows.Forms.Label();
 			this.searchPanel = new System.Windows.Forms.Panel();
@@ -94,7 +98,10 @@
 			editEntries = new System.Windows.Forms.ToolStripMenuItem();
 			importDictionary = new System.Windows.Forms.ToolStripMenuItem();
 			toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
+			dictsFolder = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			options = new System.Windows.Forms.ToolStripMenuItem();
+			charMap = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
 			this.contextMenu.SuspendLayout();
 			this.searchPanel.SuspendLayout();
@@ -299,9 +306,23 @@
 			// toolsMenu
 			// 
 			toolsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            dictsFolder,
+            charMap,
+            toolStripSeparator3,
             options});
 			toolsMenu.Name = "toolsMenu";
 			resources.ApplyResources(toolsMenu, "toolsMenu");
+			// 
+			// dictsFolder
+			// 
+			dictsFolder.Name = "dictsFolder";
+			resources.ApplyResources(dictsFolder, "dictsFolder");
+			dictsFolder.Click += new System.EventHandler(this.dictsFolder_Click);
+			// 
+			// toolStripSeparator3
+			// 
+			toolStripSeparator3.Name = "toolStripSeparator3";
+			resources.ApplyResources(toolStripSeparator3, "toolStripSeparator3");
 			// 
 			// options
 			// 
@@ -364,10 +385,17 @@
 			// 
 			this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             addToList,
+            this.addTo,
             copy,
             reverseLookup});
 			this.contextMenu.Name = "listBuilderMenu";
 			resources.ApplyResources(this.contextMenu, "contextMenu");
+			this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+			// 
+			// addTo
+			// 
+			this.addTo.Name = "addTo";
+			resources.ApplyResources(this.addTo, "addTo");
 			// 
 			// switchMode
 			// 
@@ -433,6 +461,12 @@
             toolsMenu});
 			this.mainMenu.Name = "mainMenu";
 			// 
+			// charMap
+			// 
+			charMap.Name = "charMap";
+			resources.ApplyResources(charMap, "charMap");
+			charMap.Click += new System.EventHandler(this.charMap_Click);
+			// 
 			// LookupForm
 			// 
 			resources.ApplyResources(this, "$this");
@@ -476,6 +510,7 @@
 		private System.Windows.Forms.ToolStripMenuItem recentLists;
 		private System.Windows.Forms.ToolStripMenuItem fileMenu;
 		private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem addTo;
 	}
 }
 

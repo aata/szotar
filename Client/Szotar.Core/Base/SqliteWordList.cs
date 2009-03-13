@@ -4,12 +4,52 @@ using CultureInfo = System.Globalization.CultureInfo;
 using System;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Text;
 
+//SqliteWordList: an SQLite-backed word list. All changes made are immediately
+//synchronised with the database, and can be undone or re-done. It also has an
+//in-memory version, stored in a BindingList, which provides the ListChanged 
+//events and fast read access.
+
+//Despite being database-backed, this list is NOT thread-safe!
+
+//The undo list is composed of a zipper list of ICommand objects which can be
+//performed and undone. See Undo.cs for more information.
+
+//The undo functionality is global to the list, NOT specific to each editor,
+//so this can obviously cause problems if multiple consumers are editing the
+//list at the same time. However, having separate undo lists doesn't really
+//make much sense either, unless the undo lists were somehow able to update
+//each other such that undoing an action in one list updates the other undo 
+//list's state such that it is correct. Maybe this would be something to 
+//explore at a later date, but I suspect that the provided workarounds will 
+//suffice for now.
+
+//The UI should ensure that only one UI element is providing editing services 
+//for the word list, to avoid undo-related confusion.
+
+//To work around this somewhat, the WordList class will provide for out-of-band
+//updates that aren't stored in the undo list. This makes writing ICommand 
+//objects more difficult as they should preserve out-of-band changes when they
+//undone and then re-done. For example, inserting a WordListEntry, updating its 
+//TimesFailed count out-of-band, then undoing the insertion and re-doing it 
+//should re-insert the *edited* row, not the original row. Such cases are
+//usually marked in the comments where they occur.
+
+//Note: it should be an error to perform deletion or insertion commands out-of-band, 
+//as such things could cause normal undo/redo functionality to fail.
+
+//I don't normally use #region, but I think this code is clearer with it.
 namespace Szotar.Sqlite {
 	public class SqliteWordList : WordList {
 		Worker worker;
 		BindingList<WordListEntry> list;
 		long? id;
+
+		public SqliteDataStore DataStore { get; private set; }
+		public override long? ID {
+			get { return id; }
+		}
 
 		public SqliteWordList(SqliteDataStore store, long setID) {
 			DataStore = store;
@@ -26,11 +66,6 @@ namespace Szotar.Sqlite {
 			RaiseListChanged(e);
 		}
 
-		public SqliteDataStore DataStore { get;	private set; }
-		public override long? ID {
-			get { return id; }
-		}
-
 		protected override void Dispose(bool disposing) {
 			if (disposing)
 				worker.Dispose();
@@ -43,11 +78,13 @@ namespace Szotar.Sqlite {
 		public override void DeleteWordList() {
 			DataStore.DeleteWordList(ID.Value);
 
-			//RaiseDeleted() not needed. SqliteDataStore will do that for us.
-			//It's just an extra safety measure for if DeleteWordList is called without 
-			//calling DeleteWordList on the WordList itself.
+			//RaiseDeleted() not needed. SqliteDataStore will do that for us, as an an extra safety 
+			//measure for if SqliteDataStore's DeleteWordList is called without calling DeleteWordList 
+			//on the WordList itself.
 		}
 
+		#region Metadata
+		//Should assigning null to this really raise an exception?
 		public override string Author {
 			get { return (string)worker.GetWordListProperty("Author"); }
 			set {
@@ -88,6 +125,7 @@ namespace Szotar.Sqlite {
 			}
 		}
 
+		//Will probably want both a Created and Modified property in the future.
 		public override System.DateTime? Date {
 			get { return (DateTime?)worker.GetWordListProperty("Created"); }
 			set {
@@ -97,19 +135,24 @@ namespace Szotar.Sqlite {
 				RaisePropertyChanged("Date");
 			}
 		}
+		#endregion
 
+		//Remind me why these are public?
+		/// <summary>Set a property of an entry in the database (but not in the in-memory list).</summary>
 		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
 			return (T)worker.GetProperty(index, property.ToString());
 		}
 
+		/// <summary>Set a property of an entry in the database (but not in the in-memory list).</summary>
 		public override void SetProperty(WordListEntry entry, WordList.EntryProperty property, object value) {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
 			worker.SetProperty(index, property.ToString(), value);
 		}
 
+		#region List implementation
 		public override void Add(WordListEntry item) {
 			Insert(Count, item);
 		}
@@ -138,6 +181,15 @@ namespace Szotar.Sqlite {
 			UndoList.Do(new Deletion(this, index));
 		}
 
+		public override void RemoveAt(IEnumerable<int> indices) {
+			UndoList.Do(new Deletion(this, indices));
+		}
+
+		public override void SwapRows(IEnumerable<int> indices)
+		{
+ 			UndoList.Do(new SwapRowsCommand(this, indices));
+		}
+
 		public override void Clear() {
 			UndoList.Do(new Deletion(this, EnumRange(0, list.Count - 1)));
 		}
@@ -164,12 +216,8 @@ namespace Szotar.Sqlite {
 		}
 
 		public override WordListEntry this[int index] {
-			get {
-				return list[index];
-			}
-			set {
-				UndoList.Do(new SetItem(this, index, value));
-			}
+			get { return list[index]; }
+			set { UndoList.Do(new SetItem(this, index, value));	}
 		}
 
 		public override int IndexOf(WordListEntry item) {
@@ -179,13 +227,18 @@ namespace Szotar.Sqlite {
 		public override IEnumerator<WordListEntry> GetEnumerator() {
 			return list.GetEnumerator();
 		}
+		#endregion
 
+		#region Worker
+		//Worker does the dirty database work. It's nicer if it's separated from the rest of the list code.
 		protected class Worker : SqliteObject {
 			SqliteWordList list;
 
-			DbCommand insertCommand;
+			//These are called particularly often, any performance enhancements are useful.
+			DbCommand insertCommand, deleteCommand;
 			DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
-				insertCommandTranslation, insertCommandTimesTried, insertCommandTimesFailed;
+				insertCommandTranslation, insertCommandTimesTried, insertCommandTimesFailed,
+				deleteCommandSetID, deleteCommandListPosition;
 
 			public Worker(SqliteDataStore store, SqliteWordList list)
 				: base(store) {
@@ -193,9 +246,9 @@ namespace Szotar.Sqlite {
 
 				insertCommand = Connection.CreateCommand();
 				insertCommand.CommandText =
-					"UPDATE VocabItems SET ListPosition = ListPosition + 1 WHERE SetID = $SetID AND ListPosition >= $ListPosition; " +
-					"INSERT INTO VocabItems (Phrase, Translation, SetID, ListPosition, TimesTried, TimesFailed) " +
-					"VALUES ($Phrase, $Translation, $SetID, $ListPosition, $TimesTried, $TimesFailed);";
+					@"UPDATE VocabItems SET ListPosition = ListPosition + 1 WHERE SetID = $SetID AND ListPosition >= $ListPosition;
+					  INSERT INTO VocabItems (Phrase, Translation, SetID, ListPosition, TimesTried, TimesFailed)
+					      VALUES ($Phrase, $Translation, $SetID, $ListPosition, $TimesTried, $TimesFailed);";
 
 				insertCommandSetID = insertCommand.CreateParameter();
 				insertCommandSetID.ParameterName = "SetID";
@@ -221,14 +274,33 @@ namespace Szotar.Sqlite {
 				insertCommandTimesFailed = insertCommand.CreateParameter();
 				insertCommandTimesFailed.ParameterName = "TimesFailed";
 				insertCommand.Parameters.Add(insertCommandTimesFailed);
+
+				deleteCommand = Connection.CreateCommand();
+				deleteCommand.CommandText = 
+					@"DELETE From VocabItems WHERE SetID = $SetID AND ListPosition = $ListPosition; 
+					  UPDATE VocabItems SET ListPosition = ListPosition - 1 
+					      WHERE SetId = $SetID AND ListPosition > $ListPosition";
+
+				deleteCommandSetID = deleteCommand.CreateParameter();
+				deleteCommandSetID.ParameterName = "SetID";
+				deleteCommand.Parameters.Add(deleteCommandSetID);
+
+				deleteCommandListPosition = deleteCommand.CreateParameter();
+				deleteCommandListPosition.ParameterName = "ListPosition";
+				deleteCommand.Parameters.Add(deleteCommandListPosition);
 			}
 
 			protected override void Dispose(bool disposing) {
+				//Don't need to dispose of the parameters.
 				insertCommand.Dispose();
+				deleteCommand.Dispose();
 
 				base.Dispose(disposing);
 			}
 
+			//Inserts a single item at the given index.
+			//This should be avoided unless there really is only one item to be added, because it
+			//will probably be quite slow.
 			public void Insert(int index, WordListEntry item) {
 				if (item == null)
 					throw new System.ArgumentNullException();
@@ -236,10 +308,7 @@ namespace Szotar.Sqlite {
 					throw new System.ArgumentOutOfRangeException("index");
 
 				using (var txn = Connection.BeginTransaction()) {
-					//ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition + 1 WHERE SetID = ? AND ListPosition >= ?", list.SetID, index);
-					//ExecuteSQL("INSERT INTO VocabItems (Phrase, Translation, SetID, ListPosition, TimesTried, TimesFailed) VALUES (?, ?, ?, ?, ?, ?)",
-					//    item.Phrase, item.Translation, list.SetID, index, item.TimesTried, item.TimesFailed);
-
+					insertCommandSetID.Value = list.ID;
 					insertCommandListPosition.Value = index;
 					insertCommandPhrase.Value = item.Phrase;
 					insertCommandTranslation.Value = item.Translation;
@@ -252,13 +321,16 @@ namespace Szotar.Sqlite {
 				}
 			}
 
+			//Inserts a list of entries at the given indices.
 			public void Insert(int index, IList<WordListEntry> entries) {
 				if (index < 0)
-					throw new System.ArgumentOutOfRangeException();
+					throw new System.ArgumentOutOfRangeException("index");
 				if (entries.Count == 0)
 					return;
 
 				using (var txn = Connection.BeginTransaction()) {
+					insertCommandSetID.Value = list.ID;
+
 					foreach (WordListEntry item in entries) {
 						insertCommandListPosition.Value = index;
 						insertCommandPhrase.Value = item.Phrase;
@@ -275,15 +347,43 @@ namespace Szotar.Sqlite {
 				}
 			}
 
-			public void RemoveAt(int index) {
+			//Inserts a list of (index, entry) into the database.
+			//This is used by the Deletion command's Redo method to speed up re-inserting the deleted entries.
+			public void Insert(IList<KeyValuePair<int, WordListEntry>> entries) {
+				if (entries.Count == 0)
+					return;
+
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition = ?", list.ID, index);
-					ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition - 1 WHERE ListPosition > ?", list.ID, index);
+					insertCommandSetID.Value = list.ID;
+
+					foreach (var kvp in entries) {
+						insertCommandListPosition.Value = kvp.Key;
+						var item = kvp.Value;
+						insertCommandPhrase.Value = item.Phrase;
+						insertCommandTranslation.Value = item.Translation;
+						insertCommandTimesTried.Value = item.TimesTried;
+						insertCommandTimesFailed.Value = item.TimesFailed;
+
+						insertCommand.ExecuteNonQuery();
+					}
 
 					txn.Commit();
 				}
 			}
 
+			/// <summary>Removes one element from the list. Avoid using this if there are multiple elements.</summary>
+			public void RemoveAt(int index) {
+				using (var txn = Connection.BeginTransaction()) {
+					deleteCommandSetID.Value = list.ID;
+					deleteCommandListPosition.Value = index;
+					deleteCommand.ExecuteNonQuery();
+
+					txn.Commit();
+				}
+			}
+
+			/// <summary>Removes a contiguous block of elements from the list. It's faster than the other
+			/// Remove methods.</summary>
 			public void RemoveAt(int index, int count) {
 				using (var txn = Connection.BeginTransaction()) {
 					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", list.ID, index, index + count - 1);
@@ -293,37 +393,25 @@ namespace Szotar.Sqlite {
 				}
 			}
 
+			/// <summary>Removes the items at the specified positions in the list.</summary>
 			public void RemoveAt(IEnumerable<int> indices) {
 				if (indices == null)
 					throw new System.ArgumentNullException();
 
 				using (var txn = Connection.BeginTransaction()) {
-					using (DbCommand delete = Connection.CreateCommand()) {
-						delete.CommandText = "DELETE From VocabItems WHERE SetID = ? AND ListPosition = ?";
-						var setIDParam = delete.CreateParameter();
-						setIDParam.Value = list.ID;
-						delete.Parameters.Add(setIDParam);
+					deleteCommandSetID.Value = list.ID;
 
-						var deleteIndexParam = delete.CreateParameter();
-						delete.Parameters.Add(deleteIndexParam);
-
-						using (DbCommand update = Connection.CreateCommand()) {
-							update.CommandText = "UPDATE VocabItems SET ListPosition = ListPosition - 1 WHERE SetID = ? AND ListPosition > ?";
-							update.Parameters.Add(setIDParam);
-							update.Parameters.Add(deleteIndexParam);
-
-							foreach (int i in indices) {
-								deleteIndexParam.Value = i;
-								delete.ExecuteNonQuery();
-								update.ExecuteNonQuery();
-							}
-						}
+					foreach (int i in indices) {
+						deleteCommandListPosition.Value = i;
+						deleteCommand.ExecuteNonQuery();
 					}
 
 					txn.Commit();
 				}
 			}
 
+			/// <summary>Creates WordListEntry instances from the database at the specified list positions. 
+			/// Avoid if possible, use the in-memory list.</summary>
 			public IList<WordListEntry> GetEntries(IEnumerable<int> indices) {
 				if (indices == null)
 					throw new System.ArgumentNullException();
@@ -331,7 +419,7 @@ namespace Szotar.Sqlite {
 				using (var command = Connection.CreateCommand()) {
 					var sb = new System.Text.StringBuilder();
 					sb.Append(@"SELECT Phrase, Translation, TimesTried, TimesFailed, 
-					            ListPosition FROM VocabItems WHERE ListPosition IN (");
+					            ListPosition FROM VocabItems WHERE SetID = ? AND ListPosition IN (");
 
 					int i = 0;
 					foreach (int index in indices) {
@@ -342,6 +430,7 @@ namespace Szotar.Sqlite {
 
 					sb.Append(") ORDER BY ListPosition ASC");
 					command.CommandText = sb.ToString();
+					AddParameter(command, list.ID);
 
 					using (var reader = command.ExecuteReader())
 						return GetEntries(reader);
@@ -414,7 +503,25 @@ namespace Szotar.Sqlite {
 			public object GetWordListProperty(string property) {
 				return Select(string.Format(CultureInfo.InvariantCulture, "SELECT {0} FROM Sets WHERE id = ?", property), list.ID);
 			}
+		
+			public void SwapRows(IEnumerable<int> indices)
+			{
+				var sb = new StringBuilder();
+				sb.Append("UPDATE VocabItems SET Phrase = Translation, Translation = Phrase WHERE SetID = ? AND ListPosition IN (");
+				bool first = true;
+				foreach(int i in indices) {
+					if(!first)
+						sb.Append(", ");
+					else
+						first = false;
+					sb.Append(i);
+				}
+				sb.Append(");");
+
+				ExecuteSQL(sb.ToString(), list.ID);
+			}
 		}
+		#endregion
 
 		protected abstract class Command : ICommand {
 			protected SqliteWordList owner;
@@ -424,15 +531,16 @@ namespace Szotar.Sqlite {
 			public Command(SqliteWordList owner) {
 				this.worker = owner.worker;
 				this.list = owner.list;
+				this.owner = owner;
 			}
 
 			public abstract void Do();
 			public abstract void Undo();
 			public virtual void Redo() { Do(); }
-			public virtual ICommand Coalesce(ICommand previous) { return null; }
 			public abstract string Description { get; }
 		}
 
+		///<summary>Updates an entire item in the list.</summary>
 		protected class SetItem : Command {
 			int index;
 			WordListEntry item;
@@ -450,11 +558,14 @@ namespace Szotar.Sqlite {
 				worker.SetEntry(index, item);
 			}
 
-			public override void Redo() {
-				Do();
-			}
-
 			public override void Undo() {
+				//Sidestep OOB change-related oddities such as
+				// * SetItem
+				// * Change item OOB
+				// * Undo SetItem
+				// * Redo SetItem
+				item = list[index];
+
 				list[index] = oldItem;
 				worker.SetEntry(index, oldItem);
 			}
@@ -464,6 +575,7 @@ namespace Szotar.Sqlite {
 			}
 		}
 
+		///<summary>Inserts one item into the list.</summary>
 		protected class Insertion : Command {
 			int index;
 			WordListEntry item;
@@ -475,13 +587,21 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Do() {
+				//Safe with respect to external changes.
+				//Obviously the item cannot be changed while it is not part of the list.
 				worker.Insert(index, item);
 				list.Insert(index, item);
 			}
 
-			public override void Redo() { Do(); }
-
 			public override void Undo() {
+				//Needed for safeness with respect to external changes.
+				//I write this with the practice functionality in mind: if practicing and editing a list concurrently,
+				//the undo situation gets a bit hairy. There should only be one *editor* open for the list at once, but
+				//there may be other things which are changing the list (e.g. practice window). 
+				//Obviously changes to TimesTried made by the practice window shouldn't be undoable from the editor
+				//window!
+				item = list[index];
+
 				worker.RemoveAt(index);
 				list.RemoveAt(index);
 			}
@@ -491,6 +611,7 @@ namespace Szotar.Sqlite {
 			}
 		}
 
+		/// <summary>Inserts many items into the list. Faster than inserting one item.</summary>
 		protected class MultipleInsertion : Command {
 			int index;
 			IList<WordListEntry> items;
@@ -507,23 +628,26 @@ namespace Szotar.Sqlite {
 					list.Insert(index + i, items[i]);
 			}
 
-			public override void Redo() { Do(); }
-
 			public override void Undo() {
 				worker.RemoveAt(index, items.Count);
-				for(int i = 0; i < items.Count; ++i); 
+
+				//Sidestep oddities related to OOB changes by re-reading the items as they are now.
+				for (int i = 0; i < items.Count; ++i) {
+					items[i] = list[index];
 					list.RemoveAt(index);
+				}
 			}
 
 			public override string Description {
 				get { 
-					return string.Format(CultureInfo.CurrentUICulture, 
+					return string.Format( 
 						LocalizationProvider.Default.Strings["InsertedNItems"] ?? "Inserted {0} items", 
 						items.Count); 
 				}
 			}
 		}
 
+		/// <summary>Sets a single property of a single item in the list.</summary>
 		protected class SetValue<T> : Command {
 			int index;
 			T oldValue, newValue;
@@ -546,11 +670,11 @@ namespace Szotar.Sqlite {
 				SetTo(newValue);
 			}
 
-			public override void Redo() {
-				Do();
-			}
-
 			public override void Undo() {
+				//Again, sidestep oddities related to OOB changes. This is probably very unlikely to happen with the
+				//SetValue command, however.
+				newValue = list[index].GetProperty<T>(property);
+
 				SetTo(oldValue);
 			}
 
@@ -561,24 +685,25 @@ namespace Szotar.Sqlite {
 			}
 		}
 
+		/// <summary>Deletes one or more items from the list.</summary>
 		protected class Deletion : Command {
 			List<KeyValuePair<int, WordListEntry>> items = new List<KeyValuePair<int, WordListEntry>>();
-			IEnumerable<int> indices;
-			IEnumerable<int> reverseIndices;
+			List<int> indices;
+			List<int> reverseIndices;
 
 			public Deletion(SqliteWordList owner, IEnumerable<int> indices)
 				: base(owner) {
 				foreach (int i in indices)
-					items.Add(new KeyValuePair<int, WordListEntry>(i, null));
-
-				this.indices = indices;
+					items.Add(new KeyValuePair<int, WordListEntry>(i, 
+						new WordListEntry(owner, list[i].Phrase, list[i].Translation, list[i].TimesTried, list[i].TimesFailed)
+						));
 
 				//The indices must be in order for the deletion to proceed correctly.
 				//Deleting lower indices before higher indices would result in shifting, and
 				//subsequent deletions may delete the wrong entry.
 				items.Sort((k1, k2) => k1.Key.CompareTo(k2.Key));
 
-				indices = items.ConvertAll(kvp => kvp.Key);
+				this.indices = items.ConvertAll(kvp => kvp.Key);
 			}
 
 			public Deletion(SqliteWordList owner, params int[] indices)
@@ -590,6 +715,7 @@ namespace Szotar.Sqlite {
 					return indices;
 				}
 			}
+
 			public IEnumerable<int> ReverseIndices {
 				get {
 					if (reverseIndices == null) {
@@ -602,28 +728,62 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Do() {
-				IList<WordListEntry> toBeDeleted = worker.GetEntries(Indices);
-
-				for (int i = 0; i < toBeDeleted.Count; ++i)
-					items[i] = new KeyValuePair<int, WordListEntry>(items[i].Key, toBeDeleted[i]);
-
 				worker.RemoveAt(ReverseIndices);
 				foreach (int i in ReverseIndices)
 					list.RemoveAt(i);
 			}
 
-			public override void Redo() { Do(); }
-
 			public override void Undo() {
-				foreach (var kvp in items) {
-					worker.Insert(kvp.Key, kvp.Value);
+				//There can't be any funny stuff related to OOB changes here, since any entry can't be edited while
+				//it's deleted.
+				//TODO: Modifying a deleted item should raise an exception.
+
+				worker.Insert(items);
+				foreach (var kvp in items)
 					list.Insert(kvp.Key, kvp.Value);
-				}
 			}
 
 			public override string Description {
 				get { return string.Format(LocalizationProvider.Default.Strings["DeletedNItems"] ?? "Deleted {0} items", items.Count); }
 			}
+		}
+
+		/// <summary>Swaps the phrase and translation of the entries at the given indices. Safe with regards to
+		/// out-of-band changes, since it stores no data.</summary>
+		protected class SwapRowsCommand : Command {
+			IEnumerable<int> indices;
+
+			public SwapRowsCommand(SqliteWordList owner, IEnumerable<int> indices) 
+				: base(owner)
+			{
+				this.indices = indices;
+			}
+
+			public override void Do() {
+				worker.SwapRows(indices);
+				foreach (int i in indices) {
+					list[i] = new WordListEntry(owner,
+						list[i].Translation, list[i].Phrase, list[i].TimesTried, list[i].TimesFailed);
+				}
+			}
+
+			public override void Undo() { Do(); }
+
+			public override string Description { 
+				get { 
+					return LocalizationProvider.Default.Strings["SwappedNRows"];
+				}
+			}
+		}
+
+		public override void Undo() {
+			if(UndoList.UndoItemCount > 0)
+				UndoList.Undo(1);
+		}
+
+		public override void Redo() {
+			if (UndoList.RedoItemCount > 0)
+				UndoList.Redo(1);
 		}
 	}
 }

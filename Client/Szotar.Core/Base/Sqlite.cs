@@ -270,8 +270,8 @@ namespace Szotar.Sqlite {
 			return wl;
 		}
 
-		public IEnumerable<ListInfo> GetAllSets() {			
-			using (var reader = this.SelectReader("TYPES Integer, Text, Text, Text, Text, Date; SELECT id, Name, Author, Language, Url, Created FROM Sets ORDER BY id ASC")) {
+		public IEnumerable<ListInfo> GetAllSets() {
+			using (var reader = this.SelectReader("TYPES Integer, Text, Text, Text, Text, Date, Integer; SELECT id, Name, Author, Language, Url, Created, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id) FROM Sets ORDER BY id ASC")) {
 				while (reader.Read()) {
 					var list = new ListInfo();
 					list.ID = reader.GetInt64(0);
@@ -284,6 +284,8 @@ namespace Szotar.Sqlite {
 						list.Url = reader.GetString(4);
 					if (!reader.IsDBNull(5))
 						list.Date = reader.GetDateTime(5);
+					if (!reader.IsDBNull(6))
+						list.TermCount = reader.GetInt64(6);
 
 					yield return list;
 				}
@@ -359,9 +361,11 @@ namespace Szotar.Sqlite {
 			if (handler != null)
 				handler(this, new WordListDeletedEventArgs { SetID = setID });
 
-			var wl = wlr.Target;
-			if (wl != null)
-				wl.RaiseDeleted();
+			if (wlr != null) {
+				var wl = wlr.Target;
+				if (wl != null)
+					wl.RaiseDeleted();
+			}
 		}
 
 		//Note: there's also a ListDeleted event on the WordList itself, which may be preferable.

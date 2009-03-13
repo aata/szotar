@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace Szotar {
-	//Apparently this is the command pattern. 
-	//I swear I didn't know this.
 	public interface ICommand {
-		//This will probably never do anything.
-		ICommand Coalesce(ICommand previous);
 		void Do();
 		void Undo();
 		void Redo();
@@ -15,7 +11,7 @@ namespace Szotar {
 	public class UndoList {
 		//The newest undo items are at the end of the list.
 		List<ICommand> undoItems = new List<ICommand>();
-		//The newest undo items are at the end of the list.
+		//The newest redo items are at the end of the list.
 		List<ICommand> redoItems = new List<ICommand>();
 
 		public void Undo(int count) {

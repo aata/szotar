@@ -66,6 +66,12 @@ namespace Szotar.WindowsForms.Controls {
 			browse.Click += new EventHandler(browse_Click);
 			fileName.TextChanged += new EventHandler(fileName_TextChanged);
 			importerType.SelectedIndexChanged += new EventHandler(importerType_SelectedIndexChanged);
+
+			table.Resize += new EventHandler(table_Resize);
+		}
+
+		void table_Resize(object sender, EventArgs e) {
+			helpText1.Width = helpText2.Width = helpText3.Width = table.ClientSize.Width;
 		}
 
 		void browse_Click(object sender, EventArgs e) {

@@ -17,6 +17,7 @@ namespace Szotar.WindowsForms.Preferences {
 		}
 
 		//TODO: commit properly
+		//TODO: Figure out what the above comment means
 		public override void Commit() {
 			GuiConfiguration.UserRealName = name.Text;
 			GuiConfiguration.UserNickname = nickname.Text;
