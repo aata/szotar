@@ -35,14 +35,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Mono' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug|Mono</OutputPath>
+    <OutputPath>bin\DebugMono</OutputPath>
     <DefineConstants>MONO</DefineConstants>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Mono' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Release|Mono</OutputPath>
+    <OutputPath>bin\ReleaseMono</OutputPath>
     <DefineConstants>MONO</DefineConstants>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
