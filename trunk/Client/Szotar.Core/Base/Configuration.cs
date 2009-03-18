@@ -109,6 +109,10 @@ namespace Szotar {
 			get { return Default.Get("UserListsStore", Path.Combine(UserDataStore, "Lists")); }
 			set { Default.Set("UserListsStore", value); }
 		}
+		
+		public static string DictionariesFolderName {
+			get { return "Dictionaries"; } 
+		}
 	}
 	
 	public class FileConfiguration : IConfiguration {
