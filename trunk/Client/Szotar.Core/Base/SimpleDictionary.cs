@@ -9,7 +9,7 @@ namespace Szotar {
 	public class SimpleDictionary : IBilingualDictionary {
 		Section forwards, backwards;
 		Utf8LineReader reader;
-		static string magicNumber = "sdict-magic";
+		const string magicNumber = "sdict-magic";
 
 		public class Section : IDictionarySection {
 			IList<Entry> entries;

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
 
-using System.Data.SQLite;
 using System.Text;
 
 namespace Szotar.Sqlite {
@@ -26,7 +25,13 @@ namespace Szotar.Sqlite {
 		string path;
 
 		public SqliteDatabase(string path)
-			: base(new SQLiteConnection("Data Source=" + path)) {
+			: base(
+#if !MONO
+			new System.Data.SQLite.SQLiteConnection("Data Source=" + path)
+#else
+			new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path)
+#endif
+			) {
 			
 			this.path = path;
 			conn.Open();

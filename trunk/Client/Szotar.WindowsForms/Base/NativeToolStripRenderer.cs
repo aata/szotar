@@ -110,7 +110,7 @@ namespace Szotar.WindowsForms {
 			Caption = 3603
 		}
 
-		const int RebarBackground = 6;
+		static readonly int RebarBackground = 6;
 
 		Padding GetThemeMargins(IDeviceContext dc, MarginTypes marginType) {
 			NativeMethods.MARGINS margins;
@@ -448,12 +448,15 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
-		public static bool IsSupported {
+		public bool IsSupported {
 			get {
 				if (!VisualStyleRenderer.IsSupported)
 					return false;
 
-				return VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement("Menu", (int)MenuParts.BarBackground, (int)MenuBarStates.Active));
+				// Needs a more robust check. It seems mono supports very different style sets.
+				return 
+					VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement("Menu", (int)MenuParts.BarBackground, (int)MenuBarStates.Active))
+					&& VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement(RebarClass, RebarBackground, 0));
 			}
 		}
 	}

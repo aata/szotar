@@ -13,7 +13,7 @@ namespace Szotar {
 		public List<MruEntry> Entries { get; set; }
 
 		int size;
-		public int Size {
+		public int MaximumSize {
 			get {
 				return size;
 			}
@@ -27,12 +27,12 @@ namespace Szotar {
 
 		public MruList(int size) {
 			Entries = new List<MruEntry>();
-			Size = size;
+			MaximumSize = size;
 		}
 
 		void Clip() {
-			if (Entries.Count > Size)
-				Entries.RemoveRange(Size, Entries.Count - Size);
+			if (Entries.Count > MaximumSize)
+				Entries.RemoveRange(MaximumSize, Entries.Count - MaximumSize);
 		}
 
 		public void Update(string path, string title) {

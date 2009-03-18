@@ -6,6 +6,17 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
+// This form displays a large amount of rows on the DataGridView control. For information on how to 
+// keep good performance with large datasets, see Best Practices for Scaling the Windows Forms 
+// DataGridView Control [BPSWFDC].
+// The main points to take away from that article are:
+//  * Don't access grid Row objects, because it could cause them to become unshared. Prefer grid methods such as 
+//    GetCellState, etc.
+//  * Don't access Cell object's either. Especially don't add tooltips or context menus to individual cells. Use the Cell*Needed events.
+//  * Use full-row or full-column selection modes, rather than per-cell.
+//  * Apply styles to the row templates or use the events, don't set cell styles.
+//  * Try not to make rows become unshared.
+// Note: Mono 2.2 doesn't support shared rows. This is probably causing much of the performance loss.
 namespace Szotar.WindowsForms.Forms {
 	public partial class LookupForm : Form {
 		public IBilingualDictionary Dictionary { get; private set; }
@@ -506,8 +517,6 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		//TODO: Need to find out why the list scrolls to the beginning on the first click
-		//(apparently only if there's a lot of entries, though.)
 		private void grid_MouseDown(object sender, MouseEventArgs e) {
 			return;
 			if(e.Button == MouseButtons.Left) {
@@ -516,6 +525,8 @@ namespace Szotar.WindowsForms.Forms {
 				var indices = new List<int>();
 
 				if (hit.RowIndex >= 0) {
+					// TODO: This code isn't run anyway at the moment, but it should be:
+					// grid.Rows.GetRowState(hit.RowIndex) & DataGridViewElementStates.Selected = DataGridViewElementStates.Selected
 					if (grid.Rows[hit.RowIndex].Selected)
 						foreach (DataGridViewRow row in grid.SelectedRows)
 							indices.Add(row.Index);
@@ -578,6 +589,13 @@ namespace Szotar.WindowsForms.Forms {
 				GC.Collect(0);
 			else if (e.KeyCode == Keys.Escape)
 				searchBox.Text = string.Empty;
+			else if (e.KeyCode == Keys.F10) {
+				int shared = 0;
+				for (int i = 0; i < grid.Rows.Count; ++i)
+					if (grid.Rows.SharedRow(i).Index == -1)
+						shared++;
+				MessageBox.Show(string.Format("Shared rows: {0} of {1}", shared, grid.Rows.Count), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}
 		}
 
 		/// <summary>
@@ -609,6 +627,13 @@ namespace Szotar.WindowsForms.Forms {
 			} else if (sourceCulture != null && sourceCulture.Equals(e.InputLanguage.Culture)) {
 				SearchMode = SearchMode.Forward;
 			}
+		}
+		#endregion
+
+		#region Grid methods
+		public int SelectedRowCount() {
+			// The SelectedRows and SelectedColumns collections can be inefficient [BPSWFDC].
+			return grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
 		}
 		#endregion
 
@@ -832,14 +857,16 @@ namespace Szotar.WindowsForms.Forms {
 				}
 			}
 
-			var recent = new List<ListInfo>(Configuration.RecentLists);
+			// Clone it, if it exists, or make a new one.
+			var recent = Configuration.RecentLists != null ? new List<ListInfo>(Configuration.RecentLists) : new List<ListInfo>();
 			recent.RemoveAll(r => open.IndexOf(r.ID.Value) > -1);
 
 			if (recent.Count > 0 && open.Count > 0)
 				addTo.DropDownItems.Add(new ToolStripSeparator());
 
 			foreach (var info in recent) {
-				var item = new ToolStripMenuItem(info.Name, null, new EventHandler((s, e) => AddToExistingList(info.ID.Value)));
+				var info_ = info; //HACK Copy for closure
+				var item = new ToolStripMenuItem(info.Name, null, new EventHandler((s, e) => AddToExistingList(info_.ID.Value)));
 				addTo.DropDownItems.Add(item);
 			}
 
@@ -850,12 +877,40 @@ namespace Szotar.WindowsForms.Forms {
 			AddEntries(ListBuilder.Open(listID));
 		}
 
+		IEnumerable<int> GetSelectedIndices() {
+			// Enumerate selected rows in index order. (It's faster not to use SelectedRows.)
+			for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+				index >= 0;
+				index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) {
+				yield return index;
+			}
+		}
+
+		IEnumerable<SearchResult> GetSelectedResults() {
+			for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+				index >= 0;
+				index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) {
+				yield return results[index];
+			}
+		}
+
+		IEnumerable<TranslationPair> GetSelectedTranslationPairs() {
+			for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+				index >= 0;
+				index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) {
+				yield return new TranslationPair(results[index].Phrase, results[index].Translation);
+			}
+		}
+
 		private void AddEntries(ListBuilder lb) {
 			var entries = new List<TranslationPair>();
-			foreach (DataGridViewRow row in grid.SelectedRows)
-				entries.Add(new TranslationPair(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString(), true));
+			foreach (DataGridViewRow row in grid.SelectedRows) {
+				var entry = results[row.Index];
+				entries.Add(new TranslationPair(entry.Phrase, entry.Translation));
+			}
 
-			lb.AddEntries(entries);
+			// TODO: Maybe pass this method an IEnumerable instead.
+			lb.AddEntries(GetSelectedTranslationPairs());
 		}
 
 		private void addToList_Click(object sender, EventArgs e) {
@@ -864,14 +919,17 @@ namespace Szotar.WindowsForms.Forms {
 			lb.Show();
 		}
 
+		// TODO: This may be better copying as CSV. 
+		// TODO: It also needs to support copying in some format that ListBuilder can paste.
+		// TODO: Dragging wouldn't hurt either.
 		private void copy_Click(object sender, EventArgs e) {
-			if (grid.SelectedRows.Count == 0)
+			int rowCount = grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
+			if (rowCount <= 0)
 				return;
 
-			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			var sb = new System.Text.StringBuilder(rowCount * 16);
 
-			foreach (DataGridViewRow row in grid.SelectedRows) {
-				SearchResult result = (SearchResult)row.DataBoundItem;
+			foreach(SearchResult result in GetSelectedResults()) {
 				sb.Append(result.Phrase).Append(" -- ").Append(result.Translation).AppendLine();
 			}
 
@@ -884,16 +942,10 @@ namespace Szotar.WindowsForms.Forms {
 		/// that may be).
 		/// </summary>
 		private void reverseLookupToolStripMenuItem_Click(object sender, EventArgs e) {
-			if (grid.SelectedCells.Count > 0) {
-				DataGridViewCell cell = grid.SelectedCells[0];
+			int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+			if (index >= 0) {
 				searchMode = DisplayedSearchMode == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward;
-
-				//HACK I can't just access it on the cell itself, I have NO idea why
-				//But it seems to work like this.
-				searchBox.Text = cell.OwningRow.Cells[1].Value.ToString();
-
-				//Update the UI
-				SearchMode = searchMode;
+				searchBox.Text = results[index].Translation;
 			}
 		}
 		#endregion

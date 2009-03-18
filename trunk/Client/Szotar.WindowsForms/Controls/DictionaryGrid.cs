@@ -382,17 +382,21 @@ namespace Szotar.WindowsForms.Controls {
 		#region Selection
 		public IEnumerable<int> SelectedIndices {
 			get {
-				foreach (DataGridViewRow row in grid.SelectedRows)
-					if (row.Index < source.Count)
-						yield return row.Index;
+				// SelectedRows can be inefficient.
+				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+					index >= 0;
+					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
+				{
+					yield return index;
+				}
 			}
 		}
 
 		public int SelectionSize {
 			get {
-				int count = grid.SelectedRows.Count;
+				int count = grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
 				//TODO: Test.
-				if (grid.Rows.Count > 0 && grid.AllowUserToAddRows && grid.Rows[grid.RowCount - 1].Selected)
+				if (grid.Rows.Count > 0 && grid.AllowUserToAddRows && ((grid.Rows.GetRowState(grid.RowCount - 1) & DataGridViewElementStates.Selected) != 0))
 					count--;
 				Debug.Assert(count >= 0);
 				return count;

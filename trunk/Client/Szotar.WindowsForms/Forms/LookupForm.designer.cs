@@ -51,10 +51,10 @@
 			System.Windows.Forms.ToolStripMenuItem importDictionary;
 			System.Windows.Forms.ToolStripMenuItem toolsMenu;
 			System.Windows.Forms.ToolStripMenuItem dictsFolder;
+			System.Windows.Forms.ToolStripMenuItem charMap;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 			System.Windows.Forms.ToolStripMenuItem options;
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.ToolStripMenuItem charMap;
 			this.forwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.backwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,9 +99,9 @@
 			importDictionary = new System.Windows.Forms.ToolStripMenuItem();
 			toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
 			dictsFolder = new System.Windows.Forms.ToolStripMenuItem();
+			charMap = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			options = new System.Windows.Forms.ToolStripMenuItem();
-			charMap = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
 			this.contextMenu.SuspendLayout();
 			this.searchPanel.SuspendLayout();
@@ -319,6 +319,12 @@
 			resources.ApplyResources(dictsFolder, "dictsFolder");
 			dictsFolder.Click += new System.EventHandler(this.dictsFolder_Click);
 			// 
+			// charMap
+			// 
+			charMap.Name = "charMap";
+			resources.ApplyResources(charMap, "charMap");
+			charMap.Click += new System.EventHandler(this.charMap_Click);
+			// 
 			// toolStripSeparator3
 			// 
 			toolStripSeparator3.Name = "toolStripSeparator3";
@@ -349,6 +355,7 @@
 			// 
 			this.grid.AllowUserToAddRows = false;
 			this.grid.AllowUserToDeleteRows = false;
+			this.grid.AllowUserToResizeRows = false;
 			resources.ApplyResources(this.grid, "grid");
 			this.grid.BackgroundColor = System.Drawing.SystemColors.Control;
 			this.grid.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -460,12 +467,6 @@
             dictionaryMenu,
             toolsMenu});
 			this.mainMenu.Name = "mainMenu";
-			// 
-			// charMap
-			// 
-			charMap.Name = "charMap";
-			resources.ApplyResources(charMap, "charMap");
-			charMap.Click += new System.EventHandler(this.charMap_Click);
 			// 
 			// LookupForm
 			// 
