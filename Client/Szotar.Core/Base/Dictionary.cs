@@ -42,7 +42,7 @@ namespace Szotar {
 	public static class Dictionary {
 		public static IEnumerable<DictionaryInfo> GetAll() {			
 			foreach (FileInfo file in DataStore.CombinedDataStore.GetFiles
-			         ("Dictionaries", new System.Text.RegularExpressions.Regex(@"\.dict$"), true)) 
+			         (Configuration.DictionariesFolderName, new System.Text.RegularExpressions.Regex(@"\.dict$"), true)) 
 			{
 				//Only load the info section of the dictionary
 				yield return new SimpleDictionary.Info(file.FullName);

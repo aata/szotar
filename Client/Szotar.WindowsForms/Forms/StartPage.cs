@@ -43,7 +43,9 @@ namespace Szotar.WindowsForms.Forms {
 			//DistributeColumns(listView1, 100);
 			//DistributeColumns(dictionaries, 65, 10, 25);
 
-			fileSystemWatcher.Path = System.IO.Path.Combine(DataStore.CombinedDataStore.Path, "Dictionaries");
+
+			DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
+			fileSystemWatcher.Path = System.IO.Path.Combine(DataStore.UserDataStore.Path, Configuration.DictionariesFolderName);
 			fileSystemWatcher.Created += new System.IO.FileSystemEventHandler(fileSystemWatcher_Created);
 			fileSystemWatcher.Deleted += new System.IO.FileSystemEventHandler(fileSystemWatcher_Deleted);
 			fileSystemWatcher.Renamed += new System.IO.RenamedEventHandler(fileSystemWatcher_Renamed);

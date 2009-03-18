@@ -828,8 +828,8 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Tools Menu
 		private void dictsFolder_Click(object sender, EventArgs e) {
-			DataStore.UserDataStore.EnsureDirectoryExists("Dictionaries");
-			string path = System.IO.Path.Combine(DataStore.UserDataStore.Path, "Dictionaries");
+			DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
+			string path = System.IO.Path.Combine(DataStore.UserDataStore.Path, Configuration.DictionariesFolderName);
 			System.Diagnostics.Process.Start(path);
 		}
 

@@ -1,15 +1,16 @@
 using System;
 using System.Data.Common;
 using System.Reflection;
-using System.IO;
+using System.IO;	
+using IO = System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
-
 using System.Text;
 
 namespace Szotar.Sqlite {
+	
 	[global::System.Serializable]
 	public class DatabaseVersionException : Exception {
 		public DatabaseVersionException() { }
@@ -25,18 +26,24 @@ namespace Szotar.Sqlite {
 		string path;
 
 		public SqliteDatabase(string path)
-			: base(
-#if !MONO
-			new System.Data.SQLite.SQLiteConnection("Data Source=" + path)
-#else
-			new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path)
-#endif
-			) {
-			
+			: base(OpenDatabase(path))
+		{
 			this.path = path;
 			conn.Open();
 
 			Init();
+		}
+		
+		static DbConnection OpenDatabase(string path) {
+			
+			string dir = IO.Path.GetDirectoryName(path);
+			if(!IO.Directory.Exists(dir))
+				IO.Directory.CreateDirectory(path);
+#if !MONO
+			return new System.Data.SQLite.SQLiteConnection("Data Source=" + path);
+#else
+			return new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path);
+#endif			
 		}
 
 		protected string Path {

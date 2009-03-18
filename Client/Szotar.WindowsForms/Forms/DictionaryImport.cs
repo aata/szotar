@@ -166,7 +166,7 @@ namespace Szotar.WindowsForms.Forms {
 				string root = DataStore.UserDataStore.Path;
 				string name = imported.Name ?? Properties.Resources.DefaultDictionaryName;
 
-				DataStore.UserDataStore.EnsureDirectoryExists("Dictionaries");
+				DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
 
 				//Attempt to save with a sane name; failing that, use a GUID as the name; otherwise report the error.
 				var ipc = Path.GetInvalidPathChars();
@@ -174,12 +174,12 @@ namespace Szotar.WindowsForms.Forms {
 					//TODO: Sanitize file name!
 				}
 
-				imported.Path = Path.Combine(Path.Combine(root, "Dictionaries"), name) + ".dict";
+				imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dict";
 
 				//We don't want to overwrite.
 				if (File.Exists(imported.Path)) {
 					name = Guid.NewGuid().ToString("D");
-					imported.Path = Path.Combine(Path.Combine(root, "Dictionaries"), name) + ".dict";
+					imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ". dict";
 					imported.Save();
 				}
 
