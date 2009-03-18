@@ -33,6 +33,9 @@ namespace Szotar.WindowsForms {
 		IMoniker moniker;
 
 		public FileIsInUse(string path) {
+#if MONO
+			return;
+#endif
 			try {
 				int hresult = NativeMethods.CreateFileMoniker(path, out moniker);
 
@@ -50,6 +53,9 @@ namespace Szotar.WindowsForms {
 		}
 
 		IRunningObjectTable GetTable() {
+			if (moniker == null)
+				return null; //No point.
+
 			IRunningObjectTable table;
 
 			int hresult = NativeMethods.GetRunningObjectTable(0, out table);
@@ -60,6 +66,9 @@ namespace Szotar.WindowsForms {
 		}
 
 		private void Register() {
+			if (moniker == null)
+				return; //No need to raise an error. This feature is merely a nicety anyway.
+
 			if (cookie == null) {
 				IRunningObjectTable table = GetTable();
 				if (table != null) {
@@ -72,6 +81,9 @@ namespace Szotar.WindowsForms {
 		}
 
 		private void Revoke() {
+			if (moniker == null)
+				return;
+
 			if (cookie.HasValue) {
 				IRunningObjectTable table = GetTable();
 				if (table != null) {

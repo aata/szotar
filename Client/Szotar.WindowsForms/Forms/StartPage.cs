@@ -32,6 +32,7 @@ namespace Szotar.WindowsForms.Forms {
 			dictionaries.EndUpdate();
 
 			PopulateRecentDictionaries();
+			PopulateRecentLists();
 
 			recentDictionaries.ItemActivate += new EventHandler(recentDictionaries_ItemActivate);
 			recentDictionaries.Resize += new EventHandler((s, e) => recentDictionaries.Columns[0].Width = recentDictionaries.ClientSize.Width);
@@ -103,7 +104,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			WithUpdate(recentDictionaries, lv => {
 				lv.Items.Clear();
-				for (int i = 0; i < 6 && i < rd.Size; ++i) {
+				for (int i = 0; i < 6 && i < rd.Entries.Count; ++i) {
 					var item = new ListViewItem(new string[] { rd.Entries[i].Title });
 					item.Tag = rd.Entries[i].Path;
 					item.Text = rd.Entries[i].Title;
@@ -111,9 +112,25 @@ namespace Szotar.WindowsForms.Forms {
 					lv.Items.Add(item);
 				}
 			});
+		}
 
-			dictionaries.AutoResizeColumn(dictionariesSizeColumn.Index, ColumnHeaderAutoResizeStyle.HeaderSize);
-			dictionaries.AutoResizeColumn(dictionariesAuthorColumn.Index, ColumnHeaderAutoResizeStyle.HeaderSize);
+		private void PopulateRecentLists() {
+			var mru = Configuration.RecentLists;
+			if (mru == null) {
+				recentLists.Items.Clear();
+				return;
+			}
+
+			WithUpdate(recentLists, lv => {
+				lv.Items.Clear();
+				for (int i = 0; i < 6 && i < mru.Count; ++i) {
+					var item = new ListViewItem(new string[] { mru[i].Name });
+					item.Tag = mru[i].ID;
+					item.Text = mru[i].Name;
+					item.ImageKey = "List";
+					lv.Items.Add(item);
+				}
+			});
 		}
 
 		void fileSystemWatcher_Renamed(object sender, System.IO.RenamedEventArgs e) {
