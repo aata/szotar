@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -63,7 +63,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Mono' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug|Mono</OutputPath>
+    <OutputPath>bin\DebugMono</OutputPath>
     <WarningLevel>4</WarningLevel>
     <AssemblyName>Szotar.WindowsForms</AssemblyName>
     <DefineConstants>MONO</DefineConstants>
@@ -71,7 +71,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Mono' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Release|Mono</OutputPath>
+    <OutputPath>bin\ReleaseMono</OutputPath>
     <WarningLevel>4</WarningLevel>
     <AssemblyName>Szotar.WindowsForms</AssemblyName>
     <DefineConstants>MONO</DefineConstants>
@@ -377,6 +377,13 @@
   <ItemGroup>
     <PublishFile Include="System.Data.SQLite">
       <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
     </PublishFile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
