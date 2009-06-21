@@ -673,7 +673,7 @@ namespace Szotar.Sqlite {
 			public override void Undo() {
 				//Again, sidestep oddities related to OOB changes. This is probably very unlikely to happen with the
 				//SetValue command, however.
-				newValue = list[index].GetProperty<T>(property);
+				newValue = (T)list[index].GetProperty(property);
 
 				SetTo(oldValue);
 			}

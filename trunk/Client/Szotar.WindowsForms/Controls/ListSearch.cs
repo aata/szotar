@@ -13,11 +13,8 @@ namespace Szotar.WindowsForms.Controls {
 
 		bool ReallyDesignMode {
 			get {
-				if (DesignMode)
-					return true;
-				if (Site != null && Site.DesignMode)
-					return true;
-				return false;
+				http://www.ben.geek.nz/controldesignmode-misbehaving/
+				return LicenseManager.UsageMode == LicenseUsageMode.Designtime;
 			}
 		}
 

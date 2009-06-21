@@ -31,6 +31,7 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartPage));
 			System.Windows.Forms.TableLayoutPanel recentListsTable;
 			System.Windows.Forms.Label label3;
+			System.Windows.Forms.ColumnHeader Name;
 			System.Windows.Forms.Label testingLabel;
 			System.Windows.Forms.ColumnHeader dictionariesNameColumn;
 			this.recentDictionaries = new Szotar.WindowsForms.Controls.ListViewNF();
@@ -41,8 +42,8 @@
 			this.reportBug = new System.Windows.Forms.LinkLabel();
 			this.dictionaryTab = new System.Windows.Forms.TabPage();
 			this.dictionaries = new Szotar.WindowsForms.Controls.ListViewNF();
-			this.dictionariesSizeColumn = new System.Windows.Forms.ColumnHeader();
-			this.dictionariesAuthorColumn = new System.Windows.Forms.ColumnHeader();
+			this.dictionariesSizeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.dictionariesAuthorColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.practiceTab = new System.Windows.Forms.TabPage();
 			this.listSearch = new Szotar.WindowsForms.Controls.ListSearch();
 			this.tasks = new System.Windows.Forms.TabControl();
@@ -51,11 +52,12 @@
 			mainTabTable = new System.Windows.Forms.TableLayoutPanel();
 			recentDictionariesTable = new System.Windows.Forms.TableLayoutPanel();
 			label1 = new System.Windows.Forms.Label();
-			recentDictionariesTitleColumn = new System.Windows.Forms.ColumnHeader();
+			recentDictionariesTitleColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			recentListsTable = new System.Windows.Forms.TableLayoutPanel();
 			label3 = new System.Windows.Forms.Label();
+			Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			testingLabel = new System.Windows.Forms.Label();
-			dictionariesNameColumn = new System.Windows.Forms.ColumnHeader();
+			dictionariesNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			mainTabTable.SuspendLayout();
 			recentDictionariesTable.SuspendLayout();
 			recentListsTable.SuspendLayout();
@@ -131,12 +133,14 @@
 			this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
 			this.imageList.TransparentColor = System.Drawing.Color.Transparent;
 			this.imageList.Images.SetKeyName(0, "Dictionary");
+			this.imageList.Images.SetKeyName(1, "List");
 			// 
 			// imageListSmall
 			// 
 			this.imageListSmall.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListSmall.ImageStream")));
 			this.imageListSmall.TransparentColor = System.Drawing.Color.Transparent;
 			this.imageListSmall.Images.SetKeyName(0, "Dictionary");
+			this.imageListSmall.Images.SetKeyName(1, "List");
 			// 
 			// recentListsTable
 			// 
@@ -150,10 +154,9 @@
 			recentListsTable.Location = new System.Drawing.Point(276, 3);
 			recentListsTable.Name = "recentListsTable";
 			recentListsTable.RowCount = 2;
-			mainTabTable.SetRowSpan(recentListsTable, 2);
 			recentListsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			recentListsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			recentListsTable.Size = new System.Drawing.Size(268, 356);
+			recentListsTable.Size = new System.Drawing.Size(268, 175);
 			recentListsTable.TabIndex = 2;
 			// 
 			// label3
@@ -170,14 +173,18 @@
 			this.recentLists.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
+			this.recentLists.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            Name});
 			this.recentLists.FullRowSelect = true;
+			this.recentLists.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.recentLists.LargeImageList = this.imageList;
 			this.recentLists.Location = new System.Drawing.Point(3, 16);
 			this.recentLists.Name = "recentLists";
-			this.recentLists.Size = new System.Drawing.Size(262, 337);
+			this.recentLists.Size = new System.Drawing.Size(262, 156);
 			this.recentLists.SmallImageList = this.imageListSmall;
 			this.recentLists.TabIndex = 1;
 			this.recentLists.UseCompatibleStateImageBehavior = false;
+			this.recentLists.View = System.Windows.Forms.View.Details;
 			// 
 			// practiceTable
 			// 

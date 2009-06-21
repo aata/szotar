@@ -43,6 +43,7 @@ namespace Szotar.WindowsForms.Forms {
 			name.TextChanged += new EventHandler(name_TextChanged);
 			author.TextChanged += new EventHandler(author_TextChanged);
 			url.TextChanged += new EventHandler(url_TextChanged);
+			showStartPage.Click += new EventHandler(showStartPage_Click);
 			close.Click += new EventHandler(close_Click);
 			deleteList.Click += new EventHandler(deleteList_Click);
 
@@ -187,8 +188,7 @@ namespace Szotar.WindowsForms.Forms {
 			ShadowTag tag = shadow.Tag as ShadowTag;
 			if (e.Button == MouseButtons.Left && tag != null) {
 				System.Drawing.Point down = tag.Down;
-				int delta = down.Y - e.Y;
-				meta.Height += delta;
+				meta.Height += down.Y - e.Y;
 				UpdateGridHeight();
 				GuiConfiguration.ListBuilderMetadataSectionHeight = meta.Height;
 			}
@@ -298,6 +298,10 @@ namespace Szotar.WindowsForms.Forms {
 
 		public void ScrollToPosition(int position) {
 			grid.ScrollToIndex(position);
+		}
+
+		void showStartPage_Click(object sender, EventArgs e) {
+			StartPage.ShowStartPage(null);
 		}
 
 		private void deleteList_Click(object sender, EventArgs e) {

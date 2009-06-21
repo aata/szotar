@@ -13,6 +13,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			ThemeHelper.UseExplorerTheme(dictionaries, recentDictionaries, recentLists);
 			ThemeHelper.SetNoHScroll(recentDictionaries, recentLists);
+			recentDictionaries.Scrollable = recentLists.Scrollable = false;
 
 			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
 
@@ -38,11 +39,14 @@ namespace Szotar.WindowsForms.Forms {
 			recentDictionaries.Resize += new EventHandler((s, e) => recentDictionaries.Columns[0].Width = recentDictionaries.ClientSize.Width);
 			recentDictionaries.Columns[0].Width = recentDictionaries.ClientSize.Width;
 
+			recentLists.ItemActivate += new EventHandler(recentLists_ItemActivate);
+			recentLists.Resize += new EventHandler((s, e) => recentLists.Columns[0].Width = recentLists.ClientSize.Width);
+			recentLists.Columns[0].Width = recentLists.ClientSize.Width;
+
 			//DistributeColumns(recentDictionaries, 100);
 			//DistributeColumns(recentLists, 100);
 			//DistributeColumns(listView1, 100);
 			//DistributeColumns(dictionaries, 65, 10, 25);
-
 
 			DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
 			fileSystemWatcher.Path = System.IO.Path.Combine(DataStore.UserDataStore.Path, Configuration.DictionariesFolderName);
@@ -52,13 +56,6 @@ namespace Szotar.WindowsForms.Forms {
 
 			Configuration.Default.SettingChanged += new EventHandler<SettingChangedEventArgs>(SettingChanged);
 			this.FormClosed += new FormClosedEventHandler(OnFormClosed);
-		}
-
-		void recentDictionaries_ItemActivate(object sender, EventArgs e) {
-			foreach (ListViewItem item in recentDictionaries.SelectedItems) {
-				if (item.Tag != null && item.Tag is string)
-					LookupForm.OpenDictionary(item.Tag as string);
-			}
 		}
 
 		private static void DistributeColumns(ListView lv, params int[] weights) {
@@ -97,6 +94,13 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
+		void recentDictionaries_ItemActivate(object sender, EventArgs e) {
+			foreach (ListViewItem item in recentDictionaries.SelectedItems) {
+				if (item.Tag != null && item.Tag is string)
+					LookupForm.OpenDictionary(item.Tag as string);
+			}
+		}
+
 		private void PopulateRecentDictionaries() {
 			var rd = GuiConfiguration.RecentDictionaries;
 			if(rd == null) {
@@ -114,6 +118,13 @@ namespace Szotar.WindowsForms.Forms {
 					lv.Items.Add(item);
 				}
 			});
+		}
+
+		void recentLists_ItemActivate(object sender, EventArgs e) {
+			foreach (ListViewItem item in recentLists.SelectedItems) {
+				if (item.Tag != null && item.Tag is long)
+					ListBuilder.Open((long)item.Tag);
+			}
 		}
 
 		private void PopulateRecentLists() {
