@@ -454,9 +454,11 @@ namespace Szotar.WindowsForms {
 					return false;
 
 				// Needs a more robust check. It seems mono supports very different style sets.
-				return 
-					VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement("Menu", (int)MenuParts.BarBackground, (int)MenuBarStates.Active))
-					&& VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement(RebarClass, RebarBackground, 0));
+				return
+					VisualStyleRenderer.IsElementDefined(
+						VisualStyleElement.CreateElement("Menu", 
+							(int)MenuParts.BarBackground, 
+							(int)MenuBarStates.Active));
 			}
 		}
 	}

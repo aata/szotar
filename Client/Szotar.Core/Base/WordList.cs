@@ -237,16 +237,16 @@ namespace Szotar {
 		}
 
 		//You know, I don't think this type parameter is particularly useful.
-		internal T GetProperty<T>(WordList.EntryProperty property) {
+		internal object GetProperty(WordList.EntryProperty property) {
 			switch (property) {
 				case WordList.EntryProperty.Phrase:
-					return (T)(object)phrase;
+					return phrase;
 				case WordList.EntryProperty.Translation:
-					return (T)(object)translation;
+					return translation;
 				case WordList.EntryProperty.TimesTried:
-					return (T)(object)tried;
+					return tried;
 				case WordList.EntryProperty.TimesFailed:
-					return (T)(object)failed;
+					return failed;
 			}
 			throw new ArgumentException("property");
 		}

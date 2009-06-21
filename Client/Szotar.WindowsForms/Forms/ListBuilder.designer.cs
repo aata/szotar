@@ -29,6 +29,7 @@
 			System.Windows.Forms.Label urlLabel;
 			System.Windows.Forms.FlowLayoutPanel metaFlow;
 			System.Windows.Forms.ToolStripMenuItem listMenu;
+			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 			System.Windows.Forms.ToolStripMenuItem copyAsMenu;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListBuilder));
@@ -38,6 +39,7 @@
 			this.author = new System.Windows.Forms.TextBox();
 			this.urlPanel = new System.Windows.Forms.Panel();
 			this.url = new System.Windows.Forms.TextBox();
+			this.showStartPage = new System.Windows.Forms.ToolStripMenuItem();
 			this.save = new System.Windows.Forms.ToolStripMenuItem();
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.deleteList = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,6 +63,7 @@
 			urlLabel = new System.Windows.Forms.Label();
 			metaFlow = new System.Windows.Forms.FlowLayoutPanel();
 			listMenu = new System.Windows.Forms.ToolStripMenuItem();
+			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			copyAsMenu = new System.Windows.Forms.ToolStripMenuItem();
 			metaFlow.SuspendLayout();
@@ -115,7 +118,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(12198, 60);
+			metaFlow.Size = new System.Drawing.Size(12920, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -181,38 +184,51 @@
 			// listMenu
 			// 
 			listMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showStartPage,
+            toolStripSeparator2,
             this.save,
             this.close,
             toolStripMenuItem1,
             this.deleteList});
 			listMenu.Name = "listMenu";
 			listMenu.Size = new System.Drawing.Size(37, 20);
-			listMenu.Text = "&List";
+			listMenu.Text = "&File";
+			// 
+			// showStartPage
+			// 
+			this.showStartPage.Name = "showStartPage";
+			this.showStartPage.Size = new System.Drawing.Size(159, 22);
+			this.showStartPage.Text = "S&how Start Page";
+			// 
+			// toolStripSeparator2
+			// 
+			toolStripSeparator2.Name = "toolStripSeparator2";
+			toolStripSeparator2.Size = new System.Drawing.Size(156, 6);
 			// 
 			// save
 			// 
 			this.save.Image = global::Szotar.WindowsForms.Properties.Resources.Floppy48;
 			this.save.Name = "save";
 			this.save.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.save.Size = new System.Drawing.Size(152, 22);
+			this.save.Size = new System.Drawing.Size(159, 22);
 			this.save.Text = "&Save";
 			// 
 			// close
 			// 
 			this.close.Name = "close";
 			this.close.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-			this.close.Size = new System.Drawing.Size(152, 22);
+			this.close.Size = new System.Drawing.Size(159, 22);
 			this.close.Text = "&Close";
 			// 
 			// toolStripMenuItem1
 			// 
 			toolStripMenuItem1.Name = "toolStripMenuItem1";
-			toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+			toolStripMenuItem1.Size = new System.Drawing.Size(156, 6);
 			// 
 			// deleteList
 			// 
 			this.deleteList.Name = "deleteList";
-			this.deleteList.Size = new System.Drawing.Size(152, 22);
+			this.deleteList.Size = new System.Drawing.Size(159, 22);
 			this.deleteList.Text = "&Delete this List";
 			// 
 			// copyAsMenu
@@ -410,5 +426,6 @@
 		private System.Windows.Forms.ToolStripMenuItem editMetadata;
 		private System.Windows.Forms.ToolStripMenuItem swapAll;
 		private System.Windows.Forms.MenuStrip mainMenu;
+		private System.Windows.Forms.ToolStripMenuItem showStartPage;
 	}
 }
