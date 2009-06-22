@@ -137,8 +137,6 @@ namespace Szotar.Sqlite {
 		}
 		#endregion
 
-		//Remind me why these are public?
-		/// <summary>Set a property of an entry in the database (but not in the in-memory list).</summary>
 		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
@@ -382,8 +380,8 @@ namespace Szotar.Sqlite {
 				}
 			}
 
-			/// <summary>Removes a contiguous block of elements from the list. It's faster than the other
-			/// Remove methods.</summary>
+			/// <summary>Removes a contiguous block of elements from the list.
+			/// It's faster than the other Remove methods.</summary>
 			public void RemoveAt(int index, int count) {
 				using (var txn = Connection.BeginTransaction()) {
 					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", list.ID, index, index + count - 1);
@@ -418,17 +416,17 @@ namespace Szotar.Sqlite {
 
 				using (var command = Connection.CreateCommand()) {
 					var sb = new System.Text.StringBuilder();
-					sb.Append(@"SELECT Phrase, Translation, TimesTried, TimesFailed, 
-					            ListPosition FROM VocabItems WHERE SetID = ? AND ListPosition IN (");
+					sb.Append(@"SELECT Phrase, Translation, TimesTried, TimesFailed, ListPosition
+                                FROM VocabItems WHERE SetID = ? AND ListPosition IN (");
 
 					int i = 0;
 					foreach (int index in indices) {
 						if (i++ > 0)
-							sb.Append(", ");
+							sb.Append(@", ");
 						sb.Append(index);
 					}
 
-					sb.Append(") ORDER BY ListPosition ASC");
+					sb.Append(@") ORDER BY ListPosition ASC");
 					command.CommandText = sb.ToString();
 					AddParameter(command, list.ID);
 
@@ -451,7 +449,7 @@ namespace Szotar.Sqlite {
 
 				while (reader.Read()) {
 					if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2) || reader.IsDBNull(3))
-						throw new System.Data.StrongTypingException();
+						throw new System.Data.StrongTypingException("One of the fields of a word list entry was DBNull.");
 
 					string phrase = (string)reader.GetValue(0);
 					string translation = (string)reader.GetValue(1);
@@ -467,7 +465,10 @@ namespace Szotar.Sqlite {
 
 			public object GetProperty(int index, string name) {
 				using (var cmd = Connection.CreateCommand()) {
-					cmd.CommandText = string.Format(CultureInfo.InvariantCulture, "SELECT {0} FROM VocabItems WHERE SetID = ? AND ListPosition = ?");
+					cmd.CommandText = string.Format(
+							CultureInfo.InvariantCulture, 
+							"SELECT {0} FROM VocabItems WHERE SetID = ? AND ListPosition = ?",
+							name);
 					AddParameter(cmd, list.ID);
 					AddParameter(cmd, index);
 
@@ -477,7 +478,12 @@ namespace Szotar.Sqlite {
 
 			public void SetProperty(int index, string name, object value) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL(string.Format(CultureInfo.InvariantCulture, "UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", name), value, list.ID, index);
+					ExecuteSQL(
+						string.Format(
+							CultureInfo.InvariantCulture,
+							"UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", 
+							name),
+						value, list.ID, index);
 
 					txn.Commit();
 				}
@@ -485,8 +491,11 @@ namespace Szotar.Sqlite {
 
 			public void SetEntry(int index, WordListEntry item) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL("UPDATE VocabItems Set Phrase = ?, Translation = ?, TimesTried = ?, TimesFailed = ? WHERE SetID = ? AND ListPosition = ?",
-						item.Phrase, item.Translation, item.TimesTried, item.TimesFailed, list.ID, index);
+					ExecuteSQL(@"UPDATE VocabItems 
+                                 SET Phrase = ?, Translation = ?, TimesTried = ?, TimesFailed = ?
+                                 WHERE SetID = ? AND ListPosition = ?",
+						item.Phrase, item.Translation, item.TimesTried, 
+						item.TimesFailed, list.ID, index);
 
 					txn.Commit();
 				}
@@ -494,20 +503,31 @@ namespace Szotar.Sqlite {
 
 			public void SetWordListProperty(string property, object value) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL(string.Format(CultureInfo.InvariantCulture, "UPDATE Sets SET {0} = ? WHERE id = ?", property), value, list.ID);
+					ExecuteSQL(
+						string.Format(
+							CultureInfo.InvariantCulture, 
+							@"UPDATE Sets SET {0} = ? WHERE id = ?", 
+							property),
+						value, list.ID);
 
 					txn.Commit();
 				}
 			}
 
 			public object GetWordListProperty(string property) {
-				return Select(string.Format(CultureInfo.InvariantCulture, "SELECT {0} FROM Sets WHERE id = ?", property), list.ID);
+				return Select(
+					string.Format(
+						CultureInfo.InvariantCulture, 
+						"SELECT {0} FROM Sets WHERE id = ?", 
+						property),
+					list.ID);
 			}
 		
-			public void SwapRows(IEnumerable<int> indices)
-			{
+			public void SwapRows(IEnumerable<int> indices) {
 				var sb = new StringBuilder();
-				sb.Append("UPDATE VocabItems SET Phrase = Translation, Translation = Phrase WHERE SetID = ? AND ListPosition IN (");
+				sb.Append(@"UPDATE VocabItems 
+                            SET Phrase = Translation, Translation = Phrase 
+                            WHERE SetID = ? AND ListPosition IN (");
 				bool first = true;
 				foreach(int i in indices) {
 					if(!first)

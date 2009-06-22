@@ -46,6 +46,11 @@ namespace Szotar.WindowsForms {
 			set { Default.Set("LookupFormColumn1FillWeight", value); }
 		}
 
+		public static float ListBuilderColumnRatio {
+			get { return Default.Get<float>("ListBuilderColumnRatio", 1.0f); }
+			set { Default.Set("ListBuilderColumnRatio", value); }
+		}
+
 		public static string UserRealName {
 			get { return Default.Get<string>("UserRealName", null); }
 			set { Default.Set("UserRealName", value); }

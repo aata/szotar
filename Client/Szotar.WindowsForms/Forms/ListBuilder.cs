@@ -13,10 +13,15 @@ namespace Szotar.WindowsForms.Forms {
 		public WordList WordList { get { return list; } }
 
 		public ListBuilder() : 
-			this(DataStore.Database.CreateSet(Properties.Resources.DefaultListName, 
-			GuiConfiguration.UserNickname, null, null, DateTime.Now))
+			this(
+				DataStore.Database.CreateSet(
+					Properties.Resources.DefaultListName, 
+					GuiConfiguration.UserNickname, 
+					null, null, DateTime.Now))
 		{
 			MakeRecent();
+
+			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
 		}
 
 		public ListBuilder(WordList wordList) {
@@ -46,6 +51,7 @@ namespace Szotar.WindowsForms.Forms {
 			showStartPage.Click += new EventHandler(showStartPage_Click);
 			close.Click += new EventHandler(close_Click);
 			deleteList.Click += new EventHandler(deleteList_Click);
+			grid.ColumnRatioChanged += new EventHandler(grid_ColumnRatioChanged);
 
 			swap.Click += new EventHandler(swap_Click);
 			remove.Click += new EventHandler(remove_Click);
@@ -81,6 +87,10 @@ namespace Szotar.WindowsForms.Forms {
 			//list.ListChanged -= new ListChangedEventHandler(OnListChanged);
 			list.PropertyChanged -= new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted -= new EventHandler(list_ListDeleted);
+		}
+
+		void grid_ColumnRatioChanged(object sender, EventArgs e) {
+			GuiConfiguration.ListBuilderColumnRatio = grid.ColumnRatio;
 		}
 
 		void list_ListDeleted(object sender, EventArgs e) {
