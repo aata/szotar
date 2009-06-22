@@ -82,14 +82,17 @@ namespace Szotar.WindowsForms {
 	/// </summary>
 	public class SzotarContext : ApplicationContext {
 		public SzotarContext() {
-			//This is easier than adding a handler to the Close event of every form that opens.
+			// This is easier than adding a handler to the Close event of every form that opens.
 			Application.Idle += new EventHandler(Application_Idle);
 		}
 
 		void Application_Idle(object sender, EventArgs e) {
-			//ApplicationContext also calls ExitThread, except it only waits for one form.
+			// ApplicationContext also calls ExitThread, except it only waits for one form.
 			if (Application.OpenForms.Count == 0)
 				this.ExitThread();
+
+			if (Configuration.Default.NeedsSaving)
+				Configuration.Default.Save();
 		}
 	}
 }

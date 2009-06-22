@@ -118,7 +118,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(12920, 60);
+			metaFlow.Size = new System.Drawing.Size(13642, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -292,6 +292,7 @@
 			this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             listMenu,
             copyAsMenu});
+			this.mainMenu.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
 			this.mainMenu.Location = new System.Drawing.Point(0, 0);
 			this.mainMenu.Name = "mainMenu";
 			this.mainMenu.Size = new System.Drawing.Size(361, 24);
@@ -379,6 +380,7 @@
 			this.Controls.Add(this.mainMenu);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(200, 200);
 			this.Name = "ListBuilder";
 			this.Text = "ListBuilder";
 			metaFlow.ResumeLayout(false);

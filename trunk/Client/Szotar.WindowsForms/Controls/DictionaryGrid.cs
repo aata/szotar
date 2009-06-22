@@ -15,6 +15,7 @@ namespace Szotar.WindowsForms.Controls {
 		bool showMutableRows;
 		bool allowNewRows;
 		bool ignoreNextListChangedEvent = false;
+		float columnRatio = 0.5f;
 
 		WordListEntry pairInEdit = null;
 		int? rowInEdit = null;
@@ -26,6 +27,18 @@ namespace Szotar.WindowsForms.Controls {
 			InitializeVirtualMode();
 
 			this.Disposed += (s, e) => UnwireDataSourceEvents();
+			grid.ColumnWidthChanged += (s, e) => {
+				float ratio = (float)grid.Columns[0].Width / (float)grid.ClientSize.Width;
+
+				if (Math.Abs(ratio - columnRatio) <= 0.02)
+					return;
+
+				columnRatio = ratio;
+
+				EventHandler h = ColumnRatioChanged;
+				if (h != null)
+					h(this, new EventArgs());
+			};
 		}
 
 		public DictionaryGrid(WordList dataSource)
@@ -141,12 +154,15 @@ namespace Szotar.WindowsForms.Controls {
 			phraseColumn.HeaderText = Properties.Resources.PhraseDefaultHeader;
 			phraseColumn.SortMode = DataGridViewColumnSortMode.Automatic;
 			phraseColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			phraseColumn.Resizable = DataGridViewTriState.True;
+			phraseColumn.FillWeight = columnRatio;
 			grid.Columns.Add(phraseColumn);
 
 			DataGridViewColumn translationColumn = new DataGridViewTextBoxColumn();
 			translationColumn.HeaderText = Properties.Resources.TranslationDefaultHeader;
 			translationColumn.SortMode = DataGridViewColumnSortMode.Automatic;
 			translationColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+			translationColumn.FillWeight = 1.0f - columnRatio;
 			grid.Columns.Add(translationColumn);
 
 			DataSource = null;
@@ -376,6 +392,29 @@ namespace Szotar.WindowsForms.Controls {
 		public ContextMenuStrip ItemContextMenu {
 			get { return grid.ContextMenuStrip; }
 			set { grid.ContextMenuStrip = value; }
+		}
+
+		public event EventHandler ColumnRatioChanged;
+
+		/// <summary>The ratio of the left column to the width of the control, in percent.</summary>
+		public float ColumnRatio {
+			get {
+				return grid.Columns[0].FillWeight;
+			}
+			set {
+				if (value == columnRatio)
+					return;
+
+				columnRatio = value;
+				EventHandler h = ColumnRatioChanged;
+				if (h != null)
+					h(this, new EventArgs());
+
+				if (grid.Columns.Count >= 2) {
+					grid.Columns[0].FillWeight = value;
+					grid.Columns[1].FillWeight = 1.0f - value;
+				}
+			}
 		}
 		#endregion
 

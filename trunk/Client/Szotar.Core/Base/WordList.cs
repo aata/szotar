@@ -79,7 +79,12 @@ namespace Szotar {
 			TimesFailed
 		}
 
+		// These should be probably protected, since they don't set the in-memory values,
+		// but WordListEntry uses them.
+		/// <summary>Get a property of an entry in the database (but not in the in-memory list).</summary>
 		public abstract T GetProperty<T>(WordListEntry entry, EntryProperty property);
+
+		/// <summary>Set a property of an entry in the database (but not in the in-memory list).</summary>
 		public abstract void SetProperty(WordListEntry entry, EntryProperty property, object value);
 
 		public void Dispose() {
