@@ -28,7 +28,6 @@
 			this.firstColumn = new System.Windows.Forms.ColumnHeader();
 			this.secondColumn = new System.Windows.Forms.ColumnHeader();
 			this.thirdColumn = new System.Windows.Forms.ColumnHeader();
-			this.acceptButton = new System.Windows.Forms.Button();
 			this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
 			this.SuspendLayout();
 			// 
@@ -56,7 +55,7 @@
 			this.results.Location = new System.Drawing.Point(4, 30);
 			this.results.Name = "results";
 			this.results.ShowItemToolTips = true;
-			this.results.Size = new System.Drawing.Size(486, 311);
+			this.results.Size = new System.Drawing.Size(486, 307);
 			this.results.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.results.TabIndex = 2;
 			this.results.UseCompatibleStateImageBehavior = false;
@@ -78,17 +77,6 @@
 			this.thirdColumn.Text = "";
 			this.thirdColumn.Width = 121;
 			// 
-			// acceptButton
-			// 
-			this.acceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.acceptButton.Location = new System.Drawing.Point(373, 347);
-			this.acceptButton.Name = "acceptButton";
-			this.acceptButton.Size = new System.Drawing.Size(117, 23);
-			this.acceptButton.TabIndex = 3;
-			this.acceptButton.Text = "&Practice";
-			this.acceptButton.UseVisualStyleBackColor = true;
-			this.acceptButton.Click += new System.EventHandler(this.acceptButton_Click);
-			// 
 			// searchBox
 			// 
 			this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -107,13 +95,12 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.acceptButton);
 			this.Controls.Add(this.searchBox);
 			this.Controls.Add(this.results);
 			this.Controls.Add(this.search);
 			this.DoubleBuffered = true;
 			this.Name = "ListSearch";
-			this.Size = new System.Drawing.Size(493, 373);
+			this.Size = new System.Drawing.Size(493, 340);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -127,6 +114,5 @@
 		private System.Windows.Forms.ColumnHeader secondColumn;
 		private System.Windows.Forms.ColumnHeader thirdColumn;
 		private Szotar.WindowsForms.Controls.SearchBox searchBox;
-		private System.Windows.Forms.Button acceptButton;
 	}
 }

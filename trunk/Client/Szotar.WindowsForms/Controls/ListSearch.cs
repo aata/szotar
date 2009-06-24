@@ -35,7 +35,6 @@ namespace Szotar.WindowsForms.Controls {
 			Disposed += (s, e) => UnwireDBEvents();
 
 			ThemeHelper.UseExplorerTheme(results);
-			ThemeHelper.SetNoHScroll(results);
 
 			WireDBEvents();
 			UpdateResults();
@@ -138,54 +137,40 @@ namespace Szotar.WindowsForms.Controls {
 			secondColumn.Width = results.ClientSize.Width - thirdColumn.Width - firstColumn.Width;
 		}
 
-		[Localizable(true)]
-		[Browsable(true)]
-		[DisplayName("Accept Text"), Category("List Search")]
-		[Description("The text which be shown on the confirmation button. This property is localisable.")]
-		[DefaultValue("&Practice")]
-		public string AcceptText {
-			get {
-				return acceptButton.Text;
-			}
-			set {
-				acceptButton.Text = value;
-			}
-		}
-
 		private void results_ItemActivate(object sender, EventArgs e) {
-			Accept();
+			var lists = Accept();
+			
+			// TODO: invoke event of some kind
+			var h = ListsChosen;
+			if (h != null)
+				h(this, new ListsChosenEventArgs(lists));
 		}
 
-		private void acceptButton_Click(object sender, EventArgs e) {
-			Accept();
-		}
+		public List<ListSearchResult> Accept() {
+			var lists = new List<ListSearchResult>();
 
-		private void Accept() {
 			if (results.SelectedItems.Count == 0)
-				return;
+				return new List<ListSearchResult>();
 
-			List<ListOpen> lists = new List<ListOpen>();
 			foreach (ListViewItem item in results.SelectedItems) {
 				object tag = item.Tag;
 				if (tag is ListInfo) {
 					var list = (ListInfo)tag;
-					lists.Add(new ListOpen { SetID = list.ID.Value });
+					lists.Add(new ListSearchResult(list.ID.Value));
 				} else if(tag is Szotar.Sqlite.SqliteDataStore.WordSearchResult) {
 					var wsr = (Szotar.Sqlite.SqliteDataStore.WordSearchResult)tag;
-					lists.Add(new ListOpen { SetID = wsr.SetID, Position = wsr.ListPosition });
+					lists.Add(new ListSearchResult(wsr.SetID, wsr.ListPosition));
 				} else if(tag.Equals("Truncated")) {
 					// Taking this path when many items are selected would probably be annoying.
 					if (results.SelectedItems.Count == 1) {
 						MaxItems = null;
 						UpdateResults();
-						return;
+						return new List<ListSearchResult>();
 					}
 				}
 			}
 
-			EventHandler<ListsChosenEventArgs> handler = ListsChosen;
-			if (handler != null)
-				handler(this, new ListsChosenEventArgs(lists));
+			return lists;
 		}
 
 		public event EventHandler<ListsChosenEventArgs> ListsChosen;
@@ -193,15 +178,10 @@ namespace Szotar.WindowsForms.Controls {
 		public int? MaxItems { get; set; }
 	}
 
-	public struct ListOpen {
-		public long SetID { get; set; }
-		public int Position { get; set; }
-	}
-
 	public class ListsChosenEventArgs : EventArgs {
-		public IList<ListOpen> Chosen { get; set; }
+		public IList<ListSearchResult> Chosen { get; set; }
 
-		public ListsChosenEventArgs(IList<ListOpen> ids) {
+		public ListsChosenEventArgs(IList<ListSearchResult> ids) {
 			Chosen = ids;
 		}
 	}

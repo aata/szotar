@@ -5,14 +5,11 @@ using System.Globalization;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Forms {
-	using ListOpen = Controls.ListOpen;
-
 	public partial class StartPage : Form {
 		public StartPage() {
 			InitializeComponent();
 
 			ThemeHelper.UseExplorerTheme(dictionaries, recentDictionaries, recentLists);
-			ThemeHelper.SetNoHScroll(recentDictionaries, recentLists);
 			recentDictionaries.Scrollable = recentLists.Scrollable = false;
 
 			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
@@ -78,7 +75,7 @@ namespace Szotar.WindowsForms.Forms {
 					}
 				}
 			});
-			handler(null, null);			
+			handler(null, null);
 			lv.Resize += handler;
 		}
 
@@ -177,21 +174,69 @@ namespace Szotar.WindowsForms.Forms {
 			//TODO: Implement this.
 		}
 
-		void listSearch_ListsChosen(object sender, Szotar.WindowsForms.Controls.ListsChosenEventArgs e) {
-			var opened = new List<ListOpen>();
+		private void openList_Click(object sender, EventArgs e) {
+			OpenLists(listSearch.Accept());
+		}
 
-			foreach (var current in e.Chosen) {
+		private void listSearch_ListsChosen(object sender, Controls.ListsChosenEventArgs e) {
+			OpenLists(e.Chosen);
+		}
+
+		private void practiceList_Click(object sender, EventArgs e) {
+			PracticeLists(listSearch.Accept());
+		}
+
+		T? NullableMin<T>(T? x, T? y) 
+			where T : struct, IComparable<T>
+		{
+			if (x == null && y == null)
+				return null;
+			else if (x == null)
+				return y;
+			else if (y == null)
+				return x;
+
+			if (x.Value.CompareTo(y.Value) <= 0)
+				return x;
+			else
+				return y;
+		}
+
+		private IList<ListSearchResult> UniqueLists(IList<ListSearchResult> chosen) {
+			var opened = new List<ListSearchResult>();
+
+			foreach (var current in chosen) {
 				var i = opened.FindIndex(x => x.SetID == current.SetID);
 				if (i != -1)
-					opened[i] = new ListOpen { 
-						SetID = current.SetID,
-						Position = Math.Min(opened[i].Position, current.Position) };
+					opened[i] = new ListSearchResult(
+						current.SetID,
+						NullableMin(opened[i].Position, current.Position));
 				else
 					opened.Add(current);
 			}
 
-			foreach (var open in opened)
-				ListBuilder.Open(open.SetID).ScrollToPosition(open.Position);
+			return opened;
+		}
+
+		private void OpenLists(IList<ListSearchResult> chosen) {
+			foreach (var open in UniqueLists(chosen))
+				ListBuilder.Open(open.SetID).ScrollToPosition(open.Position ?? 0);
+		}
+
+		private void PracticeLists(IList<ListSearchResult> chosen) {
+			var items = new List<ListSearchResult>();
+
+			if (chosen == null || chosen.Count == 0)
+				return;
+
+			foreach (var item in chosen) {
+				if (item.Position.HasValue
+					|| items.FindIndex(x => x.SetID == item.SetID && x.Position == null) < 0
+					)
+					items.Add(item);
+			}
+
+			PracticeWindow.OpenNewSession(items);
 		}
 
 		private void OnDictionaryItemActivate(object sender, EventArgs e) {
@@ -199,11 +244,13 @@ namespace Szotar.WindowsForms.Forms {
 
 			try {
 				LookupForm.OpenDictionary(dict);
-				// TODO: Decide whether or not this is useful.
-				//this.Close();
 			} catch (DictionaryLoadException ex) {
 				MessageBox.Show(this,
-					string.Format(CultureInfo.CurrentUICulture, Resources.Errors.CouldNotLoadDictionary, (dictionaries.SelectedItems[0].Tag as DictionaryInfo).Name, ex.Message),
+					string.Format(
+						CultureInfo.CurrentUICulture, 
+						Resources.Errors.CouldNotLoadDictionary,
+						dict.Name, 
+						ex.Message),
 					ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}

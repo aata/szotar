@@ -8,10 +8,9 @@ namespace Szotar.WindowsForms {
 		static void Main() {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
+			
 			Szotar.LocalizationProvider.Default = new LocalizationProvider();
-
 			ToolStripManager.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
-
 			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
 
 			switch (GuiConfiguration.StartupAction) {

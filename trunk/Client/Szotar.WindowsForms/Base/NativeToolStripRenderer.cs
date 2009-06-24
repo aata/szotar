@@ -13,9 +13,8 @@ namespace Szotar.WindowsForms {
 		HelpBar
 	}
 
-	/// <summary>
-	/// Renders a toolstrip using the UxTheme API via VisualStyleRenderer and a specific style.
-	/// </summary>
+	/// <summary>Renders a toolstrip using the UxTheme API via VisualStyleRenderer and a specific style.</summary>
+	/// <remarks>Perhaps surprisingly, this does not need to be disposable.</remarks>
 	public class ToolStripAeroRenderer : ToolStripSystemRenderer {
 		VisualStyleRenderer renderer;
 

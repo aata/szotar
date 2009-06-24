@@ -24,8 +24,8 @@ namespace Szotar.WindowsForms.Controls {
 				realFont = Font;
 				realForeColor = ForeColor;
 
-				this.Enter += new EventHandler(SearchBox_Enter);
-				this.Leave += new EventHandler(SearchBox_Leave);
+				this.GotFocus += new EventHandler(SearchBox_Enter);
+				this.LostFocus += new EventHandler(SearchBox_Leave);
 
 				Text = string.Empty;
 				SetPrompt();
@@ -43,9 +43,7 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-		/// <summary>
-		/// Sets the base font of the SearchBox instance.
-		/// </summary>
+		/// <summary>Sets the base font of the SearchBox instance.</summary>
 		/// <remarks>Designer-generated code constructs a SearchBox *then* sets the font, so for DPI-awareness (as an example) we must track changes to the Font.</remarks>
 		public override Font Font {
 			get { return base.Font; }
