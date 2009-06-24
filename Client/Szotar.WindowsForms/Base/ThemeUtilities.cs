@@ -7,7 +7,7 @@ namespace Szotar.WindowsForms {
 		internal static class NativeMethods {
 			[DllImport("user32.dll", CharSet = CharSet.Auto)]
 			public static extern IntPtr SendMessage
-				(IntPtr hWnd, int msg, int wParam, int lParam);
+				(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
 			[DllImport("uxtheme.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
 			public static extern int SetWindowTheme
@@ -20,14 +20,10 @@ namespace Szotar.WindowsForms {
 				TVS_NOHSCROLL = 0x8000,
 				TVM_SETEXTENDEDSTYLE = 0x1100 + 44,
 				LVS_EX_DOUBLEBUFFER = 0x10000,
-				LVS_EX_NOHSCROLL = 0x10000000,
 				LVS_EX_LABELTIP = 0x4000,
-				LVS_EX_AUTOSIZECOLUMNS = 0x10000000,
-				LVM_SETEXTENDEDSTYLE = 0x1000 + 54,
-				LVM_GETEXTENDEDLISTVIEWSTYLE = 0x1000 + 37,
-				LVM_SETEXTENDEDLISTVIEWSTYLE = 0x1000 + 36,
+				LVM_GETEXTENDEDLISTVIEWSTYLE = 0x1000 + 55,
+				LVM_SETEXTENDEDLISTVIEWSTYLE = 0x1000 + 54,
 				LVS_EX_FULLROWSELECT = 0x20;
-
 		}
 
 		public static bool UseExplorerTheme(params Control[] controls) {
@@ -41,32 +37,35 @@ namespace Szotar.WindowsForms {
 							NativeMethods.TVS_EX_AUTOHSCROLL |
 							NativeMethods.TVS_EX_FADEINOUTEXPANDOS;
 
-						NativeMethods.SendMessage(control.Handle, NativeMethods.TVM_SETEXTENDEDSTYLE, 0, extStyle);
+						NativeMethods.SendMessage(
+							control.Handle, 
+							NativeMethods.TVM_SETEXTENDEDSTYLE, 
+							IntPtr.Zero, 
+							new IntPtr(extStyle));
 
 						TreeView tv = control as TreeView;
 						tv.ShowLines = false;
 						tv.HotTracking = true;
+
 					} else if (control is ListView) {
 						ListView lv = control as ListView;
 
-						int extLvStyle = NativeMethods.SendMessage(control.Handle, NativeMethods.LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0).ToInt32();
-						extLvStyle |= NativeMethods.LVS_EX_FULLROWSELECT | NativeMethods.LVS_EX_AUTOSIZECOLUMNS | NativeMethods.LVS_EX_DOUBLEBUFFER | NativeMethods.LVS_EX_LABELTIP;
-						NativeMethods.SendMessage(control.Handle, NativeMethods.LVM_SETEXTENDEDLISTVIEWSTYLE, 0, extLvStyle);
+						int extLvStyle = NativeMethods.SendMessage(
+							control.Handle, 
+							NativeMethods.LVM_GETEXTENDEDLISTVIEWSTYLE, 
+							IntPtr.Zero, 
+							IntPtr.Zero).ToInt32();
+
+						extLvStyle |= NativeMethods.LVS_EX_FULLROWSELECT 
+							| NativeMethods.LVS_EX_DOUBLEBUFFER 
+							| NativeMethods.LVS_EX_LABELTIP;
+						
+						NativeMethods.SendMessage(
+							control.Handle, 
+							NativeMethods.LVM_SETEXTENDEDLISTVIEWSTYLE, 
+							IntPtr.Zero, 
+							new IntPtr(extLvStyle));
 					}
-				}
-			} catch (DllNotFoundException) {
-				return false;
-			}
-
-			return true;
-		}
-
-		public static bool SetNoHScroll(params ListView[] listViews) {
-			try {
-				foreach (ListView lv in listViews) {
-					int extLvStyle = NativeMethods.SendMessage(lv.Handle, NativeMethods.LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0).ToInt32();
-					extLvStyle |= NativeMethods.LVS_EX_NOHSCROLL;
-					NativeMethods.SendMessage(lv.Handle, NativeMethods.LVM_SETEXTENDEDLISTVIEWSTYLE, 0, extLvStyle);
 				}
 			} catch (DllNotFoundException) {
 				return false;

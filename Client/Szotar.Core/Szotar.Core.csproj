@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Szotar.Core</RootNamespace>
     <AssemblyName>Szotar.Core</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -48,6 +48,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139">
       <SpecificVersion>False</SpecificVersion>
@@ -62,10 +65,13 @@
     <Compile Include="Base\Dictionary.cs" />
     <Compile Include="Base\Entry.cs" />
     <Compile Include="Base\LineReader.cs" />
+    <Compile Include="Base\ListSearchResult.cs" />
     <Compile Include="Base\ListStore.cs" />
     <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\MRU.cs" />
+    <Compile Include="Base\Nullable.cs" />
     <Compile Include="Base\NullWeakReference.cs" />
+    <Compile Include="Base\Practice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Base\Search.cs" />
     <Compile Include="Base\SimpleDictionary.cs" />

@@ -9,6 +9,8 @@ using System.ComponentModel;
 using System.Collections;
 using System.Text;
 
+using System.Linq;
+
 namespace Szotar.Sqlite {
 	
 	[global::System.Serializable]
@@ -382,5 +384,90 @@ namespace Szotar.Sqlite {
 
 		//Note: there's also a ListDeleted event on the WordList itself, which may be preferable.
 		public event EventHandler<WordListDeletedEventArgs> WordListDeleted;
+
+		public List<PracticeItem> GetItems(IList<ListSearchResult> items) {
+			if (items.Count == 0)
+				return new List<PracticeItem>();
+
+			var results = new List<PracticeItem>();
+
+			using (var txn = Connection.BeginTransaction()) {
+				var query = new StringBuilder(
+					@"SELECT SetID, Phrase, Translation
+				      FROM VocabItems
+				      WHERE SetID IN (");
+
+				bool hasListItems = false;
+
+				foreach (var r in items) {
+					if (r.Position == null) {
+						query.Append(r.SetID).Append(", ");
+						hasListItems = true;
+					}
+				}
+
+				if (hasListItems) {
+					// Remove the final comma
+					query.Length -= 2;
+					query.Append(@") ORDER BY SetID, ListPosition;");
+
+					using(var cmd = Connection.CreateCommand()) {
+						cmd.CommandText = query.ToString();
+
+						GetResults(cmd, results);
+					}
+				}
+
+				using (var cmd = Connection.CreateCommand()) {
+					cmd.CommandText =
+						@"SELECT SetID, Phrase, Translation
+					      FROM VocabItems
+					      WHERE SetID = ? AND ListPosition = ?";
+
+					var setID = cmd.CreateParameter();
+					var pos = cmd.CreateParameter();
+
+					cmd.Parameters.Add(setID);
+					cmd.Parameters.Add(pos);
+
+					foreach (var r in items) {
+						if (r.Position == null)
+							continue;
+						else
+							pos.Value = r.Position.Value;
+
+						setID.Value = r.SetID;
+
+						GetResults(cmd, results);
+					}
+				}
+			}
+
+			return results;
+		}
+
+		// Call this from inside a transaction.
+		// The command should return the results as such:
+		// SetID, Phrase, Translation
+		void GetResults(DbCommand command, ICollection<PracticeItem> output) {
+			using (var reader = command.ExecuteReader()) {
+				if (reader.FieldCount != 3)
+					throw new System.Data.StrongTypingException("Practice query should only return 3 columns");
+
+				if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2))
+					throw new System.Data.StrongTypingException("Practice query returned a null value in one of the columns");
+
+				while (reader.Read()) {
+					var item = new PracticeItem() {
+						SetID = reader.GetInt64(0),
+						Phrase = reader.GetString(1),
+						Translation = reader.GetString(2)
+					};
+
+					output.Add(item);
+				}
+
+			}
+		}
 	}
 }
