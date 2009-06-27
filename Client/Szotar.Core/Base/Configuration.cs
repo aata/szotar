@@ -34,7 +34,7 @@ namespace Szotar {
 		void Delete(string setting);
 		
 		/// <summary><value>True</value> if the configuration has been changed since it was last synchronized with its external representation. This may never be set if the configuration is always synchronized with its external representation (such as a database-backed configuration or a file-based configuration which always saves itself)</summary>
-		bool NeedsSaving { get; }
+		bool NeedsSaving { get; set; }
 
 		/// <summary>Saves the configuration to some external place. The details of this are specific to the implementation.</summary>
 		void Save();
@@ -118,6 +118,7 @@ namespace Szotar {
 	public class FileConfiguration : IConfiguration {
 		string path;
 		Dictionary<string, object> settings;
+		bool dirty = false;
 		
 		//FUTURE: watch file for changes?
 		public event EventHandler<SettingChangedEventArgs> SettingChanged;
@@ -138,8 +139,15 @@ namespace Szotar {
 			if(NeedsSaving)
 				Save();
 		}
-		
-		public bool NeedsSaving { get; protected set; }
+
+		public bool NeedsSaving {
+			get {
+				return dirty;
+			}
+			set {
+				dirty |= value;
+			}
+		}
 		
 		public T Get<T>(string setting, T defaultValue) {
 			object value;
@@ -179,8 +187,14 @@ namespace Szotar {
 		//Thus, the settings are serialized as a List<Entry> (since KeyValuePair's Key/Value don't have a setter,
 		//the Key and Value properties aren't actually serialized... how useless).
 		protected XmlSerializer CreateSerializer() {
-			return new System.Xml.Serialization.XmlSerializer(typeof(List<Entry>),
-				new Type[] { typeof(List<MruEntry>), typeof(MruEntry), typeof(MruList), typeof(ListInfo), typeof(List<ListInfo>) }
+			return new System.Xml.Serialization.XmlSerializer(
+				typeof(List<Entry>),
+				new Type[] { 
+					typeof(DictionaryInfo),
+					typeof(List<DictionaryInfo>),
+					typeof(MruList<DictionaryInfo>),
+					typeof(ListInfo),
+					typeof(List<ListInfo>) }
 				);
 		}
 		
