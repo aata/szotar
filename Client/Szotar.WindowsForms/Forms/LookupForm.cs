@@ -8,29 +8,30 @@ using System.Windows.Forms;
 
 // This form displays a large amount of rows on the DataGridView control. For information on how to 
 // keep good performance with large datasets, see Best Practices for Scaling the Windows Forms 
-// DataGridView Control [BPSWFDC].
+// DataGridView Control:
+//  * http://msdn.microsoft.com/en-us/library/ha5xt0d9.aspx
+//
 // The main points to take away from that article are:
-//  * Don't access grid Row objects, because it could cause them to become unshared. Prefer grid methods such as 
-//    GetCellState, etc.
-//  * Don't access Cell object's either. Especially don't add tooltips or context menus to individual cells. Use the Cell*Needed events.
+//  * Don't access grid Row objects, because it could cause them to become unshared. 
+//    Prefer grid methods such as GetCellState, etc.
+//  * Don't access Cell objects either. Especially don't add tooltips or context menus 
+//    to individual cells. Use the Cell*Needed events.
 //  * Use full-row or full-column selection modes, rather than per-cell.
-//  * Apply styles to the row templates or use the events, don't set cell styles.
+//  * Apply styles to the row templates or use the events; don't set cell styles.
 //  * Try not to make rows become unshared.
-// Note: Mono 2.2 doesn't support shared rows. This is probably causing much of the performance loss.
+// Note: Mono 2.4 doesn't support shared rows. This is probably causing much of the performance loss.
 namespace Szotar.WindowsForms.Forms {
 	public partial class LookupForm : Form {
 		public IBilingualDictionary Dictionary { get; private set; }
 
 		SearchMode searchMode, displayedSearchMode;
+		IList<SearchResult> results;
+
 		ListBuilder listBuilder;
 
-		CultureInfo sourceCulture;
-		CultureInfo targetCulture;
-
-		IList<SearchResult> results;
-		bool ctrlHeld = false;
-
+		CultureInfo sourceCulture, targetCulture;
 		DisposableComponent listFontComponent;
+		bool ctrlHeld = false;
 		Font defaultGridFont;
 
 		class LookupFormFileIsInUse : FileIsInUse {
@@ -44,9 +45,9 @@ namespace Szotar.WindowsForms.Forms {
 				base.WindowHandle = form.Handle;
 			}
 
-			//Who knows what thread this will be invoked on?
+			// Who knows what thread this will be invoked on?
 			public override void CloseFile() {
-				form.Invoke(new EventHandler((s, e) => {
+				form.Invoke(new Action(delegate {
 					form.Close();
 				}));
 			}
@@ -71,16 +72,16 @@ namespace Szotar.WindowsForms.Forms {
 				grid.Font = listFont;
 			}
 
-			//TODO: This really needs testing. It could make things completely unusable...
-			//I can't even remember if they're used...
+			// TODO: This really needs testing. It could make things completely unusable...
+			// I can't even remember if they're used...
 			try {
 				if (dictionary.FirstLanguageCode != null && dictionary.SecondLanguage != null) {
 					sourceCulture = new CultureInfo(dictionary.FirstLanguageCode);
 					targetCulture = new CultureInfo(dictionary.SecondLanguageCode);
 				}
 			} catch (ArgumentException) {
-				//One of the cultures wasn't supported. In that case, set both cultures to null, because it
-				//isn't worth having only one.
+				// One of the cultures wasn't supported. In that case, set both cultures to null,
+				// because it isn't worth having only one.
 				sourceCulture = targetCulture = null;
 			}
 
@@ -89,15 +90,16 @@ namespace Szotar.WindowsForms.Forms {
 			mainMenu.Renderer = contextMenu.Renderer = toolStripPanel.Renderer = new ToolStripAeroRenderer(ToolbarTheme.CommunicationsToolbar);
 		}
 
+		/// <summary>Open the given dictionary, possibly loading from a file, 
+		/// in a new LookupForm window.</summary>
 		public LookupForm(DictionaryInfo dictionaryInfo)
 			: this(dictionaryInfo.GetFullInstance()) 
-		{
-		}
+		{ }
 
+		/// <summary>Load the dictionary from the given path into a new LookupForm window.</summary>
 		public LookupForm(string dictionaryPath)
 			: this(new SimpleDictionary(dictionaryPath)) 
-		{
-		}
+		{ }
 
 		private LookupForm() {
 			InitializeComponent();
@@ -110,23 +112,23 @@ namespace Szotar.WindowsForms.Forms {
 			UnregisterSettingsChangedEventHandlers();
 		}
 
-		//Call this after the dictionaries are initialised.
+		// Call this after the dictionaries are initialised.
 		private void InitialiseView() {
-			//Updates the mode switching button.
+			// Updates the mode switching button.
 			SearchMode = SearchMode;
 
 			AdjustGridRowHeight();
 
 			searchBox.RealTextChanged += new EventHandler(searchBox_RealTextChanged);
 			
-			//Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
+			// Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
 			grid.MouseLeave += new EventHandler(grid_MouseLeave);
 			grid.ShowCellToolTips = false;
 
 			UpdateResults();
 
-			//By now, the columns should have been created.
+			// By now, the columns should have been created.
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 			grid.Columns[0].FillWeight = GuiConfiguration.LookupFormColumn1FillWeight;
 			grid.Columns[1].Resizable = DataGridViewTriState.False; 
@@ -153,6 +155,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		#region Appearance
+		/// <summary>Colours a cell differently based on how well the result matched the search term
+		/// and whether the cell is on an alternating row.</summary>
 		void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
 			MatchType matchType = results != null && e.RowIndex < results.Count ? results[e.RowIndex].MatchType : MatchType.NormalMatch;
 
@@ -177,13 +181,13 @@ namespace Szotar.WindowsForms.Forms {
 				int pixels = (int)(Math.Round(lineHeight * inches * g.DpiY));
 				grid.RowTemplate.Height = pixels;
 			}
-			//Forces the grid to re-apply its template settings - there must be a better way.
+
+			// Forces the grid to re-apply its template settings -- there must be a better way.
 			UpdateResults();
 		}
 		#endregion
 
 		#region Settings Bindings
-		//If I do re-enable this, I should at least remove the handlers when the form closes.
 		private void RegisterSettingsChangedEventHandlers() {
 			Configuration.Default.SettingChanged += new EventHandler<SettingChangedEventArgs>(SettingChanging);
 		}
@@ -195,16 +199,16 @@ namespace Szotar.WindowsForms.Forms {
 		//Update UI state.
 		void SettingChanging(object sender, SettingChangedEventArgs e) {
 			if (e.SettingName == "IgnoreAccents" || e.SettingName == "IgnoreCase") {
-				//This shouldn't fire the CheckedChanged/SettingChanged events in an infinite loop.
+				// This shouldn't fire the CheckedChanged/SettingChanged events in an infinite loop.
 				if (e.SettingName == "IgnoreAccents")
 					ignoreAccentsMenuItem.Checked = ignoreAccentsCheck.Checked = GuiConfiguration.IgnoreAccents;
 				else if (e.SettingName == "IgnoreCase")
 					ignoreCaseMenuItem.Checked = ignoreCaseCheck.Checked = GuiConfiguration.IgnoreCase;
 
-				//We might want to skip this if nothing was actually changed.
+				// We might want to skip this if nothing was actually changed.
 				UpdateResults();
 			} else if (e.SettingName == "ListFontName" || e.SettingName == "ListFontSize") {
-				//Note: this is slightly inefficient, if both are set at once it redisplays twice
+				// Note: this is slightly inefficient -- if both are set at once it redisplays twice.
 				Font disposeOf = null;
 				if (listFontComponent != null) {
 					components.Remove(listFontComponent);
@@ -223,10 +227,6 @@ namespace Szotar.WindowsForms.Forms {
 					disposeOf.Dispose();
 				AdjustGridRowHeight();
 			}
-			/*else if (e.SettingName == "LookupFormColumn1FillWeight") {
-				grid.Columns[0].FillWeight = Properties.Settings.Default.LookupFormColumn1FillWeight;
-			}*/
-			//<- naturally, this breaks when it's actually this form that is doing the resizing.
 		}
 
 		void grid_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e) {
@@ -240,9 +240,6 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void UpdateResults() {
-			System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-			stopwatch.Start();
-
 			ISearchDataSource dict = this.GetSectionBySearchMode(this.SearchMode);
 			SearchMode finalSearchMode = this.SearchMode;
 
@@ -253,7 +250,7 @@ namespace Szotar.WindowsForms.Forms {
 			bool hadPerfect = false;
 			int i = 0;
 
-			//Look for the first result containing the search term at the start.
+			// Look for the first result containing the search term at the start.
 			foreach (SearchResult result in dict.Search(search, ignoreAccentsCheck.Checked, ignoreCaseCheck.Checked)) {
 				if (result.MatchType != MatchType.NormalMatch && foundAt < 0 && !hadPerfect)
 					foundAt = i;
@@ -295,12 +292,10 @@ namespace Szotar.WindowsForms.Forms {
 			displayedSearchMode = finalSearchMode;
 			UpdateButtonNames();
 
-			stopwatch.Stop();
-
 			grid.ClearSelection();
 			grid.PerformLayout();
 
-			Text = string.Format(CultureInfo.CurrentUICulture, "{0} - {1} results ({2} ms)", Dictionary.Name, results.Count, stopwatch.ElapsedMilliseconds);
+			Text = string.Format(CultureInfo.CurrentUICulture, "{0} - {1} results", Dictionary.Name, results.Count);
 		}
 
 		private void SwitchMode() {
@@ -314,6 +309,7 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region ToolTip
+		// Keep a cached version of the most recent tooltip: this should speed things up a little.
 		ToolTip infoTip;
 		int infoTipRow;
 		string infoTipText;
@@ -329,7 +325,7 @@ namespace Szotar.WindowsForms.Forms {
 			if (rowIndex < 0 || rowIndex > results.Count)
 				return null;
 
-			//Use the cached version in the current tooltip if possible.
+			// Use the cached version in the current tooltip if possible.
 			if (infoTipRow == rowIndex)
 				return infoTipText;
 
@@ -359,8 +355,8 @@ namespace Szotar.WindowsForms.Forms {
 			return null;
 		}
 		
-		//Remove some common annoyances with tooltips (really wide tooltips).
-		//Currently not needed (tooltip size is limited, text wraps)
+		/// <summary>Removes some common annoyances with tooltips (really wide tooltips).</summary>
+		/// <remarks>Currently obsolete (tooltip size is limited, text wraps).</remarks>
 		string SanitizeToolTipLine(string line) {
 			return line;
 
@@ -484,17 +480,13 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Misc Control Events
-		/// <summary>
-		/// Updates the current search results to reflect the new search terms.
-		/// </summary>
+		/// <summary>Updates the current search results to reflect the new search terms.</summary>
 		private void searchBox_RealTextChanged(object sender, EventArgs e) {
 			UpdateResults();
 		}
 
-		/// <summary>
-		/// Switches the current search mode from Forward to Backward (and vice versa), and focusses the 
-		/// search field.
-		/// </summary>
+		/// <summary>Switches the current search mode from Forward to Backward (and vice versa), 
+		/// and focuses the search field.</summary>
 		private void switchMode_Click(object sender, EventArgs e) {
 			SwitchMode();
 			FocusSearchField();
@@ -547,6 +539,9 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
+		/// <summary>Performs a reverse-lookup of the cell that was double-clicked.</summary>
+		/// <remarks>This is somewhat redundant now that the tooltips do this too, but
+		/// the tooltips are quite limited, and it is harder to interact with them.</remarks>
 		private void grid_CellMouseDoubleClick(object sender, DataGridViewCellEventArgs e) {
 			if(results != null && e.RowIndex >= 0) {
 				SearchResult sr = results[e.RowIndex];
@@ -639,17 +634,20 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Menu Events
 		#region File Menu
-		/// <summary>
-		/// Shows the start page. Attempt to find an existing start page, or create one if none exists.
-		/// </summary>
+		/// <summary>Shows the start page. Attempt to find an existing start page,
+		/// or create one if none exists.</summary>
 		private void showStartPage_Click(object sender, EventArgs e) {
 			StartPage.ShowStartPage(null);
 		}
 
+		/// <summary>Exit the entire program.</summary>
+		/// <remarks>TODO: This has a misleading name, it should be "Exit Szótár" or something.</remarks>
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
 			Application.Exit();
 		}
 
+		/// <summary>Populates the list of recent dictionaries when the File menu opens.</summary>
+		/// <remarks>The items it adds are tagged with "MRU", so that they can be removed again later.</remarks>
 		void fileMenu_DropDownOpening(object sender, EventArgs e) {
 			//Remove existing entries
 			var items = fileMenu.DropDownItems;
@@ -668,10 +666,14 @@ namespace Szotar.WindowsForms.Forms {
 
 			int count = 0;
 			for (int i = 0; i < mru.Entries.Count; ++i) {
-				var path = mru.Entries[i].Path;
-				if (path != Dictionary.Path) {
-					var item = new ToolStripMenuItem(mru.Entries[i].Name, null, 
-						new EventHandler((s, ev) => OpenDictionary(path)));
+				var info = mru.Entries[i];
+				if (info.Path != this.Dictionary.Path) {
+					var item = new ToolStripMenuItem(
+						mru.Entries[i].Name, 
+						null, 
+						delegate { OpenDictionary(info); }
+						);
+
 					item.Tag = "MRU";
 					items.Insert(index, item);
 					count++;
@@ -684,10 +686,6 @@ namespace Szotar.WindowsForms.Forms {
 				item.Tag = "MRU";
 				items.Insert(index, item);
 			}
-		}
-
-		void OpenRecentDictionary(string path) {
-			MessageBox.Show(path);
 		}
 		#endregion
 
@@ -731,7 +729,8 @@ namespace Szotar.WindowsForms.Forms {
 			GuiConfiguration.IgnoreAccents = ignoreAccentsCheck.Checked;
 		}
 
-		//Would it perhaps be better to wrap in the case where no more are found?
+		/// <summary>Navigates to the next exact match in the search results.</summary>
+		/// <remarks>Would it perhaps be better to wrap in the case where no more are found?</remarks>
 		private void nextPerfectMatch_Click(object sender, EventArgs e) {
 			if (results != null) {
 				int index = grid.FirstDisplayedScrollingRowIndex;
@@ -742,9 +741,12 @@ namespace Szotar.WindowsForms.Forms {
 					}
 				}
 			}
+
 			System.Media.SystemSounds.Beep.Play();
 		}
 
+		/// <summary>Navigates to the previous exact match in the results.</summary>
+		/// <seealso cref="nextPerfectMatch_Click"/>
 		private void previousPerfectMatch_Click(object sender, EventArgs e) {
 			if (results != null) {
 				int index = grid.FirstDisplayedScrollingRowIndex;
@@ -755,6 +757,7 @@ namespace Szotar.WindowsForms.Forms {
 					}
 				}
 			}
+
 			System.Media.SystemSounds.Beep.Play();
 		}
 		#endregion
@@ -951,13 +954,15 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 		#endregion
 
+		/// <summary>Finds an existing LookupForm instance for a dictionary.</summary>
 		private static LookupForm FindExisting(string path) {
-			//Look for an existing form using this dictionary before opening it again.
+			// Look for an existing form using this dictionary before opening it again.
 			foreach (Form form in Application.OpenForms) {
 				LookupForm lookupForm = form as LookupForm;
 				if (lookupForm != null && lookupForm.Dictionary.Path == path)
 					return lookupForm;
 			}
+
 			return null;
 		}
 

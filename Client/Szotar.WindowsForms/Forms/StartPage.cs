@@ -91,6 +91,7 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
+		#region Recent Dictionaries
 		void recentDictionaries_ItemActivate(object sender, EventArgs e) {
 			foreach (ListViewItem item in recentDictionaries.SelectedItems) {
 				if (item.Tag != null && item.Tag is string)
@@ -116,12 +117,37 @@ namespace Szotar.WindowsForms.Forms {
 				}
 			});
 		}
+		#endregion
+
+		#region Recent Lists
+		long? ListIDFromRecentList(ListViewItem item) {
+			if (item.Tag != null && item.Tag is long)
+				return (long)item.Tag;
+			return null;
+		}
 
 		void recentLists_ItemActivate(object sender, EventArgs e) {
+			OpenSelectedRecentLists();
+		}
+
+		void OpenSelectedRecentLists() {			
 			foreach (ListViewItem item in recentLists.SelectedItems) {
-				if (item.Tag != null && item.Tag is long)
-					ListBuilder.Open((long)item.Tag);
+				long? id = ListIDFromRecentList(item);
+				if (id != null)
+					ListBuilder.Open(id.Value);
 			}
+		}
+
+		void PracticeSelectedRecentLists() {
+			var lists = new List<ListSearchResult>();
+
+			foreach (ListViewItem item in recentLists.SelectedItems) {
+				long? id = ListIDFromRecentList(item);
+				if (id != null)
+					lists.Add(new ListSearchResult(id.Value));
+			}
+
+			PracticeLists(lists);
 		}
 
 		private void PopulateRecentLists() {
@@ -142,7 +168,9 @@ namespace Szotar.WindowsForms.Forms {
 				}
 			});
 		}
+		#endregion
 
+		#region File system watching
 		void fileSystemWatcher_Renamed(object sender, System.IO.RenamedEventArgs e) {
 			foreach (ListViewItem item in dictionaries.Items) {
 				var di = item.Tag as DictionaryInfo;
@@ -173,7 +201,9 @@ namespace Szotar.WindowsForms.Forms {
 		void fileSystemWatcher_Created(object sender, System.IO.FileSystemEventArgs e) {
 			//TODO: Implement this.
 		}
+		#endregion
 
+		#region List Search
 		private void openList_Click(object sender, EventArgs e) {
 			OpenLists(listSearch.Accept());
 		}
@@ -186,9 +216,8 @@ namespace Szotar.WindowsForms.Forms {
 			PracticeLists(listSearch.Accept());
 		}
 
-		T? NullableMin<T>(T? x, T? y) 
-			where T : struct, IComparable<T>
-		{
+		T? NullableMin<T>(T? x, T? y)
+			where T : struct, IComparable<T> {
 			if (x == null && y == null)
 				return null;
 			else if (x == null)
@@ -217,6 +246,24 @@ namespace Szotar.WindowsForms.Forms {
 
 			return opened;
 		}
+
+		#endregion
+
+		#region Context Menu
+		private void openListMI_Click(object sender, EventArgs e) {
+			if (ActiveControl == recentLists)
+				OpenSelectedRecentLists();
+			else if (ActiveControl == listSearch)
+				OpenLists(listSearch.Accept());
+		}
+
+		private void practiceListMI_Click(object sender, EventArgs e) {
+			if (ActiveControl == recentLists)
+				PracticeSelectedRecentLists();
+			else if (ActiveControl == listSearch)
+				PracticeLists(listSearch.Accept());
+		}
+		#endregion
 
 		private void OpenLists(IList<ListSearchResult> chosen) {
 			foreach (var open in UniqueLists(chosen))
