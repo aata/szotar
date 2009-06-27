@@ -92,7 +92,6 @@
     <Compile Include="Base\GuiConfiguration.cs" />
     <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\Practice.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Base\ThemeUtilities.cs" />
     <Compile Include="Controls\ListViewNF.cs">

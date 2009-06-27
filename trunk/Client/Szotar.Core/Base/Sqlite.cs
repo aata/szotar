@@ -10,6 +10,7 @@ using System.Collections;
 using System.Text;
 
 using System.Linq;
+using System.Data;
 
 namespace Szotar.Sqlite {
 	
@@ -284,25 +285,29 @@ namespace Szotar.Sqlite {
 			return wl;
 		}
 
+		private ListInfo ListInfoFromReader(DbDataReader reader) {
+			var list = new ListInfo();
+
+			list.ID = reader.GetInt64(0);
+			list.Name = reader.GetString(1); //Can't be null
+			if (!reader.IsDBNull(2))
+				list.Author = reader.GetString(2);
+			if (!reader.IsDBNull(3))
+				list.Language = reader.GetString(3);
+			if (!reader.IsDBNull(4))
+				list.Url = reader.GetString(4);
+			if (!reader.IsDBNull(5))
+				list.Date = reader.GetDateTime(5);
+			if (!reader.IsDBNull(6))
+				list.TermCount = reader.GetInt64(6);
+
+			return list;
+		}
+
 		public IEnumerable<ListInfo> GetAllSets() {
 			using (var reader = this.SelectReader("TYPES Integer, Text, Text, Text, Text, Date, Integer; SELECT id, Name, Author, Language, Url, Created, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id) FROM Sets ORDER BY id ASC")) {
-				while (reader.Read()) {
-					var list = new ListInfo();
-					list.ID = reader.GetInt64(0);
-					list.Name = reader.GetString(1); //Can't be null
-					if (!reader.IsDBNull(2))
-						list.Author = reader.GetString(2);
-					if (!reader.IsDBNull(3))
-						list.Language = reader.GetString(3);
-					if (!reader.IsDBNull(4))
-						list.Url = reader.GetString(4);
-					if (!reader.IsDBNull(5))
-						list.Date = reader.GetDateTime(5);
-					if (!reader.IsDBNull(6))
-						list.TermCount = reader.GetInt64(6);
-
-					yield return list;
-				}
+				while (reader.Read())
+					yield return ListInfoFromReader(reader);
 			}
 		}
 
@@ -468,6 +473,39 @@ namespace Szotar.Sqlite {
 				}
 
 			}
+		}
+
+		// Using yield return here would probably be a bad idea, since the connection
+		// would only be closed if the consumer consumes the whole list.
+		/// <summary>Returns the ListInfo instances for those items which were lists and not single vocab items.</summary>
+		public List<ListInfo> GetListInformation(List<ListSearchResult> lists) {
+			var answer = new List<ListInfo>();
+
+			using (var txn = Connection.BeginTransaction()) {
+				using (var command = Connection.CreateCommand()) {
+					command.CommandText =
+						@"TYPES Integer, Text, Text, Text, Text, Date, Integer; 
+						 SELECT id, Name, Author, Language, Url, Created, 
+						     (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
+						 FROM Sets
+						 WHERE id = ?";
+
+					var param = command.CreateParameter();
+					
+					foreach(var list in lists) {
+						if(list.Position.HasValue)
+							continue;
+
+						param.Value = list.SetID;
+
+						using (var reader = command.ExecuteReader())
+							while (reader.Read())
+								answer.Add(ListInfoFromReader(reader));
+					}
+				}
+			}
+
+			return answer;
 		}
 	}
 }

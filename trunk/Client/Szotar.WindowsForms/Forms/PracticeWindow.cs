@@ -8,11 +8,11 @@ using System.Windows.Forms;
 using System.Diagnostics;
 
 namespace Szotar.WindowsForms.Forms {
-	public partial class PracticeWindow : Form, IPracticeOverseer {
+	public partial class PracticeWindow : Form, IPracticeWindow {
 		PracticeQueue queue;
 		IPracticeMode mode;
 
-		public PracticeWindow(IList<ListSearchResult> items, PracticeMode mode) {
+		public PracticeWindow(IList<ListSearchResult> items, PracticeMode whichMode) {
 			InitializeComponent();
 
 			mainMenu.Renderer = new ToolStripAeroRenderer(ToolbarTheme.MediaToolbar);
@@ -20,21 +20,26 @@ namespace Szotar.WindowsForms.Forms {
 			var terms = DataStore.Database.GetItems(items);
 			if (terms.Count > 0) {
 				queue = new PracticeQueue(terms);
-				this.mode = new FlashcardMode();
-				this.mode.Start(panel, this);
+				SetMode(new FlashcardMode());
 			}
 
 			this.FormClosed += delegate {
-				if (this.mode != null)
-					this.mode.Stop();
+				if (mode != null)
+					mode.Stop();
 			};
 
 			components = components ?? new Container();
-			components.Add(new DisposableComponent(this.mode));
+			components.Add(new DisposableComponent(mode));
 		}
 
-		public PracticeWindow() : this(new ListSearchResult[]{}, PracticeMode.SearchMode) {
+		private void SetMode(IPracticeMode mode) {
+			this.mode = mode;
+			mode.Start(this);
 		}
+
+		public PracticeWindow() 
+			: this(new ListSearchResult[]{}, PracticeMode.SearchMode) 
+		{ }
 
 		public static void OpenNewSession(IList<ListSearchResult> items) {
 			new PracticeWindow(items, PracticeMode.Default).Show();
@@ -48,6 +53,30 @@ namespace Szotar.WindowsForms.Forms {
 
 		public PracticeItem FetchNextItem() {
 			return queue.TakeOne();
+		}
+
+		ToolStrip IPracticeWindow.Controls {
+			get { return mainMenu; }
+		}
+
+		Panel IPracticeWindow.GameArea {
+			get { return panel; }
+		}
+
+		int IPracticeWindow.ItemCount {
+			get { return queue.Length; }
+		}
+
+		int IPracticeWindow.Position {
+			get { return queue.Index; }
+		}
+
+		private void exit_Click(object sender, EventArgs e) {
+			Close();
+		}
+
+		private void showStartPage_Click(object sender, EventArgs e) {
+			StartPage.ShowStartPage(null);
 		}
 	}
 }

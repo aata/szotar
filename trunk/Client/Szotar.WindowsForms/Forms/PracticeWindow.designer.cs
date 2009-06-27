@@ -23,17 +23,22 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.Windows.Forms.ToolStripMenuItem file;
+			System.Windows.Forms.ToolStripMenuItem exit;
+			System.Windows.Forms.ToolStripMenuItem showStartPage;
 			this.mainMenu = new System.Windows.Forms.MenuStrip();
-			this.file = new System.Windows.Forms.ToolStripMenuItem();
-			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.panel = new System.Windows.Forms.Panel();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			file = new System.Windows.Forms.ToolStripMenuItem();
+			exit = new System.Windows.Forms.ToolStripMenuItem();
+			showStartPage = new System.Windows.Forms.ToolStripMenuItem();
 			this.mainMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// mainMenu
 			// 
 			this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.file});
+            file});
 			this.mainMenu.Location = new System.Drawing.Point(0, 0);
 			this.mainMenu.Name = "mainMenu";
 			this.mainMenu.Size = new System.Drawing.Size(653, 24);
@@ -42,17 +47,20 @@
 			// 
 			// file
 			// 
-			this.file.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exitToolStripMenuItem});
-			this.file.Name = "file";
-			this.file.Size = new System.Drawing.Size(37, 20);
-			this.file.Text = "&File";
+			file.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            showStartPage,
+            this.toolStripSeparator1,
+            exit});
+			file.Name = "file";
+			file.Size = new System.Drawing.Size(37, 20);
+			file.Text = "&File";
 			// 
-			// exitToolStripMenuItem
+			// exit
 			// 
-			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
-			this.exitToolStripMenuItem.Text = "E&xit";
+			exit.Name = "exit";
+			exit.Size = new System.Drawing.Size(159, 22);
+			exit.Text = "E&xit";
+			exit.Click += new System.EventHandler(this.exit_Click);
 			// 
 			// panel
 			// 
@@ -61,6 +69,18 @@
 			this.panel.Name = "panel";
 			this.panel.Size = new System.Drawing.Size(653, 424);
 			this.panel.TabIndex = 1;
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(156, 6);
+			// 
+			// showStartPage
+			// 
+			showStartPage.Name = "showStartPage";
+			showStartPage.Size = new System.Drawing.Size(159, 22);
+			showStartPage.Text = "&Show Start Page";
+			showStartPage.Click += new System.EventHandler(this.showStartPage_Click);
 			// 
 			// PracticeWindow
 			// 
@@ -83,8 +103,7 @@
 		#endregion
 
 		private System.Windows.Forms.MenuStrip mainMenu;
-		private System.Windows.Forms.ToolStripMenuItem file;
-		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.Panel panel;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 	}
 }

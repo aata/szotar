@@ -64,6 +64,8 @@ namespace Szotar {
 			public Info(SimpleDictionary dict) {
 				Load(dict);
 
+				// Keep a weak reference to the dictionary. This way we don't have to load the 
+				// dictionary again if we re-open it soon after we close it.
 				var weak = new NullWeakReference<SimpleDictionary>(dict);
 				GetFullInstance = () => FromWeak(weak);
 			}

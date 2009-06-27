@@ -22,37 +22,63 @@ namespace Szotar.WindowsForms {
 		}
 	}
 
-	public interface IPracticeOverseer {
+	public interface IPracticeWindow {
 		void MarkSuccess(PracticeItem item);
 		void MarkFailure(PracticeItem item);
 
 		PracticeItem FetchNextItem();
+
+		ToolStrip Controls { get; }
+		Panel GameArea { get; }
+
+		int ItemCount { get; }
+		int Position { get; }
 	}
 
 	public interface IPracticeMode : IDisposable {
-		void Start(Panel panel, IPracticeOverseer owner);
+		void Start(IPracticeWindow owner);
 		void Stop();
 		string Name { get; }
 	}
 
 	public class Mode : IPracticeMode, IDisposable {
 		public string Name { get; protected set; }
+		public IPracticeWindow Owner { get; private set; }
+		public Panel GameArea { get { return Owner.GameArea; } }
 
-		public IPracticeOverseer Owner { get; private set; }
-		public Panel Panel { get; private set; }
+		List<ToolStrip> mergedMenus = new List<ToolStrip>();
 
-		public virtual void Start(Panel panel, IPracticeOverseer owner) {
+		public Mode(string name) {
+			Name = name;
+		}
+
+		public virtual void Start(IPracticeWindow owner) {
 			Owner = owner;
-			Panel = panel;
 		}
 
 		public virtual void Stop() {
+			GameArea.Controls.Clear();
+			foreach (var menu in mergedMenus)
+				ToolStripManager.RevertMerge(Owner.Controls, menu);
+			mergedMenus.Clear();
 		}
 
+		protected void MergeMenu(ToolStrip menu) {
+			ToolStripManager.Merge(menu, Owner.Controls);
+			if (!mergedMenus.Contains(menu))
+				mergedMenus.Add(menu);
+		}
+
+		protected void UnmergeMenu(ToolStrip menu) {
+			ToolStripManager.RevertMerge(Owner.Controls, menu);
+			mergedMenus.Remove(menu);
+		}
+
+		#region Disposable
 		public void Dispose() {
 			Dispose(true);
 
-			Panel.Controls.Clear();
+			GameArea.Controls.Clear();
 		}
 
 		protected virtual void Dispose(bool disposing) {
@@ -62,41 +88,52 @@ namespace Szotar.WindowsForms {
 		~Mode() {
 			Dispose(false);
 		}
+		#endregion
 	}
 
 	public class DefaultMode : Mode {
-		public void Start(Panel panel, IPracticeOverseer owner) {
-			base.Start(panel, owner);
+		public DefaultMode() 
+			: base("")
+		{ }
+
+		public override void Start(IPracticeWindow owner) {
+			base.Start(owner);
 		}
 
-		public void Stop() {
+		public override void Stop() {
 			base.Stop();
 		}
 	}
 
+	/// <summary>
+	/// Stores a backwards/forwards history and navigates through it.
+	/// </summary>
 	public class Navigator {
 		Stack<PracticeItem>
 			back = new Stack<PracticeItem>(),
 			fore = new Stack<PracticeItem>();
 
-		public IPracticeOverseer Source { get; private set; }
+		public IPracticeWindow Source { get; private set; }
+		public PracticeItem CurrentItem { get; private set; }
+		public int Length { get { return Source.ItemCount; } }
+		public int Position { get { return Source.Position - fore.Count; } }
 
-		public Navigator(IPracticeOverseer source) {
+		public Navigator(IPracticeWindow source) {
 			Source = source;
 
 			CurrentItem = source.FetchNextItem();
 		}
 
-		/// <invariant>CurrentItem != null</invariant>
-		public PracticeItem CurrentItem { get; private set; }
-
+		/// <summary>
+		/// Advance to the last item that has already been seen.
+		/// </summary>
 		public void AdvanceToEnd() {
 			back.Push(CurrentItem);
 
-			while (fore.Count > 0)
-				back.Push(fore.Pop());
-
-			CurrentItem = Source.FetchNextItem();
+			while (fore.Count > 0) {
+				back.Push(CurrentItem);
+				CurrentItem = fore.Pop();
+			}
 		}
 
 		public void Advance() {
@@ -120,40 +157,54 @@ namespace Szotar.WindowsForms {
 		}
 	}
 
+	/// <summary>
+	/// The player is shown the phrase, and tries to guess the translation. Advancing
+	/// again reveals the translation.
+	/// </summary>
 	public class FlashcardMode : Mode {
 		Control phraseLabel, translationLabel;
+		
 		Navigator nav;
+		NavigatorMenu navMenu;
 
 		Font bigFont, smallFont;
 
-		public override void Start(Panel panel, IPracticeOverseer owner) {
-			base.Start(panel, owner);
+		public FlashcardMode() 
+			: base("Flashcards") 
+		{ }
 
-			Name = "Flashcards";
+		public override void Start(IPracticeWindow owner) {
+			base.Start(owner);
 
 			nav = new Navigator(owner);
+			navMenu = new NavigatorMenu(nav);
+
+			MergeMenu(navMenu.Menu);
 
 			phraseLabel = new Label();
 			translationLabel = new Label();
 			translationLabel.ForeColor = System.Drawing.SystemColors.GrayText;
 
-			bigFont = new System.Drawing.Font(panel.FindForm().Font.FontFamily, 24);
-			smallFont = new System.Drawing.Font(panel.FindForm().Font.FontFamily, 16);
+			bigFont = new System.Drawing.Font(GameArea.FindForm().Font.FontFamily, 24);
+			smallFont = new System.Drawing.Font(GameArea.FindForm().Font.FontFamily, 16);
 
 			foreach (var l in new [] { phraseLabel, translationLabel }) {
 				l.AutoSize = true;
 				l.Font = bigFont;
 				l.BackColor = Color.Transparent;
-				panel.Controls.Add(l);
+				GameArea.Controls.Add(l);
 			}
 
-			Panel.Resize += new EventHandler(Panel_Resize);
+			GameArea.Resize += new EventHandler(GameArea_Resize);
 
-			foreach(Control c in new Control[]{ phraseLabel, translationLabel, Panel }) {
-				c.MouseUp += new MouseEventHandler(Panel_MouseUp);
+			foreach(Control c in new Control[]{ phraseLabel, translationLabel, GameArea }) {
+				c.MouseUp += new MouseEventHandler(GameArea_MouseUp);
 			}
 
-			Panel.Controls.Add(new NavigatorControl());
+			navMenu.Back += delegate { GoBack(); };
+			navMenu.Forward += delegate { GoForward(); };
+			navMenu.End += delegate { GoToEnd(); };
+			navMenu.Edit += delegate {  };
 
 			translationLabel.Visible = false;
 			Update();
@@ -163,30 +214,41 @@ namespace Szotar.WindowsForms {
 		public override void Stop() {
 			base.Stop();
 
-			Panel.Resize -= new EventHandler(Panel_Resize);
+			GameArea.Resize -= new EventHandler(GameArea_Resize);
 
-			foreach (Control c in new Control[] { phraseLabel, translationLabel, Panel }) {
-				c.MouseUp -= new MouseEventHandler(Panel_MouseUp);
+			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea }) {
+				c.MouseUp -= new MouseEventHandler(GameArea_MouseUp);
 			}
 		}
 
-		void Panel_MouseUp(object sender, MouseEventArgs e) {
-			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.XButton2) {
-				if (translationLabel.Visible) {
-					nav.Advance();
-					translationLabel.Visible = false;
+		void GoForward() {
+			if (translationLabel.Visible) {
+				nav.Advance();
+				translationLabel.Visible = false;
+			} else {
+				translationLabel.Visible = true;
+			}
+
+			Update();
+			Layout();
+		}
+
+		private void GoToEnd() {
+			nav.AdvanceToEnd();
+			translationLabel.Visible = false;
+
+			Update();
+			Layout();
+		}
+
+		void GoBack() {
+			if (translationLabel.Visible) {
+				translationLabel.Visible = false;
+			} else {
+				if (!nav.Retreat()) {
+					// TODO: Show a message saying the start of the stream has been reached.
 				} else {
 					translationLabel.Visible = true;
-				}
-			} else if (e.Button == MouseButtons.Right || e.Button == MouseButtons.XButton1) {
-				if (translationLabel.Visible) {
-					translationLabel.Visible = false;
-				} else {
-					if (!nav.Retreat()) {
-						// TODO: Show a message saying the start of the stream has been reached.
-					} else {
-						translationLabel.Visible = true;
-					}
 				}
 			}
 
@@ -194,11 +256,19 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
-		void Panel_Resize(object sender, EventArgs e) {
+		void GameArea_MouseUp(object sender, MouseEventArgs e) {
+			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.XButton2)
+				GoForward();
+			else if (e.Button == MouseButtons.Right || e.Button == MouseButtons.XButton1)
+				GoBack();
+		}
+
+		void GameArea_Resize(object sender, EventArgs e) {
 			Layout();
 		}
 
 		void Update() {
+			navMenu.Update();
 			phraseLabel.Text = nav.CurrentItem.Phrase;
 			translationLabel.Text = nav.CurrentItem.Translation;
 		}
@@ -206,11 +276,11 @@ namespace Szotar.WindowsForms {
 		void Layout() {
 			// Choose a smaller font if it doesn't fit
 			foreach (var label in new [] { phraseLabel, translationLabel }) {
-				if (label.Font == bigFont && label.Width > Panel.Width) {
+				if (label.Font == bigFont && label.Width > GameArea.Width) {
 					label.Font = smallFont;
 				} else if (label.Font == smallFont) {
-					using (Graphics g = Panel.CreateGraphics()) {
-						if (g.MeasureString(label.Text, bigFont).Width < Panel.Width)
+					using (Graphics g = GameArea.CreateGraphics()) {
+						if (g.MeasureString(label.Text, bigFont).Width < GameArea.Width)
 							label.Font = bigFont;
 					}
 				}
@@ -218,10 +288,10 @@ namespace Szotar.WindowsForms {
 
 			var height = phraseLabel.Height + translationLabel.Height;
 			
-			var px = (Panel.Width - phraseLabel.Width) / 2;
-			var tx = (Panel.Width - translationLabel.Width) / 2;
+			var px = (GameArea.Width - phraseLabel.Width) / 2;
+			var tx = (GameArea.Width - translationLabel.Width) / 2;
 
-			var py = (Panel.Height - height) / 2;
+			var py = (GameArea.Height - height) / 2;
 			var ty = py + phraseLabel.Height;
 
 			phraseLabel.Location = new System.Drawing.Point(px, py);
@@ -239,49 +309,97 @@ namespace Szotar.WindowsForms {
 		}
 	}
 
-	public class NavigatorControl : UserControl {
-		Button back, fore, end, edit;
+	/// <summary>
+	/// Maintains a menu with navigation buttons that raise events when clicked. This menu
+	/// should be merged with some other menu.
+	/// </summary>
+	public class NavigatorMenu {
+		public Navigator Navigator { get; protected set; }
+		public ToolStrip Menu { get; protected set; }
 
-		public EventHandler Back, Forward, SkipToEnd, Edit;
+		ToolStripButton back, fore, end, edit;
+		ToolStripLabel position;
 
-		public NavigatorControl() {
-			back = new Button { Text = "←" };
-			fore = new Button { Text = "→" };
-			end = new Button { Text = "end" };
-			edit = new Button { Text = "edit" };
+		public NavigatorMenu(Navigator nav) {
+			Navigator = nav;
 
-			int margin = 3;
+			back = new ToolStripButton { Text = "←" };
+			fore = new ToolStripButton { Text = "→" };
+			end = new ToolStripButton { Text = "end" };
+			edit = new ToolStripButton { Text = "edit" };
+			position = new ToolStripLabel { Alignment = ToolStripItemAlignment.Right };
 
-			BackColor = Color.Transparent;
-			Controls.Add(back);
-			Controls.Add(fore);
-			Controls.Add(end);
-			Controls.Add(edit);
-
-			foreach (Button b in Controls) { 
-				b.AutoSize = true;
-				b.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+			Menu = new ToolStrip();
+			foreach (var button in new[] { edit, end, fore, back }) {
+				button.Alignment = ToolStripItemAlignment.Right;
+				Menu.Items.Add(button);
 			}
+			Menu.Items.Add(position);
 
-			Anchor = AnchorStyles.Right | AnchorStyles.Top;
+			back.Click += delegate { Raise(Back); };
+			fore.Click += delegate { Raise(Forward); };
+			end.Click += delegate { Raise(End); };
+			edit.Click += delegate { Raise(Edit); };
+		}
 
-			this.ParentChanged += delegate {
-				if (Parent == null)
-					return;
+		public event EventHandler Back;
+		public event EventHandler Forward;
+		public event EventHandler End;
+		public event EventHandler Edit;
 
-				Font = Parent.Font;
+		void Raise(EventHandler handler) {
+			if (handler != null)
+				handler(this, new EventArgs());
+		}
 
-				Width = margin * 5 + back.Width + fore.Width + end.Width + edit.Width;
-				Height = Math.Max(back.Height, Math.Max(fore.Height, Math.Max(end.Height, edit.Height))) + margin * 2; 
-
-				Left = Parent.ClientSize.Width - Width;
-				Top = 0;
-
-				back.Left = margin;
-				fore.Left = back.Right + margin;
-				end.Left = fore.Right + margin;
-				edit.Left = end.Right + margin;
-			};
+		public void Update() {
+			position.Text = string.Format("{0}/{1}", Navigator.Position, Navigator.Length);
 		}
 	}
+
+	//public class NavigatorControl : UserControl {
+	//    Button back, fore, end, edit;
+
+	//    public EventHandler Back, Forward, SkipToEnd, Edit;
+
+	//    public NavigatorControl() {
+	//        back = new Button { Text = "←" };
+	//        fore = new Button { Text = "→" };
+	//        end = new Button { Text = "end" };
+	//        edit = new Button { Text = "edit" };
+
+	//        int margin = 3;
+
+	//        BackColor = Color.Transparent;
+	//        Controls.Add(back);
+	//        Controls.Add(fore);
+	//        Controls.Add(end);
+	//        Controls.Add(edit);
+
+	//        foreach (Button b in Controls) { 
+	//            b.AutoSize = true;
+	//            b.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+	//        }
+
+	//        Anchor = AnchorStyles.Right | AnchorStyles.Top;
+
+	//        this.ParentChanged += delegate {
+	//            if (Parent == null)
+	//                return;
+
+	//            Font = Parent.Font;
+
+	//            Width = margin * 5 + back.Width + fore.Width + end.Width + edit.Width;
+	//            Height = Math.Max(back.Height, Math.Max(fore.Height, Math.Max(end.Height, edit.Height))) + margin * 2; 
+
+	//            Left = Parent.ClientSize.Width - Width;
+	//            Top = 0;
+
+	//            back.Left = margin;
+	//            fore.Left = back.Right + margin;
+	//            end.Left = fore.Right + margin;
+	//            edit.Left = end.Right + margin;
+	//        };
+	//    }
+	//}
 }

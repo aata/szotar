@@ -13,7 +13,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		bool ReallyDesignMode {
 			get {
-				http://www.ben.geek.nz/controldesignmode-misbehaving/
+				// http://www.ben.geek.nz/controldesignmode-misbehaving/
 				return LicenseManager.UsageMode == LicenseUsageMode.Designtime;
 			}
 		}
@@ -91,9 +91,9 @@ namespace Szotar.WindowsForms.Controls {
 						return false;
 
 					ListViewItem item = new ListViewItem(
-							new string[] { wsr.Phrase, 
-						               wsr.Translation, 
-									   wsr.SetName });
+							new [] { wsr.Phrase, 
+							         wsr.Translation, 
+							         wsr.SetName });
 					item.Tag = wsr;
 					item.Group = group;
 					results.Items.Add(item);
@@ -175,6 +175,14 @@ namespace Szotar.WindowsForms.Controls {
 
 		public event EventHandler<ListsChosenEventArgs> ListsChosen;
 
+		/// <summary>The context menu shown for the results list.</summary>
+		public ContextMenuStrip ListContextMenuStrip {
+			get { return results.ContextMenuStrip; }
+			set { results.ContextMenuStrip = value; }
+		}
+
+		/// <summary>The maximum number of results shown before the list is truncated.</summary>
+		/// <remarks>If the value is null, all the results are shown.</remarks>
 		public int? MaxItems { get; set; }
 	}
 
