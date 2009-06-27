@@ -26,8 +26,8 @@ namespace Szotar.WindowsForms {
 			set { Default.Set("ListBuilderMetadataSectionHeight", value); }
 		}
 
-		public static MruList RecentDictionaries {
-			get { return Default.Get<MruList>("RecentDictionaries", null); }
+		public static MruList<DictionaryInfo> RecentDictionaries {
+			get { return Default.Get<MruList<DictionaryInfo>>("RecentDictionaries", null); }
 			set { Default.Set("RecentDictionaries", value); }
 		}
 

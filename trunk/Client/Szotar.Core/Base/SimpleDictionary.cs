@@ -55,23 +55,44 @@ namespace Szotar {
 		
 		public class Info : DictionaryInfo {
 			public Info(string path) {
-				Path = path;
-				using (SimpleDictionary dict = new SimpleDictionary(path, false, false)) {
-					Name = dict.Name;
-					Author = dict.Author;
-					Url = dict.Url;
+				using (SimpleDictionary dict = new SimpleDictionary(path, false, false))
+					Load(dict);
 
-					SectionNames = dict.SectionNames;
-					if (dict.FirstLanguage != null || dict.SecondLanguage != null)
-						Languages = new string[] { dict.FirstLanguage, dict.SecondLanguage };
-					SectionSizes = dict.SectionSizes;
-				}
+				GetFullInstance = () => new SimpleDictionary(Path);
 			}
-			
-			//TODO: Could (should?) be changed to store a WeakReference.
-			//Note that StartPage will try not to open the same dictionary twice anyway.
-			public override IBilingualDictionary GetFullInstance() {
+
+			public Info(SimpleDictionary dict) {
+				Load(dict);
+
+				var weak = new NullWeakReference<SimpleDictionary>(dict);
+				GetFullInstance = () => FromWeak(weak);
+			}
+
+			private SimpleDictionary FromWeak(NullWeakReference<SimpleDictionary> weak)
+			{
+				var dict = weak.Target;
+				if(dict!= null)
+					return dict;
+
 				return new SimpleDictionary(Path);
+			}
+
+			void Load(SimpleDictionary dict) {
+				Path = dict.Path;
+				Name = dict.Name;
+				Author = dict.Author;
+				Url = dict.Url;
+
+				SectionNames = dict.SectionNames;
+				if (dict.FirstLanguage != null || dict.SecondLanguage != null)
+					Languages = new string[] { dict.FirstLanguage, dict.SecondLanguage };
+				SectionSizes = dict.SectionSizes;
+			}
+		}
+
+		DictionaryInfo IBilingualDictionary.Info {
+			get {
+				return new Info(this);
 			}
 		}
 		

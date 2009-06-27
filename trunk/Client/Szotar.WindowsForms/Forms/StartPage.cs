@@ -22,7 +22,7 @@ namespace Szotar.WindowsForms.Forms {
 			dicts.Sort((d1, d2) => d1.Name.CompareTo(d2.Name));
 			foreach (DictionaryInfo dict in dicts) {
 				int size = dict.SectionSizes != null ? dict.SectionSizes[0] + dict.SectionSizes[1] : 0;
-				ListViewItem item = new ListViewItem(new string[] { dict.Name, size > 0 ? size.ToString() : "", dict.Author });
+				ListViewItem item = new ListViewItem(new [] { dict.Name, size > 0 ? size.ToString() : "", dict.Author });
 				item.Tag = dict;
 				item.ImageKey = "Dictionary";
 				dictionaries.Items.Add(item);
@@ -108,9 +108,9 @@ namespace Szotar.WindowsForms.Forms {
 			WithUpdate(recentDictionaries, lv => {
 				lv.Items.Clear();
 				for (int i = 0; i < 6 && i < rd.Entries.Count; ++i) {
-					var item = new ListViewItem(new string[] { rd.Entries[i].Title });
+					var item = new ListViewItem(new[] { rd.Entries[i].Name });
 					item.Tag = rd.Entries[i].Path;
-					item.Text = rd.Entries[i].Title;
+					item.Text = rd.Entries[i].Name;
 					item.ImageKey = "Dictionary";
 					lv.Items.Add(item);
 				}
@@ -134,7 +134,7 @@ namespace Szotar.WindowsForms.Forms {
 			WithUpdate(recentLists, lv => {
 				lv.Items.Clear();
 				for (int i = 0; i < 6 && i < mru.Count; ++i) {
-					var item = new ListViewItem(new string[] { mru[i].Name });
+					var item = new ListViewItem(new[] { mru[i].Name });
 					item.Tag = mru[i].ID;
 					item.Text = mru[i].Name;
 					item.ImageKey = "List";

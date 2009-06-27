@@ -60,9 +60,9 @@ namespace Szotar.WindowsForms.Forms {
 
 			Dictionary = dictionary;
 
-			var mru = GuiConfiguration.RecentDictionaries ?? new MruList(10);
-			mru.Update(dictionary.Path, dictionary.Name);
-			GuiConfiguration.RecentDictionaries = mru;
+			var mru = GuiConfiguration.RecentDictionaries ?? new MruList<DictionaryInfo>(10);
+			mru.Update(dictionary.Info);
+			Configuration.Default.NeedsSaving = true;
 
 			Font listFont = GuiConfiguration.GetListFont();
 			if (listFont != null) {
@@ -670,7 +670,7 @@ namespace Szotar.WindowsForms.Forms {
 			for (int i = 0; i < mru.Entries.Count; ++i) {
 				var path = mru.Entries[i].Path;
 				if (path != Dictionary.Path) {
-					var item = new ToolStripMenuItem(mru.Entries[i].Title, null, 
+					var item = new ToolStripMenuItem(mru.Entries[i].Name, null, 
 						new EventHandler((s, ev) => OpenDictionary(path)));
 					item.Tag = "MRU";
 					items.Insert(index, item);

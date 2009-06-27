@@ -57,22 +57,6 @@ namespace Szotar.WindowsForms {
 		private static void RunUntilNoForms() {
 			Application.Run(new SzotarContext());
 		}
-
-		//Used to convert a TEI dictionary into a SimpleDictionary.
-		//Whenever possible, this should be moved to the Tools project.
-		static void ConvertFromTei() {
-			IBilingualDictionary td = new TeiDictionary(@"..\..\eng-hun-huge.xml");
-			SimpleDictionary sd = new SimpleDictionary(td.ForwardsSection, td.ReverseSection);
-			sd.Name = "English-Hungarian dictionary";
-			sd.Author = "freedict.org / Vonyó Attila";
-			sd.FirstLanguage = "English";
-			sd.SecondLanguage = "Hungarian";
-			sd.Url = "http://almos.vein.hu/~vonyoa/";
-
-			//We're probably in Debug/bin.
-			//After all, this function is only here for debugging.
-			sd.Write(@"..\..\Data\Dictionaries\en-hu.dict");
-		}
 	}
 
 	/// <summary>
