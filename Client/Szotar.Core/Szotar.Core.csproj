@@ -63,12 +63,15 @@
     <Compile Include="Base\Configuration.cs" />
     <Compile Include="Base\DataStore.cs" />
     <Compile Include="Base\Dictionary.cs" />
+    <Compile Include="Base\DictionaryInfo.cs" />
     <Compile Include="Base\Entry.cs" />
+    <Compile Include="Base\Json.cs" />
     <Compile Include="Base\LineReader.cs" />
+    <Compile Include="Base\ListInfo.cs" />
     <Compile Include="Base\ListSearchResult.cs" />
     <Compile Include="Base\ListStore.cs" />
     <Compile Include="Base\Localization.cs" />
-    <Compile Include="Base\MRU.cs" />
+    <Compile Include="Base\MruList.cs" />
     <Compile Include="Base\Nullable.cs" />
     <Compile Include="Base\NullWeakReference.cs" />
     <Compile Include="Base\Practice.cs" />

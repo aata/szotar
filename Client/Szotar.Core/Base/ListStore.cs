@@ -3,18 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Szotar {
-	[Serializable]
-	public class ListInfo {
-		public long? ID { get; set; }
-		public string Name { get; set; }
-		public string Author { get; set; }
-		public string Language { get; set; }
-		public string Url { get; set; }
-		public DateTime? Date { get; set; }
-		public long? TermCount { get; set; }
-	}
-	
+namespace Szotar {	
 	public interface IListStore {
 		string Name { get; }
 		IEnumerable<ListInfo> GetLists();
