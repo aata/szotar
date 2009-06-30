@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms {
+	using Szotar.Json;
+
 	static class Program {
-		[STAThread]
 		static void Main() {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);

@@ -63,7 +63,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			var mru = GuiConfiguration.RecentDictionaries ?? new MruList<DictionaryInfo>(10);
 			mru.Update(dictionary.Info);
-			Configuration.Default.NeedsSaving = true;
+			GuiConfiguration.RecentDictionaries = mru;
 
 			Font listFont = GuiConfiguration.GetListFont();
 			if (listFont != null) {
