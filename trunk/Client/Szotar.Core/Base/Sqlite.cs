@@ -98,13 +98,10 @@ namespace Szotar.Sqlite {
 					}
 				}
 
-				using (var cmd = conn.CreateCommand()) {
-					cmd.CommandText = "INSERT INTO Info (Name, Value) VALUES ('Version', ?)";
-					var param = cmd.CreateParameter();
-					cmd.Parameters.Add(param);
-					param.Value = version.ToString();
-					cmd.ExecuteNonQuery();
-				}
+				if (Select(@"SELECT Value FROM Info WHERE Name = 'Version'") == null)
+					ExecuteSQL(@"INSERT INTO Info (Name, Value) VALUES ('Version', ?)", version.ToString());
+				 else
+					ExecuteSQL(@"UPDATE Info SET Value = ? WHERE Name = 'Version'", version.ToString());
 
 				txn.Commit();
 			}
@@ -112,7 +109,7 @@ namespace Szotar.Sqlite {
 
 		protected void UpgradeSchemaInIncrements(int fromVersion, int toVersion) {
 			if (fromVersion >= toVersion)
-				throw new ArgumentException("Can't downgrade the application database. What is happening?", "fromVersion");
+				throw new ArgumentException("Can't downgrade the application database. What happen?", "fromVersion");
 
 			for (; fromVersion < toVersion; ++fromVersion)
 				IncrementalUpgradeSchema(fromVersion + 1);
@@ -139,11 +136,12 @@ namespace Szotar.Sqlite {
 
 		/// <summary>
 		/// Get the ID of the last inserted row. This is equal to the primary key of that row, if one exists.
-		/// If multiple threads are modifying the database, this value is unpredictable. So, please, don't do that.
+		/// If multiple threads are modifying the database, this value is unpredictable. 
+		/// So, please, don't do that.
 		/// </summary>
 		protected long GetLastInsertRowID() {
 			var lastInsertCommand = conn.CreateCommand();
-			lastInsertCommand.CommandText = "SELECT last_insert_rowid()";
+			lastInsertCommand.CommandText = @"SELECT last_insert_rowid()";
 
 			return (long)lastInsertCommand.ExecuteScalar();
 		}
@@ -216,40 +214,106 @@ namespace Szotar.Sqlite {
 		}
 
 		protected override void UpgradeSchema(int fromVersion, int toVersion) {
-			UpgradeSchemaInIncrements(fromVersion, toVersion);
+			using (var txn = Connection.BeginTransaction()) {
+				UpgradeSchemaInIncrements(fromVersion, toVersion);
+
+				txn.Commit();
+			}
 		}
 
 		protected override int ApplicationSchemaVersion() {
-			return 1;
+			return 2;
 		}
 
 		protected override void IncrementalUpgradeSchema(int toVersion) {
 			if (toVersion == 1)
 				InitDatabase();
+			if (toVersion == 2)
+				UpgradePracticeSchema();
 			else
 				throw new ArgumentOutOfRangeException("toVersion");
 		}
 
+		// Initialize the database to schema version 1, the initial version.
 		private void InitDatabase() {
-			using (var txn = conn.BeginTransaction()) {
-				ExecuteSQL("CREATE TABLE VocabItems (id INTEGER PRIMARY KEY AUTOINCREMENT, Phrase TEXT NOT NULL, Translation TEXT NOT NULL, SetID INTEGER NOT NULL, ListPosition INTEGER NOT NULL, TimesTried INTEGER NOT NULL, TimesFailed INTEGER NOT NULL)");
-				ExecuteSQL("CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase)");
-				ExecuteSQL("CREATE INDEX VocabItems_IndexT ON VocabItems (Translation)");
-				ExecuteSQL("CREATE INDEX VocabItems_IndexS ON VocabItems (SetID)");
-				ExecuteSQL("CREATE INDEX VocabItems_IndexSO ON VocabItems (SetID, ListPosition)");
-				//ExecuteSQL("CREATE INDEX VocabItems_IndexK ON VocabItems (Knowledge)");
+			ExecuteSQL(@"
+				CREATE TABLE VocabItems (
+					id INTEGER PRIMARY KEY AUTOINCREMENT, 
+					Phrase TEXT NOT NULL, 
+					Translation TEXT NOT NULL, 
+					SetID INTEGER NOT NULL,	
+					ListPosition INTEGER NOT NULL, 
+					TimesTried INTEGER NOT NULL, 
+					TimesFailed INTEGER NOT NULL);
 
-				ExecuteSQL("CREATE TABLE Sets (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Author TEXT, Language TEXT, Url TEXT, Created Date)");
-				ExecuteSQL("CREATE INDEX Sets_Index ON Sets (id)");
+				CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase);
+				CREATE INDEX VocabItems_IndexT ON VocabItems (Translation);
+				CREATE INDEX VocabItems_IndexS ON VocabItems (SetID);
+				CREATE INDEX VocabItems_IndexSO ON VocabItems (SetID, ListPosition);
 
-				ExecuteSQL("CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT)");
-				ExecuteSQL("CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property)");
+				CREATE TABLE Sets (
+					id INTEGER PRIMARY KEY AUTOINCREMENT, 
+					Name TEXT NOT NULL, 
+					Author TEXT, 
+					Language TEXT, 
+					Url TEXT, 
+					Created Date);
 
-				ExecuteSQL("CREATE TABLE SetMemberships (ChildID INTEGER NOT NULL, ParentID INTEGER NOT NULL)");
-				ExecuteSQL("CREATE INDEX SetMemberships_Index ON SetMemberships (ChildID, ParentID)");
+				CREATE INDEX Sets_Index ON Sets (id);
 
-				txn.Commit();
-			}
+				CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT);
+				CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property);
+
+				CREATE TABLE SetMemberships (ChildID INTEGER NOT NULL, ParentID INTEGER NOT NULL);
+				CREATE INDEX SetMemberships_Index ON SetMemberships (ChildID, ParentID);");
+		}
+
+		// Upgrade the schema for the new practice functionality.
+		//  * Remove the TimesTried and TimesFailed columns (at long last)
+		//  * Add a practice history. Each and every practice item is recorded, along with a date,
+		//    so this may have privacy issues. It will be used to focus on words that are difficult
+		//    to get right, words that have not yet been practiced, and other such things.
+		private void UpgradePracticeSchema() {
+			// SQLite does not implement dropping columns.
+			// This makes things a little more difficult than it has to be.
+			ExecuteSQL(@"
+				DROP INDEX VocabItems_IndexP;
+				DROP INDEX VocabItems_IndexT;
+				DROP INDEX VocabItems_IndexS;
+				DROP INDEX VocabItems_IndexSO;
+
+				ALTER TABLE VocabItems RENAME TO VocabItemsOld;
+				CREATE TABLE VocabItems (
+					id INTEGER PRIMARY KEY AUTOINCREMENT,
+					Phrase TEXT NOT NULL COLLATE NOCASE,
+					Translation TEXT NOT NULL COLLATE NOCASE,
+					SetID INTEGER NOT NULL,
+					ListPosition INTEGER NOT NULL);
+				
+				CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase);
+				CREATE INDEX VocabItems_IndexT ON VocabItems (Translation);
+				CREATE INDEX VocabItems_IndexS ON VocabItems (SetID);
+				CREATE INDEX VocabItems_IndexSO ON VocabItems (SetID, ListPosition);
+
+				INSERT INTO VocabItems (id, Phrase, Translation, SetID, ListPosition)
+					SELECT id, Phrase, Translation, SetID, ListPosition
+					FROM VocabItemsOld;
+				DROP TABLE VocabItemsOld;
+
+				CREATE TABLE PracticeHistory (
+					id INTEGER PRIMARY KEY AUTOINCREMENT,
+					Phrase TEXT NOT NULL COLLATE NOCASE,
+					Translation TEXT NOT NULL COLLATE NOCASE,
+					SetID INTEGER NOT NULL,
+					Created DATE NOT NULL,
+					Result INTEGER NOT NULL -- 1 for success, 0 for failure
+					);
+
+				-- Are these necessary?
+				CREATE INDEX PracticeHistory_IndexP ON PracticeHistory (Phrase);
+				CREATE INDEX PracticeHistory_IndexT ON PracticeHistory (Translation);
+				CREATE INDEX PracticeHistory_IndexPTS ON PracticeHistory (Phrase, Translation, SetID);
+				CREATE INDEX PracticeHistory_IndexC ON PracticeHistory (Created);");
 		}
 
 		/// <param name="setID">The SetID of the word list</param>

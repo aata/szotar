@@ -168,6 +168,7 @@ namespace Szotar.WindowsForms {
 		NavigatorMenu navMenu;
 
 		Font bigFont, smallFont;
+		bool swap;
 
 		public FlashcardMode() 
 			: base("Flashcards") 
@@ -176,8 +177,9 @@ namespace Szotar.WindowsForms {
 		public override void Start(IPracticeWindow owner) {
 			base.Start(owner);
 
+			swap = false;
 			nav = new Navigator(owner);
-			navMenu = new NavigatorMenu(nav);
+			navMenu = new NavigatorMenu(nav, true);
 
 			MergeMenu(navMenu.Menu);
 
@@ -205,8 +207,16 @@ namespace Szotar.WindowsForms {
 			navMenu.Forward += delegate { GoForward(); };
 			navMenu.End += delegate { GoToEnd(); };
 			navMenu.Edit += delegate {  };
+			navMenu.Swap += delegate { SwapItems(); };
 
 			translationLabel.Visible = false;
+			Update();
+			Layout();
+		}
+
+		private void SwapItems() {
+			swap = !swap;
+
 			Update();
 			Layout();
 		}
@@ -216,9 +226,8 @@ namespace Szotar.WindowsForms {
 
 			GameArea.Resize -= new EventHandler(GameArea_Resize);
 
-			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea }) {
+			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea })
 				c.MouseUp -= new MouseEventHandler(GameArea_MouseUp);
-			}
 		}
 
 		void GoForward() {
@@ -269,8 +278,14 @@ namespace Szotar.WindowsForms {
 
 		void Update() {
 			navMenu.Update();
-			phraseLabel.Text = nav.CurrentItem.Phrase;
-			translationLabel.Text = nav.CurrentItem.Translation;
+
+			if (swap) {
+				phraseLabel.Text = nav.CurrentItem.Translation;
+				translationLabel.Text = nav.CurrentItem.Phrase;
+			} else {
+				phraseLabel.Text = nav.CurrentItem.Phrase;
+				translationLabel.Text = nav.CurrentItem.Translation;
+			}
 		}
 
 		void Layout() {
@@ -317,20 +332,22 @@ namespace Szotar.WindowsForms {
 		public Navigator Navigator { get; protected set; }
 		public ToolStrip Menu { get; protected set; }
 
-		ToolStripButton back, fore, end, edit;
+		ToolStripButton back, fore, end, edit, swap;
 		ToolStripLabel position;
 
-		public NavigatorMenu(Navigator nav) {
+		public NavigatorMenu(Navigator nav, bool swapItem) {
 			Navigator = nav;
 
 			back = new ToolStripButton { Text = "←" };
 			fore = new ToolStripButton { Text = "→" };
 			end = new ToolStripButton { Text = "end" };
 			edit = new ToolStripButton { Text = "edit" };
+			if (swapItem)
+				swap = new ToolStripButton { Text = "swap phrase/translation" };
 			position = new ToolStripLabel { Alignment = ToolStripItemAlignment.Right };
 
 			Menu = new ToolStrip();
-			foreach (var button in new[] { edit, end, fore, back }) {
+			foreach (var button in Buttons) {
 				button.Alignment = ToolStripItemAlignment.Right;
 				Menu.Items.Add(button);
 			}
@@ -340,12 +357,26 @@ namespace Szotar.WindowsForms {
 			fore.Click += delegate { Raise(Forward); };
 			end.Click += delegate { Raise(End); };
 			edit.Click += delegate { Raise(Edit); };
+			if(swapItem)
+				swap.Click += delegate { Raise(Swap); };			
+		}
+
+		protected IEnumerable<ToolStripItem> Buttons {
+			get {
+				yield return back;
+				yield return fore;
+				yield return end;
+				yield return edit;
+				if (swap != null)
+					yield return swap;
+			}
 		}
 
 		public event EventHandler Back;
 		public event EventHandler Forward;
 		public event EventHandler End;
 		public event EventHandler Edit;
+		public event EventHandler Swap;
 
 		void Raise(EventHandler handler) {
 			if (handler != null)

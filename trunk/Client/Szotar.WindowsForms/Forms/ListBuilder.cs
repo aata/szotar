@@ -120,11 +120,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void remove_Click(object sender, EventArgs e) {
-			foreach (int i in grid.SelectedIndices)
-				list[i] = null;
-
-			while (list.Remove(null))
-				;
+			list.RemoveAt(grid.SelectedIndices);
 		}
 
 		void swap_Click(object sender, EventArgs e) {
@@ -275,7 +271,7 @@ namespace Szotar.WindowsForms.Forms {
 		public void AddPair(string phrase, string translation) {
 			System.Diagnostics.Debug.Assert(!InvokeRequired);
 
-			list.Add(new WordListEntry(list, phrase, translation, 0, 0));
+			list.Add(new WordListEntry(list, phrase, translation));
 			grid.DataSource = list;
 		}
 
@@ -284,7 +280,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			var realEntries = new List<WordListEntry>();
 			foreach (var entry in entries)
-				realEntries.Add(new WordListEntry(list, entry.Phrase, entry.Translation, 0, 0));
+				realEntries.Add(new WordListEntry(list, entry.Phrase, entry.Translation));
 
 			list.Insert(list.Count, realEntries);
 
@@ -381,14 +377,14 @@ namespace Szotar.WindowsForms.Forms {
 			return lines;
 		}
 
-		//For now, simply insert the new items at the end of the list.
-		//There might be a better way to do this.
+		// For now, simply insert the new items at the end of the list.
+		// There might be a better way to do this.
 		void Paste(List<List<string>> lines) {
 			var entries = new List<WordListEntry>();
 
 			foreach (var line in lines)
 				if (line.Count >= 2)
-					entries.Add(new WordListEntry(list, line[0], line[1], 0, 0));
+					entries.Add(new WordListEntry(list, line[0], line[1]));
 
 			if (entries.Count > 0) {
 				list.Insert(list.Count, entries);
@@ -396,7 +392,7 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		//Detect comma-separated/tab-separated based on the paste content.
+		// Detect comma-separated/tab-separated based on the paste content.
 		private void pasteCSV_Click(object sender, EventArgs e) {
 			int validCSV, validTSV;
 			List<List<string>> csv, tsv;

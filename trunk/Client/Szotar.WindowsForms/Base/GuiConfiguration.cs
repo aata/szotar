@@ -47,7 +47,7 @@ namespace Szotar.WindowsForms {
 		}
 
 		public static float ListBuilderColumnRatio {
-			get { return Default.Get<float>("ListBuilderColumnRatio", 1.0f); }
+			get { return Default.Get<float>("ListBuilderColumnRatio", 0.5f); }
 			set { Default.Set("ListBuilderColumnRatio", value); }
 		}
 

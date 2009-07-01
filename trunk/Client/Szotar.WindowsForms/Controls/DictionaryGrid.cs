@@ -301,7 +301,7 @@ namespace Szotar.WindowsForms.Controls {
 				if (pairInEdit == null) {
 					Debug.WriteLine(string.Format("  pairInEdit was null"));
 					var we = source[e.RowIndex];
-					pairInEdit = new WordListEntry(null, we.Phrase, we.Translation, we.TimesTried, we.TimesFailed);
+					pairInEdit = new WordListEntry(null, we.Phrase, we.Translation);
 				} else {
 					Debug.WriteLine(string.Format("  pairInEdit was non-null"));
 				}

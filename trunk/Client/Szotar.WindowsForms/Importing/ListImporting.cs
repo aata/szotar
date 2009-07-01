@@ -105,7 +105,7 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 						string value = (string)td.Evaluate("string(.)");
 						if (entry == null) {
 							//First TD: Search button
-							entry = new WordListEntry(wordList, null, null, 0, 0);
+							entry = new WordListEntry(wordList, null, null);
 						} else if (entry.Phrase == null) {
 							//Second TD: Phrase
 							entry.Phrase = value;
