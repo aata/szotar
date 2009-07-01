@@ -19,15 +19,15 @@ namespace Szotar.WindowsForms.Forms {
 			//dgrid.DataSource = new Controls.CustomDictionaryResultsSource(new CustomDictionary("../../../English_Hungarian.wb.custom.txt"));
 
 			var list = store.CreateSet("Test", Environment.UserName, "Klingon", "http://example.org/", DateTime.Now);
-			list.Add(new WordListEntry(list, "one", "egy", 0, 0));
-			list.Add(new WordListEntry(list, "two", "kettő", 0, 0));
-			list.Add(new WordListEntry(list, "three", "három", 0, 0));
-			list.Add(new WordListEntry(list, "four", "négy", 0, 0));
-			list.Add(new WordListEntry(list, "five", "öt", 0, 0));
-			list.Add(new WordListEntry(list, "six", "hat", 0, 0));
-			list.Add(new WordListEntry(list, "seven", "hét", 0, 0));
-			list.Add(new WordListEntry(list, "eight", "nyolc", 0, 0));
-			list.Add(new WordListEntry(list, "nine", "kilenc", 0, 0));
+			list.Add(new WordListEntry(list, "one", "egy"));
+			list.Add(new WordListEntry(list, "two", "kettő"));
+			list.Add(new WordListEntry(list, "three", "három"));
+			list.Add(new WordListEntry(list, "four", "négy"));
+			list.Add(new WordListEntry(list, "five", "öt"));
+			list.Add(new WordListEntry(list, "six", "hat"));
+			list.Add(new WordListEntry(list, "seven", "hét"));
+			list.Add(new WordListEntry(list, "eight", "nyolc"));
+			list.Add(new WordListEntry(list, "nine", "kilenc"));
 			dgrid.AllowNewItems = true;
 			dgrid.DataSource = list;
 

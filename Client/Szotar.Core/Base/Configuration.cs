@@ -388,10 +388,17 @@ namespace Szotar {
 			if (File.Exists(path)) {
 				JsonDictionary dict;
 
-				using (var sr = new StreamReader(path))
-					dict = JsonValue.Parse(sr) as JsonDictionary;
+				try {
+					using (var sr = new StreamReader(path))
+						dict = JsonValue.Parse(sr) as JsonDictionary;
+				} catch (ParseException) {
+					// TODO: Log exception
+					return;
+				}
 
+				// Why the file would contain something other than a dictionary, I don't know.
 				if (dict == null) {
+					// TODO: Log this.
 					Reset();
 					return;
 				}

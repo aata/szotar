@@ -78,6 +78,7 @@ namespace Szotar {
 
 		JsonValue IJsonConvertible.ToJson(IJsonContext context) {
 			var dict = new JsonDictionary();
+
 			if (ID.HasValue)
 				dict.Items.Add("ID", new JsonNumber(ID.Value));
 			if (Name != null)
@@ -89,7 +90,7 @@ namespace Szotar {
 			if (Url != null)
 				dict.Items.Add("Url", new JsonString(Url));
 			if (Date.HasValue)
-				dict.Items.Add("Date", new JsonString(Date.Value.ToLongTimeString()));
+				dict.Items.Add("Date", new JsonString(Date.Value.ToString("s")));
 			if (TermCount.HasValue)
 				dict.Items.Add("TermCount", new JsonNumber(TermCount.Value));
 

@@ -74,9 +74,7 @@ namespace Szotar {
 
 		public enum EntryProperty {
 			Phrase,
-			Translation,
-			TimesTried,
-			TimesFailed
+			Translation
 		}
 
 		// These should be probably protected, since they don't set the in-memory values,
@@ -132,21 +130,18 @@ namespace Szotar {
 		WordList owner;
 		string phrase;
 		string translation;
-		long tried, failed;
 
 		public WordListEntry(WordList owner) {
 			this.owner = owner;
 			phrase = translation = string.Empty;
 		}
 
-		public WordListEntry(WordList owner, string phrase, string translation, long tried, long failed) {
+		public WordListEntry(WordList owner, string phrase, string translation) {
 			this.owner = owner;
 			this.phrase = phrase;
 			this.translation = translation;
-			this.tried = tried;
-			this.failed = failed;
 
-			//This is really the wrong place to put this, but it's better to have it not break than break.
+			// This is really the wrong place to put this, but it's better to have it not break than break.
 			if (phrase == null)
 				phrase = string.Empty;
 			if (translation == null)
@@ -198,40 +193,6 @@ namespace Szotar {
 			RaisePropertyChanged("Translation");
 		}
 
-		public long TimesTried {
-			get { return tried; }
-			set {
-				SetTimesTried(value);
-				if (owner != null)
-					owner.SetProperty(this, WordList.EntryProperty.TimesTried, value);
-			}
-		}
-
-		public void SetTimesTried(long value) {
-			if (value < 0)
-				throw new ArgumentOutOfRangeException();
-
-			tried = value;
-			RaisePropertyChanged("TimesTried");
-		}
-
-		public long TimesFailed {
-			get { return failed; }
-			set {
-				SetTimesFailed(value);
-				if (owner != null)
-					owner.SetProperty(this, WordList.EntryProperty.TimesFailed, value);
-			}
-		}
-
-		public void SetTimesFailed(long value) {
-			if (value < 0)
-				throw new ArgumentOutOfRangeException();
-
-			failed = value;
-			RaisePropertyChanged("TimesFailed");
-		}
-
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		private void RaisePropertyChanged(string property) {
@@ -248,10 +209,6 @@ namespace Szotar {
 					return phrase;
 				case WordList.EntryProperty.Translation:
 					return translation;
-				case WordList.EntryProperty.TimesTried:
-					return tried;
-				case WordList.EntryProperty.TimesFailed:
-					return failed;
 			}
 			throw new ArgumentException("property");
 		}
@@ -263,12 +220,6 @@ namespace Szotar {
 					break;
 				case WordList.EntryProperty.Translation:
 					SetTranslation((string)newValue);
-					break;
-				case WordList.EntryProperty.TimesTried:
-					SetTimesTried((long)newValue);
-					break;
-				case WordList.EntryProperty.TimesFailed:
-					SetTimesFailed((long)newValue);
 					break;
 			}
 			throw new ArgumentException("property");

@@ -235,18 +235,21 @@ namespace Szotar.Sqlite {
 			//These are called particularly often, any performance enhancements are useful.
 			DbCommand insertCommand, deleteCommand;
 			DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
-				insertCommandTranslation, insertCommandTimesTried, insertCommandTimesFailed,
-				deleteCommandSetID, deleteCommandListPosition;
+				insertCommandTranslation, deleteCommandSetID, deleteCommandListPosition;
 
 			public Worker(SqliteDataStore store, SqliteWordList list)
 				: base(store) {
 				this.list = list;
 
 				insertCommand = Connection.CreateCommand();
-				insertCommand.CommandText =
-					@"UPDATE VocabItems SET ListPosition = ListPosition + 1 WHERE SetID = $SetID AND ListPosition >= $ListPosition;
-					  INSERT INTO VocabItems (Phrase, Translation, SetID, ListPosition, TimesTried, TimesFailed)
-					      VALUES ($Phrase, $Translation, $SetID, $ListPosition, $TimesTried, $TimesFailed);";
+				insertCommand.CommandText = @"
+					UPDATE VocabItems 
+						SET ListPosition = ListPosition + 1	
+						WHERE SetID = $SetID AND ListPosition >= $ListPosition;
+
+					INSERT INTO VocabItems 
+						(Phrase, Translation, SetID, ListPosition)
+						VALUES ($Phrase, $Translation, $SetID, $ListPosition);";
 
 				insertCommandSetID = insertCommand.CreateParameter();
 				insertCommandSetID.ParameterName = "SetID";
@@ -265,19 +268,12 @@ namespace Szotar.Sqlite {
 				insertCommandTranslation.ParameterName = "Translation";
 				insertCommand.Parameters.Add(insertCommandTranslation);
 
-				insertCommandTimesTried = insertCommand.CreateParameter();
-				insertCommandTimesTried.ParameterName = "TimesTried";
-				insertCommand.Parameters.Add(insertCommandTimesTried);
-
-				insertCommandTimesFailed = insertCommand.CreateParameter();
-				insertCommandTimesFailed.ParameterName = "TimesFailed";
-				insertCommand.Parameters.Add(insertCommandTimesFailed);
-
 				deleteCommand = Connection.CreateCommand();
-				deleteCommand.CommandText = 
-					@"DELETE From VocabItems WHERE SetID = $SetID AND ListPosition = $ListPosition; 
-					  UPDATE VocabItems SET ListPosition = ListPosition - 1 
-					      WHERE SetId = $SetID AND ListPosition > $ListPosition";
+				deleteCommand.CommandText = @"
+					DELETE From VocabItems 
+						WHERE SetID = $SetID AND ListPosition = $ListPosition; 
+					UPDATE VocabItems SET ListPosition = ListPosition - 1 
+						WHERE SetId = $SetID AND ListPosition > $ListPosition";
 
 				deleteCommandSetID = deleteCommand.CreateParameter();
 				deleteCommandSetID.ParameterName = "SetID";
@@ -289,16 +285,16 @@ namespace Szotar.Sqlite {
 			}
 
 			protected override void Dispose(bool disposing) {
-				//Don't need to dispose of the parameters.
+				// Don't need to dispose of the parameters.
 				insertCommand.Dispose();
 				deleteCommand.Dispose();
 
 				base.Dispose(disposing);
 			}
 
-			//Inserts a single item at the given index.
-			//This should be avoided unless there really is only one item to be added, because it
-			//will probably be quite slow.
+			// Inserts a single item at the given index.
+			// This should be avoided unless there really is only one item to be added, because it
+			// will probably be quite slow.
 			public void Insert(int index, WordListEntry item) {
 				if (item == null)
 					throw new System.ArgumentNullException();
@@ -310,8 +306,6 @@ namespace Szotar.Sqlite {
 					insertCommandListPosition.Value = index;
 					insertCommandPhrase.Value = item.Phrase;
 					insertCommandTranslation.Value = item.Translation;
-					insertCommandTimesTried.Value = item.TimesTried;
-					insertCommandTimesFailed.Value = item.TimesFailed;
 
 					insertCommand.ExecuteNonQuery();
 
@@ -333,8 +327,6 @@ namespace Szotar.Sqlite {
 						insertCommandListPosition.Value = index;
 						insertCommandPhrase.Value = item.Phrase;
 						insertCommandTranslation.Value = item.Translation;
-						insertCommandTimesTried.Value = item.TimesTried;
-						insertCommandTimesFailed.Value = item.TimesFailed;
 
 						insertCommand.ExecuteNonQuery();
 
@@ -359,8 +351,6 @@ namespace Szotar.Sqlite {
 						var item = kvp.Value;
 						insertCommandPhrase.Value = item.Phrase;
 						insertCommandTranslation.Value = item.Translation;
-						insertCommandTimesTried.Value = item.TimesTried;
-						insertCommandTimesFailed.Value = item.TimesFailed;
 
 						insertCommand.ExecuteNonQuery();
 					}
@@ -384,8 +374,15 @@ namespace Szotar.Sqlite {
 			/// It's faster than the other Remove methods.</summary>
 			public void RemoveAt(int index, int count) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL("DELETE From VocabItems WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", list.ID, index, index + count - 1);
-					ExecuteSQL("UPDATE VocabItems SET ListPosition = ListPosition - ? WHERE SetID = ? AND ListPosition > ?", count, list.ID, index);
+					ExecuteSQL(@"
+						DELETE From VocabItems 
+							WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", 
+						list.ID, index, index + count - 1);
+					ExecuteSQL(@"
+						UPDATE VocabItems 
+							SET ListPosition = ListPosition - ? 
+							WHERE SetID = ? AND ListPosition > ?", 
+						count, list.ID, index);
 
 					txn.Commit();
 				}
@@ -416,8 +413,9 @@ namespace Szotar.Sqlite {
 
 				using (var command = Connection.CreateCommand()) {
 					var sb = new System.Text.StringBuilder();
-					sb.Append(@"SELECT Phrase, Translation, TimesTried, TimesFailed, ListPosition
-                                FROM VocabItems WHERE SetID = ? AND ListPosition IN (");
+					sb.Append(@"
+						SELECT Phrase, Translation
+							FROM VocabItems WHERE SetID = ? AND ListPosition IN (");
 
 					int i = 0;
 					foreach (int index in indices) {
@@ -436,27 +434,27 @@ namespace Szotar.Sqlite {
 			}
 
 			public IList<WordListEntry> GetAllEntries() {
-				using (var command = Connection.CreateCommand()) {
-					command.CommandText = @"TYPES Text, Text, Integer, Integer; SELECT Phrase, Translation, TimesTried, TimesFailed FROM VocabItems WHERE SetID = ? ORDER BY ListPosition ASC";
-					AddParameter(command, list.ID);
-					using (var reader = command.ExecuteReader())
-						return GetEntries(reader);
-				}
+				var reader = SelectReader(@"
+					TYPES Text, Text;
+					SELECT Phrase, Translation
+						FROM VocabItems 
+						WHERE SetID = ? 
+						ORDER BY ListPosition ASC", list.ID);
+
+				return GetEntries(reader);
 			}
 
 			protected IList<WordListEntry> GetEntries(DbDataReader reader) {
 				var result = new List<WordListEntry>();
 
 				while (reader.Read()) {
-					if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2) || reader.IsDBNull(3))
+					if (reader.IsDBNull(0) || reader.IsDBNull(1))
 						throw new System.Data.StrongTypingException("One of the fields of a word list entry was DBNull.");
 
 					string phrase = (string)reader.GetValue(0);
 					string translation = (string)reader.GetValue(1);
-					long tried = (long)reader.GetValue(2);
-					long failed = (long)reader.GetValue(3);
 
-					var entry = new WordListEntry(this.list, phrase, translation, tried, failed);
+					var entry = new WordListEntry(this.list, phrase, translation);
 					result.Add(entry);
 				}
 
@@ -467,7 +465,7 @@ namespace Szotar.Sqlite {
 				using (var cmd = Connection.CreateCommand()) {
 					cmd.CommandText = string.Format(
 							CultureInfo.InvariantCulture, 
-							"SELECT {0} FROM VocabItems WHERE SetID = ? AND ListPosition = ?",
+							@"SELECT {0} FROM VocabItems WHERE SetID = ? AND ListPosition = ?",
 							name);
 					AddParameter(cmd, list.ID);
 					AddParameter(cmd, index);
@@ -481,7 +479,7 @@ namespace Szotar.Sqlite {
 					ExecuteSQL(
 						string.Format(
 							CultureInfo.InvariantCulture,
-							"UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", 
+							@"UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", 
 							name),
 						value, list.ID, index);
 
@@ -491,11 +489,12 @@ namespace Szotar.Sqlite {
 
 			public void SetEntry(int index, WordListEntry item) {
 				using (var txn = Connection.BeginTransaction()) {
-					ExecuteSQL(@"UPDATE VocabItems 
-                                 SET Phrase = ?, Translation = ?, TimesTried = ?, TimesFailed = ?
-                                 WHERE SetID = ? AND ListPosition = ?",
-						item.Phrase, item.Translation, item.TimesTried, 
-						item.TimesFailed, list.ID, index);
+					ExecuteSQL(@"
+						UPDATE VocabItems 
+							SET Phrase = ?, Translation = ?,
+							WHERE SetID = ? AND ListPosition = ?",
+						item.Phrase, item.Translation, 
+						list.ID, index);
 
 					txn.Commit();
 				}
@@ -518,16 +517,17 @@ namespace Szotar.Sqlite {
 				return Select(
 					string.Format(
 						CultureInfo.InvariantCulture, 
-						"SELECT {0} FROM Sets WHERE id = ?", 
+						@"SELECT {0} FROM Sets WHERE id = ?", 
 						property),
 					list.ID);
 			}
 		
 			public void SwapRows(IEnumerable<int> indices) {
 				var sb = new StringBuilder();
-				sb.Append(@"UPDATE VocabItems 
-                            SET Phrase = Translation, Translation = Phrase 
-                            WHERE SetID = ? AND ListPosition IN (");
+				sb.Append(@"
+					UPDATE VocabItems 
+						SET Phrase = Translation, Translation = Phrase 
+						WHERE SetID = ? AND ListPosition IN (");
 				bool first = true;
 				foreach(int i in indices) {
 					if(!first)
@@ -536,7 +536,7 @@ namespace Szotar.Sqlite {
 						first = false;
 					sb.Append(i);
 				}
-				sb.Append(");");
+				sb.Append(@");");
 
 				ExecuteSQL(sb.ToString(), list.ID);
 			}
@@ -579,11 +579,6 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Undo() {
-				//Sidestep OOB change-related oddities such as
-				// * SetItem
-				// * Change item OOB
-				// * Undo SetItem
-				// * Redo SetItem
 				item = list[index];
 
 				list[index] = oldItem;
@@ -607,19 +602,17 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Do() {
-				//Safe with respect to external changes.
-				//Obviously the item cannot be changed while it is not part of the list.
+				// Safe with respect to external changes.
+				// Obviously the item cannot be changed while it is not part of the list.
 				worker.Insert(index, item);
 				list.Insert(index, item);
 			}
 
 			public override void Undo() {
-				//Needed for safeness with respect to external changes.
-				//I write this with the practice functionality in mind: if practicing and editing a list concurrently,
-				//the undo situation gets a bit hairy. There should only be one *editor* open for the list at once, but
-				//there may be other things which are changing the list (e.g. practice window). 
-				//Obviously changes to TimesTried made by the practice window shouldn't be undoable from the editor
-				//window!
+				// Needed for safeness with respect to external changes.
+				// I write this with the practice functionality in mind: if practicing and editing a list concurrently,
+				// the undo situation gets a bit hairy. There should only be one *editor* open for the list at once, but
+				// there may be other things which are changing the list (e.g. practice window).
 				item = list[index];
 
 				worker.RemoveAt(index);
@@ -651,7 +644,7 @@ namespace Szotar.Sqlite {
 			public override void Undo() {
 				worker.RemoveAt(index, items.Count);
 
-				//Sidestep oddities related to OOB changes by re-reading the items as they are now.
+				// Sidestep oddities related to OOB changes by re-reading the items as they are now.
 				for (int i = 0; i < items.Count; ++i) {
 					items[i] = list[index];
 					list.RemoveAt(index);
@@ -691,8 +684,8 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Undo() {
-				//Again, sidestep oddities related to OOB changes. This is probably very unlikely to happen with the
-				//SetValue command, however.
+				// Again, sidestep oddities related to OOB changes. 
+				// This is probably very unlikely to happen with the SetValue command, however.
 				newValue = (T)list[index].GetProperty(property);
 
 				SetTo(oldValue);
@@ -715,12 +708,12 @@ namespace Szotar.Sqlite {
 				: base(owner) {
 				foreach (int i in indices)
 					items.Add(new KeyValuePair<int, WordListEntry>(i, 
-						new WordListEntry(owner, list[i].Phrase, list[i].Translation, list[i].TimesTried, list[i].TimesFailed)
+						new WordListEntry(owner, list[i].Phrase, list[i].Translation)
 						));
 
-				//The indices must be in order for the deletion to proceed correctly.
-				//Deleting lower indices before higher indices would result in shifting, and
-				//subsequent deletions may delete the wrong entry.
+				// The indices must be in order for the deletion to proceed correctly.
+				// Deleting lower indices before higher indices would result in shifting, and
+				// subsequent deletions may delete the wrong entry.
 				items.Sort((k1, k2) => k1.Key.CompareTo(k2.Key));
 
 				this.indices = items.ConvertAll(kvp => kvp.Key);
@@ -754,9 +747,9 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Undo() {
-				//There can't be any funny stuff related to OOB changes here, since any entry can't be edited while
-				//it's deleted.
-				//TODO: Modifying a deleted item should raise an exception.
+				// There can't be any funny stuff related to OOB changes here, since any entry 
+				// can't be edited while it's deleted.
+				// TODO: Modifying a deleted item should raise an exception.
 
 				worker.Insert(items);
 				foreach (var kvp in items)
@@ -783,7 +776,7 @@ namespace Szotar.Sqlite {
 				worker.SwapRows(indices);
 				foreach (int i in indices) {
 					list[i] = new WordListEntry(owner,
-						list[i].Translation, list[i].Phrase, list[i].TimesTried, list[i].TimesFailed);
+						list[i].Translation, list[i].Phrase);
 				}
 			}
 
