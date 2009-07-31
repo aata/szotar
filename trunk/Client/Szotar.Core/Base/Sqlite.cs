@@ -1,27 +1,19 @@
 using System;
-using System.Data.Common;
-using System.Reflection;
-using System.IO;	
-using IO = System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Collections;
+using System.Data.Common;
+using System.Diagnostics;
 using System.Text;
-
-using System.Linq;
-using System.Data;
+using IO = System.IO;
 
 namespace Szotar.Sqlite {
-	
 	[global::System.Serializable]
 	public class DatabaseVersionException : Exception {
 		public DatabaseVersionException() { }
 		public DatabaseVersionException(string message) : base(message) { }
 		public DatabaseVersionException(string message, Exception inner) : base(message, inner) { }
 		protected DatabaseVersionException(
-		  System.Runtime.Serialization.SerializationInfo info,
-		  System.Runtime.Serialization.StreamingContext context)
+			System.Runtime.Serialization.SerializationInfo info,
+			System.Runtime.Serialization.StreamingContext context)
 			: base(info, context) { }
 	}
 
@@ -29,24 +21,22 @@ namespace Szotar.Sqlite {
 		string path;
 
 		public SqliteDatabase(string path)
-			: base(OpenDatabase(path))
-		{
+			: base(OpenDatabase(path)) {
 			this.path = path;
 			conn.Open();
 
 			Init();
 		}
-		
+
 		static DbConnection OpenDatabase(string path) {
-			
 			string dir = IO.Path.GetDirectoryName(path);
-			if(!IO.Directory.Exists(dir))
-				IO.Directory.CreateDirectory(path);
+			if (!IO.Directory.Exists(dir))
+				IO.Directory.CreateDirectory(dir);
 #if !MONO
 			return new System.Data.SQLite.SQLiteConnection("Data Source=" + path);
 #else
 			return new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path);
-#endif			
+#endif
 		}
 
 		protected string Path {
@@ -100,7 +90,7 @@ namespace Szotar.Sqlite {
 
 				if (Select(@"SELECT Value FROM Info WHERE Name = 'Version'") == null)
 					ExecuteSQL(@"INSERT INTO Info (Name, Value) VALUES ('Version', ?)", version.ToString());
-				 else
+				else
 					ExecuteSQL(@"UPDATE Info SET Value = ? WHERE Name = 'Version'", version.ToString());
 
 				txn.Commit();
@@ -117,8 +107,8 @@ namespace Szotar.Sqlite {
 
 		protected override void Dispose(bool disposing) {
 			if (disposing)
-				conn.Dispose(); 
-			
+				conn.Dispose();
+
 			base.Dispose(disposing);
 		}
 	}
@@ -170,7 +160,7 @@ namespace Szotar.Sqlite {
 				return res;
 			}
 		}
-		
+
 		protected DbDataReader SelectReader(string sql, params object[] parameters) {
 			using (DbCommand command = conn.CreateCommand()) {
 				command.CommandText = sql;
@@ -325,7 +315,7 @@ namespace Szotar.Sqlite {
 			if (wordLists.TryGetValue(setID, out list))
 				wl = list.Target;
 
-			if(wl != null)
+			if (wl != null)
 				return wl;
 
 			wl = new SqliteWordList(this, setID);
@@ -409,8 +399,7 @@ namespace Szotar.Sqlite {
 			using (var reader = this.SelectReader(
 				"TYPES Integer, Text, Text, Text, Integer;" +
 				"SELECT SetID, Name, Phrase, Translation, ListPosition FROM VocabItems JOIN Sets ON (VocabItems.SetID = Sets.id)" +
-				"WHERE Phrase LIKE ? OR Translation LIKE ? ORDER BY SetID ASC, Phrase ASC", sb.ToString(), sb.ToString())) 
-			{
+				"WHERE Phrase LIKE ? OR Translation LIKE ? ORDER BY SetID ASC, Phrase ASC", sb.ToString(), sb.ToString())) {
 
 				while (reader.Read()) {
 					var wsr = new WordSearchResult();
@@ -480,7 +469,7 @@ namespace Szotar.Sqlite {
 					query.Length -= 2;
 					query.Append(@") ORDER BY SetID, ListPosition;");
 
-					using(var cmd = Connection.CreateCommand()) {
+					using (var cmd = Connection.CreateCommand()) {
 						cmd.CommandText = query.ToString();
 
 						GetResults(cmd, results);
@@ -555,9 +544,9 @@ namespace Szotar.Sqlite {
 						 WHERE id = ?";
 
 					var param = command.CreateParameter();
-					
-					foreach(var list in lists) {
-						if(list.Position.HasValue)
+
+					foreach (var list in lists) {
+						if (list.Position.HasValue)
 							continue;
 
 						param.Value = list.SetID;

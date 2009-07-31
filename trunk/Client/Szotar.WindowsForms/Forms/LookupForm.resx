@@ -408,6 +408,15 @@
   <data name="charMap.Text" xml:space="preserve">
     <value>Character &amp;Map</value>
   </data>
+  <metadata name="debugLog.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="debugLog.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="debugLog.Text" xml:space="preserve">
+    <value>Debug &amp;Log</value>
+  </data>
   <metadata name="toolStripSeparator3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
@@ -958,6 +967,12 @@
     <value>addTo</value>
   </data>
   <data name="&gt;&gt;addTo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;debugLog.Name" xml:space="preserve">
+    <value>debugLog</value>
+  </data>
+  <data name="&gt;&gt;debugLog.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

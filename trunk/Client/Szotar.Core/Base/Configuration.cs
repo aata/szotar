@@ -391,14 +391,14 @@ namespace Szotar {
 				try {
 					using (var sr = new StreamReader(path))
 						dict = JsonValue.Parse(sr) as JsonDictionary;
-				} catch (ParseException) {
-					// TODO: Log exception
+				} catch (ParseException e) {
+                    ProgramLog.Default.AddMessage(LogType.Error, "JSON parsing exception in configuration: {0}", e.Message);
 					return;
 				}
 
 				// Why the file would contain something other than a dictionary, I don't know.
 				if (dict == null) {
-					// TODO: Log this.
+                    ProgramLog.Default.AddMessage(LogType.Error, "JSON configuration file was not a JSON hash object!");
 					Reset();
 					return;
 				}
@@ -422,10 +422,10 @@ namespace Szotar {
 						json = GetConverter(k.Value.GetType()).ToJson(k.Value, this);
 
 						dict.Items.Add(k.Key, json);
-					} catch (JsonConvertException) {
-						// TODO: Log exception
-					} catch (InvalidCastException) {
-						// TODO: Log exception
+					} catch (JsonConvertException e) {
+                        ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
+					} catch (InvalidCastException e) {
+                        ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
 					}
 				}
 			}
@@ -461,11 +461,11 @@ namespace Szotar {
 						T real;
 						try {
 							real = (T)GetConverter<T>().FromJson((JsonValue)value, this);
-						} catch (JsonConvertException) {
-							// TODO: Log exception
+						} catch (JsonConvertException e) {
+                            ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
 							real = default(T);
-						} catch (InvalidCastException) {
-							// TODO: Log exception
+						} catch (InvalidCastException e) {
+                            ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
 							real = default(T);
 						}
 						values[setting] = real;

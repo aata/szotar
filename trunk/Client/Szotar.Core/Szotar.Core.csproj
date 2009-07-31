@@ -10,8 +10,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Szotar.Core</RootNamespace>
     <AssemblyName>Szotar.Core</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkSubset>
+    </TargetFrameworkSubset>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,9 +50,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139">
       <SpecificVersion>False</SpecificVersion>
@@ -62,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Base\Configuration.cs" />
     <Compile Include="Base\DataStore.cs" />
+    <Compile Include="Base\Delegates.cs" />
     <Compile Include="Base\Dictionary.cs" />
     <Compile Include="Base\DictionaryInfo.cs" />
     <Compile Include="Base\Entry.cs" />
@@ -71,8 +71,8 @@
     <Compile Include="Base\ListSearchResult.cs" />
     <Compile Include="Base\ListStore.cs" />
     <Compile Include="Base\Localization.cs" />
+    <Compile Include="Base\Log.cs" />
     <Compile Include="Base\MruList.cs" />
-    <Compile Include="Base\Nullable.cs" />
     <Compile Include="Base\NullWeakReference.cs" />
     <Compile Include="Base\Practice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,6 +82,9 @@
     <Compile Include="Base\SqliteWordList.cs" />
     <Compile Include="Base\WordList.cs" />
     <Compile Include="Base\Undo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

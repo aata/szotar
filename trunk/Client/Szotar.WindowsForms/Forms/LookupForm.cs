@@ -515,7 +515,7 @@ namespace Szotar.WindowsForms.Forms {
 				var hit = grid.HitTest(e.X, e.Y);
 
 				var indices = new List<int>();
-
+                
 				if (hit.RowIndex >= 0) {
 					// TODO: This code isn't run anyway at the moment, but it should be:
 					// grid.Rows.GetRowState(hit.RowIndex) & DataGridViewElementStates.Selected = DataGridViewElementStates.Selected
@@ -839,6 +839,10 @@ namespace Szotar.WindowsForms.Forms {
 		private void charMap_Click(object sender, EventArgs e) {
 			System.Diagnostics.Process.Start("charmap.exe");
 		}
+
+        private void debugLog_Click(object sender, EventArgs e) {
+            LogViewerForm.Open();
+        }
 
 		private void options_Click(object sender, EventArgs e) {
 			new Forms.Preferences().ShowDialog();
