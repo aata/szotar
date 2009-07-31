@@ -122,5 +122,15 @@ namespace Szotar.WindowsForms.Resources {
                 return ResourceManager.GetString("TheOperationWasCancelled", resourceCulture);
             }
         }
+
+		/// <summary>
+		///   Looks up a localized string similar to The program data was created by a newer version of this program. Please upgrade {0} to the latest version to use the program.
+		/// </summary>
+		internal static string NewerDatabaseVersion {
+			get {
+				
+				return ResourceManager.GetString("NewerDatabaseVersion", resourceCulture);
+			}
+		}
     }
 }

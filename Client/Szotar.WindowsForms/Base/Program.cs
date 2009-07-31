@@ -14,6 +14,18 @@ namespace Szotar.WindowsForms {
 			ToolStripManager.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
 			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
 
+			try {
+				DataStore.InitializeDatabase();
+			} catch (Szotar.Sqlite.DatabaseVersionException) {
+				MessageBox.Show(
+					string.Format(Resources.Errors.NewerDatabaseVersion, Application.ProductName),
+					Application.ProductName,
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
+
+				return;
+			}
+
 			switch (GuiConfiguration.StartupAction) {
 				case "StartPage":
 					new Forms.StartPage().Show();

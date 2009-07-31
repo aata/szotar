@@ -105,10 +105,18 @@ namespace Szotar {
 		private static Sqlite.SqliteDataStore database;
 		public static Sqlite.SqliteDataStore Database {
 			get {
-				if (database != null)
-					return database;
-				return database = new Sqlite.SqliteDataStore(IO.Path.Combine(UserDataStore.Path, "database.sqlite"));
+				InitializeDatabase();
+				return database;
 			}
+		}
+
+		/// <summary>Call this method if you need to be sure of when the database is initialized
+		/// (e.g. to catch versioning exceptions)</summary>
+		/// <remarks>Really, this should be necessary, not optional...</remarks>
+		public static void InitializeDatabase() {
+			if (database != null)
+				 return;
+			database = new Sqlite.SqliteDataStore(IO.Path.Combine(UserDataStore.Path, "database.sqlite"));
 		}
 		#endregion
 	}

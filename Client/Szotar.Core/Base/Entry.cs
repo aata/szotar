@@ -190,5 +190,23 @@ namespace Szotar {
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public Entry Clone() {
+			var clone = new Entry(Phrase, null);
+			
+			if(Translations != null) {
+				var translations = new List<Translation>(Translations.Count);
+				foreach(var t in Translations)
+					translations.Add(t);
+				clone.Translations = translations;
+			}
+
+			if(Tag != null) {
+				var tag = new EntryTag(Tag.DictionarySection, Tag.Data);
+				clone.Tag = tag;
+			}
+
+			return clone;
+		}
 	}	
 }

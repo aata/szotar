@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,23 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CannotUpgradeDatabaseToVersion" xml:space="preserve">
-    <value>Cannot upgrade the database to version {0}</value>
-  </data>
-  <data name="CouldNotLoadDictionary" xml:space="preserve">
-    <value>An error occurred when loading the dictionary {0}. The error was "{1}".</value>
-  </data>
-  <data name="ImportFailedWithMessage" xml:space="preserve">
-    <value>The import failed with the message: {1}{0}</value>
-  </data>
-  <data name="ImportHadNotBegun" xml:space="preserve">
-    <value>The import had not begun.</value>
-  </data>
-  <data name="NewerDatabaseVersion" xml:space="preserve">
-    <value>The program data was created by a newer version of this program. Please upgrade {0} to the latest version to use the program.</value>
-    <comment>{0} = Product name</comment>
-  </data>
-  <data name="TheOperationWasCancelled" xml:space="preserve">
-    <value>The operation was cancelled.</value>
-  </data>
+  <metadata name="columnHeader1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="columnHeader2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="columnHeader3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
 </root>

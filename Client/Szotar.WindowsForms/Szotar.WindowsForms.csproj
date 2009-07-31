@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Szotar.WindowsForms</RootNamespace>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <ManifestCertificateThumbprint>64261886B26FF8C8156F5EFF6718DEA9644A49EB</ManifestCertificateThumbprint>
@@ -38,6 +38,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkSubset>
+    </TargetFrameworkSubset>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -78,11 +80,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -121,6 +119,12 @@
     <Compile Include="Controls\ListSearch.designer.cs">
       <DependentUpon>ListSearch.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\LogViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\LogViewer.Designer.cs">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ProgressUI.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -138,6 +142,12 @@
     </Compile>
     <Compile Include="Controls\SearchBox.designer.cs">
       <DependentUpon>SearchBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\LogViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\LogViewerForm.Designer.cs">
+      <DependentUpon>LogViewerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Importing\DictionaryImporting.cs" />
     <Compile Include="Base\FileIsInUse.cs" />
@@ -243,6 +253,9 @@
       <DependentUpon>ListSearch.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\LogViewer.resx">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ProgressUI.resx">
       <DependentUpon>ProgressUI.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -274,6 +287,9 @@
     <EmbeddedResource Include="Forms\ListBuilder.resx">
       <DependentUpon>ListBuilder.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LogViewerForm.resx">
+      <DependentUpon>LogViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\LookupForm.resx">
       <DependentUpon>LookupForm.cs</DependentUpon>
@@ -327,11 +343,11 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Base\RtlAwareMessageBox.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Resources\Strings\Errors.Designer.cs">
       <DependentUpon>Errors.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Resources\Strings\ImporterDescriptions.Designer.cs">
       <DependentUpon>ImporterDescriptions.resx</DependentUpon>
@@ -387,6 +403,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Szotar.WindowsForms_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

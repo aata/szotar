@@ -108,12 +108,14 @@ namespace Szotar.WindowsForms.Forms {
 
 			WithUpdate(recentDictionaries, lv => {
 				lv.Items.Clear();
-				for (int i = 0; i < 6 && i < rd.Entries.Count; ++i) {
-					var item = new ListViewItem(new[] { rd.Entries[i].Name });
-					item.Tag = rd.Entries[i].Path;
-					item.Text = rd.Entries[i].Name;
-					item.ImageKey = "Dictionary";
-					lv.Items.Add(item);
+				for (int i = 0; lv.Items.Count < 6 && i < rd.Entries.Count; ++i) {
+					if (System.IO.File.Exists(rd.Entries[i].Path)) {
+						var item = new ListViewItem(new[] { rd.Entries[i].Name });
+						item.Tag = rd.Entries[i].Path;
+						item.Text = rd.Entries[i].Name;
+						item.ImageKey = "Dictionary";
+						lv.Items.Add(item);
+					}
 				}
 			});
 		}

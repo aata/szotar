@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.ComponentModel;
+using System.IO;
+using System.Text;
+using System.Threading;
+using P = System.IO.Path;
 
 namespace Szotar {
 	[TypeDescriptionProvider(typeof(LocalizedTypeDescriptionProvider<SimpleDictionary>))]
@@ -49,7 +51,9 @@ namespace Szotar {
 
 				Entry full = dictionary.GetFullEntry(stub, this);
 				stub.Translations = full.Translations;
-				stub.Tag = null;
+				
+				// Actually, this should still be kept. It allows for saving the dictionary cache.
+				//stub.Tag = null;
 			}
 		}
 		
@@ -102,7 +106,15 @@ namespace Szotar {
 		}
 
 		public SimpleDictionary(string path, bool poolStrings, bool full) {
+			var timer = new System.Diagnostics.Stopwatch();
+			timer.Start();
+
 			Path = path;
+
+			if (full && LoadCache()) {
+                Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
+				return;
+			}
 
 			var forwardsEntries = new List<Entry>();
 			var backwardsEntries = new List<Entry>();
@@ -129,8 +141,10 @@ namespace Szotar {
 					}
 					
 					if(line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
-						if(!full)
+						if (!full) {
+                            Metrics.LogMeasurement(string.Format("Loaded {0} header", this.Name), timer.Elapsed);
 							return; //We got to the actual entries in the dictionary, but we just want the headers.
+						}
 
 						string rest = Uri.UnescapeDataString(line.Substring(2));
 						switch (line[0]) {
@@ -202,6 +216,10 @@ namespace Szotar {
 				reader.Dispose();
 				reader = null;
 			}
+
+            Metrics.LogMeasurement(string.Format("Loading {0} without cache", this.Name), timer.Elapsed);
+
+			SaveCache();
 		}
 
 		protected void OpenFile() {
@@ -374,11 +392,131 @@ namespace Szotar {
 		public void Save() {
 			if (Path != null) {
 				Write(Path);
+				SaveCache();
 			} else {
 				throw new InvalidOperationException();
 			}
 		}
-		
+
+		#region Caching
+		static readonly int CacheFormatVersion = 1;
+
+		string CachePath() {
+			return P.ChangeExtension(Path, ".dict.cache");
+		}
+
+		// Saves the dictionary cache, on a separate thread.
+		void SaveCache() {
+			string path = CachePath();
+			
+			// This would be quite insane
+			if (path == Path)
+				return;
+
+			string
+				name = Name ?? string.Empty,
+				author = Author ?? string.Empty,
+				url = Url ?? string.Empty,
+				firstLanguage = FirstLanguage ?? string.Empty,
+				firstLanguageCode = FirstLanguageCode ?? string.Empty,
+				secondLanguage = SecondLanguage ?? string.Empty,
+				secondLanguageCode = SecondLanguageCode ?? string.Empty;
+
+			// We have to save a copy of the list of entries in case it gets modified while the thread is running.
+			var forwardsEntries = new List<Entry>(forwards.HeadWords);
+			foreach (var entry in forwards)
+				forwardsEntries.Add(entry.Clone());
+			var backwardsEntries = new List<Entry>(backwards.HeadWords);
+			foreach (var entry in backwards)
+				backwardsEntries.Add(entry.Clone());
+
+			new Thread(new ThreadStart(delegate {
+				Metrics.Measure("Saving {0} cache", delegate {
+				    try {
+					    using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
+						    using (var writer = new BinaryWriter(stream)) {
+							    writer.Write(CacheFormatVersion);
+
+							    foreach (var str in new[] { name, author, url, firstLanguage, firstLanguageCode, secondLanguage, secondLanguageCode })
+								    writer.Write(str);
+
+							    foreach (var section in new[] { forwardsEntries, backwardsEntries }) {
+								    writer.Write(section.Count);
+								    foreach (var entry in section) {
+									    writer.Write(entry.Phrase);
+
+									    writer.Write((long)entry.Tag.Data);
+								    }
+							    }
+						    }
+					    }
+				    } catch (IOException e) {
+					    // If we can't save the cache, it's not a huge problem.
+                        ProgramLog.Default.AddMessage(LogType.Error, "Can't save cache for dictionary {0}: {1}", name, e.Message);
+				    }
+                });
+			})).Start();
+		}
+
+		bool LoadCache() {
+			string path = CachePath();
+
+			if (path == Path || !File.Exists(path))
+				return false;
+
+			try {
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+					using (var reader = new BinaryReader(stream)) {
+						int version = reader.ReadInt32();
+
+						if (version > CacheFormatVersion)
+							return false;
+
+						this.Name = reader.ReadString();
+						this.Author = reader.ReadString();
+						this.Url = reader.ReadString();
+						this.FirstLanguage = reader.ReadString();
+						this.FirstLanguageCode = reader.ReadString();
+						this.SecondLanguage = reader.ReadString();
+						this.SecondLanguageCode = reader.ReadString();
+
+						forwards = LoadCacheSection(reader);
+						backwards = LoadCacheSection(reader);
+
+						return true;
+					}
+				}
+			} catch (IOException) { // EndOfStreamException falls into this.
+				// Maybe it's corrupt and this will fix it.
+				File.Delete(path);
+				return false;
+			}
+		}
+
+		Section LoadCacheSection(BinaryReader reader) {
+			int capacity = reader.ReadInt32();
+			
+			var entries = new List<Entry>(capacity);
+			var section = new Section(entries, this);
+
+			for (int i = 0; i < capacity; ++i) 
+				entries.Add(LoadCacheEntry(reader, section));
+
+			return section;
+		}
+
+		private Entry LoadCacheEntry(BinaryReader reader, Section section) {
+			string phrase = reader.ReadString();
+
+			//int translationCount = reader.ReadInt32();
+			//var translations = new List<Translation>(translationCount);
+			//for(int i = 0; i < translationCount; ++i)
+			//    translations.Add(new Translation(reader.ReadString()));
+
+			return new Entry(phrase, null) { Tag = new EntryTag(section, reader.ReadInt64()) };
+		}
+#endregion
+
 		#region Properties
 		[Browsable(false)]
 		public string Path { get; set; }

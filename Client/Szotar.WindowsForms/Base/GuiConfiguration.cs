@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Szotar.WindowsForms {
 	public static class GuiConfiguration {
-		static IConfiguration Default { 
+		static IConfiguration Default {
 			get { return Szotar.Configuration.Default; }
 		}
 
@@ -75,6 +75,26 @@ namespace Szotar.WindowsForms {
 			if (ListFontName == null)
 				return null;
 			return new System.Drawing.Font(ListFontName, ListFontSize);
+		}
+
+		public static bool LogViewerShowMetrics {
+			get { return Default.Get<bool>("LogViewerShowMetrics", true); }
+			set { Default.Set("LogViewerShowMetrics", value); }
+		}
+
+		public static bool LogViewerShowDebug {
+			get { return Default.Get<bool>("LogViewerShowDebug", true); }
+			set { Default.Set("LogViewerShowDebug", value); }
+		}
+
+		public static bool LogViewerShowWarnings {
+			get { return Default.Get<bool>("LogViewerShowWarnings", true); }
+			set { Default.Set("LogViewerShowWarnings", value); }
+		}
+
+		public static bool LogViewerShowErrors {
+			get { return Default.Get<bool>("LogViewerShowErrors", true); }
+			set { Default.Set("LogViewerShowErrors", value); }
 		}
 	}
 }
