@@ -491,7 +491,7 @@ namespace Szotar.Sqlite {
 				using (var txn = Connection.BeginTransaction()) {
 					ExecuteSQL(@"
 						UPDATE VocabItems 
-							SET Phrase = ?, Translation = ?,
+							SET Phrase = ?, Translation = ?
 							WHERE SetID = ? AND ListPosition = ?",
 						item.Phrase, item.Translation, 
 						list.ID, index);

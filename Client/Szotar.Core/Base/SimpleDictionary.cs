@@ -464,6 +464,14 @@ namespace Szotar {
 			if (path == Path || !File.Exists(path))
 				return false;
 
+			var dictModified = File.GetLastWriteTimeUtc(this.Path);
+			var cacheModified = File.GetLastWriteTimeUtc(path);
+			
+			if(cacheModified < dictModified) {
+				ProgramLog.Default.AddMessage(LogType.Error, "Cache file for {0} was invalid because the last write time was earlier than the dictionary file.", this.Path);
+				return false;
+			}
+
 			try {
 				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
 					using (var reader = new BinaryReader(stream)) {
