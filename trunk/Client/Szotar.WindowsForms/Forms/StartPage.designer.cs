@@ -27,51 +27,56 @@
 			System.Windows.Forms.TableLayoutPanel mainTabTable;
 			System.Windows.Forms.TableLayoutPanel recentDictionariesTable;
 			System.Windows.Forms.Label label1;
+			System.Windows.Forms.ColumnHeader recentDictionariesTitleColumn;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartPage));
 			System.Windows.Forms.TableLayoutPanel recentListsTable;
 			System.Windows.Forms.Label label3;
+			System.Windows.Forms.ColumnHeader Name;
+			System.Windows.Forms.ToolStripMenuItem openListMI;
+			System.Windows.Forms.ToolStripMenuItem practiceListMI;
 			System.Windows.Forms.Label testingLabel;
 			System.Windows.Forms.TableLayoutPanel listSearchTable;
 			System.Windows.Forms.FlowLayoutPanel listSearchButtons;
-			System.Windows.Forms.ToolStripMenuItem openListMI;
-			System.Windows.Forms.ToolStripMenuItem practiceListMI;
-			System.Windows.Forms.ColumnHeader recentDictionariesTitleColumn;
-			System.Windows.Forms.ColumnHeader Name;
+			System.Windows.Forms.Button practiceList;
+			System.Windows.Forms.Button openList;
+			System.Windows.Forms.Button newList;
 			System.Windows.Forms.ColumnHeader dictionariesNameColumn;
+			this.recentDictionaries = new Szotar.WindowsForms.Controls.ListViewNF();
 			this.imageList = new System.Windows.Forms.ImageList(this.components);
 			this.imageListSmall = new System.Windows.Forms.ImageList(this.components);
+			this.recentLists = new Szotar.WindowsForms.Controls.ListViewNF();
+			this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.practiceTable = new System.Windows.Forms.TableLayoutPanel();
 			this.reportBug = new System.Windows.Forms.LinkLabel();
-			this.practiceList = new System.Windows.Forms.Button();
-			this.openList = new System.Windows.Forms.Button();
+			this.listSearch = new Szotar.WindowsForms.Controls.ListSearch();
 			this.dictionaryTab = new System.Windows.Forms.TabPage();
+			this.dictionaries = new Szotar.WindowsForms.Controls.ListViewNF();
+			this.dictionariesSizeColumn = new System.Windows.Forms.ColumnHeader();
+			this.dictionariesAuthorColumn = new System.Windows.Forms.ColumnHeader();
 			this.practiceTab = new System.Windows.Forms.TabPage();
 			this.tasks = new System.Windows.Forms.TabControl();
 			this.mainTab = new System.Windows.Forms.TabPage();
 			this.fileSystemWatcher = new System.IO.FileSystemWatcher();
-			this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.recentDictionaries = new Szotar.WindowsForms.Controls.ListViewNF();
-			this.recentLists = new Szotar.WindowsForms.Controls.ListViewNF();
-			this.dictionaries = new Szotar.WindowsForms.Controls.ListViewNF();
-			this.dictionariesSizeColumn = new System.Windows.Forms.ColumnHeader();
-			this.dictionariesAuthorColumn = new System.Windows.Forms.ColumnHeader();
-			this.listSearch = new Szotar.WindowsForms.Controls.ListSearch();
 			mainTabTable = new System.Windows.Forms.TableLayoutPanel();
 			recentDictionariesTable = new System.Windows.Forms.TableLayoutPanel();
 			label1 = new System.Windows.Forms.Label();
+			recentDictionariesTitleColumn = new System.Windows.Forms.ColumnHeader();
 			recentListsTable = new System.Windows.Forms.TableLayoutPanel();
 			label3 = new System.Windows.Forms.Label();
+			Name = new System.Windows.Forms.ColumnHeader();
+			openListMI = new System.Windows.Forms.ToolStripMenuItem();
+			practiceListMI = new System.Windows.Forms.ToolStripMenuItem();
 			testingLabel = new System.Windows.Forms.Label();
 			listSearchTable = new System.Windows.Forms.TableLayoutPanel();
 			listSearchButtons = new System.Windows.Forms.FlowLayoutPanel();
-			openListMI = new System.Windows.Forms.ToolStripMenuItem();
-			practiceListMI = new System.Windows.Forms.ToolStripMenuItem();
-			recentDictionariesTitleColumn = new System.Windows.Forms.ColumnHeader();
-			Name = new System.Windows.Forms.ColumnHeader();
+			practiceList = new System.Windows.Forms.Button();
+			openList = new System.Windows.Forms.Button();
+			newList = new System.Windows.Forms.Button();
 			dictionariesNameColumn = new System.Windows.Forms.ColumnHeader();
 			mainTabTable.SuspendLayout();
 			recentDictionariesTable.SuspendLayout();
 			recentListsTable.SuspendLayout();
+			this.listContextMenu.SuspendLayout();
 			this.practiceTable.SuspendLayout();
 			listSearchTable.SuspendLayout();
 			listSearchButtons.SuspendLayout();
@@ -80,7 +85,6 @@
 			this.tasks.SuspendLayout();
 			this.mainTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher)).BeginInit();
-			this.listContextMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// mainTabTable
@@ -124,6 +128,24 @@
 			label1.TabIndex = 0;
 			label1.Text = "Recent Dictionaries:";
 			// 
+			// recentDictionaries
+			// 
+			this.recentDictionaries.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.recentDictionaries.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            recentDictionariesTitleColumn});
+			this.recentDictionaries.FullRowSelect = true;
+			this.recentDictionaries.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.recentDictionaries.LargeImageList = this.imageList;
+			this.recentDictionaries.Location = new System.Drawing.Point(3, 16);
+			this.recentDictionaries.Name = "recentDictionaries";
+			this.recentDictionaries.Size = new System.Drawing.Size(261, 156);
+			this.recentDictionaries.SmallImageList = this.imageListSmall;
+			this.recentDictionaries.TabIndex = 2;
+			this.recentDictionaries.UseCompatibleStateImageBehavior = false;
+			this.recentDictionaries.View = System.Windows.Forms.View.Details;
+			// 
 			// imageList
 			// 
 			this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
@@ -163,6 +185,48 @@
 			label3.Size = new System.Drawing.Size(102, 13);
 			label3.TabIndex = 0;
 			label3.Text = "Recent Word Lists:";
+			// 
+			// recentLists
+			// 
+			this.recentLists.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.recentLists.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            Name});
+			this.recentLists.ContextMenuStrip = this.listContextMenu;
+			this.recentLists.FullRowSelect = true;
+			this.recentLists.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+			this.recentLists.LargeImageList = this.imageList;
+			this.recentLists.Location = new System.Drawing.Point(3, 16);
+			this.recentLists.Name = "recentLists";
+			this.recentLists.Size = new System.Drawing.Size(262, 156);
+			this.recentLists.SmallImageList = this.imageListSmall;
+			this.recentLists.TabIndex = 3;
+			this.recentLists.UseCompatibleStateImageBehavior = false;
+			this.recentLists.View = System.Windows.Forms.View.Details;
+			// 
+			// listContextMenu
+			// 
+			this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            openListMI,
+            practiceListMI});
+			this.listContextMenu.Name = "listContextMenu";
+			this.listContextMenu.Size = new System.Drawing.Size(117, 48);
+			// 
+			// openListMI
+			// 
+			openListMI.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+			openListMI.Name = "openListMI";
+			openListMI.Size = new System.Drawing.Size(116, 22);
+			openListMI.Text = "&Open";
+			openListMI.Click += new System.EventHandler(this.openListMI_Click);
+			// 
+			// practiceListMI
+			// 
+			practiceListMI.Name = "practiceListMI";
+			practiceListMI.Size = new System.Drawing.Size(116, 22);
+			practiceListMI.Text = "&Practice";
+			practiceListMI.Click += new System.EventHandler(this.practiceListMI_Click);
 			// 
 			// practiceTable
 			// 
@@ -219,12 +283,25 @@
 			listSearchTable.Size = new System.Drawing.Size(547, 362);
 			listSearchTable.TabIndex = 5;
 			// 
+			// listSearch
+			// 
+			this.listSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.listSearch.ListContextMenuStrip = this.listContextMenu;
+			this.listSearch.Location = new System.Drawing.Point(0, 0);
+			this.listSearch.Margin = new System.Windows.Forms.Padding(0);
+			this.listSearch.MaxItems = 100;
+			this.listSearch.Name = "listSearch";
+			this.listSearch.Size = new System.Drawing.Size(547, 333);
+			this.listSearch.TabIndex = 6;
+			this.listSearch.ListsChosen += new System.EventHandler<Szotar.WindowsForms.Controls.ListsChosenEventArgs>(this.listSearch_ListsChosen);
+			// 
 			// listSearchButtons
 			// 
 			listSearchButtons.AutoSize = true;
 			listSearchButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			listSearchButtons.Controls.Add(this.practiceList);
-			listSearchButtons.Controls.Add(this.openList);
+			listSearchButtons.Controls.Add(practiceList);
+			listSearchButtons.Controls.Add(openList);
+			listSearchButtons.Controls.Add(newList);
 			listSearchButtons.Dock = System.Windows.Forms.DockStyle.Fill;
 			listSearchButtons.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
 			listSearchButtons.Location = new System.Drawing.Point(0, 333);
@@ -235,23 +312,38 @@
 			// 
 			// practiceList
 			// 
-			this.practiceList.Location = new System.Drawing.Point(469, 3);
-			this.practiceList.Name = "practiceList";
-			this.practiceList.Size = new System.Drawing.Size(75, 23);
-			this.practiceList.TabIndex = 7;
-			this.practiceList.Text = "&Practice";
-			this.practiceList.UseVisualStyleBackColor = true;
-			this.practiceList.Click += new System.EventHandler(this.practiceList_Click);
+			practiceList.Location = new System.Drawing.Point(469, 3);
+			practiceList.Name = "practiceList";
+			practiceList.Size = new System.Drawing.Size(75, 23);
+			practiceList.TabIndex = 9;
+			practiceList.Text = "&Practice";
+			practiceList.UseVisualStyleBackColor = true;
+			practiceList.Click += new System.EventHandler(this.practiceList_Click);
 			// 
 			// openList
 			// 
-			this.openList.Location = new System.Drawing.Point(388, 3);
-			this.openList.Name = "openList";
-			this.openList.Size = new System.Drawing.Size(75, 23);
-			this.openList.TabIndex = 6;
-			this.openList.Text = "&Open";
-			this.openList.UseVisualStyleBackColor = true;
-			this.openList.Click += new System.EventHandler(this.openList_Click);
+			openList.Location = new System.Drawing.Point(388, 3);
+			openList.Name = "openList";
+			openList.Size = new System.Drawing.Size(75, 23);
+			openList.TabIndex = 8;
+			openList.Text = "&Open";
+			openList.UseVisualStyleBackColor = true;
+			openList.Click += new System.EventHandler(this.openList_Click);
+			// 
+			// newList
+			// 
+			newList.Location = new System.Drawing.Point(307, 3);
+			newList.Name = "newList";
+			newList.Size = new System.Drawing.Size(75, 23);
+			newList.TabIndex = 7;
+			newList.Text = "&New";
+			newList.UseVisualStyleBackColor = true;
+			newList.Click += new System.EventHandler(this.newList_Click);
+			// 
+			// dictionariesNameColumn
+			// 
+			dictionariesNameColumn.Text = "Name";
+			dictionariesNameColumn.Width = 312;
 			// 
 			// dictionaryTab
 			// 
@@ -263,6 +355,36 @@
 			this.dictionaryTab.TabIndex = 0;
 			this.dictionaryTab.Text = "Dictionaries";
 			this.dictionaryTab.UseVisualStyleBackColor = true;
+			// 
+			// dictionaries
+			// 
+			this.dictionaries.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            dictionariesNameColumn,
+            this.dictionariesSizeColumn,
+            this.dictionariesAuthorColumn});
+			this.dictionaries.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.dictionaries.FullRowSelect = true;
+			this.dictionaries.LargeImageList = this.imageList;
+			this.dictionaries.Location = new System.Drawing.Point(3, 3);
+			this.dictionaries.MultiSelect = false;
+			this.dictionaries.Name = "dictionaries";
+			this.dictionaries.ShowItemToolTips = true;
+			this.dictionaries.Size = new System.Drawing.Size(547, 362);
+			this.dictionaries.SmallImageList = this.imageListSmall;
+			this.dictionaries.TabIndex = 5;
+			this.dictionaries.UseCompatibleStateImageBehavior = false;
+			this.dictionaries.View = System.Windows.Forms.View.Details;
+			this.dictionaries.ItemActivate += new System.EventHandler(this.OnDictionaryItemActivate);
+			// 
+			// dictionariesSizeColumn
+			// 
+			this.dictionariesSizeColumn.Text = "Entries";
+			this.dictionariesSizeColumn.Width = 75;
+			// 
+			// dictionariesAuthorColumn
+			// 
+			this.dictionariesAuthorColumn.Text = "Author";
+			this.dictionariesAuthorColumn.Width = 134;
 			// 
 			// practiceTab
 			// 
@@ -305,113 +427,6 @@
 			this.fileSystemWatcher.IncludeSubdirectories = true;
 			this.fileSystemWatcher.SynchronizingObject = this;
 			// 
-			// listContextMenu
-			// 
-			this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            openListMI,
-            practiceListMI});
-			this.listContextMenu.Name = "listContextMenu";
-			this.listContextMenu.Size = new System.Drawing.Size(153, 70);
-			// 
-			// openListMI
-			// 
-			openListMI.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-			openListMI.Name = "openListMI";
-			openListMI.Size = new System.Drawing.Size(152, 22);
-			openListMI.Text = "&Open";
-			openListMI.Click += new System.EventHandler(this.openListMI_Click);
-			// 
-			// practiceListMI
-			// 
-			practiceListMI.Name = "practiceListMI";
-			practiceListMI.Size = new System.Drawing.Size(152, 22);
-			practiceListMI.Text = "&Practice";
-			practiceListMI.Click += new System.EventHandler(this.practiceListMI_Click);
-			// 
-			// recentDictionaries
-			// 
-			this.recentDictionaries.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.recentDictionaries.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            recentDictionariesTitleColumn});
-			this.recentDictionaries.FullRowSelect = true;
-			this.recentDictionaries.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-			this.recentDictionaries.LargeImageList = this.imageList;
-			this.recentDictionaries.Location = new System.Drawing.Point(3, 16);
-			this.recentDictionaries.Name = "recentDictionaries";
-			this.recentDictionaries.Size = new System.Drawing.Size(261, 156);
-			this.recentDictionaries.SmallImageList = this.imageListSmall;
-			this.recentDictionaries.TabIndex = 1;
-			this.recentDictionaries.UseCompatibleStateImageBehavior = false;
-			this.recentDictionaries.View = System.Windows.Forms.View.Details;
-			// 
-			// recentLists
-			// 
-			this.recentLists.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.recentLists.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            Name});
-			this.recentLists.ContextMenuStrip = this.listContextMenu;
-			this.recentLists.FullRowSelect = true;
-			this.recentLists.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-			this.recentLists.LargeImageList = this.imageList;
-			this.recentLists.Location = new System.Drawing.Point(3, 16);
-			this.recentLists.Name = "recentLists";
-			this.recentLists.Size = new System.Drawing.Size(262, 156);
-			this.recentLists.SmallImageList = this.imageListSmall;
-			this.recentLists.TabIndex = 1;
-			this.recentLists.UseCompatibleStateImageBehavior = false;
-			this.recentLists.View = System.Windows.Forms.View.Details;
-			// 
-			// dictionaries
-			// 
-			this.dictionaries.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            dictionariesNameColumn,
-            this.dictionariesSizeColumn,
-            this.dictionariesAuthorColumn});
-			this.dictionaries.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.dictionaries.FullRowSelect = true;
-			this.dictionaries.LargeImageList = this.imageList;
-			this.dictionaries.Location = new System.Drawing.Point(3, 3);
-			this.dictionaries.MultiSelect = false;
-			this.dictionaries.Name = "dictionaries";
-			this.dictionaries.ShowItemToolTips = true;
-			this.dictionaries.Size = new System.Drawing.Size(547, 362);
-			this.dictionaries.SmallImageList = this.imageListSmall;
-			this.dictionaries.TabIndex = 0;
-			this.dictionaries.UseCompatibleStateImageBehavior = false;
-			this.dictionaries.View = System.Windows.Forms.View.Details;
-			this.dictionaries.ItemActivate += new System.EventHandler(this.OnDictionaryItemActivate);
-			// 
-			// dictionariesNameColumn
-			// 
-			dictionariesNameColumn.Text = "Name";
-			dictionariesNameColumn.Width = 312;
-			// 
-			// dictionariesSizeColumn
-			// 
-			this.dictionariesSizeColumn.Text = "Entries";
-			this.dictionariesSizeColumn.Width = 75;
-			// 
-			// dictionariesAuthorColumn
-			// 
-			this.dictionariesAuthorColumn.Text = "Author";
-			this.dictionariesAuthorColumn.Width = 134;
-			// 
-			// listSearch
-			// 
-			this.listSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.listSearch.ListContextMenuStrip = this.listContextMenu;
-			this.listSearch.Location = new System.Drawing.Point(0, 0);
-			this.listSearch.Margin = new System.Windows.Forms.Padding(0);
-			this.listSearch.MaxItems = 100;
-			this.listSearch.Name = "listSearch";
-			this.listSearch.Size = new System.Drawing.Size(547, 333);
-			this.listSearch.TabIndex = 12;
-			this.listSearch.ListsChosen += new System.EventHandler<Szotar.WindowsForms.Controls.ListsChosenEventArgs>(this.listSearch_ListsChosen);
-			// 
 			// StartPage
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -430,6 +445,7 @@
 			recentDictionariesTable.PerformLayout();
 			recentListsTable.ResumeLayout(false);
 			recentListsTable.PerformLayout();
+			this.listContextMenu.ResumeLayout(false);
 			this.practiceTable.ResumeLayout(false);
 			this.practiceTable.PerformLayout();
 			listSearchTable.ResumeLayout(false);
@@ -440,7 +456,6 @@
 			this.tasks.ResumeLayout(false);
 			this.mainTab.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher)).EndInit();
-			this.listContextMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -462,8 +477,6 @@
 		private System.Windows.Forms.TableLayoutPanel practiceTable;
 		private System.Windows.Forms.LinkLabel reportBug;
 		private Szotar.WindowsForms.Controls.ListSearch listSearch;
-		private System.Windows.Forms.Button practiceList;
-		private System.Windows.Forms.Button openList;
 		private System.Windows.Forms.ContextMenuStrip listContextMenu;
 
 	}

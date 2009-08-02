@@ -311,6 +311,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void deleteList_Click(object sender, EventArgs e) {
+			// TODO: Confirm this (it can't yet be undone)
 			list.DeleteWordList();
 
 			//The form will close automatically, because deleting the list will 
@@ -365,6 +366,9 @@ namespace Szotar.WindowsForms.Forms {
 
 					last = c;
 				}
+
+				if (cur.Length > 0)
+					line.Add(cur.ToString());
 			}
 
 			if (line.Count > 0)
@@ -400,10 +404,10 @@ namespace Szotar.WindowsForms.Forms {
 			csv = ParseCSV(',', text, out validCSV);
 			tsv = ParseCSV('\t', text, out validTSV);
 
-			if (validCSV >= validTSV)
-				Paste(csv);
-			else
+			if (validTSV >= validCSV)
 				Paste(tsv);
+			else
+				Paste(csv);
 		}
 	}
 }

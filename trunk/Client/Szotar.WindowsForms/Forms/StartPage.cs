@@ -206,6 +206,10 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region List Search
+		private void newList_Click(object sender, EventArgs e) {
+			new ListBuilder().Show();
+		}
+
 		private void openList_Click(object sender, EventArgs e) {
 			OpenLists(listSearch.Accept());
 		}
