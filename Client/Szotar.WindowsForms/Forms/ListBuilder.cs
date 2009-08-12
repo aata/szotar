@@ -409,5 +409,14 @@ namespace Szotar.WindowsForms.Forms {
 			else
 				Paste(csv);
 		}
+
+		private void practiceThis_Click(object sender, EventArgs e) {
+			if (!list.ID.HasValue) {
+				ProgramLog.Default.AddMessage(LogType.Error, "WordList {0} has no ID", list.Name);
+				return;
+			}
+
+			PracticeWindow.OpenNewSession(new[] { new ListSearchResult(list.ID.Value) });
+		}
 	}
 }

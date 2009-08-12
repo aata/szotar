@@ -363,8 +363,8 @@ namespace Szotar.WindowsForms {
 
 		protected IEnumerable<ToolStripItem> Buttons {
 			get {
-				yield return back;
 				yield return fore;
+				yield return back;
 				yield return end;
 				yield return edit;
 				if (swap != null)

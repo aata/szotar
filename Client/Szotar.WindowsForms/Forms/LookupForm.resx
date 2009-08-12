@@ -597,6 +597,9 @@
   <data name="ignoreCaseCheck.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="ignoreCaseCheck.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="ignoreCaseCheck.Location" type="System.Drawing.Point, System.Drawing">
     <value>217, 3</value>
   </data>
@@ -681,11 +684,11 @@
   <data name="mainMenu.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>None</value>
   </data>
+  <data name="mainMenu.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 9pt</value>
+  </data>
   <data name="mainMenu.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
-  </data>
-  <data name="mainMenu.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>7, 2, 0, 2</value>
   </data>
   <data name="mainMenu.Size" type="System.Drawing.Size, System.Drawing">
     <value>700, 24</value>
@@ -743,6 +746,9 @@
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Verdana, 8.25pt</value>
+  </data>
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Dictionary Lookup</value>
@@ -939,6 +945,12 @@
   <data name="&gt;&gt;charMap.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;debugLog.Name" xml:space="preserve">
+    <value>debugLog</value>
+  </data>
+  <data name="&gt;&gt;debugLog.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;toolStripSeparator3.Name" xml:space="preserve">
     <value>toolStripSeparator3</value>
   </data>
@@ -967,12 +979,6 @@
     <value>addTo</value>
   </data>
   <data name="&gt;&gt;addTo.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;debugLog.Name" xml:space="preserve">
-    <value>debugLog</value>
-  </data>
-  <data name="&gt;&gt;debugLog.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

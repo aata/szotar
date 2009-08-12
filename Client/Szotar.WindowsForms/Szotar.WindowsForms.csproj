@@ -17,6 +17,8 @@
     <GenerateManifests>true</GenerateManifests>
     <SignManifests>true</SignManifests>
     <ApplicationIcon>dictionary.ico</ApplicationIcon>
+    <TargetFrameworkSubset>
+    </TargetFrameworkSubset>
     <PublishUrl>ftp://szotar.asztal.net/clickonce/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -38,8 +40,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkSubset>
-    </TargetFrameworkSubset>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\DisposableComponent.cs" />
+    <Compile Include="Base\Errors.cs" />
     <Compile Include="Base\GuiConfiguration.cs" />
     <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\Practice.cs">
