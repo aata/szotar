@@ -4,6 +4,10 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
+// Thanks for fixes:
+//  * Marco Minerva, jachymko - http://www.codeplex.com/windowsformsaero
+//  * Ben Ryves - http://www.benryves.com/
+
 namespace Szotar.WindowsForms {
 	public enum ToolbarTheme {
 		Toolbar,
@@ -126,7 +130,7 @@ namespace Szotar.WindowsForms {
 		private static int GetItemState(ToolStripItem item) {
 			bool hot = item.Selected;
 
-			if (item.Owner.IsDropDown) {
+			if (item.IsOnDropDown) {
 				if (item.Enabled)
 					return hot ? (int)MenuPopupItemStates.Hover : (int)MenuPopupItemStates.Normal;
 				return hot ? (int)MenuPopupItemStates.DisabledHover : (int)MenuPopupItemStates.Disabled;
@@ -204,7 +208,7 @@ namespace Szotar.WindowsForms {
 			foreach (Control control in toolStripPanel.Controls)
 				if (control is ToolStrip)
 					Initialize((ToolStrip)control);
-			
+
 			base.InitializePanel(toolStripPanel);
 		}
 
@@ -230,18 +234,27 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
+		Rectangle GetBackgroundRectangle(ToolStripItem item) {
+			if (!item.IsOnDropDown)
+				return new Rectangle(new Point(), item.Bounds.Size);
+
+			// For a drop-down menu item, the background rectangles of the items should be touching.
+			// This ensures that's the case.
+			Rectangle rect = item.Bounds;
+			rect.X = item.ContentRectangle.X;
+			rect.Width = item.ContentRectangle.Width;
+			
+			// We're already in the co-ordinate space of e.Bounds, so we need Y to be 0.
+			rect.Y = 0;
+			return rect;
+		}
+
 		protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e) {
 			if (EnsureRenderer()) {
-				int partID = e.Item.Owner.IsDropDown ? (int)MenuParts.PopupItem : (int)MenuParts.BarItem;
+				int partID = e.Item.IsOnDropDown ? (int)MenuParts.PopupItem : (int)MenuParts.BarItem;
 				renderer.SetParameters(MenuClass, partID, GetItemState(e.Item));
 
-				Rectangle bgRect = e.Item.ContentRectangle;
-
-				//e.Item.Bounds is actually in the co-ordinate space of the owning toolstrip.
-				//It seems that, in this method, (0, 0) corresponds to the top left of that rectangle.
-				if (!e.Item.Owner.IsDropDown)
-					bgRect = new Rectangle(new Point(), e.Item.Bounds.Size);
-
+				Rectangle bgRect = GetBackgroundRectangle(e.Item);
 				renderer.DrawBackground(e.Graphics, bgRect, bgRect);
 			} else {
 				base.OnRenderMenuItemBackground(e);
@@ -359,7 +372,8 @@ namespace Szotar.WindowsForms {
 					//based on whether or not it's RTL. (It doesn't need to be narrowed to an edge in LTR mode, but let's
 					//do that anyway.)
 					//Using the DisplayRectangle gets roughly the right size so that the separator is closer to the text.
-					int extraWidth = (e.ToolStrip.Width - e.ToolStrip.DisplayRectangle.Width) - e.AffectedBounds.Width;
+					Padding margins = GetThemeMargins(e.Graphics, MarginTypes.Sizing);
+					int extraWidth = (e.ToolStrip.Width - e.ToolStrip.DisplayRectangle.Width - margins.Left - margins.Right - 1) - e.AffectedBounds.Width;
 					Rectangle rect = e.AffectedBounds;
 					rect.Y += 2;
 					rect.Height -= 4;
@@ -391,29 +405,25 @@ namespace Szotar.WindowsForms {
 		//ToolStrip gets the wrong sizes for most of its items, so it could be difficult to get it to draw correctly.
 		protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e) {
 			if (EnsureRenderer()) {
-				Rectangle rect = e.Item.ContentRectangle;
-				rect.Width = rect.Height;
-
-				//Center the checkmark horizontally in the gutter (looks ugly, though)
-				//rect.X = (e.ToolStrip.DisplayRectangle.Left - rect.Width) / 2;
+				Rectangle bgRect = GetBackgroundRectangle(e.Item);
+				bgRect.Width = bgRect.Height;
+				bgRect.X++;
 
 				//Now, mirror its position if the menu item is RTL.
 				if (e.Item.RightToLeft == RightToLeft.Yes)
-					rect = new Rectangle(e.ToolStrip.ClientSize.Width - rect.X - rect.Width, rect.Y, rect.Width, rect.Height);
+					bgRect = new Rectangle(e.ToolStrip.ClientSize.Width - bgRect.X - bgRect.Width, bgRect.Y, bgRect.Width, bgRect.Height);
 
 				renderer.SetParameters(MenuClass, (int)MenuParts.PopupCheckBackground, e.Item.Enabled ? (int)MenuPopupCheckBackgroundStates.Normal : (int)MenuPopupCheckBackgroundStates.Disabled);
-				renderer.DrawBackground(e.Graphics, rect);
+				renderer.DrawBackground(e.Graphics, bgRect);
 
-				Padding margins = GetThemeMargins(e.Graphics, MarginTypes.Sizing);
-
-				rect = new Rectangle(rect.X + margins.Left, rect.Y + margins.Top,
-					rect.Width - margins.Horizontal,
-					rect.Height - margins.Vertical);
+				Rectangle checkRect = e.ImageRectangle;
+				checkRect.X = bgRect.X + bgRect.Width / 2 - checkRect.Width / 2;
+				checkRect.Y = bgRect.Y + bgRect.Height / 2 - checkRect.Height / 2;
 
 				//I don't think ToolStrip even supports radio box items, so no need to render them.
 				renderer.SetParameters(MenuClass, (int)MenuParts.PopupCheck, e.Item.Enabled ? (int)MenuPopupCheckStates.CheckmarkNormal : (int)MenuPopupCheckStates.CheckmarkDisabled);
 
-				renderer.DrawBackground(e.Graphics, rect);
+				renderer.DrawBackground(e.Graphics, checkRect);
 			} else {
 				base.OnRenderItemCheck(e);
 			}
