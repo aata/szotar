@@ -67,16 +67,25 @@ namespace Szotar.WindowsForms.Resources {
             get {
                 return ResourceManager.GetString("CannotUpgradeDatabaseToVersion", resourceCulture);
             }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An error occurred when loading the dictionary {0}. The error was &quot;{1}&quot;..
-        /// </summary>
-        internal static string CouldNotLoadDictionary {
-            get {
-                return ResourceManager.GetString("CouldNotLoadDictionary", resourceCulture);
-            }
-        }
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to An error occurred when loading the dictionary {0}. The error was &quot;{1}&quot;..
+		/// </summary>
+		internal static string CouldNotLoadDictionary {
+			get {
+				return ResourceManager.GetString("CouldNotLoadDictionary", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to Error opening dictionary
+		/// </summary>
+		internal static string CouldNotLoadDictionaryCaption {
+			get {
+				return ResourceManager.GetString("CouldNotLoadDictionaryCaption", resourceCulture);
+			}
+		}
         
         /// <summary>
         ///   Looks up a localized string similar to Error saving list.

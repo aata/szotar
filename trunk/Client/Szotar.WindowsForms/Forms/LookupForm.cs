@@ -659,17 +659,17 @@ namespace Szotar.WindowsForms.Forms {
 			}
 
 			//Add new entries
-			var mru = GuiConfiguration.RecentDictionaries;
+			var mru = GuiConfiguration.RecentDictionaries.Entries;
 			var index = items.IndexOf(exitMenuItem);
 			if (index == -1)
 				index = items.Count;
 
 			int count = 0;
-			for (int i = 0; i < mru.Entries.Count; ++i) {
-				var info = mru.Entries[i];
-				if (info.Path != this.Dictionary.Path) {
+			for (int i = 0; i < mru.Count; ++i) {
+				var info = mru[i];
+				if (info.Path != this.Dictionary.Path && System.IO.File.Exists(info.Path)) {
 					var item = new ToolStripMenuItem(
-						mru.Entries[i].Name, 
+						mru[i].Name, 
 						null, 
 						delegate { OpenDictionary(info); }
 						);
@@ -798,13 +798,9 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void OpenRecentFile(object sender, EventArgs e) {
-			try {
-				ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
-				if(info.ID.HasValue)
-					ListBuilder.Open(info.ID.Value);
-			} catch (System.IO.IOException x) {
-				MessageBox.Show(x.Message);
-			}
+			ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
+			if(info.ID.HasValue)
+				ListBuilder.Open(info.ID.Value);
 		}
 		#endregion
 
@@ -970,16 +966,24 @@ namespace Szotar.WindowsForms.Forms {
 			return null;
 		}
 
-		public static LookupForm OpenDictionary(DictionaryInfo dict) {
+		public static void OpenDictionary(DictionaryInfo dict) {
+			if (dict == null)
+				return;
+
 			var existing = FindExisting(dict.Path);
 			if(existing != null) {
 				existing.BringToFront();
-				return existing;
+				return;
 			}
 
-			existing = new LookupForm(dict);
-			existing.Show();
-			return existing;
+			try {
+				existing = new LookupForm(dict);
+				existing.Show();
+			} catch (System.IO.IOException e) {
+				Errors.CouldNotLoadDictionary(dict, e);
+			} catch (DictionaryLoadException e) {
+				Errors.CouldNotLoadDictionary(dict, e);
+			}
 		}
 
 		public static LookupForm OpenDictionary(string path) {

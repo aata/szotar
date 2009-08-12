@@ -32,6 +32,7 @@
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 			System.Windows.Forms.ToolStripMenuItem copyAsMenu;
+			System.Windows.Forms.ToolStripMenuItem practice;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListBuilder));
 			this.namePanel = new System.Windows.Forms.Panel();
 			this.name = new System.Windows.Forms.TextBox();
@@ -57,6 +58,7 @@
 			this.meta = new System.Windows.Forms.Panel();
 			this.shadow = new System.Windows.Forms.PictureBox();
 			this.icon = new System.Windows.Forms.PictureBox();
+			this.practiceThis = new System.Windows.Forms.ToolStripMenuItem();
 			this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
 			nameLabel = new System.Windows.Forms.Label();
 			authorLabel = new System.Windows.Forms.Label();
@@ -66,6 +68,7 @@
 			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			copyAsMenu = new System.Windows.Forms.ToolStripMenuItem();
+			practice = new System.Windows.Forms.ToolStripMenuItem();
 			metaFlow.SuspendLayout();
 			this.namePanel.SuspendLayout();
 			this.authorPanel.SuspendLayout();
@@ -118,7 +121,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(13642, 60);
+			metaFlow.Size = new System.Drawing.Size(14364, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -291,7 +294,8 @@
 			// 
 			this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             listMenu,
-            copyAsMenu});
+            copyAsMenu,
+            practice});
 			this.mainMenu.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
 			this.mainMenu.Location = new System.Drawing.Point(0, 0);
 			this.mainMenu.Name = "mainMenu";
@@ -356,12 +360,29 @@
 			this.icon.TabIndex = 0;
 			this.icon.TabStop = false;
 			// 
+			// practice
+			// 
+			practice.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.practiceThis});
+			practice.Name = "practice";
+			practice.Size = new System.Drawing.Size(61, 20);
+			practice.Text = "&Practice";
+			// 
+			// practiceThis
+			// 
+			this.practiceThis.Name = "practiceThis";
+			this.practiceThis.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+			this.practiceThis.Size = new System.Drawing.Size(158, 22);
+			this.practiceThis.Text = "&This List";
+			this.practiceThis.Click += new System.EventHandler(this.practiceThis_Click);
+			// 
 			// grid
 			// 
 			this.grid.AllowNewItems = true;
 			this.grid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
+			this.grid.ColumnRatio = 0.5F;
 			this.grid.DataSource = null;
 			this.grid.ItemContextMenu = this.itemContextMenu;
 			this.grid.Location = new System.Drawing.Point(0, 24);
@@ -429,5 +450,6 @@
 		private System.Windows.Forms.ToolStripMenuItem swapAll;
 		private System.Windows.Forms.MenuStrip mainMenu;
 		private System.Windows.Forms.ToolStripMenuItem showStartPage;
+		private System.Windows.Forms.ToolStripMenuItem practiceThis;
 	}
 }

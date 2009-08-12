@@ -108,7 +108,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			WithUpdate(recentDictionaries, lv => {
 				lv.Items.Clear();
-				for (int i = 0; lv.Items.Count < 6 && i < rd.Entries.Count; ++i) {
+				for (int i = 0; i < rd.Entries.Count; ++i) {
 					if (System.IO.File.Exists(rd.Entries[i].Path)) {
 						var item = new ListViewItem(new[] { rd.Entries[i].Name });
 						item.Tag = rd.Entries[i].Path;
@@ -295,17 +295,7 @@ namespace Szotar.WindowsForms.Forms {
 		private void OnDictionaryItemActivate(object sender, EventArgs e) {
 			DictionaryInfo dict = dictionaries.SelectedItems[0].Tag as DictionaryInfo;
 
-			try {
-				LookupForm.OpenDictionary(dict);
-			} catch (DictionaryLoadException ex) {
-				MessageBox.Show(this,
-					string.Format(
-						CultureInfo.CurrentUICulture, 
-						Resources.Errors.CouldNotLoadDictionary,
-						dict.Name, 
-						ex.Message),
-					ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
+			LookupForm.OpenDictionary(dict);
 		}
 
 		public static StartPage ShowStartPage(StartPageTab? tab) {

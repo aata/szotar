@@ -121,10 +121,15 @@
     <value>Cannot upgrade the database to version {0}</value>
   </data>
   <data name="CouldNotLoadDictionary" xml:space="preserve">
-    <value>An error occurred when loading the dictionary {0}. The error was "{1}".</value>
+    <value>The dictionary \"{0}\" could not be loaded: perhaps the file has been moved or deleted?</value>
+    <comment>{0} = Dictionary name or path</comment>
+  </data>
+  <data name="CouldNotLoadDictionaryCaption" xml:space="preserve">
+    <value>Error opening dictionary</value>
   </data>
   <data name="ImportFailedWithMessage" xml:space="preserve">
     <value>The import failed with the message: {1}{0}</value>
+    <comment>{1} = \n\n</comment>
   </data>
   <data name="ImportHadNotBegun" xml:space="preserve">
     <value>The import had not begun.</value>

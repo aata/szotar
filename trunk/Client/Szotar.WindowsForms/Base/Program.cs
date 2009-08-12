@@ -17,13 +17,8 @@ namespace Szotar.WindowsForms {
 
 			try {
 				DataStore.InitializeDatabase();
-			} catch (Szotar.Sqlite.DatabaseVersionException) {
-				MessageBox.Show(
-					string.Format(Resources.Errors.NewerDatabaseVersion, Application.ProductName),
-					Application.ProductName,
-					MessageBoxButtons.OK,
-					MessageBoxIcon.Error);
-
+			} catch (Szotar.Sqlite.DatabaseVersionException e) {
+				Errors.NewerDatabaseVersion(e);
 				return;
 			}
 
