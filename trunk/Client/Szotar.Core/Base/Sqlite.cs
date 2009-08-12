@@ -216,12 +216,11 @@ namespace Szotar.Sqlite {
 		}
 
 		protected override void IncrementalUpgradeSchema(int toVersion) {
-			if (toVersion == 1)
-				InitDatabase();
-			if (toVersion == 2)
-				UpgradePracticeSchema();
-			else
-				throw new ArgumentOutOfRangeException("toVersion");
+			switch (toVersion) {
+				case 1: InitDatabase(); break;
+				case 2: UpgradePracticeSchema(); break;
+				default: throw new ArgumentOutOfRangeException("toVersion");
+			}
 		}
 
 		// Initialize the database to schema version 1, the initial version.
