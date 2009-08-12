@@ -238,13 +238,16 @@ namespace Szotar.WindowsForms {
 			if (!item.IsOnDropDown)
 				return new Rectangle(new Point(), item.Bounds.Size);
 
-			// For a drop-down menu item, the background rectangles of the items should be touching.
+			// For a drop-down menu item, the background rectangles of the items should be touching vertically.
 			// This ensures that's the case.
 			Rectangle rect = item.Bounds;
-			rect.X = item.ContentRectangle.X;
-			rect.Width = item.ContentRectangle.Width;
+
+			// The background rectangle should be inset two pixels horizontally (on both sides), but we have 
+			// to take into account the border.
+			rect.X = item.ContentRectangle.X + 1;
+			rect.Width = item.ContentRectangle.Width - 1;
 			
-			// We're already in the co-ordinate space of e.Bounds, so we need Y to be 0.
+			// Make sure we're using all of the vertical space, so that the edges touch.
 			rect.Y = 0;
 			return rect;
 		}
@@ -401,13 +404,10 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
-		//Currently the check mark looks a bit odd in most configurations because the icon isn't scaled very well.
-		//ToolStrip gets the wrong sizes for most of its items, so it could be difficult to get it to draw correctly.
 		protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e) {
 			if (EnsureRenderer()) {
 				Rectangle bgRect = GetBackgroundRectangle(e.Item);
 				bgRect.Width = bgRect.Height;
-				bgRect.X++;
 
 				//Now, mirror its position if the menu item is RTL.
 				if (e.Item.RightToLeft == RightToLeft.Yes)
