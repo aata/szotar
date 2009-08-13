@@ -170,7 +170,33 @@ namespace Szotar.WindowsForms.Controls {
 
 		void grid_KeyUp(object sender, KeyEventArgs e) {
 			if (e.KeyCode == Keys.Delete && e.Modifiers == Keys.None) {
-				source.RemoveAt(SelectedIndices);
+				// When the delete key is pressed, the selected rows are deleted. To do this, we don't actually delete the rows 
+				// from the grid: we delete the rows from the DataSource, and let the binding take care of the rest.
+				// 
+				// There's a snag, however: the editing row. If a row is in edit and hasn't been added to the list yet (i.e. rowInEdit >= source.Count)
+				// then we can't actually delete it from the data source. So we delete it from the grid. However, this raises a slight problem too: when
+				// the cell is deleted, the selection moves onto another cell -- we could end up deleting that cell, too, if we're not careful.
+				// 
+				// To mitigate this, we use the InternalSelectedIndices, not SelectedIndices: this returns the editing row too, unlike SelectedIndices.
+				// Then we remove the editing row, delete it, and use the previous selection to guide us in what else to delete.
+
+				var rowsToDelete = new List<int>(InternalSelectedIndices);
+
+				Debug.Print("Deleting rows:");
+				foreach (int row in rowsToDelete) {
+					Debug.Print("  Row {0}: {1} -- {2}{3}", 
+						row, 
+						grid[0, row].Value,
+						grid[1, row].Value, 
+						row == rowInEdit ? " (being edited)" : "");
+				}				
+
+				if (rowInEdit.HasValue && rowInEdit.Value >= source.Count) {
+					rowsToDelete.Remove(rowInEdit.Value);
+					grid.Rows.RemoveAt(rowInEdit.Value);
+				}
+
+				source.RemoveAt(rowsToDelete);
 				e.Handled = true;
 			} else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control) {
 				source.Undo();
@@ -185,25 +211,9 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		void grid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e) {
-			e.Cancel = true; //Handled by KeyUp event
-			return;
-
-			if (source == null)
-				return;
-
-			if (e.Row.Index < source.Count) {
-				//If the user has deleted an existing row, remove the
-				//corresponding TranslationPair object from the data source.
-				//Suppress the ListChangedType.ItemRemoved event.
-				ignoreNextListChangedEvent = true;
-				if(e.Row.Index < source.Count) //We can't remove the editing row from the data source!
-					source.RemoveAt(e.Row.Index);
-			} else {
-				//If the user has deleted a newly created row, release
-				//the corresponding TranslationPair object.
-				rowInEdit = null;
-				pairInEdit = null;
-			}
+			// This is handled by the KeyUp event now.
+			Debug.Print("Warning: UserDeletingRow fired (shouldn't this event have already been processed?)");
+			e.Cancel = true; 
 		}
 
 		void grid_CancelRowEdit(object sender, QuestionEventArgs e) {
@@ -282,6 +292,8 @@ namespace Szotar.WindowsForms.Controls {
 		void grid_NewRowNeeded(object sender, DataGridViewRowEventArgs e) {
 			pairInEdit = new WordListEntry(null);
 			rowInEdit = grid.Rows.Count - 1;
+
+			Debug.Print("New row added to the grid: e.Row = {0}, rowInEdit = {1}", e.Row, rowInEdit.Value);
 		}
 
 		//Called when the user enters data for a cell and commits that change.
@@ -419,14 +431,30 @@ namespace Szotar.WindowsForms.Controls {
 		#endregion
 
 		#region Selection
+		/// <summary>Works like SelectedIndices, but returns the New Row too, if it is selected.</summary>
+		/// <remarks>The DataGridView.SelectedRows property is inefficient: it can cause shared rows
+		/// to become unshared, for one. It should be avoided.</remarks>
+		protected IEnumerable<int> InternalSelectedIndices {
+			get {
+				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+					index >= 0;
+					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) 
+				{
+					yield return index;
+				}
+			}
+		}
+
+		/// <summary>Returns the indices of the selected rows on the grid, in ascending order. 
+		/// If there is a New Row that has not yet been added to the data source, it is not included.</summary>
 		public IEnumerable<int> SelectedIndices {
 			get {
-				// SelectedRows can be inefficient.
 				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
 					index >= 0;
 					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
 				{
-					yield return index;
+					if(index < source.Count)
+						yield return index;
 				}
 			}
 		}
