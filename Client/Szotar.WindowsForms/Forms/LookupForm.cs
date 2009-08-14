@@ -555,6 +555,9 @@ namespace Szotar.WindowsForms.Forms {
 					int n = 0;
 					foreach(var rsr in otherSide.Search(t.Value, false, false)) {
 						if (rsr.MatchType == MatchType.PerfectMatch) {
+							if (rsr.Entry.Translations == null)
+								otherSide.GetFullEntry(rsr.Entry);
+
 							foreach (var tr in rsr.Entry.Translations) {
 								if (n++ > 0)
 									sb.Append(", ");
