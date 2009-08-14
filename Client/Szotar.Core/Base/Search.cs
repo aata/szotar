@@ -34,7 +34,7 @@ namespace Szotar {
 
 		public string Translation {
 			get {
-				if (Entry.Translations == null && Entry.Tag != null)
+				if (Entry.Translations == null)
 					Entry.Tag.DictionarySection.GetFullEntry(Entry);
 				return Searcher.Join(Entry.Translations);
 			}

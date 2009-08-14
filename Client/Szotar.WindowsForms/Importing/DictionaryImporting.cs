@@ -17,17 +17,15 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		protected IDictionarySectionImporter first, second;
 		protected string firstPath, secondPath;
 		protected bool shouldGenerateSecondHalf;
-		protected long state = 0; //0 - Ready
-		                          //1 - Importing
-		                          //2 - Cancelled?
+		//0 = Ready, 1 = Importing, 2 = Cancelled?
+		protected long state = 0; 
 		protected SectionInfo sectionInfo;
 
 		/// <summary>
 		/// Sets the two importers used to import the two sections of the dictionary.
 		/// </summary>
 		public void SetImporters(IDictionarySectionImporter first, string firstPath,
-			IDictionarySectionImporter second, string secondPath, bool generateSecondHalf)
-		{
+			IDictionarySectionImporter second, string secondPath, bool generateSecondHalf) {
 			if (this.first != null || this.second != null)
 				throw new InvalidOperationException();
 
@@ -57,7 +55,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		}
 
 		private void WorkerThread() {
-			if(Interlocked.Exchange(ref state, 1L) == 0) {
+			if (Interlocked.Exchange(ref state, 1L) == 0) {
 				try {
 					SimpleDictionary.Section firstResult;
 					try {
@@ -143,7 +141,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		}
 
 		#region Implementation details
-		private void OnCompleted (IBilingualDictionary result, Exception exception, bool cancelled, object state) {
+		private void OnCompleted(IBilingualDictionary result, Exception exception, bool cancelled, object state) {
 			operation.PostOperationCompleted(new System.Threading.SendOrPostCallback(delegate(object postState) {
 				EventHandler<ImportCompletedEventArgs<IBilingualDictionary>> h = Completed;
 				if (h != null)
@@ -151,7 +149,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			}), null);
 		}
 
-		private void OnProgressChanged (string message, int? percent) {
+		private void OnProgressChanged(string message, int? percent) {
 			operation.Post(new System.Threading.SendOrPostCallback(delegate(object postState) {
 				EventHandler<ProgressMessageEventArgs> h = ProgressChanged;
 				if (h != null)
@@ -168,7 +166,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		}
 
 		private void UnwireEvents(IDictionarySectionImporter importer) {
-			if(importer != null) //Most likely because of Cancel()
+			if (importer != null) //Most likely because of Cancel()
 				importer.ProgressChanged -= new EventHandler<ProgressMessageEventArgs>(ImporterProgressChanged);
 		}
 		#endregion
@@ -198,7 +196,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		}
 
 		protected SimpleDictionary.Section GenerateSecondHalf(IDictionarySection firstSection) {
-			Dictionary<string, List<string>> entries = new Dictionary<string,List<string>>();
+			Dictionary<string, List<string>> entries = new Dictionary<string, List<string>>();
 
 			StringPool pool = new StringPool();
 
@@ -206,6 +204,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			//Also, pool them so that the "Contains" method of the List<string> works.
 			foreach (Entry entry in firstSection) {
 				entry.Phrase = pool.Pool(entry.Phrase.Normalize());
+
 				foreach (Translation t in entry.Translations) {
 					t.Value = pool.Pool(t.Value.Normalize());
 				}
@@ -230,19 +229,21 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			//Convert it into a list.
 			List<Entry> list = new List<Entry>();
 			foreach (KeyValuePair<string, List<string>> kv in entries) {
-				Entry e = new Entry(kv.Key, new List<Translation>());
+				var translations = new List<Translation>();
+				Entry e = new Entry(kv.Key, translations);
+
 				foreach (string t in kv.Value)
-					e.Translations.Add(new Translation(t));
+					translations.Add(new Translation(t));
+
+				// Sort the list of translations in each entry.
+				translations.Sort((a, b) => a.Value.CompareTo(b.Value));
+
 				list.Add(e);
 			}
 
-			//Sort the list of entries and the list of translations in each entry.
+			//Sort the list of entries.
 			list.Sort((a, b) => (a.Phrase.CompareTo(b.Phrase)));
 
-			//Sort each entry. (Is this really necessary/useful?)
-			//Also, it adds a noticeable delay at the end...
-			foreach (Entry entry in list)
-				((List<Translation>)entry.Translations).Sort((a, b) => a.Value.CompareTo(b.Value));
 			SimpleDictionary.Section section = new SimpleDictionary.Section(list, null);
 
 			return section;
@@ -260,7 +261,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
-				if(first != null)
+				if (first != null)
 					first.Dispose();
 				if (second != null)
 					second.Dispose();
@@ -287,7 +288,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		void ReportError(string error);
 		void ReportError(string headWord, string error);
 		void ReportWarning(string warning);
-		
+
 	}
 
 	/// <summary>
@@ -360,7 +361,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 								try {
 									senses = ParseSenses(bits[0], phrase);
 								} catch (InvalidDataException e) {
-                                    ProgramLog.Default.AddMessage(LogType.Error, "Invalid word sense for phrase \"{0}\" in {1}: {2}", phrase, path, bits[0]);
+									ProgramLog.Default.AddMessage(LogType.Error, "Invalid word sense for phrase \"{0}\" in {1}: {2}", phrase, path, bits[0]);
 									continue;
 								}
 								if (bits.Length > 1) {
@@ -376,7 +377,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 										suffix = " bytes";
 										//This won't be perfect due to buffering, but it doesn't have to be.
 										max = (int)compressedSize;
-										n = (int)fileStream.Position;										
+										n = (int)fileStream.Position;
 									}
 
 									percentage = 100 * n / max;
@@ -485,28 +486,28 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			//Returns null if the enumerator was at the end of the enumerable.
 			//tagName is set if readStartTag is true.
 			string Parse(StringEnumerator e, SubElementHandler subElementHandler, bool readStartTag, string expectedEndTag, out string outTagName) {
-				if(!readStartTag && expectedEndTag == null) {
+				if (!readStartTag && expectedEndTag == null) {
 					throw new ArgumentException("readStartTag is false and expectedEndTag is null.");
 				}
 
 				outTagName = null;
-				if (readStartTag) {					
+				if (readStartTag) {
 					//Skip to opening brace (there could be space between two top-level tags!)
 					//Or there could be none, in which case it's no problem, there just aren't any
 					//more top-level tags.
 					while (true) {
-						if(!e.Valid)
+						if (!e.Valid)
 							return null;
 						if (e.Current == '{')
 							break;
 						e.MoveNext();
 					}
-					
+
 					StringBuilder tag = new StringBuilder();
 
 					bool closingBraceFound = false;
-					while(e.MoveNext()) {
-						if(e.Current == '}') {
+					while (e.MoveNext()) {
+						if (e.Current == '}') {
 							closingBraceFound = true;
 							e.MoveNext();
 							break;
@@ -516,21 +517,21 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 					if (!closingBraceFound)
 						throw new InvalidDataException("Expected: }, reached end of entry");
-					
+
 					outTagName = tag.ToString();
 					expectedEndTag = "/" + outTagName;
 				}
-				
+
 				char last = default(char);
 				bool inTag = false;
-				StringBuilder 
+				StringBuilder
 					textContent = new StringBuilder(),
 					tagName = new StringBuilder();
 
 				if (e.Current == '}')
 					throw new InvalidDataException("Unexpected '}' in entry (no corresponding '{').");
 
-				while(true) {
+				while (true) {
 					char c = e.Current;
 					switch (last == '\\' ? '\0' : c) { //Use default case if last was backslash
 						case '{':
@@ -546,11 +547,11 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 								if (tagName.ToString() != expectedEndTag)
 									throw new InvalidDataException("Expected: {" + expectedEndTag + "}, Found: {" + tagName + "}");
 
-								
+
 
 								//Don't forget to consume the closing brace!
 								e.MoveNext();
-								
+
 								return textContent.ToString();
 							}
 
@@ -562,8 +563,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 								throw new InvalidDataException("Unexpected '}', no matching '{'.");
 							}
 
-							if(!e.MoveNext())
-								throw new InvalidDataException("Expected {/" + tagName.ToString() +", found end of entry");
+							if (!e.MoveNext())
+								throw new InvalidDataException("Expected {/" + tagName.ToString() + ", found end of entry");
 
 							//subElementHandler is responsible for reading the {/tag} (or not, in
 							//the case of {hw/}, {img/} and {br/}
@@ -572,7 +573,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 								textContent.Append(replacement);
 							tagName.Length = 0;
 							inTag = false;
-							
+
 							//The child element met an end of stream. No problem, though.
 							if (!e.Valid)
 								return textContent.ToString();
@@ -655,7 +656,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 						continue;
 					list.Add(new Translation(trimmed.Normalize()));
 				}
-				
+
 				return list;
 			}
 
@@ -682,12 +683,12 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 						return str.Substring(i, 15);
 					}
 				}
-		
+
 				public char Current {
-					get { 
-						if(!valid)
+					get {
+						if (!valid)
 							throw new InvalidOperationException("The enumeration has finished or hasn't started.");
-						return str[i]; 
+						return str[i];
 					}
 				}
 
@@ -718,7 +719,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				List<Entry> senses = new List<Entry>();
 				StringEnumerator e = new StringEnumerator(definitions);
 				e.MoveNext();
-				while(true) {
+				while (true) {
 					Entry entry = new Entry(headWord, new List<Translation>());
 					string topLevelTag = null;
 					string s = Parse(e, tag => {
@@ -731,14 +732,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 						} else if (tag == "ss") {
 							foreach (Translation tr in ParseTranslation(e, headWord)) {
 								//Strings have been trimmed and normalized by ParseTranslation.
-								bool duplicate = false;
-								foreach (Translation other in entry.Translations) {
-									if (tr.Value == other.Value) {
-										duplicate = true;
-										break;
-									}
-								}
-								if(!duplicate)
+								if (!entry.Translations.Contains(tr))
 									entry.Translations.Add(tr);
 							}
 							return null;
