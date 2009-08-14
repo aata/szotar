@@ -43,8 +43,8 @@ namespace Szotar.WindowsForms {
 			public extern static Int32 GetThemeMargins(IntPtr hTheme, IntPtr hdc, int iPartId, int iStateId, int iPropId, IntPtr rect, out MARGINS pMargins);
 		}
 
-		//See http://msdn2.microsoft.com/en-us/library/bb773210.aspx - "Parts and States"
-		//Only menu-related parts/states are needed here, VisualStyleRenderer handles most of the rest.
+		// See http://msdn2.microsoft.com/en-us/library/bb773210.aspx - "Parts and States"
+		// Only menu-related parts/states are needed here, VisualStyleRenderer handles most of the rest.
 		enum MenuParts : int {
 			ItemTMSchema = 1,
 			DropDownTMSchema = 2,
@@ -144,7 +144,8 @@ namespace Szotar.WindowsForms {
 		}
 
 		public ToolbarTheme Theme {
-			get; set;
+			get;
+			set;
 		}
 
 		private string RebarClass {
@@ -192,7 +193,7 @@ namespace Szotar.WindowsForms {
 			return true;
 		}
 
-		//Gives parented ToolStrips a transparent background.
+		// Gives parented ToolStrips a transparent background.
 		protected override void Initialize(ToolStrip toolStrip) {
 			if (toolStrip.Parent is ToolStripPanel)
 				toolStrip.BackColor = Color.Transparent;
@@ -200,10 +201,10 @@ namespace Szotar.WindowsForms {
 			base.Initialize(toolStrip);
 		}
 
-		//Using just ToolStripManager.Renderer without setting the Renderer individually per ToolStrip means
-		//that the ToolStrip is not passed to the Initialize method. ToolStripPanels, however, are. So we can 
-		//simply initialize it here too, and this should guarantee that the ToolStrip is initialized at least 
-		//once. Hopefully it isn't any more complicated than this.
+		// Using just ToolStripManager.Renderer without setting the Renderer individually per ToolStrip means
+		// that the ToolStrip is not passed to the Initialize method. ToolStripPanels, however, are. So we can 
+		// simply initialize it here too, and this should guarantee that the ToolStrip is initialized at least 
+		// once. Hopefully it isn't any more complicated than this.
 		protected override void InitializePanel(ToolStripPanel toolStripPanel) {
 			foreach (Control control in toolStripPanel.Controls)
 				if (control is ToolStrip)
@@ -218,15 +219,15 @@ namespace Szotar.WindowsForms {
 				if (e.ToolStrip.IsDropDown) {
 					Region oldClip = e.Graphics.Clip;
 
-					//Tool strip borders are rendered *after* the content, for some reason.
-					//So we have to exclude the inside of the popup otherwise we'll draw over it.
+					// Tool strip borders are rendered *after* the content, for some reason.
+					// So we have to exclude the inside of the popup otherwise we'll draw over it.
 					Rectangle insideRect = e.ToolStrip.ClientRectangle;
 					insideRect.Inflate(-1, -1);
 					e.Graphics.ExcludeClip(insideRect);
 
 					renderer.DrawBackground(e.Graphics, e.ToolStrip.ClientRectangle, e.AffectedBounds);
 
-					//Restore the old clip in case the Graphics is used again (does that ever happen?)
+					// Restore the old clip in case the Graphics is used again (does that ever happen?)
 					e.Graphics.Clip = oldClip;
 				}
 			} else {
@@ -246,7 +247,7 @@ namespace Szotar.WindowsForms {
 			// to take into account the border.
 			rect.X = item.ContentRectangle.X + 1;
 			rect.Width = item.ContentRectangle.Width - 1;
-			
+
 			// Make sure we're using all of the vertical space, so that the edges touch.
 			rect.Y = 0;
 			return rect;
@@ -266,8 +267,8 @@ namespace Szotar.WindowsForms {
 
 		protected override void OnRenderToolStripPanelBackground(ToolStripPanelRenderEventArgs e) {
 			if (EnsureRenderer()) {
-				//Draw the background using Rebar & RP_BACKGROUND (or, if that is not available, fall back to
-				//Rebar.Band.Normal)
+				// Draw the background using Rebar & RP_BACKGROUND (or, if that is not available, fall back to
+				// Rebar.Band.Normal)
 				if (VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement(RebarClass, RebarBackground, 0))) {
 					renderer.SetParameters(RebarClass, RebarBackground, 0);
 				} else {
@@ -279,38 +280,30 @@ namespace Szotar.WindowsForms {
 
 				renderer.DrawBackground(e.Graphics, e.ToolStripPanel.ClientRectangle);
 
-				//Draw the etched edges of each row.
-				//renderer.SetParameters(Subclass(VisualStyleElement.Rebar.Band.Normal));
-				//foreach (ToolStripPanelRow row in e.ToolStripPanel.Rows) {
-				//    Rectangle rowBounds = row.Bounds;
-				//    rowBounds.Offset(0, -1);
-				//    renderer.DrawEdge(e.Graphics, rowBounds, Edges.Top, EdgeStyle.Etched, EdgeEffects.None);
-				//}
-
 				e.Handled = true;
 			} else {
 				base.OnRenderToolStripPanelBackground(e);
 			}
 		}
 
-		//Render the background of an actual menu bar, dropdown menu or toolbar.
+		// Render the background of an actual menu bar, dropdown menu or toolbar.
 		protected override void OnRenderToolStripBackground(System.Windows.Forms.ToolStripRenderEventArgs e) {
 			if (EnsureRenderer()) {
 				if (e.ToolStrip.IsDropDown) {
 					renderer.SetParameters(MenuClass, (int)MenuParts.PopupBackground, 0);
 				} else {
-					//It's a MenuStrip or a ToolStrip. If it's contained inside a larger panel, it should have a
-					//transparent background, showing the panel's background.
+					// It's a MenuStrip or a ToolStrip. If it's contained inside a larger panel, it should have a
+					// transparent background, showing the panel's background.
 
 					if (e.ToolStrip.Parent is ToolStripPanel) {
-						//The background should be transparent, because the ToolStripPanel's background will be visible.
-						//(Of course, we assume the ToolStripPanel is drawn using the same theme, but it's not my fault
-						//if someone does that.)
+						// The background should be transparent, because the ToolStripPanel's background will be visible.
+						// (Of course, we assume the ToolStripPanel is drawn using the same theme, but it's not my fault
+						// if someone does that.)
 						return;
 					} else {
-						//A lone toolbar/menubar should act like it's inside a toolbox, I guess.
-						//Maybe I should use the MenuClass in the case of a MenuStrip, although that would break
-						//the other themes...
+						// A lone toolbar/menubar should act like it's inside a toolbox, I guess.
+						// Maybe I should use the MenuClass in the case of a MenuStrip, although that would break
+						// the other themes...
 						if (VisualStyleRenderer.IsElementDefined(VisualStyleElement.CreateElement(RebarClass, RebarBackground, 0)))
 							renderer.SetParameters(RebarClass, RebarBackground, 0);
 						else
@@ -327,14 +320,14 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
-		//The only purpose of this override is to change the arrow colour.
-		//It's OK to just draw over the default arrow since we also pass down arrow drawing to the system renderer.
+		// The only purpose of this override is to change the arrow colour.
+		// It's OK to just draw over the default arrow since we also pass down arrow drawing to the system renderer.
 		protected override void OnRenderSplitButtonBackground(ToolStripItemRenderEventArgs e) {
 			if (EnsureRenderer()) {
 				ToolStripSplitButton sb = (ToolStripSplitButton)e.Item;
 				base.OnRenderSplitButtonBackground(e);
 
-				//It doesn't matter what colour of arrow we tell it to draw. OnRenderArrow will compute it from the item anyway.
+				// It doesn't matter what colour of arrow we tell it to draw. OnRenderArrow will compute it from the item anyway.
 				OnRenderArrow(new ToolStripArrowRenderEventArgs(e.Graphics, sb, sb.DropDownButtonBounds, Color.Red, ArrowDirection.Down));
 			} else {
 				base.OnRenderSplitButtonBackground(e);
@@ -354,27 +347,15 @@ namespace Szotar.WindowsForms {
 			base.OnRenderItemText(e);
 		}
 
-		//This is ugly. Need to get the actual grip bounds. It seems to look OK with the default .NET style, anyway.
-		//protected override void OnRenderGrip(ToolStripGripRenderEventArgs e) {
-		//    if (EnsureRenderer()) {
-		//        if (e.GripStyle == ToolStripGripStyle.Visible) {
-		//            renderer.SetParameters(VisualStyleElement.Rebar.Gripper.Normal);
-		//            renderer.DrawBackground(e.Graphics, e.GripBounds, e.AffectedBounds);
-		//        }
-		//    } else {
-		//        base.OnRenderGrip(e);
-		//    }
-		//}
-
 		protected override void OnRenderImageMargin(ToolStripRenderEventArgs e) {
 			if (EnsureRenderer()) {
 				if (e.ToolStrip.IsDropDown) {
 					renderer.SetParameters(MenuClass, (int)MenuParts.PopupGutter, 0);
-					//The AffectedBounds is usually too small, way too small to look right. Instead of using that,
-					//use the AffectedBounds but with the right width. Then narrow the rectangle to the correct edge
-					//based on whether or not it's RTL. (It doesn't need to be narrowed to an edge in LTR mode, but let's
-					//do that anyway.)
-					//Using the DisplayRectangle gets roughly the right size so that the separator is closer to the text.
+					// The AffectedBounds is usually too small, way too small to look right. Instead of using that,
+					// use the AffectedBounds but with the right width. Then narrow the rectangle to the correct edge
+					// based on whether or not it's RTL. (It doesn't need to be narrowed to an edge in LTR mode, but let's
+					// do that anyway.)
+					// Using the DisplayRectangle gets roughly the right size so that the separator is closer to the text.
 					Padding margins = GetThemeMargins(e.Graphics, MarginTypes.Sizing);
 					int extraWidth = (e.ToolStrip.Width - e.ToolStrip.DisplayRectangle.Width - margins.Left - margins.Right - 1) - e.AffectedBounds.Width;
 					Rectangle rect = e.AffectedBounds;
@@ -409,7 +390,7 @@ namespace Szotar.WindowsForms {
 				Rectangle bgRect = GetBackgroundRectangle(e.Item);
 				bgRect.Width = bgRect.Height;
 
-				//Now, mirror its position if the menu item is RTL.
+				// Now, mirror its position if the menu item is RTL.
 				if (e.Item.RightToLeft == RightToLeft.Yes)
 					bgRect = new Rectangle(e.ToolStrip.ClientSize.Width - bgRect.X - bgRect.Width, bgRect.Y, bgRect.Width, bgRect.Height);
 
@@ -420,7 +401,7 @@ namespace Szotar.WindowsForms {
 				checkRect.X = bgRect.X + bgRect.Width / 2 - checkRect.Width / 2;
 				checkRect.Y = bgRect.Y + bgRect.Height / 2 - checkRect.Height / 2;
 
-				//I don't think ToolStrip even supports radio box items, so no need to render them.
+				// I don't think ToolStrip even supports radio box items, so no need to render them.
 				renderer.SetParameters(MenuClass, (int)MenuParts.PopupCheck, e.Item.Enabled ? (int)MenuPopupCheckStates.CheckmarkNormal : (int)MenuPopupCheckStates.CheckmarkDisabled);
 
 				renderer.DrawBackground(e.Graphics, checkRect);
@@ -430,8 +411,8 @@ namespace Szotar.WindowsForms {
 		}
 
 		protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e) {
-			//The default renderer will draw an arrow for us (the UXTheme API seems not to have one for all directions),
-			//but it will get the colour wrong in many cases. The text colour is probably the best colour to use.
+			// The default renderer will draw an arrow for us (the UXTheme API seems not to have one for all directions),
+			// but it will get the colour wrong in many cases. The text colour is probably the best colour to use.
 			if (EnsureRenderer())
 				e.ArrowColor = GetItemTextColor(e.Item);
 			base.OnRenderArrow(e);
@@ -439,7 +420,7 @@ namespace Szotar.WindowsForms {
 
 		protected override void OnRenderOverflowButtonBackground(ToolStripItemRenderEventArgs e) {
 			if (EnsureRenderer()) {
-				//BrowserTabBar::Rebar draws the chevron using the default background. Odd.
+				// BrowserTabBar::Rebar draws the chevron using the default background. Odd.
 				string rebarClass = RebarClass;
 				if (Theme == ToolbarTheme.BrowserTabBar)
 					rebarClass = "Rebar";
@@ -465,8 +446,8 @@ namespace Szotar.WindowsForms {
 				// Needs a more robust check. It seems mono supports very different style sets.
 				return
 					VisualStyleRenderer.IsElementDefined(
-						VisualStyleElement.CreateElement("Menu", 
-							(int)MenuParts.BarBackground, 
+						VisualStyleElement.CreateElement("Menu",
+							(int)MenuParts.BarBackground,
 							(int)MenuBarStates.Active));
 			}
 		}

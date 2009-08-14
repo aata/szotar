@@ -34,7 +34,7 @@ namespace Szotar {
 		/// <summary>Removes a setting from the configuration store entirely.</summary>
 		/// <param name="setting">The setting to remove.</param>
 		void Delete(string setting);
-		
+
 		/// <summary><value>True</value> if the configuration has been changed since it was last synchronized with its external representation. This may never be set if the configuration is always synchronized with its external representation (such as a database-backed configuration or a file-based configuration which always saves itself)</summary>
 		bool NeedsSaving { get; set; }
 
@@ -49,41 +49,42 @@ namespace Szotar {
 		/// a need for that, SettingChanging can be added without much difficulty.</remarks>
 		event EventHandler<SettingChangedEventArgs> SettingChanged;
 	}
-	
+
 	/// <summary>
 	/// Specifies which setting was changed.
 	/// </summary>
 	public class SettingChangedEventArgs : EventArgs {
 		public string SettingName { get; protected set; }
-		
+
 		public SettingChangedEventArgs(string settingName) {
 			SettingName = settingName;
 		}
 	}
-	
+
 	public static class Configuration {
 		public static IConfiguration Default {
-			get; set; 
+			get;
+			set;
 		}
-		
+
 		/// <summary>
 		/// Initialises the default configuration with a configuration file located 
 		/// in ~/.config/Szotar/config.txt.
 		/// </summary>
 		static Configuration() {
-			if(Default == null) {
+			if (Default == null) {
 				string path = Path.Combine(DefaultConfigurationFolder(), "config.txt");
 				Default = new JsonConfiguration(path);
 			} else {
 				// Someone already set the default configuration.
 			}
 		}
-		
+
 		public static string DefaultConfigurationFolder() {
 			string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 			return Path.Combine(path, "Szotar");
 		}
-		
+
 		public static void Save() {
 			Default.Save();
 		}
@@ -111,34 +112,34 @@ namespace Szotar {
 			get { return Default.Get("UserListsStore", Path.Combine(UserDataStore, "Lists")); }
 			set { Default.Set("UserListsStore", value); }
 		}
-		
+
 		public static string DictionariesFolderName {
-			get { return "Dictionaries"; } 
+			get { return "Dictionaries"; }
 		}
 	}
-	
+
 	public class FileConfiguration : IConfiguration {
 		string path;
 		Dictionary<string, object> settings;
 		bool dirty = false;
-		
+
 		//FUTURE: watch file for changes?
 		public event EventHandler<SettingChangedEventArgs> SettingChanged;
-		
+
 		protected void RaiseSettingChanged(string setting) {
 			var handler = SettingChanged;
-			if(handler != null)
+			if (handler != null)
 				handler(this, new SettingChangedEventArgs(setting));
 		}
-		
+
 		public FileConfiguration(string path) {
 			this.path = path;
-			
+
 			Load();
 		}
-		
+
 		~FileConfiguration() {
-			if(NeedsSaving)
+			if (NeedsSaving)
 				Save();
 		}
 
@@ -150,41 +151,41 @@ namespace Szotar {
 				dirty |= value;
 			}
 		}
-		
+
 		public T Get<T>(string setting, T defaultValue) {
 			object value;
-			lock(settings) {
-				if(settings.TryGetValue(setting, out value)) {
+			lock (settings) {
+				if (settings.TryGetValue(setting, out value)) {
 					return (T)Convert.ChangeType(value, typeof(T));
 				}
 			}
 			return defaultValue;
 		}
-		
+
 		public T Get<T>(string setting) {
 			return Get<T>(setting, default(T));
 		}
-		
+
 		public void Set<T>(string setting, T value) {
-			lock(settings) {
+			lock (settings) {
 				settings[setting] = value;
 			}
-			
+
 			NeedsSaving = true;
 			RaiseSettingChanged(setting);
 		}
-		
+
 		public void Delete(string setting) {
-			lock(settings) {
-				if(settings.ContainsKey(setting)) {
+			lock (settings) {
+				if (settings.ContainsKey(setting)) {
 					settings.Remove(setting);
 				}
 			}
-			
+
 			NeedsSaving = true;
 			RaiseSettingChanged(setting);
 		}
-		
+
 		//Annoyingly, XmlSerializer refuses to serialize anything deriving from IDictionary.
 		//Thus, the settings are serialized as a List<Entry> (since KeyValuePair's Key/Value don't have a setter,
 		//the Key and Value properties aren't actually serialized... how useless).
@@ -199,20 +200,20 @@ namespace Szotar {
 					typeof(List<ListInfo>) }
 				);
 		}
-		
+
 		public void Save() {
 			XmlSerializer serializer = CreateSerializer();
-			
+
 			var pairs = new List<Entry>();
-			lock(settings) {
-				foreach(var kv in settings) {
+			lock (settings) {
+				foreach (var kv in settings) {
 					pairs.Add(new Entry { Key = kv.Key, Value = kv.Value });
 				}
 			}
 
 			string tempPath = Path.GetTempFileName();
 
-			using(StreamWriter sw = new StreamWriter(tempPath))
+			using (StreamWriter sw = new StreamWriter(tempPath))
 				serializer.Serialize(sw, pairs);
 
 			//Ensure that the target directory exists.
@@ -223,28 +224,28 @@ namespace Szotar {
 			} catch (FileNotFoundException) { }
 			File.Delete(path);
 			File.Move(tempPath, path);
-			
+
 			NeedsSaving = false;
 		}
-		
+
 		protected void Load() {
 			XmlSerializer serializer = CreateSerializer();
-			
-			settings = new Dictionary<string,object>();
-			
-			if(File.Exists(path)) {
+
+			settings = new Dictionary<string, object>();
+
+			if (File.Exists(path)) {
 				List<Entry> pairs;
-				using(StreamReader sr = new StreamReader(path)) {
+				using (StreamReader sr = new StreamReader(path)) {
 					pairs = (List<Entry>)serializer.Deserialize(sr);
 				}
-				
-				foreach(var kvp in pairs) {
-					if(kvp.Key != null) {
+
+				foreach (var kvp in pairs) {
+					if (kvp.Key != null) {
 						settings.Add(kvp.Key, kvp.Value);
 					}
 				}
 			}
-			
+
 			NeedsSaving = false;
 		}
 
@@ -255,7 +256,7 @@ namespace Szotar {
 
 		[Serializable]
 		public class Entry {
-			public string Key { get; set; } 
+			public string Key { get; set; }
 			public object Value { get; set; }
 		}
 	}
@@ -352,9 +353,9 @@ namespace Szotar {
 	/// conversion, the setting's value is treated as null. The same goes for when writing the configuration 
 	/// file.
 	/// </remarks>
-	public class JsonConfiguration 
-		: IConfiguration 
-		, IJsonContext
+	public class JsonConfiguration
+		: IConfiguration
+		, IJsonContext 
 	{
 		Dictionary<Type, IJsonConverter> converters;
 		Dictionary<string, object> values;
@@ -392,13 +393,13 @@ namespace Szotar {
 					using (var sr = new StreamReader(path))
 						dict = JsonValue.Parse(sr) as JsonDictionary;
 				} catch (ParseException e) {
-                    ProgramLog.Default.AddMessage(LogType.Error, "JSON parsing exception in configuration: {0}", e.Message);
+					ProgramLog.Default.AddMessage(LogType.Error, "JSON parsing exception in configuration: {0}", e.Message);
 					return;
 				}
 
 				// Why the file would contain something other than a dictionary, I don't know.
 				if (dict == null) {
-                    ProgramLog.Default.AddMessage(LogType.Error, "JSON configuration file was not a JSON hash object!");
+					ProgramLog.Default.AddMessage(LogType.Error, "JSON configuration file was not a JSON hash object!");
 					Reset();
 					return;
 				}
@@ -423,9 +424,9 @@ namespace Szotar {
 
 						dict.Items.Add(k.Key, json);
 					} catch (JsonConvertException e) {
-                        ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
+						ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
 					} catch (InvalidCastException e) {
-                        ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
+						ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
 					}
 				}
 			}
@@ -443,7 +444,7 @@ namespace Szotar {
 		}
 
 		T IJsonContext.FromJson<T>(JsonValue json) {
-		    return (T)GetConverter<T>().FromJson(json, this);
+			return (T)GetConverter<T>().FromJson(json, this);
 		}
 
 		public T Get<T>(string setting) {
@@ -457,15 +458,15 @@ namespace Szotar {
 				// This shouldn't pose a problem, I think, even with nullable types, because
 				// I don't see a scenario where they would mean anything different.
 				if (values.TryGetValue(setting, out value) && value != null) {
-					if(value is JsonValue) {
+					if (value is JsonValue) {
 						T real;
 						try {
 							real = (T)GetConverter<T>().FromJson((JsonValue)value, this);
 						} catch (JsonConvertException e) {
-                            ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
+							ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
 							real = default(T);
 						} catch (InvalidCastException e) {
-                            ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
+							ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
 							real = default(T);
 						}
 						values[setting] = real;
@@ -476,7 +477,7 @@ namespace Szotar {
 				} else {
 					return defaultValue;
 				}
-			}			
+			}
 		}
 
 		protected IJsonConverter GetConverter<T>() {
@@ -498,7 +499,7 @@ namespace Szotar {
 					return null;
 
 				var c = value as IJsonConvertible;
-				if(c != null)
+				if (c != null)
 					return c.ToJson(context);
 
 				throw new JsonConvertException("There is no converter registered for the type " + type.Namespace + "." + type.Name + " and it does not implement IJsonConvertible");
@@ -553,7 +554,7 @@ namespace Szotar {
 		}
 
 		public bool NeedsSaving {
-			get { return dirty;	}
+			get { return dirty; }
 			set { dirty |= value; }
 		}
 
@@ -582,7 +583,7 @@ namespace Szotar {
 				if (b != null)
 					return b.Value;
 
-				throw new JsonConvertException("Value was not a boolean"); 
+				throw new JsonConvertException("Value was not a boolean");
 			}
 		}
 

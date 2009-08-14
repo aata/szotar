@@ -63,7 +63,7 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void UnwireDataSourceEvents() {
-			if (source is IBindingList) 
+			if (source is IBindingList)
 				((IBindingList)source).ListChanged -= new ListChangedEventHandler(source_ListChanged);
 		}
 
@@ -184,12 +184,12 @@ namespace Szotar.WindowsForms.Controls {
 
 				Debug.Print("Deleting rows:");
 				foreach (int row in rowsToDelete) {
-					Debug.Print("  Row {0}: {1} -- {2}{3}", 
-						row, 
+					Debug.Print("  Row {0}: {1} -- {2}{3}",
+						row,
 						grid[0, row].Value,
-						grid[1, row].Value, 
+						grid[1, row].Value,
 						row == rowInEdit ? " (being edited)" : "");
-				}				
+				}
 
 				if (rowInEdit.HasValue && rowInEdit.Value >= source.Count) {
 					rowsToDelete.Remove(rowInEdit.Value);
@@ -203,8 +203,7 @@ namespace Szotar.WindowsForms.Controls {
 				e.Handled = true;
 			} else if (
 				(e.KeyCode == Keys.Z && e.Modifiers == (Keys.Control | Keys.Shift)) ||
-				(e.KeyCode == Keys.Y && e.Modifiers == Keys.Control))
-			{
+				(e.KeyCode == Keys.Y && e.Modifiers == Keys.Control)) {
 				source.Redo();
 				e.Handled = true;
 			}
@@ -213,7 +212,7 @@ namespace Szotar.WindowsForms.Controls {
 		void grid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e) {
 			// This is handled by the KeyUp event now.
 			Debug.Print("Warning: UserDeletingRow fired (shouldn't this event have already been processed?)");
-			e.Cancel = true; 
+			e.Cancel = true;
 		}
 
 		void grid_CancelRowEdit(object sender, QuestionEventArgs e) {
@@ -438,7 +437,7 @@ namespace Szotar.WindowsForms.Controls {
 			get {
 				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
 					index >= 0;
-					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) 
+					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
 				{
 					yield return index;
 				}
@@ -453,7 +452,7 @@ namespace Szotar.WindowsForms.Controls {
 					index >= 0;
 					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
 				{
-					if(index < source.Count)
+					if (index < source.Count)
 						yield return index;
 				}
 			}

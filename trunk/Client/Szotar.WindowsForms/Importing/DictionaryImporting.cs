@@ -17,8 +17,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		protected IDictionarySectionImporter first, second;
 		protected string firstPath, secondPath;
 		protected bool shouldGenerateSecondHalf;
-		//0 = Ready, 1 = Importing, 2 = Cancelled?
-		protected long state = 0; 
+		// 0 = Ready, 1 = Importing, 2 = Cancelled?
+		protected long state = 0;
 		protected SectionInfo sectionInfo;
 
 		/// <summary>
@@ -92,12 +92,12 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				} catch (ImportException ex) {
 					OnCompleted(null, ex, false, null);
 				} finally {
-					//Set the state back to 0 (Ready)
-					//Don't need to check the return value.
+					// Set the state back to 0 (Ready)
+					// Don't need to check the return value.
 					Interlocked.Exchange(ref state, 0L);
 				}
 			} else {
-				//Already importing!
+				// Already importing!
 				OnCompleted(null, new InvalidOperationException(), false, null);
 			}
 		}
@@ -106,8 +106,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			CallOnMainThread(new SendOrPostCallback(delegate(object arg) {
 				EventHandler<ProgressMessageEventArgs> temp = ProgressChanged;
 
-				//Set the percentage to null, for now.
-				//TODO: Allow localization
+				// Set the percentage to null, for now.
+				// TODO: Allow localization
 				ProgressMessageEventArgs args = new ProgressMessageEventArgs(
 					string.Format(CultureInfo.CurrentUICulture, "(Part {1}): {0}", e.Message, sender == first ? 1 : 2), null);
 
@@ -122,11 +122,11 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 			SimpleDictionary dict = new SimpleDictionary(firstSection, secondSection);
 
-			//It only has to be a guess, because the user can override it.
+			// It only has to be a guess, because the user can override it.
 			if (sectionInfo != null) {
 				dict.Name = sectionInfo.Name;
 
-				//Attempt to guess at the names of the languages.
+				// Attempt to guess at the names of the languages.
 				foreach (char delim in new char[] { '\u21d4', '\u2194', '\u2014', '-' }) {
 					string[] bits = dict.Name.Split(new char[] { delim }, 2);
 					if (bits.Length == 2) {
@@ -166,7 +166,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		}
 
 		private void UnwireEvents(IDictionarySectionImporter importer) {
-			if (importer != null) //Most likely because of Cancel()
+			if (importer != null) // Most likely because of Cancel()
 				importer.ProgressChanged -= new EventHandler<ProgressMessageEventArgs>(ImporterProgressChanged);
 		}
 		#endregion
@@ -180,8 +180,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				first.Dispose();
 				first = null;
 
-				//The second one hasn't started yet, so no need to dispose it, and it
-				//cannot start importing because state is now set to 2.
+				// The second one hasn't started yet, so no need to dispose it, and it
+				// cannot start importing because state is now set to 2.
 				if (second != null) {
 					second.Dispose();
 					second = null;
@@ -190,9 +190,6 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				second.Cancel();
 				second.Dispose();
 			}
-
-			//We shouldn't get here, but it's not really an error.
-			////Wait, what?
 		}
 
 		protected SimpleDictionary.Section GenerateSecondHalf(IDictionarySection firstSection) {
@@ -200,8 +197,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 			StringPool pool = new StringPool();
 
-			//Normalize all translations (and entries, for good measure).
-			//Also, pool them so that the "Contains" method of the List<string> works.
+			// Normalize all translations (and entries, for good measure).
+			// Also, pool them so that the "Contains" method of the List<string> works.
 			foreach (Entry entry in firstSection) {
 				entry.Phrase = pool.Pool(entry.Phrase.Normalize());
 
@@ -210,7 +207,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				}
 			}
 
-			//Perform the actual reversion.
+			// Perform the actual reversion.
 			foreach (Entry entry in firstSection) {
 				foreach (Translation t in entry.Translations) {
 					List<string> reverse;
@@ -226,7 +223,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				}
 			}
 
-			//Convert it into a list.
+			// Convert it into a list.
 			List<Entry> list = new List<Entry>();
 			foreach (KeyValuePair<string, List<string>> kv in entries) {
 				var translations = new List<Translation>();
@@ -241,7 +238,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				list.Add(e);
 			}
 
-			//Sort the list of entries.
+			// Sort the list of entries.
 			list.Sort((a, b) => (a.Phrase.CompareTo(b.Phrase)));
 
 			SimpleDictionary.Section section = new SimpleDictionary.Section(list, null);
@@ -375,7 +372,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 										n = entries.Count;
 									} else {
 										suffix = " bytes";
-										//This won't be perfect due to buffering, but it doesn't have to be.
+										// This won't be perfect due to buffering, but it doesn't have to be.
 										max = (int)compressedSize;
 										n = (int)fileStream.Position;
 									}
@@ -385,7 +382,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 										OnProgressChanged(string.Format("{0}% completed ({1} of {2}{3})", percentage, n, max, suffix), percentage);
 									lastPercentage = percentage;
 
-									phrase = bits[1].Normalize(); //Set phrase for next entry
+									phrase = bits[1].Normalize(); // Set phrase for next entry
 								} else {
 									break;
 								}
@@ -394,16 +391,16 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 					}
 				}
 
-				//This sort is needed because of the {hw} tag which can change the entry's headword.
+				// This sort is needed because of the {hw} tag which can change the entry's headword.
 				entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
 				return new SimpleDictionary.Section(entries, null);
 			}
 
 			public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
 
-			//Signal the import thread to cancel. It returns before the thread is canceled,
-			//so the import thread may live on for a short while, but that shouldn't prove
-			//a problem.
+			// Signal the import thread to cancel. It returns before the thread is canceled,
+			// so the import thread may live on for a short while, but that shouldn't prove
+			// a problem.
 			public void Cancel() {
 				Interlocked.Increment(ref shouldCancel);
 			}
@@ -480,11 +477,11 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				return info;
 			}
 
-			//Returns the text that should be inserted in the element's place.
+			// Returns the text that should be inserted in the element's place.
 			delegate string SubElementHandler(string tag);
 
-			//Returns null if the enumerator was at the end of the enumerable.
-			//tagName is set if readStartTag is true.
+			// Returns null if the enumerator was at the end of the enumerable.
+			// tagName is set if readStartTag is true.
 			string Parse(StringEnumerator e, SubElementHandler subElementHandler, bool readStartTag, string expectedEndTag, out string outTagName) {
 				if (!readStartTag && expectedEndTag == null) {
 					throw new ArgumentException("readStartTag is false and expectedEndTag is null.");
@@ -492,9 +489,9 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 				outTagName = null;
 				if (readStartTag) {
-					//Skip to opening brace (there could be space between two top-level tags!)
-					//Or there could be none, in which case it's no problem, there just aren't any
-					//more top-level tags.
+					// Skip to opening brace (there could be space between two top-level tags!)
+					// Or there could be none, in which case it's no problem, there just aren't any
+					// more top-level tags.
 					while (true) {
 						if (!e.Valid)
 							return null;
@@ -539,8 +536,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 							break;
 						case '}':
 							if (tagName.Length > 0 && tagName[0] == '/') {
-								//This is a common error, it seems, and might be worth working around.
-								//Won't work yet. We need to be able to rewind to the {/ss} for the calling Parse.
+								// This is a common error, it seems, and might be worth working around.
+								// Won't work yet. We need to be able to rewind to the {/ss} for the calling Parse.
 								//if (tagName.ToString() == "/ss" && expectedEndTag == "/ex")
 								//	return textContent.ToString();
 
@@ -549,35 +546,33 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 
 
-								//Don't forget to consume the closing brace!
+								// Don't forget to consume the closing brace!
 								e.MoveNext();
 
 								return textContent.ToString();
 							}
 
-							//In the days of old, this used to be a common occurance meaning that the parser
-							//was broken. However, it is more stable now, and some dictionaries do seem to 
-							//contain this error.
-							if (tagName.Length == 0) {
-								//Debugger.Break();
+							// In the days of old, this used to be a common occurance meaning that the parser
+							// was broken. However, it is more stable now, and some dictionaries do seem to 
+							// contain this error.
+							if (tagName.Length == 0)
 								throw new InvalidDataException("Unexpected '}', no matching '{'.");
-							}
 
 							if (!e.MoveNext())
 								throw new InvalidDataException("Expected {/" + tagName.ToString() + ", found end of entry");
 
-							//subElementHandler is responsible for reading the {/tag} (or not, in
-							//the case of {hw/}, {img/} and {br/}
+							// subElementHandler is responsible for reading the {/tag} (or not, in
+							// the case of {hw/}, {img/} and {br/}
 							string replacement = subElementHandler(tagName.ToString());
 							if (!string.IsNullOrEmpty(replacement))
 								textContent.Append(replacement);
 							tagName.Length = 0;
 							inTag = false;
 
-							//The child element met an end of stream. No problem, though.
+							// The child element met an end of stream. No problem, though.
 							if (!e.Valid)
 								return textContent.ToString();
-							continue; //Skip the MoveNext() call, subElementHandler did it
+							continue; // Skip the MoveNext() call, subElementHandler did it
 						case '\\':
 							break;
 						default:
@@ -590,16 +585,16 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 						break;
 				}
 
-				//Some dictionaries seem to expect to be allowed to do "{s}{ss}translation".
-				//I'm fine with that, I guess.
+				// Some dictionaries seem to expect to be allowed to do "{s}{ss}translation".
+				// I'm fine with that, I guess.
 				//throw new InvalidDataException("Expected: {" + expectedEndTag + "}, reached end of entry");
 				return textContent.ToString();
 			}
 
-			//Parses an element that is known not to contain sub-elements (significant structural ones, anyway).
-			//If a sub-element is encountered, its text is processed in the same manner.
-			//The headWord needs to be known in case {hw/} is encountered.
-			//(Though perhaps we should just replace it with "~"...)
+			// Parses an element that is known not to contain sub-elements (significant structural ones, anyway).
+			// If a sub-element is encountered, its text is processed in the same manner.
+			// The headWord needs to be known in case {hw/} is encountered.
+			// (Though perhaps we should just replace it with "~"...)
 			string ParseStringElement(StringEnumerator e, string tag, string headWord) {
 				string unused;
 				if (tag == "hw/")
@@ -615,8 +610,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				}, false, "/" + tag, out unused).Normalize();
 			}
 
-			//This is a subsense in bedic terminology. It can contain {sa}, {hw}, {ex}, {ct},
-			//all of which are expected to contain only text, but we don't even need them anyway (yet).
+			// This is a subsense in bedic terminology. It can contain {sa}, {hw}, {ex}, {ct},
+			// all of which are expected to contain only text, but we don't even need them anyway (yet).
 			private IList<Translation> ParseTranslation(StringEnumerator e, string headWord) {
 				string unused;
 				string str = Parse(e, tag => {
@@ -637,10 +632,10 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				if (str == null)
 					throw new InvalidDataException("Expected {/ss}, reached end of entry.");
 
-				//This bit should be optional.
-				//First, try ';', because it generally overrides ','. Thus, on the off chance that the 
-				//translations contain commas, the result will be better. Failing that, let's try commas 
-				//from other languages.
+				// This bit should be optional.
+				// First, try ';', because it generally overrides ','. Thus, on the off chance that the 
+				// translations contain commas, the result will be better. Failing that, let's try commas 
+				// from other languages.
 				List<Translation> list = new List<Translation>();
 				string[] parts = str.Split(';');
 				if (parts.Length == 1)
@@ -660,9 +655,9 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 				return list;
 			}
 
-			//Better than the default String enumerator because it allows checking to see
-			//if the current enumerator is valid rather than passing it around as a method 
-			//parameter and because it allows you to look at what will be enumerated next.
+			// Better than the default String enumerator because it allows checking to see
+			// if the current enumerator is valid rather than passing it around as a method 
+			// parameter and because it allows you to look at what will be enumerated next.
 			sealed class StringEnumerator : IEnumerator<char> {
 				string str;
 				int i;
@@ -692,7 +687,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 					}
 				}
 
-				//The class is sealed, no worries.
+				// The class is sealed, no worries.
 				public void Dispose() {
 				}
 
@@ -725,13 +720,13 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 					string s = Parse(e, tag => {
 						if (tag == "pr") {
 							ParseStringElement(e, tag, headWord);
-							//Set sense pronunciation
+							// Set sense pronunciation
 						} else if (tag == "ps") {
 							ParseStringElement(e, tag, headWord);
-							//Set sense part of speech
+							// Set sense part of speech
 						} else if (tag == "ss") {
 							foreach (Translation tr in ParseTranslation(e, headWord)) {
-								//Strings have been trimmed and normalized by ParseTranslation.
+								// Strings have been trimmed and normalized by ParseTranslation.
 								if (!entry.Translations.Contains(tr))
 									entry.Translations.Add(tr);
 							}
@@ -742,14 +737,14 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 						return null;
 					}, true, null, out topLevelTag);
 
-					//Check if the enumeration was finished.
+					// Check if the enumeration was finished.
 					if (s == null)
 						break;
 
 					if (topLevelTag == "s") {
-						//Combine senses when they're not substantially different.
-						//Senses with the same headword, part of speech and pronunciation are considered the same.
-						//TODO: update when Pr/PoS added to Entry
+						// Combine senses when they're not substantially different.
+						// Senses with the same headword, part of speech and pronunciation are considered the same.
+						// TODO: update when Pr/PoS added to Entry
 						bool merged = false;
 						foreach (Entry other in senses) {
 							if (other.Phrase == entry.Phrase) {
@@ -763,9 +758,9 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 						if (!merged)
 							senses.Add(entry);
 					} else if (topLevelTag == "pr") {
-						//Set sense pronunciation
+						// Set sense pronunciation
 					} else if (topLevelTag == "ps") {
-						//Why would this be at the top level?
+						// Why would this be at the top level?
 					}
 				}
 				return senses;
@@ -775,8 +770,6 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			#region Dispose
 			public void Dispose() {
 				Dispose(true);
-
-				//Just in case a derived class implements a finalizer.
 				GC.SuppressFinalize(this);
 			}
 

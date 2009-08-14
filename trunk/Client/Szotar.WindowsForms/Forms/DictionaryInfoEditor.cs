@@ -34,7 +34,7 @@ namespace Szotar.WindowsForms.Forms {
 				try {
 					dict.Save();
 				} catch (InvalidOperationException) {
-					//Oh well. I tried.
+					// Oh well. I tried.
 				}
 			}
 

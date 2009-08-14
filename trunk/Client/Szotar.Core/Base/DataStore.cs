@@ -5,8 +5,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Szotar {
-	//Because of the "Path" member of IDataStore, it is necessary to explicitly refer to System.IO.Path,
-	//and I find it cleaner to omit the "System".
 	using IO = System.IO;
 
 	public interface IDataStore {
@@ -27,19 +25,19 @@ namespace Szotar {
 			Writable = writable;
 		}
 
-		//The intended purpose of this method is for enumeration of files of a 
-		//particular type. Perhaps it should be replaced with an iterator method.
+		// The intended purpose of this method is for enumeration of files of a 
+		// particular type. Perhaps it should be replaced with an iterator method.
 		private DirectoryInfo GetSubDirectory(string relativePath) {
 			return new DirectoryInfo(IO.Path.Combine(this.Path, relativePath));
 		}
 
 		public IEnumerable<FileInfo> GetFiles(string relativePath, Regex nameRegex, bool recurse) {
 			DirectoryInfo subDir = GetSubDirectory(relativePath);
-			if(!subDir.Exists)
+			if (!subDir.Exists)
 				yield break;
-			
+
 			foreach (FileInfo fi in subDir.GetFiles()) {
-				//Depth-first recursion. (Hopefully there is no recursive file structure.)
+				// Depth-first recursion. (Hopefully there is no recursive file structure.)
 				if (((fi.Attributes & FileAttributes.Directory) == FileAttributes.Directory) && recurse) {
 					foreach (FileInfo sfi in GetFiles(IO.Path.Combine(relativePath, fi.Name), nameRegex, true)) {
 						yield return sfi;
@@ -56,7 +54,7 @@ namespace Szotar {
 				throw new InvalidOperationException();
 
 			DirectoryInfo di = new DirectoryInfo(IO.Path.Combine(Path, relativePath));
-			if(!di.Exists)
+			if (!di.Exists)
 				di.Create();
 		}
 
@@ -65,7 +63,7 @@ namespace Szotar {
 			get {
 				if (userDataStore != null)
 					return userDataStore;
-				
+
 				return userDataStore = new DataStore(Configuration.UserDataStore, true);
 			}
 		}
@@ -74,21 +72,21 @@ namespace Szotar {
 			get {
 				if (programDataStore != null)
 					return programDataStore;
-				
+
 				string exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
-				if(string.IsNullOrEmpty(exePath))
+				if (string.IsNullOrEmpty(exePath))
 					exePath = "./Something.exe";
 				string dirPath = IO.Path.Combine(IO.Path.GetDirectoryName(exePath), "Data");
-				
-				//Ensure that this path exists, as currently it's the cause of numerous ugly exceptions.
-				//This may sound silly, considering the ProgramDataStore isn't even writable, but it 
-				//is better in two ways:
-				// - if the location is writable, there is no problem.
-				// - if the location is not writable, it fails immediately rather than at an indeterminate time.
+
+				// Ensure that this path exists, as currently it's the cause of numerous ugly exceptions.
+				// This may sound silly, considering the ProgramDataStore isn't even writable, but it 
+				// is better in two ways:
+				//  - if the location is writable, there is no problem.
+				//  - if the location is not writable, it fails immediately rather than at an indeterminate time.
 				DirectoryInfo di = new IO.DirectoryInfo(dirPath);
-				if(!di.Exists)
+				if (!di.Exists)
 					di.Create();
-				
+
 				return programDataStore = new DataStore(
 					dirPath, false);
 			}
@@ -115,7 +113,7 @@ namespace Szotar {
 		/// <remarks>Really, this should be necessary, not optional...</remarks>
 		public static void InitializeDatabase() {
 			if (database != null)
-				 return;
+				return;
 			database = new Sqlite.SqliteDataStore(IO.Path.Combine(UserDataStore.Path, "database.sqlite"));
 		}
 		#endregion
@@ -125,7 +123,7 @@ namespace Szotar {
 	/// Combines the User and Program data stores. Any writes go to the user data store.
 	/// </summary>
 	class CombinedDataStore : IDataStore {
-		//The user data store should be writable, but the program data store should never be writable.
+		// The user data store should be writable, but the program data store should never be writable.
 		public bool Writable {
 			get { return User.Writable; }
 		}

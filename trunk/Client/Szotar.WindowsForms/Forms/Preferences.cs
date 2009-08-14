@@ -20,9 +20,9 @@ namespace Szotar.WindowsForms.Forms {
 			ThemeHelper.UseExplorerTheme(tree);
 			tree.Nodes.Clear();
 
-			foreach(Type type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()) {
+			foreach (Type type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()) {
 				Attribute attr = Attribute.GetCustomAttribute(type, typeof(PreferencePageAttribute), true);
-				if(attr != null)
+				if (attr != null)
 					FindOrCreateNode(new NodeTag { Type = type, Attribute = attr as PreferencePageAttribute });
 			}
 
@@ -37,8 +37,7 @@ namespace Szotar.WindowsForms.Forms {
 			TreeNodeCollection parentNodeCollection = null;
 
 			if (tag.Attribute.Parent != null) {
-				NodeTag parentTag = new NodeTag
-				{
+				NodeTag parentTag = new NodeTag {
 					Attribute = (PreferencePageAttribute)Attribute.GetCustomAttribute(tag.Attribute.Parent, typeof(PreferencePageAttribute)),
 					Type = tag.Attribute.Parent
 				};
@@ -49,7 +48,7 @@ namespace Szotar.WindowsForms.Forms {
 					if (node.Name == tag.Type.AssemblyQualifiedName)
 						return node;
 			} else {
-				//It's a root node
+				// It's a root node
 				foreach (TreeNode node in tree.Nodes)
 					if (node.Name == tag.Type.AssemblyQualifiedName)
 						return node;
@@ -69,7 +68,7 @@ namespace Szotar.WindowsForms.Forms {
 			TreeNode finalNode = null;
 
 			try {
-				//Get the first leaf node
+				// Get the first leaf node
 				finalNode = e.Node;
 				while (finalNode.Nodes.Count > 0)
 					finalNode = finalNode.Nodes[0];
@@ -82,7 +81,7 @@ namespace Szotar.WindowsForms.Forms {
 				throw;
 			}
 
-			//There were no instantiable leaf nodes!
+			// There were no instantiable leaf nodes!
 			if (tag.Type.IsAbstract) {
 				content.Controls.Clear();
 				displayedNode = null;
@@ -95,7 +94,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			PreferencePage page = null;
 			foreach (PreferencePage uncommittedPage in commitList) {
-				if(uncommittedPage.GetType() == tag.Type) {
+				if (uncommittedPage.GetType() == tag.Type) {
 					page = uncommittedPage;
 					break;
 				}
@@ -115,7 +114,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			page.Dock = DockStyle.Fill;
 
-			content.Controls.Add(new Label { 
+			content.Controls.Add(new Label {
 				Text = string.Join(@"\", new List<string>(tag.Attribute.LocalisedPath).ToArray())
 			});
 
@@ -160,7 +159,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			Configuration.Save();
 
-			if(close)
+			if (close)
 				Close();
 		}
 
@@ -179,7 +178,7 @@ namespace Szotar.WindowsForms.Forms {
 				commitList.Add(displayedPage);
 		}
 	}
-	
+
 	internal static class ArrayExtensions {
 		public static T GetFirstOrNull<T>(IEnumerable<T> enumerable) {
 			var e = enumerable.GetEnumerator();

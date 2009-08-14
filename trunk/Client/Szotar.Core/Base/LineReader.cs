@@ -15,9 +15,9 @@ namespace Szotar {
 		long position;
 		//The default buffer size is quite big. (32K, I believe.) It's probably best to keep 
 		//it around between ReadLine calls to avoid big allocations every time.
-		StringBuilder lineBuilder; 
+		StringBuilder lineBuilder;
 		Decoder decoder;
-		
+
 		byte[] buffer;
 		char[] decodedChars;
 		int bytesInBuffer;
@@ -38,16 +38,16 @@ namespace Szotar {
 			bytesInBuffer = 0;
 			Line = 0;
 
-			if(skipBOM)
+			if (skipBOM)
 				SkipBOM();
 		}
 
 		public Utf8LineReader(string path)
-			: this(path, true) {
-		}
+			: this(path, true)
+		{ }
 
-		public Utf8LineReader(string path, long bytePosition) 
-			: this(path, false)
+		public Utf8LineReader(string path, long bytePosition)
+			: this(path, false) 
 		{
 			stream.Seek(bytePosition, SeekOrigin.Begin);
 			position = bytePosition;
@@ -55,44 +55,44 @@ namespace Szotar {
 			bytesInBuffer = 0;
 		}
 
-		#region IDisposable implementation 
-		public void Dispose () {
+		#region IDisposable implementation
+		public void Dispose() {
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		
+
 		protected virtual void Dispose(bool disposing) {
-			if(disposing) {
-				if(disposeStream)
+			if (disposing) {
+				if (disposeStream)
 					BaseStream.Dispose();
 			}
 		}
-		
+
 		~Utf8LineReader() {
 			Dispose(false);
 		}
-		#endregion 
-		
+		#endregion
+
 		long Line { get; set; }
-		
+
 		int BufferSize { get { return 1024; } }
-		
+
 		public bool EndOfStream {
 			get {
 				return eof;
 			}
 		}
-		
-		public Stream BaseStream { 
+
+		public Stream BaseStream {
 			get { return stream; }
 		}
-		
+
 		//Skip the UTF-8 byte order mark, EF BB BF.
 		//It doesn't actually identify the byte order, since UTF-8 doesn't have byte order issues,
 		//but it does identify that it's UTF-8. That's pretty useless to us, considering we already know that.
 		void SkipBOM() {
 			BufferNextPart();
-			if(buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF) {
+			if (buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF) {
 				position = 3;
 				offset = 3;
 			}
@@ -114,15 +114,15 @@ namespace Szotar {
 
 		public string ReadLine(out long bytePosition) {
 			bytePosition = position;
-			
-			if(EndOfStream)
+
+			if (EndOfStream)
 				return null;
-			
-			bool lineBreakFound = false;			
+
+			bool lineBreakFound = false;
 			lineBuilder.Length = 0;
 			decoder.Reset();
-			
-			while(true) {
+
+			while (true) {
 				int start = offset;
 
 				//We need to know how many characters were in the linebreak, in order to remove
@@ -131,14 +131,14 @@ namespace Szotar {
 				//That actually breaks things with the older code (lbChars = 2 in CR case, reset 
 				//to 0 on normal char) anyway, when the CRLF line breaks straddled a boundary.
 				int lbChars = 0;
-				
-				for(; offset < bytesInBuffer; ++offset, ++position) {
+
+				for (; offset < bytesInBuffer; ++offset, ++position) {
 					byte b = buffer[offset];
-					
-					if(b == 13) {
+
+					if (b == 13) {
 						//CR on its own doesn't count as a line break.
 						lbChars = 1;
-					} else if(b == 10) {
+					} else if (b == 10) {
 						if (lbChars == 0)
 							lbChars = 1;
 						else if (lbChars == 1) //There's already a CR.
@@ -153,20 +153,20 @@ namespace Szotar {
 						lbChars = 0;
 					}
 				}
-				
-				if(decodedChars == null)
+
+				if (decodedChars == null)
 					decodedChars = new char[BufferSize]; //Decoding 1000 bytes can only use at most 1000 chars.
-				
+
 				//Decode the new bytes from the buffer and add them into the lineBuilder.
 				//It seems to be faster using GetChars instead of Convert (takes about 2/3 of the time).
 				int charsUsed = decoder.GetChars(buffer, start, offset - start - lbChars, decodedChars, 0);
 				lineBuilder.Append(decodedChars, 0, charsUsed);
 				lbChars = 0;
-				
-				if(lineBreakFound)
+
+				if (lineBreakFound)
 					break;
-			
-				if(!BufferNextPart())
+
+				if (!BufferNextPart())
 					break;
 			}
 
@@ -178,23 +178,23 @@ namespace Szotar {
 				if (offset == bytesInBuffer)
 					BufferNextPart();
 			}
-			
-			if(Line != -1)
+
+			if (Line != -1)
 				Line++;
-			
+
 			//Now, we have all the bytes in the line.
 			return lineBuilder.ToString();
 		}
-		
+
 		bool BufferNextPart() {
 			offset = 0;
 			bytesInBuffer = stream.Read(buffer, 0, buffer.Length);
-			
-			if(bytesInBuffer == 0) {
+
+			if (bytesInBuffer == 0) {
 				eof = true;
 				return false;
 			}
-			
+
 			return true;
 		}
 	}

@@ -23,8 +23,7 @@ namespace Szotar.WindowsForms {
 		string prefix;
 
 		public TypeStringTable(Type type)
-			: base("TypeDescriptions")
-		{
+			: base("TypeDescriptions") {
 			prefix = type.Name + "$";
 		}
 

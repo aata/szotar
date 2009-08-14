@@ -54,8 +54,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		public LookupForm(IBilingualDictionary dictionary)
-			: this()
-		{
+			: this() {
 			components.Add(new DisposableComponent(new LookupFormFileIsInUse(this, dictionary.Path)));
 			components.Add(new DisposableComponent(dictionary));
 
@@ -93,13 +92,11 @@ namespace Szotar.WindowsForms.Forms {
 		/// <summary>Open the given dictionary, possibly loading from a file, 
 		/// in a new LookupForm window.</summary>
 		public LookupForm(DictionaryInfo dictionaryInfo)
-			: this(dictionaryInfo.GetFullInstance()) 
-		{ }
+			: this(dictionaryInfo.GetFullInstance()) { }
 
 		/// <summary>Load the dictionary from the given path into a new LookupForm window.</summary>
 		public LookupForm(string dictionaryPath)
-			: this(new SimpleDictionary(dictionaryPath)) 
-		{ }
+			: this(new SimpleDictionary(dictionaryPath)) { }
 
 		private LookupForm() {
 			InitializeComponent();
@@ -120,7 +117,7 @@ namespace Szotar.WindowsForms.Forms {
 			AdjustGridRowHeight();
 
 			searchBox.RealTextChanged += new EventHandler(searchBox_RealTextChanged);
-			
+
 			// Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
 			grid.MouseLeave += new EventHandler(grid_MouseLeave);
@@ -131,7 +128,7 @@ namespace Szotar.WindowsForms.Forms {
 			// By now, the columns should have been created.
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 			grid.Columns[0].FillWeight = GuiConfiguration.LookupFormColumn1FillWeight;
-			grid.Columns[1].Resizable = DataGridViewTriState.False; 
+			grid.Columns[1].Resizable = DataGridViewTriState.False;
 			grid.CellFormatting += new DataGridViewCellFormattingEventHandler(grid_CellFormatting);
 			grid.ColumnWidthChanged += new DataGridViewColumnEventHandler(grid_ColumnWidthChanged);
 
@@ -144,7 +141,7 @@ namespace Szotar.WindowsForms.Forms {
 			this.Closed += new EventHandler(LookupForm_Closed);
 			this.InputLanguageChanged += new InputLanguageChangedEventHandler(LookupForm_InputLanguageChanged);
 			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
-			this.KeyUp += (s, e) => { if(e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
+			this.KeyUp += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
 
 			fileMenu.DropDownOpening += new EventHandler(fileMenu_DropDownOpening);
 		}
@@ -196,7 +193,7 @@ namespace Szotar.WindowsForms.Forms {
 			Configuration.Default.SettingChanged -= new EventHandler<SettingChangedEventArgs>(SettingChanging);
 		}
 
-		//Update UI state.
+		// Update UI state.
 		void SettingChanging(object sender, SettingChangedEventArgs e) {
 			if (e.SettingName == "IgnoreAccents" || e.SettingName == "IgnoreCase") {
 				// This shouldn't fire the CheckedChanged/SettingChanged events in an infinite loop.
@@ -354,7 +351,7 @@ namespace Szotar.WindowsForms.Forms {
 				return sb.ToString();
 			return null;
 		}
-		
+
 		/// <summary>Removes some common annoyances with tooltips (really wide tooltips).</summary>
 		/// <remarks>Currently obsolete (tooltip size is limited, text wraps).</remarks>
 		string SanitizeToolTipLine(string line) {
@@ -366,15 +363,15 @@ namespace Szotar.WindowsForms.Forms {
 
 			var sb = new StringBuilder();
 			while (line.Length > maxWidth) {
-				if(sb.Length > 0)
+				if (sb.Length > 0)
 					sb.Append("\t");
 
-				//Find first space before maxWidth characters.
+				// Find first space before maxWidth characters.
 				int i = line.LastIndexOf(" ", maxWidth);
-				if(i == -1) {
-					//No spaces before maxWidth?! As a last resort, increase the width a little.
+				if (i == -1) {
+					// No spaces before maxWidth?! As a last resort, increase the width a little.
 					i = line.LastIndexOf(" ", maxWidth + 20);
-					if(i == -1) {
+					if (i == -1) {
 						sb.AppendLine(line);
 						return sb.ToString();
 					}
@@ -390,7 +387,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void grid_MouseMove(object sender, MouseEventArgs e) {
-			if(e.Button != MouseButtons.None)
+			if (e.Button != MouseButtons.None)
 				return;
 
 			if (e.Location == currentInfoTipMouseLocation)
@@ -398,8 +395,8 @@ namespace Szotar.WindowsForms.Forms {
 			currentInfoTipMouseLocation = e.Location;
 
 			var hitTest = grid.HitTest(e.X, e.Y);
-			if(hitTest.Type != DataGridViewHitTestType.Cell && hitTest.Type != DataGridViewHitTestType.RowHeader) {
-				if(infoTip != null && infoTip.Active)
+			if (hitTest.Type != DataGridViewHitTestType.Cell && hitTest.Type != DataGridViewHitTestType.RowHeader) {
+				if (infoTip != null && infoTip.Active)
 					infoTip.Hide(grid);
 				infoTipText = null;
 				infoTipRow = -1;
@@ -412,7 +409,7 @@ namespace Szotar.WindowsForms.Forms {
 			string text = GetInfoTipText(hitTest.RowIndex);
 
 			if (text == null) {
-				if(infoTip != null)
+				if (infoTip != null)
 					infoTip.Hide(grid);
 				return;
 			}
@@ -424,14 +421,14 @@ namespace Szotar.WindowsForms.Forms {
 				infoTip = new ToolTip(components);
 				infoTip.StripAmpersands = false;
 				infoTip.UseAnimation = false;
-				infoTip.Popup += (s, e3) => { e3.ToolTipSize = new Size(Math.Min(e3.ToolTipSize.Width, grid.Width), e3.ToolTipSize.Height);  };
+				infoTip.Popup += (s, e3) => { e3.ToolTipSize = new Size(Math.Min(e3.ToolTipSize.Width, grid.Width), e3.ToolTipSize.Height); };
 			}
 
 			infoTip.ToolTipTitle = GetInfoTipTitle(hitTest.RowIndex);
 
 			int offset = grid.GetRowDisplayRectangle(hitTest.RowIndex, true).Height;
 
-			//This usually happens due to bugs and import errors. Either way, it's bad.
+			// This usually happens due to bugs and import errors. Either way, it's bad.
 			if (text.Length > 5000) {
 				infoTip.Hide(grid);
 				return;
@@ -510,50 +507,24 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void grid_MouseDown(object sender, MouseEventArgs e) {
-			return;
-			if(e.Button == MouseButtons.Left) {
-				var hit = grid.HitTest(e.X, e.Y);
-
-				var indices = new List<int>();
-                
-				if (hit.RowIndex >= 0) {
-					// TODO: This code isn't run anyway at the moment, but it should be:
-					// grid.Rows.GetRowState(hit.RowIndex) & DataGridViewElementStates.Selected = DataGridViewElementStates.Selected
-					if (grid.Rows[hit.RowIndex].Selected)
-						foreach (DataGridViewRow row in grid.SelectedRows)
-							indices.Add(row.Index);
-					else if (ctrlHeld)
-						indices.Add(hit.RowIndex);
-				} else {
-					return;
-				}
-
-				if(indices.Count > 0) {
-					indices.Sort();
-					var rowset = new DraggableRowSet(indices.ConvertAll(i => results[i]));
-
-					DataObject data = new DataObject(rowset);
-					data.SetText(rowset.ToString());
-					grid.DoDragDrop(data, DragDropEffects.Copy);
-				}
-			}
+			// TODO: Re-add working dragging code
 		}
 
 		/// <summary>Performs a reverse-lookup of the cell that was double-clicked.</summary>
 		/// <remarks>This is somewhat redundant now that the tooltips do this too, but
 		/// the tooltips are quite limited, and it is harder to interact with them.</remarks>
 		private void grid_CellMouseDoubleClick(object sender, DataGridViewCellEventArgs e) {
-			if(results != null && e.RowIndex >= 0) {
+			if (results != null && e.RowIndex >= 0) {
 				SearchResult sr = results[e.RowIndex];
 
 				var sb = new StringBuilder();
 				var otherSide = GetSectionBySearchMode(DisplayedSearchMode == SearchMode.Backward ? SearchMode.Forward : SearchMode.Backward);
-				
+
 				foreach (Translation t in sr.Entry.Translations) {
 					sb.Append(t.Value);
 					sb.Append(": ");
 					int n = 0;
-					foreach(var rsr in otherSide.Search(t.Value, false, false)) {
+					foreach (var rsr in otherSide.Search(t.Value, false, false)) {
 						if (rsr.MatchType == MatchType.PerfectMatch) {
 							if (rsr.Entry.Translations == null)
 								otherSide.GetFullEntry(rsr.Entry);
@@ -607,16 +578,16 @@ namespace Szotar.WindowsForms.Forms {
 		void LookupForm_Closed(object sender, EventArgs e) {
 			if (listBuilder != null)
 				listBuilder.Close();
-			
+
 			GuiConfiguration.Save();
 
 			RemoveEventHandlers();
 
-			//This is done as a hint to the GC, because forms which are open for a long time 
-			//might not trigger a gen2 collection when closing. 
-			//We want to reclaim the memory in case there are other windows open.
-			//GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
-			GC.Collect(GC.MaxGeneration); //force it
+			// This is done as a hint to the GC, because forms which are open for a long time 
+			// might not trigger a gen2 collection when closing. 
+			// We want to reclaim the memory in case there are other windows open.
+			// GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+			GC.Collect(GC.MaxGeneration);
 		}
 
 		void LookupForm_InputLanguageChanged(object sender, InputLanguageChangedEventArgs e) {
@@ -661,7 +632,7 @@ namespace Szotar.WindowsForms.Forms {
 					i++;
 			}
 
-			//Add new entries
+			// Add new entries
 			var mru = GuiConfiguration.RecentDictionaries.Entries;
 			var index = items.IndexOf(exitMenuItem);
 			if (index == -1)
@@ -672,8 +643,8 @@ namespace Szotar.WindowsForms.Forms {
 				var info = mru[i];
 				if (info.Path != this.Dictionary.Path && System.IO.File.Exists(info.Path)) {
 					var item = new ToolStripMenuItem(
-						mru[i].Name, 
-						null, 
+						mru[i].Name,
+						null,
 						delegate { OpenDictionary(info); }
 						);
 
@@ -790,7 +761,6 @@ namespace Szotar.WindowsForms.Forms {
 				var item = new ToolStripMenuItem(li.Name, null, handler);
 				item.Tag = li;
 				recentLists.DropDownItems.Add(item);
-				//recentListsToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem(s, null, this.OpenRecentFile));
 			}
 
 			if (recentLists.DropDownItems.Count == 0) {
@@ -802,7 +772,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		private void OpenRecentFile(object sender, EventArgs e) {
 			ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
-			if(info.ID.HasValue)
+			if (info.ID.HasValue)
 				ListBuilder.Open(info.ID.Value);
 		}
 		#endregion
@@ -814,8 +784,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void UpdateButtonNames() {
-			//Set the menu items' Text to match the names of the dictionary sections.
-			//The mode switch button is based on these.
+			// Set the menu items' Text to match the names of the dictionary sections.
+			// The mode switch button is based on these.
 			forwards.Text = Dictionary.FirstLanguage + "-" + Dictionary.SecondLanguage;
 			backwards.Text = Dictionary.SecondLanguage + "-" + Dictionary.FirstLanguage;
 			switchMode.Text = SearchMode == SearchMode.Forward ? forwards.Text : backwards.Text;
@@ -839,9 +809,9 @@ namespace Szotar.WindowsForms.Forms {
 			System.Diagnostics.Process.Start("charmap.exe");
 		}
 
-        private void debugLog_Click(object sender, EventArgs e) {
-            LogViewerForm.Open();
-        }
+		private void debugLog_Click(object sender, EventArgs e) {
+			LogViewerForm.Open();
+		}
 
 		private void options_Click(object sender, EventArgs e) {
 			new Forms.Preferences().ShowDialog();
@@ -871,7 +841,7 @@ namespace Szotar.WindowsForms.Forms {
 				addTo.DropDownItems.Add(new ToolStripSeparator());
 
 			foreach (var info in recent) {
-				var info_ = info; //HACK Copy for closure
+				var info_ = info; // HACK: Copy for closure
 				var item = new ToolStripMenuItem(info.Name, null, new EventHandler((s, e) => AddToExistingList(info_.ID.Value)));
 				addTo.DropDownItems.Add(item);
 			}
@@ -935,7 +905,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			var sb = new System.Text.StringBuilder(rowCount * 16);
 
-			foreach(SearchResult result in GetSelectedResults()) {
+			foreach (SearchResult result in GetSelectedResults()) {
 				sb.Append(result.Phrase).Append(" -- ").Append(result.Translation).AppendLine();
 			}
 
@@ -974,7 +944,7 @@ namespace Szotar.WindowsForms.Forms {
 				return;
 
 			var existing = FindExisting(dict.Path);
-			if(existing != null) {
+			if (existing != null) {
 				existing.BringToFront();
 				return;
 			}
@@ -991,7 +961,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		public static LookupForm OpenDictionary(string path) {
 			var existing = FindExisting(path);
-			if(existing != null) {
+			if (existing != null) {
 				existing.BringToFront();
 				return existing;
 			}

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Szotar.WindowsForms.Preferences;
 
 namespace Szotar.WindowsForms.Preferences {
-	[PreferencePage("Startup", Parent=typeof(Categories.General), Importance=20)]
+	[PreferencePage("Startup", Parent = typeof(Categories.General), Importance = 20)]
 	public partial class Startup : PreferencePage {
 		public Startup() {
 			InitializeComponent();
@@ -43,7 +43,7 @@ namespace Szotar.WindowsForms.Preferences {
 		public override void Commit() {
 			if (startPage.Checked) {
 				GuiConfiguration.StartupAction = "StartPage";
-			} else if(dictionary.Checked) {
+			} else if (dictionary.Checked) {
 				GuiConfiguration.StartupAction = "Dictionary";
 				object dict = list.SelectedItem;
 				if (dict != null) {
@@ -51,7 +51,7 @@ namespace Szotar.WindowsForms.Preferences {
 				} else {
 					GuiConfiguration.StartupDictionary = null;
 				}
-			} else if(practice.Checked) {
+			} else if (practice.Checked) {
 				GuiConfiguration.StartupAction = "Practice";
 			}
 		}

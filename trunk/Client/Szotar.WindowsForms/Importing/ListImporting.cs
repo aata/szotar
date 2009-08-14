@@ -76,7 +76,7 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 					doc.LoadXml(xml);
 					XPathNavigator nav = doc.CreateNavigator();
 
-					//Acquire the name, author and entries of the set.
+					// Acquire the name, author and entries of the set.
 
 					{
 						object eval = nav.Evaluate("string(//html:h2[1])", nsm);
@@ -91,7 +91,7 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 					}
 
 					{
-						//This is almost as bad as that bloody regex.
+						// This is almost as bad as that bloody regex.
 						object eval = nav.Evaluate("string(//html:h3[1]/../html:table[1]/html:tr[string(html:td[1])='Creator']/html:td[2]/html:a)", nsm);
 						if (eval is string)
 							info.Author = (string)eval;
@@ -104,13 +104,13 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 					foreach (XPathNavigator td in iterator) {
 						string value = (string)td.Evaluate("string(.)");
 						if (entry == null) {
-							//First TD: Search button
+							// First TD: Search button
 							entry = new WordListEntry(wordList, null, null);
 						} else if (entry.Phrase == null) {
-							//Second TD: Phrase
+							// Second TD: Phrase
 							entry.Phrase = value;
 						} else if (entry.Translation == null) {
-							//Third TD: Translation
+							// Third TD: Translation
 							entry.Translation = value;
 							wordList.Add(entry);
 							entry = null;

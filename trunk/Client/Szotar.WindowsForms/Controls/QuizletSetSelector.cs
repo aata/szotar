@@ -57,7 +57,7 @@ namespace Szotar.WindowsForms.Controls {
 			result = currentRequest.BeginGetResponse(new AsyncCallback(this.SearchReturned), null);
 		}
 
-		//Aborts the current web request, if any.
+		// Aborts the current web request, if any.
 		private void AbortRequest() {
 			if (currentRequest != null) {
 				currentRequest.Abort();
@@ -68,9 +68,9 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void SearchReturned(IAsyncResult result) {
-			//Sometimes this actually asserts, presumably because SearchReturned executes before result
-			//is assigned in StartSearch.
-			//System.Diagnostics.Debug.Assert(result == this.result);
+			// Sometimes this actually asserts, presumably because SearchReturned executes before result
+			// is assigned in StartSearch.
+			// System.Diagnostics.Debug.Assert(result == this.result);
 
 			try {
 				WebResponse response = currentRequest.EndGetResponse(result);
@@ -234,24 +234,24 @@ namespace Szotar.WindowsForms.Controls {
 			if (content.IndexOf("<p>Nothing on Quizlet matched your search") > -1)
 				return;
 
-			//Probably also not needed.
+			// Probably also not needed.
 			int i = content.IndexOf("<div id='sets'>");
 			if (i == -1)
 				throw new InvalidDataException("Could not parse Quizlet data.");
 			content = content.Substring(i);
 
-			//This regex... it is evil.
-			//(1) set ID
-			//(2) set name
-			//(3) creator
-			//(4) amount of terms
-			//(5) date created
+			// This regex... it is evil.
+			// (1) set ID
+			// (2) set name
+			// (3) creator
+			// (4) amount of terms
+			// (5) date created
 			Regex regex = new Regex(
 				"<tr.*?>\\s*<td.*?>.*?</td>\\s*<td.*?><strong.*?><a\\s+href=\"/set/(\\d+)/\">(.*?)</a></strong>" +
 				"<small.*?>.*?<a.*?>(.*?)</a></small></td>\\s*" +
 				"<td.*?>(\\d+)[^<]+<td.*?><span.*?>([^<]*)</span></td></tr>"
 				, RegexOptions.Multiline | RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
-			//Regex regex = new Regex("<li><strong><a\\s+href=\"/set/(\\d+)/\">([^<]+)</a>[^u]+<ul>\\s+<li>[^<]+<span[^>]+>([^>]+)</span>\\s*</li>\\s*<li>[^\\d]+(\\d+)[^<]+<li>[^<]+<a[^>]+>([^<]+)</a></li></ul>(?:\\s*<p>([^<]+)</p>)?\\s*</li>", RegexOptions.Multiline | RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
 			Match match;
 			while ((match = regex.Match(content)).Success) {
 				sets.Add(new QuizletSetInfo(int.Parse(match.Groups[1].Value), match.Groups[2].Value, match.Groups[5].Value, int.Parse(match.Groups[4].Value), match.Groups[3].Value));

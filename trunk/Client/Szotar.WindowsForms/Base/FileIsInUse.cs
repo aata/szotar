@@ -39,8 +39,8 @@ namespace Szotar.WindowsForms {
 			try {
 				int hresult = NativeMethods.CreateFileMoniker(path, out moniker);
 
-				//Failing to create a moniker is bad. It's likely that nothing else will work
-				//in this case. Perhaps it should be an exception though.
+				// Failing to create a moniker is bad. It's likely that nothing else will work
+				// in this case. Perhaps it should be an exception though.
 				if (hresult < 0)
 					return;
 			} catch (DllNotFoundException) {
@@ -67,7 +67,7 @@ namespace Szotar.WindowsForms {
 
 		private void Register() {
 			if (moniker == null)
-				return; //No need to raise an error. This feature is merely a nicety anyway.
+				return; // No need to raise an error. This feature is merely a nicety anyway.
 
 			if (cookie == null) {
 				IRunningObjectTable table = GetTable();
@@ -90,7 +90,7 @@ namespace Szotar.WindowsForms {
 					try {
 						table.Revoke(cookie.Value);
 					} catch (COMException) {
-						//Realistically, there is no point trying to handle this exception.
+						// Realistically, there is no point trying to handle this exception.
 					}
 				}
 			}

@@ -37,9 +37,8 @@ namespace Szotar.WindowsForms.Forms {
 			mode.Start(this);
 		}
 
-		public PracticeWindow() 
-			: this(new ListSearchResult[]{}, PracticeMode.SearchMode) 
-		{ }
+		public PracticeWindow()
+			: this(new ListSearchResult[] { }, PracticeMode.SearchMode) { }
 
 		public static void OpenNewSession(IList<ListSearchResult> items) {
 			new PracticeWindow(items, PracticeMode.Default).Show();

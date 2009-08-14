@@ -64,7 +64,6 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		//To do: show some sort of non-modal error UI.
 		private void ImportFailed(Exception exception) {
 			string message = exception != null ? exception.Message : Resources.Errors.TheOperationWasCancelled;
 			CurrentUI = new Controls.ErrorUI(
@@ -149,7 +148,7 @@ namespace Szotar.WindowsForms.Forms {
 				Controls.ProgressUI progressUI = new Controls.ProgressUI();
 				CurrentUI = progressUI;
 
-				//Try is needed here too in case the import fails synchronously
+				// Try is needed here too in case the import fails synchronously
 				try {
 					importer.BeginImport();
 				} catch (ImportException ex) {

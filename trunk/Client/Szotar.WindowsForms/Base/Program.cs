@@ -10,7 +10,7 @@ namespace Szotar.WindowsForms {
 		static void Main() {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			
+
 			Szotar.LocalizationProvider.Default = new LocalizationProvider();
 			ToolStripManager.Renderer = new ToolStripAeroRenderer(ToolbarTheme.Toolbar);
 			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
@@ -40,10 +40,10 @@ namespace Szotar.WindowsForms {
 					try {
 						DictionaryInfo info = new SimpleDictionary.Info(dict);
 						new Forms.LookupForm(info).Show();
-					} catch (System.IO.IOException) { //TODO: Access/permission exceptions?
+					} catch (System.IO.IOException) { // TODO: Access/permission exceptions?
 						goto case "StartPage";
 					} catch (DictionaryLoadException) {
-						//Maybe there should be some UI for this (it's there, but not loadable?)...
+						// Maybe there should be some UI for this (it's there, but not loadable?)...
 						goto case "StartPage";
 					}
 

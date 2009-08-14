@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Preferences {
-	[PreferencePage("Display", Parent=typeof(Categories.General), Importance=5)]
+	[PreferencePage("Display", Parent = typeof(Categories.General), Importance = 5)]
 	public partial class Display : PreferencePage {
 		string fontName;
 		float fontSize;
@@ -35,7 +35,7 @@ namespace Szotar.WindowsForms.Preferences {
 		}
 
 		public void UpdateListFontButton() {
-			if(fontName != null) {
+			if (fontName != null) {
 				listFontButton.Text = string.Format("{0} ({1}pt)", fontName, fontSize);
 			} else {
 				listFontButton.Text = "(Default)";

@@ -6,14 +6,14 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 
-//TODO: Hide stack trace by default, store visibility in GuiConfiguration.
+// TODO: Hide stack trace by default, store visibility in GuiConfiguration.
 namespace Szotar.WindowsForms.Controls {
 	public partial class ErrorUI : UserControl {
 		Bitmap errorBitmap;
 
 		public ErrorUI(string error, string stack) {
 			InitializeComponent();
-			
+
 			icon.Image = errorBitmap = SystemIcons.Error.ToBitmap();
 
 			ErrorText = error;

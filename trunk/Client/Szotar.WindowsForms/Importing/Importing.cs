@@ -7,8 +7,8 @@ namespace Szotar.WindowsForms.Importing {
 	[Serializable]
 	public class ImportException : Exception {
 		public ImportException(string message)
-			: base(message) {
-		}
+			: base(message)
+		{ }
 
 		public ImportException() { }
 	}
@@ -21,7 +21,6 @@ namespace Szotar.WindowsForms.Importing {
 		readonly string name;
 		readonly Type type;
 
-		// This is a positional argument.
 		public ImporterAttribute(string name, Type type) {
 			this.name = name;
 			this.type = type;
@@ -44,7 +43,6 @@ namespace Szotar.WindowsForms.Importing {
 		readonly string resourceTableName;
 		readonly string resourceIdentifier;
 
-		// This is a positional argument.
 		public ImporterDescriptionAttribute(string description) {
 			this.description = description;
 		}

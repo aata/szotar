@@ -6,40 +6,38 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Text;
 
-//SqliteWordList: an SQLite-backed word list. All changes made are immediately
-//synchronised with the database, and can be undone or re-done. It also has an
-//in-memory version, stored in a BindingList, which provides the ListChanged 
-//events and fast read access.
+// SqliteWordList: an SQLite-backed word list. All changes made are immediately
+// synchronised with the database, and can be undone or re-done. It also has an
+// in-memory version, stored in a BindingList, which provides the ListChanged 
+// events and fast read access.
 
-//Despite being database-backed, this list is NOT thread-safe!
+// Despite being database-backed, this list is NOT thread-safe!
 
-//The undo list is composed of a zipper list of ICommand objects which can be
-//performed and undone. See Undo.cs for more information.
+// The undo list is composed of a zipper list of ICommand objects which can be
+// performed and undone. See Undo.cs for more information.
 
-//The undo functionality is global to the list, NOT specific to each editor,
-//so this can obviously cause problems if multiple consumers are editing the
-//list at the same time. However, having separate undo lists doesn't really
-//make much sense either, unless the undo lists were somehow able to update
-//each other such that undoing an action in one list updates the other undo 
-//list's state such that it is correct. Maybe this would be something to 
-//explore at a later date, but I suspect that the provided workarounds will 
-//suffice for now.
+// The undo functionality is global to the list, NOT specific to each editor,
+// so this can obviously cause problems if multiple consumers are editing the
+// list at the same time. However, having separate undo lists doesn't really
+// make much sense either, unless the undo lists were somehow able to update
+// each other such that undoing an action in one list updates the other undo 
+// list's state such that it is correct. Maybe this would be something to 
+// explore at a later date, but I suspect that the provided workarounds will 
+// suffice for now.
 
-//The UI should ensure that only one UI element is providing editing services 
-//for the word list, to avoid undo-related confusion.
+// The UI should ensure that only one UI element is providing editing services 
+// for the word list, to avoid undo-related confusion.
 
-//To work around this somewhat, the WordList class will provide for out-of-band
-//updates that aren't stored in the undo list. This makes writing ICommand 
-//objects more difficult as they should preserve out-of-band changes when they
-//undone and then re-done. For example, inserting a WordListEntry, updating its 
-//TimesFailed count out-of-band, then undoing the insertion and re-doing it 
-//should re-insert the *edited* row, not the original row. Such cases are
-//usually marked in the comments where they occur.
+// To work around this somewhat, the WordList class will provide for out-of-band
+// updates that aren't stored in the undo list. This makes writing ICommand 
+// objects more difficult as they should preserve out-of-band changes when they
+// undone and then re-done. For example, inserting a WordListEntry, updating its 
+// TimesFailed count out-of-band, then undoing the insertion and re-doing it 
+// should re-insert the *edited* row, not the original row. Such cases are
+// usually marked in the comments where they occur.
 
-//Note: it should be an error to perform deletion or insertion commands out-of-band, 
-//as such things could cause normal undo/redo functionality to fail.
-
-//I don't normally use #region, but I think this code is clearer with it.
+// Note: it should be an error to perform deletion or insertion commands out-of-band, 
+// as such things could cause normal undo/redo functionality to fail.
 namespace Szotar.Sqlite {
 	public class SqliteWordList : WordList {
 		Worker worker;
@@ -183,9 +181,8 @@ namespace Szotar.Sqlite {
 			UndoList.Do(new Deletion(this, indices));
 		}
 
-		public override void SwapRows(IEnumerable<int> indices)
-		{
- 			UndoList.Do(new SwapRowsCommand(this, indices));
+		public override void SwapRows(IEnumerable<int> indices) {
+			UndoList.Do(new SwapRowsCommand(this, indices));
 		}
 
 		public override void Clear() {
@@ -215,7 +212,7 @@ namespace Szotar.Sqlite {
 
 		public override WordListEntry this[int index] {
 			get { return list[index]; }
-			set { UndoList.Do(new SetItem(this, index, value));	}
+			set { UndoList.Do(new SetItem(this, index, value)); }
 		}
 
 		public override int IndexOf(WordListEntry item) {
@@ -376,12 +373,12 @@ namespace Szotar.Sqlite {
 				using (var txn = Connection.BeginTransaction()) {
 					ExecuteSQL(@"
 						DELETE From VocabItems 
-							WHERE SetID = ? AND ListPosition BETWEEN ? AND ?", 
+							WHERE SetID = ? AND ListPosition BETWEEN ? AND ?",
 						list.ID, index, index + count - 1);
 					ExecuteSQL(@"
 						UPDATE VocabItems 
 							SET ListPosition = ListPosition - ? 
-							WHERE SetID = ? AND ListPosition > ?", 
+							WHERE SetID = ? AND ListPosition > ?",
 						count, list.ID, index);
 
 					txn.Commit();
@@ -464,7 +461,7 @@ namespace Szotar.Sqlite {
 			public object GetProperty(int index, string name) {
 				using (var cmd = Connection.CreateCommand()) {
 					cmd.CommandText = string.Format(
-							CultureInfo.InvariantCulture, 
+							CultureInfo.InvariantCulture,
 							@"SELECT {0} FROM VocabItems WHERE SetID = ? AND ListPosition = ?",
 							name);
 					AddParameter(cmd, list.ID);
@@ -479,7 +476,7 @@ namespace Szotar.Sqlite {
 					ExecuteSQL(
 						string.Format(
 							CultureInfo.InvariantCulture,
-							@"UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?", 
+							@"UPDATE VocabItems SET {0} = ? WHERE SetID = ? AND ListPosition = ?",
 							name),
 						value, list.ID, index);
 
@@ -493,7 +490,7 @@ namespace Szotar.Sqlite {
 						UPDATE VocabItems 
 							SET Phrase = ?, Translation = ?
 							WHERE SetID = ? AND ListPosition = ?",
-						item.Phrase, item.Translation, 
+						item.Phrase, item.Translation,
 						list.ID, index);
 
 					txn.Commit();
@@ -504,8 +501,8 @@ namespace Szotar.Sqlite {
 				using (var txn = Connection.BeginTransaction()) {
 					ExecuteSQL(
 						string.Format(
-							CultureInfo.InvariantCulture, 
-							@"UPDATE Sets SET {0} = ? WHERE id = ?", 
+							CultureInfo.InvariantCulture,
+							@"UPDATE Sets SET {0} = ? WHERE id = ?",
 							property),
 						value, list.ID);
 
@@ -516,12 +513,12 @@ namespace Szotar.Sqlite {
 			public object GetWordListProperty(string property) {
 				return Select(
 					string.Format(
-						CultureInfo.InvariantCulture, 
-						@"SELECT {0} FROM Sets WHERE id = ?", 
+						CultureInfo.InvariantCulture,
+						@"SELECT {0} FROM Sets WHERE id = ?",
 						property),
 					list.ID);
 			}
-		
+
 			public void SwapRows(IEnumerable<int> indices) {
 				var sb = new StringBuilder();
 				sb.Append(@"
@@ -529,8 +526,8 @@ namespace Szotar.Sqlite {
 						SET Phrase = Translation, Translation = Phrase 
 						WHERE SetID = ? AND ListPosition IN (");
 				bool first = true;
-				foreach(int i in indices) {
-					if(!first)
+				foreach (int i in indices) {
+					if (!first)
 						sb.Append(", ");
 					else
 						first = false;
@@ -567,7 +564,8 @@ namespace Szotar.Sqlite {
 			WordListEntry oldItem;
 
 			public SetItem(SqliteWordList owner, int index, WordListEntry item)
-				: base(owner) {
+				: base(owner)
+			{
 				this.index = index;
 				this.item = item;
 			}
@@ -596,7 +594,8 @@ namespace Szotar.Sqlite {
 			WordListEntry item;
 
 			public Insertion(SqliteWordList owner, int index, WordListEntry item)
-				: base(owner) {
+				: base(owner)
+			{
 				this.index = index;
 				this.item = item;
 			}
@@ -630,7 +629,8 @@ namespace Szotar.Sqlite {
 			IList<WordListEntry> items;
 
 			public MultipleInsertion(SqliteWordList owner, int index, IList<WordListEntry> items)
-				: base(owner) {
+				: base(owner)
+			{
 				this.index = index;
 				this.items = items;
 			}
@@ -652,10 +652,10 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { 
-					return string.Format( 
-						LocalizationProvider.Default.Strings["InsertedNItems"] ?? "Inserted {0} items", 
-						items.Count); 
+				get {
+					return string.Format(
+						LocalizationProvider.Default.Strings["InsertedNItems"] ?? "Inserted {0} items",
+						items.Count);
 				}
 			}
 		}
@@ -667,7 +667,8 @@ namespace Szotar.Sqlite {
 			WordList.EntryProperty property;
 
 			public SetValue(SqliteWordList owner, int index, WordList.EntryProperty property, T oldValue, T newValue)
-				: base(owner) {
+				: base(owner)
+			{
 				this.index = index;
 				this.oldValue = oldValue;
 				this.newValue = newValue;
@@ -692,8 +693,9 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return string.Format(
-					LocalizationProvider.Default.Strings["ChangedXToY"] ?? "Changed \"{0}\" to \"{1}\"", oldValue, newValue);
+				get {
+					return string.Format(
+						LocalizationProvider.Default.Strings["ChangedXToY"] ?? "Changed \"{0}\" to \"{1}\"", oldValue, newValue);
 				}
 			}
 		}
@@ -705,9 +707,10 @@ namespace Szotar.Sqlite {
 			List<int> reverseIndices;
 
 			public Deletion(SqliteWordList owner, IEnumerable<int> indices)
-				: base(owner) {
+				: base(owner)
+			{
 				foreach (int i in indices)
-					items.Add(new KeyValuePair<int, WordListEntry>(i, 
+					items.Add(new KeyValuePair<int, WordListEntry>(i,
 						new WordListEntry(owner, list[i].Phrase, list[i].Translation)
 						));
 
@@ -720,8 +723,8 @@ namespace Szotar.Sqlite {
 			}
 
 			public Deletion(SqliteWordList owner, params int[] indices)
-				: this(owner, (IEnumerable<int>)indices) {
-			}
+				: this(owner, (IEnumerable<int>)indices) 
+			{ }
 
 			public IEnumerable<int> Indices {
 				get {
@@ -766,7 +769,7 @@ namespace Szotar.Sqlite {
 		protected class SwapRowsCommand : Command {
 			IEnumerable<int> indices;
 
-			public SwapRowsCommand(SqliteWordList owner, IEnumerable<int> indices) 
+			public SwapRowsCommand(SqliteWordList owner, IEnumerable<int> indices)
 				: base(owner)
 			{
 				this.indices = indices;
@@ -782,15 +785,15 @@ namespace Szotar.Sqlite {
 
 			public override void Undo() { Do(); }
 
-			public override string Description { 
-				get { 
+			public override string Description {
+				get {
 					return LocalizationProvider.Default.Strings["SwappedNRows"];
 				}
 			}
 		}
 
 		public override void Undo() {
-			if(UndoList.UndoItemCount > 0)
+			if (UndoList.UndoItemCount > 0)
 				UndoList.Undo(1);
 		}
 

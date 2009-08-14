@@ -40,6 +40,7 @@ namespace Szotar.WindowsForms.Forms {
 			recentLists.Resize += new EventHandler((s, e) => recentLists.Columns[0].Width = recentLists.ClientSize.Width);
 			recentLists.Columns[0].Width = recentLists.ClientSize.Width;
 
+			// Currently this causes ugly scrollbar flickering.
 			//DistributeColumns(recentDictionaries, 100);
 			//DistributeColumns(recentLists, 100);
 			//DistributeColumns(listView1, 100);
@@ -64,7 +65,6 @@ namespace Szotar.WindowsForms.Forms {
 				totalWeight += w;
 
 			EventHandler handler = new EventHandler((s, e) => {
-				//lv.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
 				int sum = 0;
 				foreach (ColumnHeader column in lv.Columns) {
 					if(column.Index == lv.Columns.Count - 1) {
@@ -201,7 +201,7 @@ namespace Szotar.WindowsForms.Forms {
 		// There should either be a mechanism to refresh or a delay in the adding of this. If there is a delay, it should
 		// also take into account the possibility that the file has been deleted before the delay completed.
 		void fileSystemWatcher_Created(object sender, System.IO.FileSystemEventArgs e) {
-			//TODO: Implement this.
+			// TODO: Implement this.
 		}
 		#endregion
 

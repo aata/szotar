@@ -48,7 +48,7 @@ namespace Szotar.WindowsForms.Controls {
 			DataStore.Database.WordListDeleted -= new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
 		}
 
-		//When a word list is deleted, remove it from the results view.
+		// When a word list is deleted, remove it from the results view.
 		void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
 			for (int i = 0; i < results.Items.Count; ) {
 				var tag = results.Items[i].Tag;
@@ -91,7 +91,7 @@ namespace Szotar.WindowsForms.Controls {
 						return false;
 
 					ListViewItem item = new ListViewItem(
-							new [] { wsr.Phrase, 
+							new[] { wsr.Phrase, 
 							         wsr.Translation, 
 							         wsr.SetName });
 					item.Tag = wsr;
@@ -120,10 +120,10 @@ namespace Szotar.WindowsForms.Controls {
 				item.Tag = "Truncated";
 				item.Group = group;
 				item.ToolTipText = text;
-				
+
 				results.Groups.Add(group);
 				results.Items.Add(item);
-			}			
+			}
 
 			thirdColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
 			ResizeColumns();
@@ -139,7 +139,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		private void results_ItemActivate(object sender, EventArgs e) {
 			var lists = Accept();
-			
+
 			// TODO: invoke event of some kind
 			var h = ListsChosen;
 			if (h != null)
@@ -157,10 +157,10 @@ namespace Szotar.WindowsForms.Controls {
 				if (tag is ListInfo) {
 					var list = (ListInfo)tag;
 					lists.Add(new ListSearchResult(list.ID.Value));
-				} else if(tag is Szotar.Sqlite.SqliteDataStore.WordSearchResult) {
+				} else if (tag is Szotar.Sqlite.SqliteDataStore.WordSearchResult) {
 					var wsr = (Szotar.Sqlite.SqliteDataStore.WordSearchResult)tag;
 					lists.Add(new ListSearchResult(wsr.SetID, wsr.ListPosition));
-				} else if(tag.Equals("Truncated")) {
+				} else if (tag.Equals("Truncated")) {
 					// Taking this path when many items are selected would probably be annoying.
 					if (results.SelectedItems.Count == 1) {
 						MaxItems = null;

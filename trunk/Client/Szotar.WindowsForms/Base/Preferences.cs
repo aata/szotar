@@ -7,7 +7,6 @@ namespace Szotar.WindowsForms.Preferences {
 	sealed class PreferencePageAttribute : Attribute {
 		static ResourceManager defaultResourceManager = new ResourceManager(typeof(PreferencePageAttribute));
 
-		// This is a positional argument
 		public PreferencePageAttribute(string name) {
 			this.Name = name;
 			Importance = 0;
@@ -17,7 +16,7 @@ namespace Szotar.WindowsForms.Preferences {
 		public string Name { get; private set; }
 		public int Importance { get; set; }
 
-		bool IsRoot { 
+		bool IsRoot {
 			get {
 				return Parent == null;
 			}
@@ -26,7 +25,7 @@ namespace Szotar.WindowsForms.Preferences {
 		public IEnumerable<string> Path {
 			get {
 				var components = new List<string>();
-				
+
 				Type t = Parent;
 				while (t != null) {
 					PreferencePageAttribute attr = Attribute.GetCustomAttribute(t, typeof(PreferencePageAttribute)) as PreferencePageAttribute;
@@ -50,9 +49,9 @@ namespace Szotar.WindowsForms.Preferences {
 		}
 
 		private string LocalizePathComponent(string name) {
-			//Hmmm...
-			//ResourceTable property maybe, or ResourceType
-			ResourceManager specificResourceManager = null; 
+			// Hmmm...
+			// ResourceTable property maybe, or ResourceType
+			ResourceManager specificResourceManager = null;
 
 			string key = "PrefPathString." + name;
 
@@ -74,13 +73,13 @@ namespace Szotar.WindowsForms.Preferences {
 	}
 
 	namespace Categories {
-		[PreferencePage("General", Importance=100)]
+		[PreferencePage("General", Importance = 100)]
 		public static class General { }
 
-		[PreferencePage("Advanced", Importance=30)]
+		[PreferencePage("Advanced", Importance = 30)]
 		public static class Advanced { }
 	}
-	
+
 	public class PreferencePage : System.Windows.Forms.UserControl {
 		public virtual void Commit() {
 		}
