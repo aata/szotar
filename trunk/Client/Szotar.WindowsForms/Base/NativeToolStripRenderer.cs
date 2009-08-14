@@ -31,7 +31,7 @@ namespace Szotar.WindowsForms {
 		/// misses out a parameter in its own P/Invoke.
 		/// </summary>
 		static internal class NativeMethods {
-			[StructLayout(LayoutKind.Sequential, Pack = 1)]
+			[StructLayout(LayoutKind.Sequential)]
 			public struct MARGINS {
 				public int cxLeftWidth;
 				public int cxRightWidth;
@@ -39,8 +39,8 @@ namespace Szotar.WindowsForms {
 				public int cyBottomHeight;
 			}
 
-			[DllImport("uxtheme.dll", ExactSpelling = true)]
-			public extern static Int32 GetThemeMargins(IntPtr hTheme, IntPtr hdc, int iPartId, int iStateId, int iPropId, IntPtr rect, out MARGINS pMargins);
+			[DllImport("uxtheme.dll")]
+			public extern static int GetThemeMargins(IntPtr hTheme, IntPtr hdc, int iPartId, int iStateId, int iPropId, IntPtr rect, out MARGINS pMargins);
 		}
 
 		// See http://msdn2.microsoft.com/en-us/library/bb773210.aspx - "Parts and States"
@@ -121,7 +121,7 @@ namespace Szotar.WindowsForms {
 				IntPtr hDC = dc.GetHdc();
 				if (0 == NativeMethods.GetThemeMargins(renderer.Handle, hDC, renderer.Part, renderer.State, (int)marginType, IntPtr.Zero, out margins))
 					return new Padding(margins.cxLeftWidth, margins.cyTopHeight, margins.cxRightWidth, margins.cyBottomHeight);
-				return new Padding(-1);
+				return new Padding(0);
 			} finally {
 				dc.ReleaseHdc();
 			}

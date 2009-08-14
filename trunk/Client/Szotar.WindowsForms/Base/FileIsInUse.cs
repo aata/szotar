@@ -125,6 +125,7 @@ namespace Szotar.WindowsForms {
 			public static extern int CreateFileMoniker([MarshalAs(UnmanagedType.LPWStr)] string lpszPathName, out IMoniker ppmk);
 			[Flags]
 			public enum RotFlags : int {
+				None = 0,
 				RegistrationKeepsAlive = 1,
 				/// <summary>
 				/// In order to use this flag, the application must have its executable name in the AppID section
