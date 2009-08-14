@@ -41,8 +41,8 @@ namespace Szotar {
 			set { fullEntryHandle = value; }
 		}
 
-		///<summary>The phrase without any accents. This is used for speeding up the search.</summary>
-		///<remarks>Note that The translation without accents is not yet needed.</remarks>
+		/// <summary>The phrase without any accents. This is used for speeding up the search.</summary>
+		/// <remarks>Note that The translation without accents is not yet needed.</remarks>
 		[Browsable(false)]
 		public string PhraseNoAccents {
 			get { return phraseNA; }
@@ -62,8 +62,8 @@ namespace Szotar {
 			phraseNA = Searcher.RemoveAccents(phrase);
 		}
 
-		///<summary>A default constructor for the purposes of data binding lists and such.
-		///Not really intended to be used from code which knows better.</summary>
+		/// <summary>A default constructor for the purposes of data binding lists and such.
+		/// Not really intended to be used from code which knows better.</summary>
 		public TranslationPair() {
 			phrase = string.Empty;
 			translation = string.Empty;
@@ -105,7 +105,7 @@ namespace Szotar {
 	[System.Diagnostics.DebuggerDisplay("{Value} ({PartOfSpeech})")]
 	public class Translation {
 		public string Value { get; set; }
-		//public string PartOfSpeech { get; set; }
+		// public string PartOfSpeech { get; set; }
 
 		public Translation(string value) {
 			Value = value;

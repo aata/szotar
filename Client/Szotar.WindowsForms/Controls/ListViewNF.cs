@@ -11,7 +11,7 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		protected override void OnNotifyMessage(Message m) {
-			if(m.Msg != 0x14) //WM_ERASEBKGND
+			if (m.Msg != 0x14) // WM_ERASEBKGND
 				base.OnNotifyMessage(m);
 		}
 	}

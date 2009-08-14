@@ -22,7 +22,7 @@ namespace Szotar {
 			foreach (var k in dict.Items) {
 				switch (k.Key) {
 					case "ID":
-						if(k.Value != null) {
+						if (k.Value != null) {
 							var n = k.Value as JsonNumber;
 							if (n != null)
 								ID = (long)n.LongValue;

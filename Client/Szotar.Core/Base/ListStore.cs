@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Szotar {	
+namespace Szotar {
 	public interface IListStore {
 		string Name { get; }
 		IEnumerable<ListInfo> GetLists();

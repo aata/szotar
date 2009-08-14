@@ -10,7 +10,7 @@ namespace Szotar {
 	[Serializable]
 	public class MruList<T>
 		: IJsonConvertible
-		where T : IKeyCompare<T>
+		where T : IKeyCompare<T> 
 	{
 		public List<T> Entries { get; set; }
 		int maximumSize;
@@ -51,7 +51,7 @@ namespace Szotar {
 			if (dict == null)
 				throw new JsonConvertException("Expected a JSON dictionary");
 
-			foreach(var k in dict.Items) {
+			foreach (var k in dict.Items) {
 				switch (k.Key) {
 					case "Entries":
 						Entries = context.FromJson<List<T>>(k.Value);

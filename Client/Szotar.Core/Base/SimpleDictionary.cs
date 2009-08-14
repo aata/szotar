@@ -21,8 +21,8 @@ namespace Szotar {
 				this.entries = entries;
 				this.dictionary = dictionary;
 			}
-			
-			public SimpleDictionary Dictionary { 
+
+			public SimpleDictionary Dictionary {
 				get { return dictionary; }
 			}
 
@@ -51,12 +51,12 @@ namespace Szotar {
 
 				Entry full = dictionary.GetFullEntry(stub, this);
 				stub.Translations = full.Translations;
-				
+
 				// Actually, this should still be kept. It allows for saving the dictionary cache.
 				//stub.Tag = null;
 			}
 		}
-		
+
 		public class Info : DictionaryInfo {
 			public Info(string path) {
 				using (SimpleDictionary dict = new SimpleDictionary(path, false, false))
@@ -74,10 +74,9 @@ namespace Szotar {
 				GetFullInstance = () => FromWeak(weak);
 			}
 
-			private SimpleDictionary FromWeak(NullWeakReference<SimpleDictionary> weak)
-			{
+			private SimpleDictionary FromWeak(NullWeakReference<SimpleDictionary> weak) {
 				var dict = weak.Target;
-				if(dict!= null)
+				if (dict != null)
 					return dict;
 
 				return new SimpleDictionary(Path);
@@ -101,8 +100,9 @@ namespace Szotar {
 				return new Info(this);
 			}
 		}
-		
-		public SimpleDictionary(string path) : this(path, true, true) {
+
+		public SimpleDictionary(string path)
+			: this(path, true, true) {
 		}
 
 		public SimpleDictionary(string path, bool poolStrings, bool full) {
@@ -112,7 +112,7 @@ namespace Szotar {
 			Path = path;
 
 			if (full && LoadCache()) {
-                Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
+				Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
 				return;
 			}
 
@@ -139,10 +139,10 @@ namespace Szotar {
 							throw new DictionaryLoadException("The file you are loading is probably not a dictionary (wrong magic number!)");
 						firstLine = false;
 					}
-					
-					if(line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
+
+					if (line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
 						if (!full) {
-                            Metrics.LogMeasurement(string.Format("Loaded {0} header", this.Name), timer.Elapsed);
+							Metrics.LogMeasurement(string.Format("Loaded {0} header", this.Name), timer.Elapsed);
 							return; //We got to the actual entries in the dictionary, but we just want the headers.
 						}
 
@@ -163,7 +163,7 @@ namespace Szotar {
 							case 't':
 								break;
 						}
-						
+
 						continue;
 					}
 
@@ -195,7 +195,7 @@ namespace Szotar {
 								sorted = true;
 								break;
 							case "headwords-hint":
-								this.SectionSizes = new int[] { int.Parse(bits[1]), int.Parse(bits[2]) }; 
+								this.SectionSizes = new int[] { int.Parse(bits[1]), int.Parse(bits[2]) };
 								break;
 							default:
 								break;
@@ -217,7 +217,7 @@ namespace Szotar {
 				reader = null;
 			}
 
-            Metrics.LogMeasurement(string.Format("Loading {0} without cache", this.Name), timer.Elapsed);
+			Metrics.LogMeasurement(string.Format("Loading {0} without cache", this.Name), timer.Elapsed);
 
 			SaveCache();
 		}
@@ -290,10 +290,11 @@ namespace Szotar {
 					//When called from Load, this doesn't actually get executed. Load special-cases those
 					//properties to load only the phrase, not the translation or metadata.
 					//Return true, I guess.
-					case "f": case "b": {
-						string headWord = pool.Pool(Uri.UnescapeDataString(line.Substring(2)).Normalize());
-						entry = new Entry(headWord, new List<Translation>());
-					} break;
+					case "f":
+					case "b": {
+							string headWord = pool.Pool(Uri.UnescapeDataString(line.Substring(2)).Normalize());
+							entry = new Entry(headWord, new List<Translation>());
+						} break;
 
 					//It couldn't be applied. Return false so that the caller can try applying file-level properties.
 					default:
@@ -369,7 +370,7 @@ namespace Szotar {
 		/// <param name="entry">Entry instance to be written</param>
 		void WriteEntry(TextWriter writer, string type, Entry entry) {
 			writer.WriteLine(type + " " + Escape(entry.Phrase, false));
-			
+
 			foreach (Translation tr in entry.Translations) {
 				writer.WriteLine("t " + Escape(tr.Value, false));
 				//if (tr.PartOfSpeech != null) {
@@ -408,7 +409,7 @@ namespace Szotar {
 		// Saves the dictionary cache, on a separate thread.
 		void SaveCache() {
 			string path = CachePath();
-			
+
 			// This would be quite insane
 			if (path == Path)
 				return;
@@ -432,29 +433,29 @@ namespace Szotar {
 
 			new Thread(new ThreadStart(delegate {
 				Metrics.Measure("Saving {0} cache", delegate {
-				    try {
-					    using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
-						    using (var writer = new BinaryWriter(stream)) {
-							    writer.Write(CacheFormatVersion);
+					try {
+						using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
+							using (var writer = new BinaryWriter(stream)) {
+								writer.Write(CacheFormatVersion);
 
-							    foreach (var str in new[] { name, author, url, firstLanguage, firstLanguageCode, secondLanguage, secondLanguageCode })
-								    writer.Write(str);
+								foreach (var str in new[] { name, author, url, firstLanguage, firstLanguageCode, secondLanguage, secondLanguageCode })
+									writer.Write(str);
 
-							    foreach (var section in new[] { forwardsEntries, backwardsEntries }) {
-								    writer.Write(section.Count);
-								    foreach (var entry in section) {
-									    writer.Write(entry.Phrase);
+								foreach (var section in new[] { forwardsEntries, backwardsEntries }) {
+									writer.Write(section.Count);
+									foreach (var entry in section) {
+										writer.Write(entry.Phrase);
 
-									    writer.Write((long)entry.Tag.Data);
-								    }
-							    }
-						    }
-					    }
-				    } catch (IOException e) {
-					    // If we can't save the cache, it's not a huge problem.
-                        ProgramLog.Default.AddMessage(LogType.Error, "Can't save cache for dictionary {0}: {1}", name, e.Message);
-				    }
-                });
+										writer.Write((long)entry.Tag.Data);
+									}
+								}
+							}
+						}
+					} catch (IOException e) {
+						// If we can't save the cache, it's not a huge problem.
+						ProgramLog.Default.AddMessage(LogType.Error, "Can't save cache for dictionary {0}: {1}", name, e.Message);
+					}
+				});
 			})).Start();
 		}
 
@@ -466,8 +467,8 @@ namespace Szotar {
 
 			var dictModified = File.GetLastWriteTimeUtc(this.Path);
 			var cacheModified = File.GetLastWriteTimeUtc(path);
-			
-			if(cacheModified < dictModified) {
+
+			if (cacheModified < dictModified) {
 				ProgramLog.Default.AddMessage(LogType.Error, "Cache file for {0} was invalid because the last write time was earlier than the dictionary file.", this.Path);
 				return false;
 			}
@@ -503,11 +504,11 @@ namespace Szotar {
 
 		Section LoadCacheSection(BinaryReader reader) {
 			int capacity = reader.ReadInt32();
-			
+
 			var entries = new List<Entry>(capacity);
 			var section = new Section(entries, this);
 
-			for (int i = 0; i < capacity; ++i) 
+			for (int i = 0; i < capacity; ++i)
 				entries.Add(LoadCacheEntry(reader, section));
 
 			return section;
@@ -523,7 +524,7 @@ namespace Szotar {
 
 			return new Entry(phrase, null) { Tag = new EntryTag(section, reader.ReadInt64()) };
 		}
-#endregion
+		#endregion
 
 		#region Properties
 		[Browsable(false)]
@@ -544,11 +545,15 @@ namespace Szotar {
 		public string Url { get; set; }
 		public string FirstLanguage { get; set; }
 		public string SecondLanguage { get; set; }
-		[Browsable(false)] public string FirstLanguageCode { get; set; }
-		[Browsable(false)] public string SecondLanguageCode { get; set; }
+		[Browsable(false)]
+		public string FirstLanguageCode { get; set; }
+		[Browsable(false)]
+		public string SecondLanguageCode { get; set; }
 
-		[Browsable(false)] public string[] SectionNames { get; protected set; }
-		[Browsable(false)] public int[] SectionSizes { get; protected set; }
+		[Browsable(false)]
+		public string[] SectionNames { get; protected set; }
+		[Browsable(false)]
+		public int[] SectionSizes { get; protected set; }
 		#endregion
 
 		#region Dispose
@@ -560,7 +565,7 @@ namespace Szotar {
 
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
-				if(reader != null)
+				if (reader != null)
 					reader.Dispose();
 			}
 		}
@@ -593,11 +598,13 @@ namespace Szotar {
 		}
 
 		public bool ShouldPool {
-			get; set;
+			get;
+			set;
 		}
 
 		public int Calls {
-			get; protected set;
+			get;
+			protected set;
 		}
 
 		public int Count {

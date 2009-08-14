@@ -13,7 +13,7 @@ namespace Szotar.WindowsForms {
 			public static extern int SetWindowTheme
 				(IntPtr hWnd, String pszSubAppName, String pszSubIdList);
 
-			public const int 
+			public const int
 				TVS_EX_FADEINOUTEXPANDOS = 0x40,
 				TVS_EX_AUTOHSCROLL = 0x20,
 				TVS_EX_DOUBLEBUFFER = 0x4,
@@ -38,9 +38,9 @@ namespace Szotar.WindowsForms {
 							NativeMethods.TVS_EX_FADEINOUTEXPANDOS;
 
 						NativeMethods.SendMessage(
-							control.Handle, 
-							NativeMethods.TVM_SETEXTENDEDSTYLE, 
-							IntPtr.Zero, 
+							control.Handle,
+							NativeMethods.TVM_SETEXTENDEDSTYLE,
+							IntPtr.Zero,
 							new IntPtr(extStyle));
 
 						TreeView tv = control as TreeView;
@@ -51,19 +51,19 @@ namespace Szotar.WindowsForms {
 						ListView lv = control as ListView;
 
 						int extLvStyle = NativeMethods.SendMessage(
-							control.Handle, 
-							NativeMethods.LVM_GETEXTENDEDLISTVIEWSTYLE, 
-							IntPtr.Zero, 
+							control.Handle,
+							NativeMethods.LVM_GETEXTENDEDLISTVIEWSTYLE,
+							IntPtr.Zero,
 							IntPtr.Zero).ToInt32();
 
-						extLvStyle |= NativeMethods.LVS_EX_FULLROWSELECT 
-							| NativeMethods.LVS_EX_DOUBLEBUFFER 
+						extLvStyle |= NativeMethods.LVS_EX_FULLROWSELECT
+							| NativeMethods.LVS_EX_DOUBLEBUFFER
 							| NativeMethods.LVS_EX_LABELTIP;
-						
+
 						NativeMethods.SendMessage(
-							control.Handle, 
-							NativeMethods.LVM_SETEXTENDEDLISTVIEWSTYLE, 
-							IntPtr.Zero, 
+							control.Handle,
+							NativeMethods.LVM_SETEXTENDEDLISTVIEWSTYLE,
+							IntPtr.Zero,
 							new IntPtr(extLvStyle));
 					}
 				}

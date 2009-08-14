@@ -43,7 +43,7 @@ namespace Szotar.WindowsForms.Controls {
 			if (importerType.Items.Count > 0)
 				importerType.SelectedIndex = 0;
 		}
-		
+
 		public DualImporterUI(DualSectionImporter importer) {
 			InitializeComponent();
 
@@ -112,7 +112,7 @@ namespace Szotar.WindowsForms.Controls {
 					pleaseSelect.Text = Properties.Resources.DictionarySectionSelectSecondHalf;
 					fileSelectNext.Text = Properties.Resources.BeginCommand;
 					fileName.Focus();
-				} 					
+				}
 			} else {
 				secondImporter = importer;
 				secondPath = fileName.Text;
@@ -142,13 +142,13 @@ namespace Szotar.WindowsForms.Controls {
 				return currentUI;
 			}
 			set {
-				//Avoid changing anything where not necessary.
-				//It may introduce visual artifacts.
+				// Avoid changing anything where not necessary.
+				// It may introduce visual artifacts.
 				if (value == currentUI)
 					return;
 
-				//Set the dock before it becomes visible (it should be set anyway, however).
-				if(value != null)
+				// Set the dock before it becomes visible (it should be set anyway, however).
+				if (value != null)
 					value.Dock = DockStyle.Fill;
 				foreach (Control panel in Controls)
 					panel.Visible = panel == value;

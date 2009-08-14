@@ -7,13 +7,13 @@ namespace Szotar {
 	public interface ISearchDataSource : IEnumerable<Entry> {
 		IEnumerable<SearchResult> Search(string search, bool ignoreAccents, bool ignoreCase);
 	}
-	
+
 	public enum MatchType : byte {
 		NormalMatch,
 		StartMatch,
 		PerfectMatch
 	}
-	
+
 	/// <summary>
 	/// Represents a result of a search. The <cref>Translation</cref> member is not generated until
 	/// it is requested, and is discarded once the caller discards it. This should improve memory usage,
@@ -58,7 +58,7 @@ namespace Szotar {
 		public string text;
 		public string[] terms;
 	};
-	
+
 	public static class Searcher {
 		public static IEnumerable<SearchResult> Search(ISearchDataSource source, string search, bool ignoreAccents, bool ignoreCase) {
 			if (ignoreAccents)

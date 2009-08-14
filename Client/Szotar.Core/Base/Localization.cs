@@ -118,9 +118,8 @@ namespace Szotar {
 
 	public class LocalizedTypeDescriptionProvider<T> : TypeDescriptionProvider {
 		public LocalizedTypeDescriptionProvider()
-			: base(TypeDescriptor.GetProvider(typeof(T)))
-		{
-		}
+			: base(TypeDescriptor.GetProvider(typeof(T))) 
+		{ }
 
 		public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType, object instance) {
 			return new LocalizedTypeDescriptor(objectType, base.GetTypeDescriptor(objectType, instance));

@@ -92,7 +92,7 @@ namespace Szotar.WindowsForms {
 	}
 
 	public class DefaultMode : Mode {
-		public DefaultMode() 
+		public DefaultMode()
 			: base("")
 		{ }
 
@@ -142,7 +142,7 @@ namespace Szotar.WindowsForms {
 				CurrentItem = Source.FetchNextItem();
 				return;
 			}
-			
+
 			back.Push(CurrentItem);
 			CurrentItem = fore.Pop();
 		}
@@ -163,14 +163,14 @@ namespace Szotar.WindowsForms {
 	/// </summary>
 	public class FlashcardMode : Mode {
 		Control phraseLabel, translationLabel;
-		
+
 		Navigator nav;
 		NavigatorMenu navMenu;
 
 		Font bigFont, smallFont;
 		bool swap;
 
-		public FlashcardMode() 
+		public FlashcardMode()
 			: base("Flashcards") 
 		{ }
 
@@ -190,7 +190,7 @@ namespace Szotar.WindowsForms {
 			bigFont = new System.Drawing.Font(GameArea.FindForm().Font.FontFamily, 24);
 			smallFont = new System.Drawing.Font(GameArea.FindForm().Font.FontFamily, 16);
 
-			foreach (var l in new [] { phraseLabel, translationLabel }) {
+			foreach (var l in new[] { phraseLabel, translationLabel }) {
 				l.AutoSize = true;
 				l.Font = bigFont;
 				l.BackColor = Color.Transparent;
@@ -199,14 +199,14 @@ namespace Szotar.WindowsForms {
 
 			GameArea.Resize += new EventHandler(GameArea_Resize);
 
-			foreach(Control c in new Control[]{ phraseLabel, translationLabel, GameArea }) {
+			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea }) {
 				c.MouseUp += new MouseEventHandler(GameArea_MouseUp);
 			}
 
 			navMenu.Back += delegate { GoBack(); };
 			navMenu.Forward += delegate { GoForward(); };
 			navMenu.End += delegate { GoToEnd(); };
-			navMenu.Edit += delegate {  };
+			navMenu.Edit += delegate { };
 			navMenu.Swap += delegate { SwapItems(); };
 
 			translationLabel.Visible = false;
@@ -266,7 +266,7 @@ namespace Szotar.WindowsForms {
 		}
 
 		void GameArea_MouseUp(object sender, MouseEventArgs e) {
-			if(e.Button == MouseButtons.Left || e.Button == MouseButtons.XButton2)
+			if (e.Button == MouseButtons.Left || e.Button == MouseButtons.XButton2)
 				GoForward();
 			else if (e.Button == MouseButtons.Right || e.Button == MouseButtons.XButton1)
 				GoBack();
@@ -290,7 +290,7 @@ namespace Szotar.WindowsForms {
 
 		void Layout() {
 			// Choose a smaller font if it doesn't fit
-			foreach (var label in new [] { phraseLabel, translationLabel }) {
+			foreach (var label in new[] { phraseLabel, translationLabel }) {
 				if (label.Font == bigFont && label.Width > GameArea.Width) {
 					label.Font = smallFont;
 				} else if (label.Font == smallFont) {
@@ -302,7 +302,7 @@ namespace Szotar.WindowsForms {
 			}
 
 			var height = phraseLabel.Height + translationLabel.Height;
-			
+
 			var px = (GameArea.Width - phraseLabel.Width) / 2;
 			var tx = (GameArea.Width - translationLabel.Width) / 2;
 
@@ -357,8 +357,8 @@ namespace Szotar.WindowsForms {
 			fore.Click += delegate { Raise(Forward); };
 			end.Click += delegate { Raise(End); };
 			edit.Click += delegate { Raise(Edit); };
-			if(swapItem)
-				swap.Click += delegate { Raise(Swap); };			
+			if (swapItem)
+				swap.Click += delegate { Raise(Swap); };
 		}
 
 		protected IEnumerable<ToolStripItem> Buttons {
@@ -387,50 +387,4 @@ namespace Szotar.WindowsForms {
 			position.Text = string.Format("{0}/{1}", Navigator.Position, Navigator.Length);
 		}
 	}
-
-	//public class NavigatorControl : UserControl {
-	//    Button back, fore, end, edit;
-
-	//    public EventHandler Back, Forward, SkipToEnd, Edit;
-
-	//    public NavigatorControl() {
-	//        back = new Button { Text = "←" };
-	//        fore = new Button { Text = "→" };
-	//        end = new Button { Text = "end" };
-	//        edit = new Button { Text = "edit" };
-
-	//        int margin = 3;
-
-	//        BackColor = Color.Transparent;
-	//        Controls.Add(back);
-	//        Controls.Add(fore);
-	//        Controls.Add(end);
-	//        Controls.Add(edit);
-
-	//        foreach (Button b in Controls) { 
-	//            b.AutoSize = true;
-	//            b.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-	//        }
-
-	//        Anchor = AnchorStyles.Right | AnchorStyles.Top;
-
-	//        this.ParentChanged += delegate {
-	//            if (Parent == null)
-	//                return;
-
-	//            Font = Parent.Font;
-
-	//            Width = margin * 5 + back.Width + fore.Width + end.Width + edit.Width;
-	//            Height = Math.Max(back.Height, Math.Max(fore.Height, Math.Max(end.Height, edit.Height))) + margin * 2; 
-
-	//            Left = Parent.ClientSize.Width - Width;
-	//            Top = 0;
-
-	//            back.Left = margin;
-	//            fore.Left = back.Right + margin;
-	//            end.Left = fore.Right + margin;
-	//            edit.Left = end.Right + margin;
-	//        };
-	//    }
-	//}
 }

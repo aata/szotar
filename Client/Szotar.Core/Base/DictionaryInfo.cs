@@ -10,7 +10,7 @@ namespace Szotar {
 	public class DictionaryInfo
 		: IKeyCompare<DictionaryInfo>
 		, IXmlSerializable
-		, IJsonConvertible
+		, IJsonConvertible 
 	{
 		public string Name { get; set; }
 		public string Author { get; set; }
@@ -21,7 +21,7 @@ namespace Szotar {
 		public string[] Languages { get; set; }
 		public int[] SectionSizes { get; set; }
 
-		public DictionaryInfo() { 
+		public DictionaryInfo() {
 			// This needs a default: for example, JSON-serialized DictionaryInfo objects might not have it.
 			// Maybe it shouldn't be a delegate after all. LookupForm makes sure the dictionary is deallocated
 			// after closing anyway, so it's not like the weak reference does anything.
@@ -64,7 +64,9 @@ namespace Szotar {
 			writer.WriteElementString("Url", Url);
 		}
 
-		protected DictionaryInfo(JsonValue value, IJsonContext context) : this() {
+		protected DictionaryInfo(JsonValue value, IJsonContext context)
+			: this() 
+		{
 			var dict = value as JsonDictionary;
 			if (dict == null)
 				throw new JsonConvertException("Expected a JSON dictionary");

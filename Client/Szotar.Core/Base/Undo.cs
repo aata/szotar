@@ -9,9 +9,9 @@ namespace Szotar {
 	}
 
 	public class UndoList {
-		//The newest undo items are at the end of the list.
+		// The newest undo items are at the end of the list.
 		List<ICommand> undoItems = new List<ICommand>();
-		//The newest redo items are at the end of the list.
+		// The newest redo items are at the end of the list.
 		List<ICommand> redoItems = new List<ICommand>();
 
 		public void Undo(int count) {

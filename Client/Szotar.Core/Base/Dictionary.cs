@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 
-namespace Szotar {	
+namespace Szotar {
 	/// <summary>
 	/// Represents a read-write dictionary.
 	/// </summary>
@@ -14,7 +14,7 @@ namespace Szotar {
 		string Url { get; set; }
 
 		DictionaryInfo Info { get; }
-		
+
 		IDictionarySection ForwardsSection { get; }
 		IDictionarySection ReverseSection { get; }
 
@@ -25,20 +25,19 @@ namespace Szotar {
 
 		void Save();
 	}
-	
+
 	public static class Dictionary {
-		public static IEnumerable<DictionaryInfo> GetAll() {			
+		public static IEnumerable<DictionaryInfo> GetAll() {
 			foreach (FileInfo file in DataStore.CombinedDataStore.GetFiles
-			         (Configuration.DictionariesFolderName, new System.Text.RegularExpressions.Regex(@"\.dict$"), true)) 
-			{
-				//Only load the info section of the dictionary
+					 (Configuration.DictionariesFolderName, new System.Text.RegularExpressions.Regex(@"\.dict$"), true)) {
+				// Only load the info section of the dictionary
 				yield return new SimpleDictionary.Info(file.FullName);
 			}
 
 			yield break;
 		}
 	}
-	
+
 	public interface IDictionarySection : ISearchDataSource {
 		int HeadWords { get; }
 

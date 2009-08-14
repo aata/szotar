@@ -9,15 +9,15 @@ using System.Windows.Forms;
 namespace Szotar.WindowsForms.Forms {
 	public partial class ListBuilder : Form {
 		WordList list;
-		
+
 		public WordList WordList { get { return list; } }
 
-		public ListBuilder() : 
+		public ListBuilder() :
 			this(
 				DataStore.Database.CreateSet(
-					Properties.Resources.DefaultListName, 
-					GuiConfiguration.UserNickname, 
-					null, null, DateTime.Now))
+					Properties.Resources.DefaultListName,
+					GuiConfiguration.UserNickname,
+					null, null, DateTime.Now)) 
 		{
 			MakeRecent();
 
@@ -63,9 +63,9 @@ namespace Szotar.WindowsForms.Forms {
 		/// <summary>Opens a ListBuilder for the given Word List, or focusses an existing ListBuilder 
 		/// if one exists.</summary>
 		public static ListBuilder Open(long setID) {
-			foreach(Form f in Application.OpenForms) {
+			foreach (Form f in Application.OpenForms) {
 				var lb = f as ListBuilder;
-				if(lb != null && lb.WordList.ID == setID) {
+				if (lb != null && lb.WordList.ID == setID) {
 					lb.BringToFront();
 					return lb;
 				}
@@ -78,13 +78,11 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void WireListEvents() {
-			//list.ListChanged += new ListChangedEventHandler(OnListChanged);
 			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted += new EventHandler(list_ListDeleted);
 		}
 
 		private void UnwireListEvents() {
-			//list.ListChanged -= new ListChangedEventHandler(OnListChanged);
 			list.PropertyChanged -= new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted -= new EventHandler(list_ListDeleted);
 		}
@@ -129,14 +127,14 @@ namespace Szotar.WindowsForms.Forms {
 
 		void swapAll_Click(object sender, EventArgs e) {
 			var rows = new List<int>();
-			for(int i = 0; i < list.Count; ++i)
+			for (int i = 0; i < list.Count; ++i)
 				rows.Add(i);
 
 			list.SwapRows(rows);
 		}
 
-		//TODO: Get this working.
-		//Presumably using the underlying database's sort is easiest.
+		// TODO: Get this working.
+		// Presumably using the underlying database's sort is easiest.
 		void sort_Click(object sender, EventArgs e) {
 			//List<TranslationPair> items = new List<TranslationPair>(list);
 			//items.Sort();
@@ -169,12 +167,12 @@ namespace Szotar.WindowsForms.Forms {
 		void list_PropertyChanged(object sender, PropertyChangedEventArgs e) {
 			switch (e.PropertyName) {
 				case "Name":
-					if(!name.Text.Equals(list.Name))
+					if (!name.Text.Equals(list.Name))
 						name.Text = list.Name;
 					this.UpdateTitle();
 					break;
 				case "Author":
-					if(!author.Text.Equals(list.Author))
+					if (!author.Text.Equals(list.Author))
 						author.Text = list.Author;
 					break;
 				case "Url":
@@ -242,7 +240,7 @@ namespace Szotar.WindowsForms.Forms {
 				sb.AppendLine();
 			}
 
-			if(sb.Length > 0)
+			if (sb.Length > 0)
 				Clipboard.SetText(sb.ToString());
 		}
 
@@ -256,7 +254,6 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Height = ClientSize.Height - grid.Top - (meta.Visible ? meta.Height : 0);
 		}
 
-		//Metadata
 		private void ShowMeta() {
 			meta.Visible = true;
 			grid.Height -= meta.Height;
@@ -267,7 +264,6 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Height += meta.Height;
 		}
 
-		//Public methods
 		public void AddPair(string phrase, string translation) {
 			System.Diagnostics.Debug.Assert(!InvokeRequired);
 
@@ -292,7 +288,7 @@ namespace Szotar.WindowsForms.Forms {
 				return meta.Visible;
 			}
 			set {
-				//Don't do anything it if it hasn't changed since Show/HideMeta will break in such cases.
+				// Don't do anything it if it hasn't changed since Show/HideMeta will break in such cases.
 				if (value != ShowMetadata) {
 					if (value)
 						ShowMeta();
@@ -314,15 +310,15 @@ namespace Szotar.WindowsForms.Forms {
 			// TODO: Confirm this (it can't yet be undone)
 			list.DeleteWordList();
 
-			//The form will close automatically, because deleting the list will 
-			//fire the list's ListDeleted event, which this form subscribes to.
+			// The form will close automatically, because deleting the list will 
+			// fire the list's ListDeleted event, which this form subscribes to.
 		}
 
 		private void close_Click(object sender, EventArgs e) {
 			Close();
 		}
 
-		//The 'valid' count is the count of rows which produced two columns when parsed.
+		// The 'valid' count is the count of rows which produced two columns when parsed.
 		List<List<string>> ParseCSV(char delim, string text, out int validCount) {
 			validCount = 0;
 			var lines = new List<List<string>>();
@@ -345,7 +341,7 @@ namespace Szotar.WindowsForms.Forms {
 					} else if (c == '\r') {
 					} else if (c == '\n') {
 						if (escaped) {
-							//Newlines aren't useful to us. Replace them with spaces instead.
+							// Newlines aren't useful to us. Replace them with spaces instead.
 							cur.Append(' ');
 						} else {
 							line.Add(cur.ToString());
@@ -392,7 +388,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			if (entries.Count > 0) {
 				list.Insert(list.Count, entries);
-				grid.Refresh(); //XXX Is this necessary?
+				grid.Refresh(); // XXX Is this necessary?
 			}
 		}
 

@@ -36,7 +36,7 @@ namespace Szotar.WindowsForms.Forms {
 				if (name != null) {
 					ImporterItem item = new ImporterItem(type, name, description);
 
-					//Not to be vain, or anything, but I think this should be the default choice of importer.
+					// Not to be vain, or anything, but I think this should be the default choice of importer.
 					if (type == typeof(Importing.DictionaryImporting.DualSectionImporter)) {
 						select.Items.Insert(0, item);
 					} else {
@@ -62,7 +62,7 @@ namespace Szotar.WindowsForms.Forms {
 				importer = (IImporter<IBilingualDictionary>)item.Type.GetConstructor(new Type[] { }).Invoke(new object[] { });
 				WireImporterEvents();
 
-				//To do: add an "error message" UI on failure.
+				// To do: add an "error message" UI on failure.
 				IImporterUI<IBilingualDictionary> newUI = importer.CreateUI();
 				newUI.Finished += new EventHandler(this.ImporterUIFinished);
 				CurrentUI = (Control)newUI;
@@ -160,7 +160,7 @@ namespace Szotar.WindowsForms.Forms {
 
 				this.imported = result;
 
-				//Modal dialog simplifies things slightly.
+				// Modal dialog simplifies things slightly.
 				new DictionaryInfoEditor(imported, false).ShowDialog();
 
 				string root = DataStore.UserDataStore.Path;
@@ -168,28 +168,28 @@ namespace Szotar.WindowsForms.Forms {
 
 				DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
 
-				//Attempt to save with a sane name; failing that, use a GUID as the name; otherwise report the error.
+				// Attempt to save with a sane name; failing that, use a GUID as the name; otherwise report the error.
 				var ipc = Path.GetInvalidPathChars();
 				if (name.IndexOfAny(ipc) >= 0) {
-					//TODO: Sanitize file name!
+					// TODO: Sanitize file name!
 				}
 
 				imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dict";
 
-				//We don't want to overwrite.
+				// We don't want to overwrite.
 				if (File.Exists(imported.Path)) {
 					name = Guid.NewGuid().ToString("D");
 					imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ". dict";
 					imported.Save();
 				}
 
-				//If the dictionary can't save, we should delete the half-written file.
-				//TODO: this should probably avoid deleting the file if the error was caused
-				//by the file already existing (say, if it was created between calls). It would be
-				//kind of rare though.
+				// If the dictionary can't save, we should delete the half-written file.
+				// TODO: this should probably avoid deleting the file if the error was caused
+				// by the file already existing (say, if it was created between calls). It would be
+				// kind of rare though.
 				try {
 					imported.Save();
-				} catch(SystemException) { //XXX Lazy.
+				} catch (SystemException) { // XXX Lazy.
 					File.Delete(imported.Path);
 					throw;
 				}
