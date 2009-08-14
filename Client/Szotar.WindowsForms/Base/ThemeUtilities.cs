@@ -11,7 +11,7 @@ namespace Szotar.WindowsForms {
 
 			[DllImport("uxtheme.dll", ExactSpelling = true, CharSet = CharSet.Unicode)]
 			public static extern int SetWindowTheme
-				(IntPtr hWnd, String pszSubAppName, String pszSubIdList);
+				(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
 
 			public const int
 				TVS_EX_FADEINOUTEXPANDOS = 0x40,

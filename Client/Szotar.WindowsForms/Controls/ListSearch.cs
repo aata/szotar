@@ -140,7 +140,6 @@ namespace Szotar.WindowsForms.Controls {
 		private void results_ItemActivate(object sender, EventArgs e) {
 			var lists = Accept();
 
-			// TODO: invoke event of some kind
 			var h = ListsChosen;
 			if (h != null)
 				h(this, new ListsChosenEventArgs(lists));
