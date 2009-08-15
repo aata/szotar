@@ -28,6 +28,7 @@
 			System.Windows.Forms.Label urlLabel;
 			System.Windows.Forms.Label firstLanguageLabel;
 			System.Windows.Forms.Label secondLanguageLabel;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DictionaryInfoEditor));
 			this.save = new System.Windows.Forms.Button();
 			this.group = new System.Windows.Forms.GroupBox();
 			this.cancel = new System.Windows.Forms.Button();
@@ -179,13 +180,16 @@
 			// 
 			// DictionaryInfoEditor
 			// 
+			this.AcceptButton = this.save;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.CancelButton = this.cancel;
 			this.ClientSize = new System.Drawing.Size(411, 286);
 			this.Controls.Add(this.group);
 			this.Controls.Add(this.cancel);
 			this.Controls.Add(this.save);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximumSize = new System.Drawing.Size(100000, 324);
 			this.MinimumSize = new System.Drawing.Size(427, 324);
 			this.Name = "DictionaryInfoEditor";

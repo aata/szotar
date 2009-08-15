@@ -80,7 +80,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 					}
 
 					if (secondResult == null)
-						secondResult = new SimpleDictionary.Section(new List<Entry>(), null);
+						secondResult = new SimpleDictionary.Section(new List<Entry>(), true, null);
 
 					Finish(firstResult, secondResult);
 				} catch (OperationCanceledException ex) {
@@ -116,11 +116,11 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			}));
 		}
 
-		private void Finish(IDictionarySection firstSection, IDictionarySection secondSection) {
+		private void Finish(SimpleDictionary.Section firstSection, SimpleDictionary.Section secondSection) {
 			if (shouldGenerateSecondHalf)
 				secondSection = GenerateSecondHalf(firstSection);
 
-			SimpleDictionary dict = new SimpleDictionary(firstSection, secondSection);
+			var dict = new SimpleDictionary(firstSection, secondSection);
 
 			// It only has to be a guess, because the user can override it.
 			if (sectionInfo != null) {
@@ -241,7 +241,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			// Sort the list of entries.
 			list.Sort((a, b) => (a.Phrase.CompareTo(b.Phrase)));
 
-			SimpleDictionary.Section section = new SimpleDictionary.Section(list, null);
+			SimpleDictionary.Section section = new SimpleDictionary.Section(list, true, null);
 
 			return section;
 		}
@@ -393,7 +393,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 				// This sort is needed because of the {hw} tag which can change the entry's headword.
 				entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
-				return new SimpleDictionary.Section(entries, null);
+				return new SimpleDictionary.Section(entries, true, null);
 			}
 
 			public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
