@@ -12,6 +12,7 @@ namespace Szotar {
 		Section forwards, backwards;
 		Utf8LineReader reader;
 		const string magicNumber = "sdict-magic";
+		string revisionID = string.Empty;
 
 		public class Section : IDictionarySection {
 			IList<Entry> entries;
@@ -111,9 +112,19 @@ namespace Szotar {
 
 			Path = path;
 
-			if (full && LoadCache()) {
-				Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
-				return;
+			if (full) {
+				// Get the revision ID so we can check if the cache is correct.
+				using (var info = new SimpleDictionary(path, poolStrings, false)) {
+					revisionID = info.revisionID;
+
+					// Knowing the name is useful too, for debugging.
+					Name = info.Name;
+				}
+
+				if (LoadCache()) {
+					Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
+					return;
+				}
 			}
 
 			var forwardsEntries = new List<Entry>();
@@ -143,10 +154,10 @@ namespace Szotar {
 					if (line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
 						if (!full) {
 							Metrics.LogMeasurement(string.Format("Loaded {0} header", this.Name), timer.Elapsed);
-							return; //We got to the actual entries in the dictionary, but we just want the headers.
+							return; // We got to the actual entries in the dictionary, but we just want the headers.
 						}
 
-						string rest = Uri.UnescapeDataString(line.Substring(2));
+						string rest = Uri.UnescapeDataString(line.Substring(2).Normalize());
 						switch (line[0]) {
 							case 'f': {
 									Entry e = new Entry(rest, null);
@@ -167,7 +178,7 @@ namespace Szotar {
 						continue;
 					}
 
-					//We're only looking for file-level properties, because Load doesn't need entry data.
+					// We're only looking for file-level properties, because Load doesn't need entry data.
 					string[] bits = line.Split(' ');
 					for (int i = 0; i < bits.Length; ++i)
 						bits[i] = Uri.UnescapeDataString(bits[i]);
@@ -197,6 +208,9 @@ namespace Szotar {
 							case "headwords-hint":
 								this.SectionSizes = new int[] { int.Parse(bits[1]), int.Parse(bits[2]) };
 								break;
+							case "revision-id":
+								this.revisionID = bits[1];
+								break;
 							default:
 								break;
 						}
@@ -222,6 +236,12 @@ namespace Szotar {
 			SaveCache();
 		}
 
+		private void LoadMissingEntries() {
+			// TODO: Implement this.
+			// Instead of calling GetFullEntry for every entry, read the file sequentially.
+			// This should be faster.
+		}
+
 		protected void OpenFile() {
 			reader = new Utf8LineReader(Path);
 		}
@@ -230,7 +250,6 @@ namespace Szotar {
 			long bytePosition = (long)entryStub.Tag.Data;
 			Entry entry = null, current = null;
 			Translation lastTrans = null;
-			string[] bits;
 
 			if (reader == null)
 				OpenFile();
@@ -238,9 +257,9 @@ namespace Szotar {
 			reader.Seek(bytePosition);
 			while (!reader.EndOfStream) {
 				string line = reader.ReadLine();
-				ApplyLine(line, null, ref current, ref lastTrans, out bits);
+				ApplyLine(line, null, ref current, ref lastTrans);
 
-				//We want to return if a new entry was defined and we already have an entry.
+				// We want to return if a new entry was defined and we already have an entry.
 				if (current != entry) {
 					if (entry != null)
 						return entry;
@@ -251,7 +270,7 @@ namespace Szotar {
 
 			if (entry == null)
 				throw new ArgumentException("Got a null entry when loading from the given tag.", "entryStub");
-			//We reached the end of the file.
+			// We reached the end of the file.
 			return entry;
 		}
 
@@ -264,37 +283,36 @@ namespace Szotar {
 		/// <param name="bits">The individual parts of the line, unescaped.</param>
 		/// <returns><value>True</value> if the property could be applied to the entry, otherwise false (e.g. the property is a file-level property).</returns>
 		/// <remarks>Is the return value really needed?</remarks>
-		protected bool ApplyLine(string line, StringPool pool, ref Entry entry, ref Translation lastTranslation, out string[] bits) {
-			bits = line.Split(' ');
+		protected bool ApplyLine(string line, StringPool pool, ref Entry entry, ref Translation lastTranslation) {
+			pool = pool ?? new StringPool();
+
+			if (line.StartsWith("t ")) {
+				var tr = Uri.UnescapeDataString(line.Substring(2).Normalize());
+				entry.Translations.Add(lastTranslation = new Translation(tr));
+				return true;
+			}
+
+			// When called from Load, this doesn't actually get executed. Load special-cases those
+			// properties to load only the phrase, not the translation or metadata.
+			// Return true, I guess.
+			if (line.StartsWith("f ") || line.StartsWith("b ")) {
+				string headWord = Uri.UnescapeDataString(pool.Pool(line.Substring(2)).Normalize());
+				entry = new Entry(headWord, new List<Translation>());
+				return true;
+			} 
+
+			string[] bits = line.Split(' ');
 			for (int i = 0; i < bits.Length; ++i)
 				bits[i] = Uri.UnescapeDataString(bits[i]);
-
-			//This may be unoptimal.
-			if (pool == null)
-				pool = new StringPool();
 
 			//Note: f, b, and t don't need %20, so we can't use bits.
 			if (bits.Length > 0) {
 				switch (bits[0]) {
-					case "t":
-						bits[1] = pool.Pool(Uri.UnescapeDataString(line.Substring(2)).Normalize());
-						entry.Translations.Add(lastTranslation = new Translation(bits[1]));
-						break;
-
 					//It may make more sense to have a separate string pool for PoS information.
 					case "ps":
 						//I've temporarily removed PoS, as it's going to be moved to Entry anyway. (Probably)
 						//lastTranslation.PartOfSpeech = pool.Pool(bits[1]);
 						break;
-
-					//When called from Load, this doesn't actually get executed. Load special-cases those
-					//properties to load only the phrase, not the translation or metadata.
-					//Return true, I guess.
-					case "f":
-					case "b": {
-							string headWord = pool.Pool(Uri.UnescapeDataString(line.Substring(2)).Normalize());
-							entry = new Entry(headWord, new List<Translation>());
-						} break;
 
 					//It couldn't be applied. Return false so that the caller can try applying file-level properties.
 					default:
@@ -310,9 +328,25 @@ namespace Szotar {
 		/// <param name="s">String to be encoded</param>
 		/// <returns>Encoded string, suitable for use with System.Uri.UnescapeDataString</returns>
 		private string Escape(string s, bool escapeSpace) {
-			if (escapeSpace)
-				s = s.Replace(" ", "%20");
-			return s.Replace("\0", "%00").Replace("%", "%25").Replace("\n", "%0D").Replace("\r", "%0A");
+			var sb = new StringBuilder();
+
+			foreach (char c in s) {
+				switch (c) {
+					case ' ':
+						if (escapeSpace)
+							sb.Append("%20");
+						else
+							sb.Append(' ');
+						break;
+					case '\0': sb.Append("%00"); break;
+					case '%': sb.Append("%25"); break;
+					case '\n': sb.Append("%0D"); break;
+					case '\r': sb.Append("%0A"); break;
+					default: sb.Append(c); break;
+				}
+			}
+
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -321,46 +355,63 @@ namespace Szotar {
 		/// </summary>
 		/// <param name="path">The file name (relative or absolute) to write to.</param>
 		public void Write(string path) {
-			//First, fully load any entry stubs before we start writing, to avoid massive data loss...
-			foreach (Entry e in ForwardsSection)
-				ForwardsSection.GetFullEntry(e);
-			foreach (Entry e in ReverseSection)
-				ReverseSection.GetFullEntry(e);
+			// As soon as we start writing the file, the indices in the cache file will probably be invalid.
+			DestroyCache();
 
-			//Now dispose of the reader so that we can unlock the file.
-			//The file needs to be truncated anyway, so it's not possible to share the file stream
-			//with the Line Reader.
-			if (reader != null) {
-				reader.Dispose();
-				reader = null;
-			}
+			// Update the revision ID. Instead of incrementing a number, pick a random GUID and use that.
+			// If incrementing were used, then if a dictionary were copied to a different computer, modified,
+			// and copied back to the original computer, where the dictionary had also been modified, the 
+			// cache revision ID on the original computer would still match that of the dictionary file, despite
+			// being invalid.
+			revisionID = Guid.NewGuid().ToString();
 
-			using (Stream stream = File.Open(path, FileMode.Create, FileAccess.Write)) {
-				using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8)) {
-					writer.WriteLine(magicNumber);
+			Metrics.Measure(string.Format("Writing dictionary {0} to file", this.Name), delegate {
+				Metrics.Measure(string.Format("Fully loading {0} before writing", this.Name), delegate {
+					// First, fully load any entry stubs before we start writing, to avoid massive data loss...
+					foreach (Entry e in ForwardsSection)
+						ForwardsSection.GetFullEntry(e);
+					foreach (Entry e in ReverseSection)
+						ReverseSection.GetFullEntry(e);
+				});
 
-					if (Name != null)
-						writer.WriteLine("name " + Uri.EscapeDataString(Name));
-					if (Author != null)
-						writer.WriteLine("author " + Uri.EscapeDataString(Author));
-					if (Url != null)
-						writer.WriteLine("url " + Uri.EscapeDataString(Url));
-
-					//TODO: WritePairedProperty
-					writer.WriteLine(string.Format("headwords-hint {0} {1}", forwards.HeadWords, backwards.HeadWords));
-					if (FirstLanguage != null || SecondLanguage != null)
-						writer.WriteLine(string.Format("languages {0} {1}", Uri.EscapeDataString(FirstLanguage), Uri.EscapeDataString(SecondLanguage)));
-					if (FirstLanguageCode != null || SecondLanguageCode != null)
-						writer.WriteLine(string.Format("language-codes {0} {1}", Uri.EscapeDataString(FirstLanguageCode), Uri.EscapeDataString(SecondLanguageCode)));
-					writer.WriteLine("sorted");
-
-					foreach (Entry entry in ForwardsSection)
-						WriteEntry(writer, "f", entry);
-
-					foreach (Entry entry in ReverseSection)
-						WriteEntry(writer, "b", entry);
+				// Now dispose of the reader so that we can unlock the file.
+				// The file needs to be truncated anyway, so it's not possible to share the file stream
+				// with the Line Reader.
+				if (reader != null) {
+					reader.Dispose();
+					reader = null;
 				}
-			}
+
+				using (Stream stream = File.Open(path, FileMode.Create)) {
+					using (var writer = new LineWriter(stream)) {
+						writer.WriteLine(magicNumber);
+
+						if (Name != null)
+							writer.WriteLine("name " + Uri.EscapeDataString(Name));
+						if (Author != null)
+							writer.WriteLine("author " + Uri.EscapeDataString(Author));
+						if (Url != null)
+							writer.WriteLine("url " + Uri.EscapeDataString(Url));
+						writer.WriteLine("revision-id " + Uri.EscapeDataString(revisionID));
+
+						// TODO: WritePairedProperty
+						writer.WriteLine(string.Format("headwords-hint {0} {1}", forwards.HeadWords, backwards.HeadWords));
+						if (FirstLanguage != null || SecondLanguage != null)
+							writer.WriteLine(string.Format("languages {0} {1}", Uri.EscapeDataString(FirstLanguage), Uri.EscapeDataString(SecondLanguage)));
+						if (FirstLanguageCode != null || SecondLanguageCode != null)
+							writer.WriteLine(string.Format("language-codes {0} {1}", Uri.EscapeDataString(FirstLanguageCode), Uri.EscapeDataString(SecondLanguageCode)));
+						writer.WriteLine("sorted");
+
+						foreach (Entry entry in ForwardsSection)
+							WriteEntry(writer, "f ", entry);
+
+						foreach (Entry entry in ReverseSection)
+							WriteEntry(writer, "b ", entry);
+					}
+				}
+			});
+
+			SaveCache();
 		}
 
 		/// <summary>
@@ -368,11 +419,17 @@ namespace Szotar {
 		/// </summary>
 		/// <param name="type">Type of entry (usually 'b' or 'f')</param>
 		/// <param name="entry">Entry instance to be written</param>
-		void WriteEntry(TextWriter writer, string type, Entry entry) {
-			writer.WriteLine(type + " " + Escape(entry.Phrase, false));
+		void WriteEntry(LineWriter writer, string type, Entry entry) {
+			// Reset the tag so that writing the cache can work.
+			entry.Tag = new EntryTag(entry.Tag.DictionarySection, writer.Position);
+
+			writer.Write(type);
+			writer.WriteLine(Escape(entry.Phrase, false));
 
 			foreach (Translation tr in entry.Translations) {
-				writer.WriteLine("t " + Escape(tr.Value, false));
+				writer.Write("t ");
+				writer.WriteLine(Escape(tr.Value, false));
+
 				//if (tr.PartOfSpeech != null) {
 				//    writer.Write("ps ");
 				//    writer.WriteLine(Escape(tr.PartOfSpeech, true));
@@ -393,26 +450,25 @@ namespace Szotar {
 		public void Save() {
 			if (Path != null) {
 				Write(Path);
-				SaveCache();
 			} else {
 				throw new InvalidOperationException();
 			}
 		}
 
 		#region Caching
-		static readonly int CacheFormatVersion = 1;
+		static readonly int CacheFormatVersion = 2;
 
 		string CachePath() {
 			return P.ChangeExtension(Path, ".dict.cache");
 		}
 
+		void DestroyCache() {
+			File.Delete(CachePath());
+		}
+
 		// Saves the dictionary cache, on a separate thread.
 		void SaveCache() {
 			string path = CachePath();
-
-			// This would be quite insane
-			if (path == Path)
-				return;
 
 			string
 				name = Name ?? string.Empty,
@@ -432,11 +488,12 @@ namespace Szotar {
 				backwardsEntries.Add(entry.Clone());
 
 			new Thread(new ThreadStart(delegate {
-				Metrics.Measure("Saving {0} cache", delegate {
+				Metrics.Measure(string.Format("Saving dictionary cache for {0}", this.Name), delegate {
 					try {
 						using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
 							using (var writer = new BinaryWriter(stream)) {
 								writer.Write(CacheFormatVersion);
+								writer.Write(this.revisionID ?? "");
 
 								foreach (var str in new[] { name, author, url, firstLanguage, firstLanguageCode, secondLanguage, secondLanguageCode })
 									writer.Write(str);
@@ -462,7 +519,7 @@ namespace Szotar {
 		bool LoadCache() {
 			string path = CachePath();
 
-			if (path == Path || !File.Exists(path))
+			if (!File.Exists(path))
 				return false;
 
 			var dictModified = File.GetLastWriteTimeUtc(this.Path);
@@ -480,6 +537,23 @@ namespace Szotar {
 
 						if (version > CacheFormatVersion)
 							return false;
+
+						// Check the cache revision ID against the dictionary's revision ID.
+						if (version > 1) {
+							var revisionID = reader.ReadString();
+							if (revisionID != this.revisionID) {
+								ProgramLog.Default.AddMessage(LogType.Warning, "Cache file for {0} did not have the same revision ID as the dictionary itself", this.Name);
+								reader.Close();
+								File.Delete(path);
+								return false;
+							}
+						} else {
+							// Version 1 caches don't include a revision ID, and thus aren't reliable.
+							ProgramLog.Default.AddMessage(LogType.Warning, "Cache file for {0} was of version 1, which does not include revision IDs, and was thus deleted", this.Name);
+							reader.Close();
+							File.Delete(path);
+							return false;
+						}
 
 						this.Name = reader.ReadString();
 						this.Author = reader.ReadString();

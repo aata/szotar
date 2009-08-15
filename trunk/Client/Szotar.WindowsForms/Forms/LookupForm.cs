@@ -356,34 +356,6 @@ namespace Szotar.WindowsForms.Forms {
 		/// <remarks>Currently obsolete (tooltip size is limited, text wraps).</remarks>
 		string SanitizeToolTipLine(string line) {
 			return line;
-
-			const int maxWidth = 200;
-			if (line.Length < maxWidth)
-				return line;
-
-			var sb = new StringBuilder();
-			while (line.Length > maxWidth) {
-				if (sb.Length > 0)
-					sb.Append("\t");
-
-				// Find first space before maxWidth characters.
-				int i = line.LastIndexOf(" ", maxWidth);
-				if (i == -1) {
-					// No spaces before maxWidth?! As a last resort, increase the width a little.
-					i = line.LastIndexOf(" ", maxWidth + 20);
-					if (i == -1) {
-						sb.AppendLine(line);
-						return sb.ToString();
-					}
-				}
-
-				sb.AppendLine(line.Substring(0, i));
-				line = line.Substring(i + 1).Trim();
-			}
-
-			sb.AppendLine(line);
-
-			return sb.ToString();
 		}
 
 		void grid_MouseMove(object sender, MouseEventArgs e) {
@@ -746,7 +718,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void importList_Click(object sender, EventArgs e) {
-			new Forms.ImportForm().Show();
+			ShowForm.Show<ImportForm>();
 		}
 
 		/// <summary>
@@ -794,7 +766,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void importDictionary_Click(object sender, EventArgs e) {
-			new Forms.DictionaryImport().Show();
+			ShowForm.Show<DictionaryImport>();
 		}
 		#endregion
 
@@ -810,11 +782,11 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void debugLog_Click(object sender, EventArgs e) {
-			LogViewerForm.Open();
+			ShowForm.Show<LogViewerForm>();
 		}
 
 		private void options_Click(object sender, EventArgs e) {
-			new Forms.Preferences().ShowDialog();
+			ShowForm.Show<Preferences>();
 		}
 		#endregion
 
@@ -927,48 +899,24 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 		#endregion
 
-		/// <summary>Finds an existing LookupForm instance for a dictionary.</summary>
-		private static LookupForm FindExisting(string path) {
-			// Look for an existing form using this dictionary before opening it again.
-			foreach (Form form in Application.OpenForms) {
-				LookupForm lookupForm = form as LookupForm;
-				if (lookupForm != null && lookupForm.Dictionary.Path == path)
-					return lookupForm;
-			}
-
-			return null;
-		}
-
+		/// <summary>
+		/// Opens a dictionary window for the specified dictionary, using an 
+		/// existing window if possible.
+		/// </summary>
+		/// <param name="dict">The dictionary to open.</param>
 		public static void OpenDictionary(DictionaryInfo dict) {
 			if (dict == null)
 				return;
 
-			var existing = FindExisting(dict.Path);
-			if (existing != null) {
-				existing.BringToFront();
-				return;
-			}
-
 			try {
-				existing = new LookupForm(dict);
-				existing.Show();
+				ShowForm.Show(
+					form => form.Dictionary.Path == dict.Path,
+					() => new LookupForm(dict));
 			} catch (System.IO.IOException e) {
-				Errors.CouldNotLoadDictionary(dict, e);
+				Errors.CouldNotLoadDictionary(dict.Name, dict.Path, e);
 			} catch (DictionaryLoadException e) {
-				Errors.CouldNotLoadDictionary(dict, e);
+				Errors.CouldNotLoadDictionary(dict.Name, dict.Path, e);
 			}
-		}
-
-		public static LookupForm OpenDictionary(string path) {
-			var existing = FindExisting(path);
-			if (existing != null) {
-				existing.BringToFront();
-				return existing;
-			}
-
-			existing = new LookupForm(path);
-			existing.Show();
-			return existing;
 		}
 	}
 

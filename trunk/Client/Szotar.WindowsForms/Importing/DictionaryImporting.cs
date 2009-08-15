@@ -357,7 +357,7 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 								List<Entry> senses;
 								try {
 									senses = ParseSenses(bits[0], phrase);
-								} catch (InvalidDataException e) {
+								} catch (InvalidDataException) {
 									ProgramLog.Default.AddMessage(LogType.Error, "Invalid word sense for phrase \"{0}\" in {1}: {2}", phrase, path, bits[0]);
 									continue;
 								}

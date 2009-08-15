@@ -24,22 +24,36 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.search = new System.Windows.Forms.Button();
+			this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
 			this.results = new Szotar.WindowsForms.Controls.ListViewNF();
 			this.firstColumn = new System.Windows.Forms.ColumnHeader();
 			this.secondColumn = new System.Windows.Forms.ColumnHeader();
 			this.thirdColumn = new System.Windows.Forms.ColumnHeader();
-			this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
 			this.SuspendLayout();
 			// 
 			// search
 			// 
 			this.search.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.search.Location = new System.Drawing.Point(390, 3);
+			this.search.Location = new System.Drawing.Point(393, 0);
 			this.search.Name = "search";
 			this.search.Size = new System.Drawing.Size(100, 23);
 			this.search.TabIndex = 1;
 			this.search.Text = "&Search";
 			this.search.UseVisualStyleBackColor = true;
+			// 
+			// searchBox
+			// 
+			this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.searchBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+			this.searchBox.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.searchBox.Location = new System.Drawing.Point(0, 0);
+			this.searchBox.Name = "searchBox";
+			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
+			this.searchBox.PromptFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic);
+			this.searchBox.PromptText = "Search";
+			this.searchBox.Size = new System.Drawing.Size(387, 20);
+			this.searchBox.TabIndex = 0;
 			// 
 			// results
 			// 
@@ -52,10 +66,10 @@
             this.thirdColumn});
 			this.results.FullRowSelect = true;
 			this.results.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-			this.results.Location = new System.Drawing.Point(4, 30);
+			this.results.Location = new System.Drawing.Point(0, 26);
 			this.results.Name = "results";
 			this.results.ShowItemToolTips = true;
-			this.results.Size = new System.Drawing.Size(486, 307);
+			this.results.Size = new System.Drawing.Size(493, 314);
 			this.results.Sorting = System.Windows.Forms.SortOrder.Ascending;
 			this.results.TabIndex = 2;
 			this.results.UseCompatibleStateImageBehavior = false;
@@ -76,20 +90,6 @@
 			// 
 			this.thirdColumn.Text = "";
 			this.thirdColumn.Width = 121;
-			// 
-			// searchBox
-			// 
-			this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.searchBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-			this.searchBox.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.searchBox.Location = new System.Drawing.Point(4, 3);
-			this.searchBox.Name = "searchBox";
-			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
-			this.searchBox.PromptFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic);
-			this.searchBox.PromptText = "Search";
-			this.searchBox.Size = new System.Drawing.Size(380, 20);
-			this.searchBox.TabIndex = 0;
 			// 
 			// ListSearch
 			// 
