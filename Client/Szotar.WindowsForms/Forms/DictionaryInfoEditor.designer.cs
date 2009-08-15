@@ -23,80 +23,189 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent () {
-			this.selectionPrompt = new System.Windows.Forms.Label();
-			this.objects = new System.Windows.Forms.ComboBox();
-			this.closeButton = new System.Windows.Forms.Button();
-			this.properties = new System.Windows.Forms.PropertyGrid();
+			System.Windows.Forms.Label nameLabel;
+			System.Windows.Forms.Label authorLabel;
+			System.Windows.Forms.Label urlLabel;
+			System.Windows.Forms.Label firstLanguageLabel;
+			System.Windows.Forms.Label secondLanguageLabel;
+			this.save = new System.Windows.Forms.Button();
+			this.group = new System.Windows.Forms.GroupBox();
+			this.cancel = new System.Windows.Forms.Button();
+			this.name = new System.Windows.Forms.TextBox();
+			this.author = new System.Windows.Forms.TextBox();
+			this.url = new System.Windows.Forms.TextBox();
+			this.firstLanguage = new System.Windows.Forms.TextBox();
+			this.secondLanguage = new System.Windows.Forms.TextBox();
+			nameLabel = new System.Windows.Forms.Label();
+			authorLabel = new System.Windows.Forms.Label();
+			urlLabel = new System.Windows.Forms.Label();
+			firstLanguageLabel = new System.Windows.Forms.Label();
+			secondLanguageLabel = new System.Windows.Forms.Label();
+			this.group.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// selectionPrompt
+			// save
 			// 
-			this.selectionPrompt.AutoSize = true;
-			this.selectionPrompt.Location = new System.Drawing.Point(12, 15);
-			this.selectionPrompt.Name = "selectionPrompt";
-			this.selectionPrompt.Size = new System.Drawing.Size(30, 13);
-			this.selectionPrompt.TabIndex = 1;
-			this.selectionPrompt.Text = "Edit:";
+			this.save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.save.DialogResult = System.Windows.Forms.DialogResult.OK;
+			this.save.Location = new System.Drawing.Point(243, 251);
+			this.save.Name = "save";
+			this.save.Size = new System.Drawing.Size(75, 23);
+			this.save.TabIndex = 10;
+			this.save.Text = "&Save";
+			this.save.UseVisualStyleBackColor = true;
 			// 
-			// objects
+			// group
 			// 
-			this.objects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.objects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.objects.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.objects.FormattingEnabled = true;
-			this.objects.Location = new System.Drawing.Point(76, 12);
-			this.objects.Name = "objects";
-			this.objects.Size = new System.Drawing.Size(424, 21);
-			this.objects.TabIndex = 2;
-			this.objects.SelectedIndexChanged += new System.EventHandler(this.dictionaries_SelectedIndexChanged);
-			// 
-			// closeButton
-			// 
-			this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.closeButton.Location = new System.Drawing.Point(425, 373);
-			this.closeButton.Name = "closeButton";
-			this.closeButton.Size = new System.Drawing.Size(75, 23);
-			this.closeButton.TabIndex = 4;
-			this.closeButton.Text = "&Close";
-			this.closeButton.UseVisualStyleBackColor = true;
-			this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
-			// 
-			// properties
-			// 
-			this.properties.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+			this.group.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
 						| System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.properties.Location = new System.Drawing.Point(12, 39);
-			this.properties.Name = "properties";
-			this.properties.Size = new System.Drawing.Size(488, 328);
-			this.properties.TabIndex = 5;
-			this.properties.Visible = false;
+			this.group.Controls.Add(this.secondLanguage);
+			this.group.Controls.Add(this.firstLanguage);
+			this.group.Controls.Add(this.url);
+			this.group.Controls.Add(this.author);
+			this.group.Controls.Add(this.name);
+			this.group.Controls.Add(secondLanguageLabel);
+			this.group.Controls.Add(firstLanguageLabel);
+			this.group.Controls.Add(urlLabel);
+			this.group.Controls.Add(authorLabel);
+			this.group.Controls.Add(nameLabel);
+			this.group.Location = new System.Drawing.Point(13, 13);
+			this.group.Name = "group";
+			this.group.Size = new System.Drawing.Size(386, 232);
+			this.group.TabIndex = 0;
+			this.group.TabStop = false;
+			// 
+			// cancel
+			// 
+			this.cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.cancel.Location = new System.Drawing.Point(324, 251);
+			this.cancel.Name = "cancel";
+			this.cancel.Size = new System.Drawing.Size(75, 23);
+			this.cancel.TabIndex = 11;
+			this.cancel.Text = "&Cancel";
+			this.cancel.UseVisualStyleBackColor = true;
+			// 
+			// nameLabel
+			// 
+			nameLabel.AutoSize = true;
+			nameLabel.Location = new System.Drawing.Point(7, 27);
+			nameLabel.Name = "nameLabel";
+			nameLabel.Size = new System.Drawing.Size(36, 13);
+			nameLabel.TabIndex = 0;
+			nameLabel.Text = "Name";
+			// 
+			// name
+			// 
+			this.name.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.name.Location = new System.Drawing.Point(76, 22);
+			this.name.Name = "name";
+			this.name.Size = new System.Drawing.Size(304, 22);
+			this.name.TabIndex = 1;
+			// 
+			// authorLabel
+			// 
+			authorLabel.AutoSize = true;
+			authorLabel.Location = new System.Drawing.Point(7, 71);
+			authorLabel.Name = "authorLabel";
+			authorLabel.Size = new System.Drawing.Size(43, 13);
+			authorLabel.TabIndex = 2;
+			authorLabel.Text = "Author";
+			// 
+			// author
+			// 
+			this.author.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.author.Location = new System.Drawing.Point(76, 66);
+			this.author.Name = "author";
+			this.author.Size = new System.Drawing.Size(304, 22);
+			this.author.TabIndex = 3;
+			// 
+			// urlLabel
+			// 
+			urlLabel.AutoSize = true;
+			urlLabel.Location = new System.Drawing.Point(7, 115);
+			urlLabel.Name = "urlLabel";
+			urlLabel.Size = new System.Drawing.Size(27, 13);
+			urlLabel.TabIndex = 4;
+			urlLabel.Text = "URL";
+			// 
+			// url
+			// 
+			this.url.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.url.Location = new System.Drawing.Point(76, 110);
+			this.url.Name = "url";
+			this.url.Size = new System.Drawing.Size(304, 22);
+			this.url.TabIndex = 5;
+			// 
+			// firstLanguageLabel
+			// 
+			firstLanguageLabel.AutoSize = true;
+			firstLanguageLabel.Location = new System.Drawing.Point(7, 159);
+			firstLanguageLabel.Name = "firstLanguageLabel";
+			firstLanguageLabel.Size = new System.Drawing.Size(81, 13);
+			firstLanguageLabel.TabIndex = 6;
+			firstLanguageLabel.Text = "First language";
+			// 
+			// secondLanguageLabel
+			// 
+			secondLanguageLabel.AutoSize = true;
+			secondLanguageLabel.Location = new System.Drawing.Point(7, 203);
+			secondLanguageLabel.Name = "secondLanguageLabel";
+			secondLanguageLabel.Size = new System.Drawing.Size(97, 13);
+			secondLanguageLabel.TabIndex = 4;
+			secondLanguageLabel.Text = "Second language";
+			// 
+			// firstLanguage
+			// 
+			this.firstLanguage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.firstLanguage.Location = new System.Drawing.Point(124, 154);
+			this.firstLanguage.Name = "firstLanguage";
+			this.firstLanguage.Size = new System.Drawing.Size(256, 22);
+			this.firstLanguage.TabIndex = 7;
+			// 
+			// secondLanguage
+			// 
+			this.secondLanguage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.secondLanguage.Location = new System.Drawing.Point(124, 198);
+			this.secondLanguage.Name = "secondLanguage";
+			this.secondLanguage.Size = new System.Drawing.Size(256, 22);
+			this.secondLanguage.TabIndex = 9;
 			// 
 			// DictionaryInfoEditor
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(512, 408);
-			this.Controls.Add(this.properties);
-			this.Controls.Add(this.closeButton);
-			this.Controls.Add(this.objects);
-			this.Controls.Add(this.selectionPrompt);
+			this.ClientSize = new System.Drawing.Size(411, 286);
+			this.Controls.Add(this.group);
+			this.Controls.Add(this.cancel);
+			this.Controls.Add(this.save);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.MinimumSize = new System.Drawing.Size(264, 267);
+			this.MaximumSize = new System.Drawing.Size(100000, 324);
+			this.MinimumSize = new System.Drawing.Size(427, 324);
 			this.Name = "DictionaryInfoEditor";
-			this.Text = "Edit Dictionary Info";
+			this.Text = "Edit {0}";
+			this.group.ResumeLayout(false);
+			this.group.PerformLayout();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
         }
 
         #endregion
 
-		private System.Windows.Forms.Label selectionPrompt;
-        private System.Windows.Forms.ComboBox objects;
-        private System.Windows.Forms.Button closeButton;
-		private System.Windows.Forms.PropertyGrid properties;
+		private System.Windows.Forms.Button save;
+		private System.Windows.Forms.GroupBox group;
+		private System.Windows.Forms.Button cancel;
+		private System.Windows.Forms.TextBox name;
+		private System.Windows.Forms.TextBox author;
+		private System.Windows.Forms.TextBox url;
+		private System.Windows.Forms.TextBox secondLanguage;
+		private System.Windows.Forms.TextBox firstLanguage;
 
 
     }

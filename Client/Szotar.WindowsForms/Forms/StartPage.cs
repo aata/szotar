@@ -11,24 +11,14 @@ namespace Szotar.WindowsForms.Forms {
 
 			ThemeHelper.UseExplorerTheme(dictionaries, recentDictionaries, recentLists);
 			recentDictionaries.Scrollable = recentLists.Scrollable = false;
-
-			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
-
-			if (DesignMode)
+			
+			// http://www.ben.geek.nz/controldesignmode-misbehaving/
+			if (System.ComponentModel.LicenseManager.UsageMode == System.ComponentModel.LicenseUsageMode.Designtime)
 				return;
 
-			dictionaries.BeginUpdate();
-			var dicts = new List<DictionaryInfo>(Szotar.Dictionary.GetAll());
-			dicts.Sort((d1, d2) => d1.Name.CompareTo(d2.Name));
-			foreach (DictionaryInfo dict in dicts) {
-				int size = dict.SectionSizes != null ? dict.SectionSizes[0] + dict.SectionSizes[1] : 0;
-				ListViewItem item = new ListViewItem(new [] { dict.Name, size > 0 ? size.ToString() : "", dict.Author });
-				item.Tag = dict;
-				item.ImageKey = "Dictionary";
-				dictionaries.Items.Add(item);
-			}
-			dictionaries.EndUpdate();
+			exitProgram.Text = string.Format(exitProgram.Text, Application.ProductName);
 
+			PopulateDictionaries();
 			PopulateRecentDictionaries();
 			PopulateRecentLists();
 
@@ -39,6 +29,8 @@ namespace Szotar.WindowsForms.Forms {
 			recentLists.ItemActivate += new EventHandler(recentLists_ItemActivate);
 			recentLists.Resize += new EventHandler((s, e) => recentLists.Columns[0].Width = recentLists.ClientSize.Width);
 			recentLists.Columns[0].Width = recentLists.ClientSize.Width;
+
+			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
 
 			// Currently this causes ugly scrollbar flickering.
 			//DistributeColumns(recentDictionaries, 100);
@@ -94,8 +86,8 @@ namespace Szotar.WindowsForms.Forms {
 		#region Recent Dictionaries
 		void recentDictionaries_ItemActivate(object sender, EventArgs e) {
 			foreach (ListViewItem item in recentDictionaries.SelectedItems) {
-				if (item.Tag != null && item.Tag is string)
-					LookupForm.OpenDictionary(item.Tag as string);
+				if (item.Tag != null && item.Tag is DictionaryInfo)
+					LookupForm.OpenDictionary(item.Tag as DictionaryInfo);
 			}
 		}
 
@@ -111,7 +103,7 @@ namespace Szotar.WindowsForms.Forms {
 				for (int i = 0; i < rd.Entries.Count; ++i) {
 					if (System.IO.File.Exists(rd.Entries[i].Path)) {
 						var item = new ListViewItem(new[] { rd.Entries[i].Name });
-						item.Tag = rd.Entries[i].Path;
+						item.Tag = rd.Entries[i];
 						item.Text = rd.Entries[i].Name;
 						item.ImageKey = "Dictionary";
 						lv.Items.Add(item);
@@ -201,7 +193,20 @@ namespace Szotar.WindowsForms.Forms {
 		// There should either be a mechanism to refresh or a delay in the adding of this. If there is a delay, it should
 		// also take into account the possibility that the file has been deleted before the delay completed.
 		void fileSystemWatcher_Created(object sender, System.IO.FileSystemEventArgs e) {
-			// TODO: Implement this.
+			if (System.IO.Path.GetExtension(e.FullPath) != ".dict")
+				return;
+
+			var timer = new Timer();
+			timer.Interval = 1000;
+			EventHandler handler = null;
+			handler = new EventHandler(delegate {
+				timer.Stop();
+				timer.Tick -= handler;
+				timer.Dispose();
+				PopulateDictionaries();
+			});
+			timer.Tick += handler;
+			timer.Start();
 		}
 		#endregion
 
@@ -253,6 +258,25 @@ namespace Szotar.WindowsForms.Forms {
 			return opened;
 		}
 
+		private void OpenLists(IList<ListSearchResult> chosen) {
+			foreach (var open in UniqueLists(chosen))
+				ListBuilder.Open(open.SetID).ScrollToPosition(open.Position ?? 0);
+		}
+
+		private void PracticeLists(IList<ListSearchResult> chosen) {
+			var items = new List<ListSearchResult>();
+
+			if (chosen == null || chosen.Count == 0)
+				return;
+
+			foreach (var item in chosen) {
+				if (item.Position.HasValue
+					|| items.FindIndex(x => x.SetID == item.SetID && x.Position == null) < 0)
+					items.Add(item);
+			}
+
+			PracticeWindow.OpenNewSession(items);
+		}
 		#endregion
 
 		#region Context Menu
@@ -271,61 +295,55 @@ namespace Szotar.WindowsForms.Forms {
 		}
 		#endregion
 
-		private void OpenLists(IList<ListSearchResult> chosen) {
-			foreach (var open in UniqueLists(chosen))
-				ListBuilder.Open(open.SetID).ScrollToPosition(open.Position ?? 0);
-		}
-
-		private void PracticeLists(IList<ListSearchResult> chosen) {
-			var items = new List<ListSearchResult>();
-
-			if (chosen == null || chosen.Count == 0)
-				return;
-
-			foreach (var item in chosen) {
-				if (item.Position.HasValue
-					|| items.FindIndex(x => x.SetID == item.SetID && x.Position == null) < 0
-					)
-					items.Add(item);
+		#region Dictionary List
+		private void PopulateDictionaries() {
+			dictionaries.BeginUpdate();
+			dictionaries.Items.Clear();
+			var dicts = new List<DictionaryInfo>(Szotar.Dictionary.GetAll());
+			dicts.Sort((d1, d2) => d1.Name.CompareTo(d2.Name));
+			foreach (DictionaryInfo dict in dicts) {
+				int size = dict.SectionSizes != null ? dict.SectionSizes[0] + dict.SectionSizes[1] : 0;
+				ListViewItem item = new ListViewItem(new[] { dict.Name, size > 0 ? size.ToString() : "", dict.Author });
+				item.Tag = dict;
+				item.ImageKey = "Dictionary";
+				dictionaries.Items.Add(item);
 			}
-
-			PracticeWindow.OpenNewSession(items);
+			dictionaries.EndUpdate();
 		}
 
 		private void OnDictionaryItemActivate(object sender, EventArgs e) {
-			DictionaryInfo dict = dictionaries.SelectedItems[0].Tag as DictionaryInfo;
+			var dict = dictionaries.SelectedItems[0].Tag as DictionaryInfo;
 
 			LookupForm.OpenDictionary(dict);
 		}
 
+		private void importDictionary_Click(object sender, EventArgs e) {
+			new DictionaryImport().Show();
+		}
+
+		private void openDictionary_Click(object sender, EventArgs e) {
+			if (dictionaries.SelectedItems.Count > 0) {
+				var dict = dictionaries.SelectedItems[0].Tag as DictionaryInfo;
+				LookupForm.OpenDictionary(dict);
+			}
+		}
+		#endregion
+
 		public static StartPage ShowStartPage(StartPageTab? tab) {
-			StartPage sp = null;
-
-			foreach (Form form in Application.OpenForms) {
-				if (form is StartPage) {
-					sp = (StartPage)form;
-					form.BringToFront();
-					break;
-				}
-			}
-
-			if (sp == null) {
-				sp = new StartPage();
-				sp.Show();
-			}
+			var sp = ShowForm.Show<StartPage>();
 
 			if (tab.HasValue)
 				sp.SwitchToTab(tab.Value);
+
 			return sp;
 		}
 
 		private void SwitchToTab(StartPageTab tab) {
-			if (tab == StartPageTab.Main)
-				tasks.SelectedIndex = 0;
-			else if (tab == StartPageTab.Dictionaries)
-				tasks.SelectedIndex = 1;
-			else if(tab == StartPageTab.WordLists)
-				tasks.SelectedIndex = 2;
+			switch (tab) {
+				case StartPageTab.Main: tasks.SelectedIndex = 0; break;
+				case StartPageTab.Dictionaries: tasks.SelectedIndex = 1; break;
+				case StartPageTab.WordLists: tasks.SelectedIndex = 2; break;
+			}
 		}
 
 		private void tasks_Selected(object sender, TabControlEventArgs e) {
@@ -349,6 +367,28 @@ namespace Szotar.WindowsForms.Forms {
 		private void reportBug_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
 			System.Diagnostics.Process.Start("http://code.google.com/p/szotar/issues/entry?template=Defect%20report%20from%20user");
 		}
+
+		#region Menu items
+		private void close_Click(object sender, EventArgs e) {
+			Close();
+		}
+
+		private void exitProgram_Click(object sender, EventArgs e) {
+			Application.Exit();
+		}
+
+		private void debugLog_Click(object sender, EventArgs e) {
+			ShowForm.Show<LogViewerForm>();
+		}
+
+		private void options_Click(object sender, EventArgs e) {
+			ShowForm.Show<Preferences>();
+		}
+
+		private void aboutToolStripMenuItem_Click(object sender, EventArgs e) {
+			ShowForm.Show<About>();
+		}
+		#endregion
 	}
 
 	public enum StartPageTab {

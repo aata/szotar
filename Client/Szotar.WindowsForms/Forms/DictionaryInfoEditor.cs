@@ -10,40 +10,67 @@ namespace Szotar.WindowsForms.Forms {
 	public partial class DictionaryInfoEditor : Form {
 		IBilingualDictionary dict;
 		bool saveOnClose;
+		string initialTitle;
 
 		public DictionaryInfoEditor(IBilingualDictionary dict, bool saveOnClose) {
 			InitializeComponent();
 
+			initialTitle = Text;			
+
+			name.Text = dict.Name;
+			author.Text = dict.Author;
+			url.Text = dict.Url;
+			firstLanguage.Text = dict.FirstLanguage;
+			secondLanguage.Text = dict.SecondLanguage;
+
 			this.dict = dict;
 			this.saveOnClose = saveOnClose;
 
-			objects.DisplayMember = "Name";
-			objects.Items.Add(new Item { Name = "Dictionary", Object = dict });
-			objects.Items.Add(new Item { Name = "Forwards Section", Object = dict.ForwardsSection });
-			objects.Items.Add(new Item { Name = "Backwards Section", Object = dict.ReverseSection });
-			objects.SelectedIndex = 0;
+			save.Click += new EventHandler(save_Click);
+			cancel.Click += delegate { Close(); };
+
+			name.TextChanged += delegate { UpdateNames(); };
+			UpdateNames();
 		}
 
-		private void dictionaries_SelectedIndexChanged(object sender, EventArgs e) {
-			properties.SelectedObject = ((Item)objects.SelectedItem).Object;
-			properties.Visible = true;
+		void UpdateNames() {
+			Text = string.Format(initialTitle, name.Text);
+			group.Text = name.Text;
 		}
 
-		private void closeButton_Click(object sender, EventArgs e) {
+		void save_Click(object sender, EventArgs e) {
+			if (!IsDirty())
+				return;
+
+			dict.Name = name.Text;
+			dict.Author = author.Text;
+			dict.Url = url.Text;
+			dict.FirstLanguage = firstLanguage.Text;
+			dict.SecondLanguage = secondLanguage.Text;
+
 			if (saveOnClose) {
 				try {
 					dict.Save();
-				} catch (InvalidOperationException) {
-					// Oh well. I tried.
+				} catch (InvalidOperationException ex) {
+					ProgramLog.Default.AddMessage(
+						LogType.Error,
+						"Error saving dictionary information for {0}: {1}",
+						dict.Name,
+						ex.Message);
 				}
 			}
 
 			Close();
 		}
 
-		class Item {
-			public object Object { get; set; }
-			public string Name { get; set; }
+		bool IsDirty() {
+			return 
+				dict.Name != name.Text ||
+				dict.Author != author.Text ||
+				dict.Url != url.Text ||
+				dict.FirstLanguage != firstLanguage.Text ||
+				dict.SecondLanguage != secondLanguage.Text
+				;
 		}
 	}
 }

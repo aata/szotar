@@ -5,16 +5,5 @@ namespace Szotar.WindowsForms.Forms {
 		public LogViewerForm() {
 			InitializeComponent();
 		}
-
-		public static void Open() {
-			LogViewerForm form = null;
-
-			foreach (Form f in Application.OpenForms)
-				if (f is LogViewerForm)
-					form = (LogViewerForm)f;
-
-			form = form ?? new Forms.LogViewerForm();
-			form.Show();
-		}
 	}
 }

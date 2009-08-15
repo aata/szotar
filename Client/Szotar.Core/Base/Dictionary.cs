@@ -30,8 +30,16 @@ namespace Szotar {
 		public static IEnumerable<DictionaryInfo> GetAll() {
 			foreach (FileInfo file in DataStore.CombinedDataStore.GetFiles
 					 (Configuration.DictionariesFolderName, new System.Text.RegularExpressions.Regex(@"\.dict$"), true)) {
-				// Only load the info section of the dictionary
-				yield return new SimpleDictionary.Info(file.FullName);
+
+				DictionaryInfo info = null;
+				try {
+					info = new SimpleDictionary.Info(file.FullName);
+				} catch (IOException e) {
+					ProgramLog.Default.AddMessage(LogType.Warning, "Failed loading dictionary info for {0}: {1}", file.FullName, e.Message);
+				}
+
+				if(info != null)
+					yield return info;
 			}
 
 			yield break;

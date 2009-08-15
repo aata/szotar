@@ -175,6 +175,10 @@ namespace Szotar {
 			this.phrase = phrase;
 		}
 
+		public void FullyLoad() {
+			Tag.DictionarySection.GetFullEntry(this);
+		}
+
 		public IList<Translation> Translations {
 			get {
 				return translations;

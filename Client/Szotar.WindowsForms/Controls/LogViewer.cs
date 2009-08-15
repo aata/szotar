@@ -82,7 +82,6 @@ namespace Szotar.WindowsForms.Controls {
 			}
 			list.EndUpdate();
 
-			list.AutoResizeColumn(2, ColumnHeaderAutoResizeStyle.ColumnContent);
 			ScrollToEnd();
 		}
 

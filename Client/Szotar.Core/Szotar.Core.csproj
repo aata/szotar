@@ -67,6 +67,7 @@
     <Compile Include="Base\Entry.cs" />
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\LineReader.cs" />
+    <Compile Include="Base\LineWriter.cs" />
     <Compile Include="Base\ListInfo.cs" />
     <Compile Include="Base\ListSearchResult.cs" />
     <Compile Include="Base\ListStore.cs" />

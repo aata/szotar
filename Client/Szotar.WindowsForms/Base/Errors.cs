@@ -7,14 +7,25 @@ namespace Szotar.WindowsForms {
 			MessageBox.Show(string.Format(message, inserts), caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
-		public static void CouldNotLoadDictionary(DictionaryInfo dict, Exception e) {
+		/// <summary>
+		/// Displays a message indicating that a dictionary could not be loaded.
+		/// </summary>
+		/// <param name="name">The name of the dictionary, if known. May be null, in which case the path will be shown instead.</param>
+		/// <param name="path">The path of the dictionary.</param>
+		/// <param name="e">The exception thrown.</param>
+		public static void CouldNotLoadDictionary(string name, string path, Exception e) {
 			ShowError(
 				Resources.Errors.CouldNotLoadDictionaryCaption,
 				Resources.Errors.CouldNotLoadDictionary,
-				dict.Name);
-			ProgramLog.Default.AddMessage(LogType.Error, "Recent dictionary {0} was not available: {1}", dict.Name, e.Message);
+				name ?? path);
+			ProgramLog.Default.AddMessage(LogType.Error, "Dictionary {0} was not available: {1}", name ?? path, e.Message);
 		}
 
+		/// <summary>
+		/// Displays a message indicating that the program database was created by a 
+		/// newer version of the application.
+		/// </summary>
+		/// <param name="e">The version exception thrown.</param>
 		public static void NewerDatabaseVersion(Szotar.Sqlite.DatabaseVersionException e) {
 			ShowError(
 				Application.ProductName,
