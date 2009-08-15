@@ -27,8 +27,6 @@ namespace Szotar.WindowsForms.Forms {
 		SearchMode searchMode, displayedSearchMode;
 		IList<SearchResult> results;
 
-		ListBuilder listBuilder;
-
 		CultureInfo sourceCulture, targetCulture;
 		DisposableComponent listFontComponent;
 		bool ctrlHeld = false;
@@ -86,7 +84,10 @@ namespace Szotar.WindowsForms.Forms {
 
 			InitialiseView();
 
-			mainMenu.Renderer = contextMenu.Renderer = toolStripPanel.Renderer = new ToolStripAeroRenderer(ToolbarTheme.CommunicationsToolbar);
+			this.Load += delegate {
+				UpdateResults();
+			};
+			Show();
 		}
 
 		/// <summary>Open the given dictionary, possibly loading from a file, 
@@ -123,7 +124,8 @@ namespace Szotar.WindowsForms.Forms {
 			grid.MouseLeave += new EventHandler(grid_MouseLeave);
 			grid.ShowCellToolTips = false;
 
-			UpdateResults();
+			// Bind an empty result set to the grid: this causes the columns to be created.
+			grid.DataSource = results = new List<SearchResult>();
 
 			// By now, the columns should have been created.
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -143,6 +145,8 @@ namespace Szotar.WindowsForms.Forms {
 			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
 			this.KeyUp += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
 
+			mainMenu.Renderer = contextMenu.Renderer = toolStripPanel.Renderer = new ToolStripAeroRenderer(ToolbarTheme.CommunicationsToolbar);
+			exitMenuItem.Text = string.Format(exitMenuItem.Text, Application.ProductName);
 			fileMenu.DropDownOpening += new EventHandler(fileMenu_DropDownOpening);
 		}
 
@@ -172,15 +176,22 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void AdjustGridRowHeight() {
+			int pixels;
+
 			using (Graphics g = grid.CreateGraphics()) {
 				float inches = grid.Font.SizeInPoints / 72;
 				const double lineHeight = 1.9;
-				int pixels = (int)(Math.Round(lineHeight * inches * g.DpiY));
-				grid.RowTemplate.Height = pixels;
+				pixels = (int)(Math.Round(lineHeight * inches * g.DpiY));
 			}
 
+			grid.RowTemplate.Height = pixels;
+
 			// Forces the grid to re-apply its template settings -- there must be a better way.
-			UpdateResults();
+			//UpdateResults();
+			if (grid.RowCount > 0) {
+				grid.Rows.SharedRow(0).Height = pixels;
+				grid.Invalidate();
+			}
 		}
 		#endregion
 
@@ -232,11 +243,11 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Search code
-		private IDictionarySection GetSectionBySearchMode(SearchMode mode) {
+		IDictionarySection GetSectionBySearchMode(SearchMode mode) {
 			return mode == SearchMode.Forward ? Dictionary.ForwardsSection : Dictionary.ReverseSection;
 		}
 
-		private void UpdateResults() {
+		void UpdateResults() {
 			ISearchDataSource dict = this.GetSectionBySearchMode(this.SearchMode);
 			SearchMode finalSearchMode = this.SearchMode;
 
@@ -292,14 +303,18 @@ namespace Szotar.WindowsForms.Forms {
 			grid.ClearSelection();
 			grid.PerformLayout();
 
+			UpdateTitle();
+		}
+
+		void UpdateTitle() {
 			Text = string.Format(CultureInfo.CurrentUICulture, "{0} - {1} results", Dictionary.Name, results.Count);
 		}
 
-		private void SwitchMode() {
+		void SwitchMode() {
 			SearchMode = SearchMode == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward;
 		}
 
-		private void FocusSearchField() {
+		void FocusSearchField() {
 			searchBox.Focus();
 			searchBox.SelectAll();
 		}
@@ -536,21 +551,29 @@ namespace Szotar.WindowsForms.Forms {
 					if (grid.Rows.SharedRow(i).Index == -1)
 						shared++;
 				MessageBox.Show(string.Format("Shared rows: {0} of {1}", shared, grid.Rows.Count), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+			} else if (e.KeyCode == Keys.F11) {
+				var dict = Dictionary as SimpleDictionary;
+				if (dict != null) {
+					var forward = (SimpleDictionary.Section)Dictionary.ForwardsSection;
+					var backward = (SimpleDictionary.Section)Dictionary.ReverseSection;
+
+					MessageBox.Show(
+						string.Format(
+							"Debug statistics for {0}:\n\nForwards section: {1} of {2} fully loaded\nBackwards section: {3} of {4} fully loaded",
+							dict.Name ?? dict.Path,
+							forward.FullyLoadedCount,
+							forward.HeadWords,
+							backward.FullyLoadedCount,
+							backward.HeadWords
+							),
+						Dictionary.Name,
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Information);
+				}
 			}
 		}
 
-		/// <summary>
-		/// The ListBuilder associated with this form was closed, so remove the reference to it.
-		/// </summary>
-		void listBuilder_Closed(object sender, EventArgs e) {
-			((Form)sender).Closed -= new EventHandler(listBuilder_Closed);
-			listBuilder = null;
-		}
-
 		void LookupForm_Closed(object sender, EventArgs e) {
-			if (listBuilder != null)
-				listBuilder.Close();
-
 			GuiConfiguration.Save();
 
 			RemoveEventHandlers();
@@ -586,9 +609,12 @@ namespace Szotar.WindowsForms.Forms {
 			StartPage.ShowStartPage(null);
 		}
 
+		private void closeWindow_Click(object sender, EventArgs e) {
+			Close();
+		}
+
 		/// <summary>Exit the entire program.</summary>
-		/// <remarks>TODO: This has a misleading name, it should be "Exit Szótár" or something.</remarks>
-		private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
+		private void exitMenuItem_Click(object sender, EventArgs e) {
 			Application.Exit();
 		}
 
@@ -651,19 +677,19 @@ namespace Szotar.WindowsForms.Forms {
 			FocusSearchField();
 		}
 
-		private void focusSearchField_Click(object sender, EventArgs e) {
+		void focusSearchField_Click(object sender, EventArgs e) {
 			FocusSearchField();
 		}
 
-		private void clearSearchToolStripMenuItem_Click(object sender, EventArgs e) {
+		void clearSearch_Click(object sender, EventArgs e) {
 			searchBox.Text = String.Empty;
 		}
 
-		private void ignoreAccentsMenuItem_Click(object sender, EventArgs e) {
+		void ignoreAccentsMenuItem_Click(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreAccents = ignoreAccentsMenuItem.Checked;
 		}
 
-		private void ignoreCaseMenuItem_Click(object sender, EventArgs e) {
+		void ignoreCaseMenuItem_Click(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreCase = ignoreCaseMenuItem.Checked;
 		}
 
@@ -677,7 +703,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		/// <summary>Navigates to the next exact match in the search results.</summary>
 		/// <remarks>Would it perhaps be better to wrap in the case where no more are found?</remarks>
-		private void nextPerfectMatch_Click(object sender, EventArgs e) {
+		void nextPerfectMatch_Click(object sender, EventArgs e) {
 			if (results != null) {
 				int index = grid.FirstDisplayedScrollingRowIndex;
 				while (++index < results.Count) {
@@ -693,7 +719,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		/// <summary>Navigates to the previous exact match in the results.</summary>
 		/// <seealso cref="nextPerfectMatch_Click"/>
-		private void previousPerfectMatch_Click(object sender, EventArgs e) {
+		void previousPerfectMatch_Click(object sender, EventArgs e) {
 			if (results != null) {
 				int index = grid.FirstDisplayedScrollingRowIndex;
 				while (--index >= 0) {
@@ -709,22 +735,22 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region List Menu
-		private void newList_Click(object sender, EventArgs e) {
+		void newList_Click(object sender, EventArgs e) {
 			new ListBuilder().Show();
 		}
 
-		private void openList_Click(object sender, EventArgs e) {
+		void openList_Click(object sender, EventArgs e) {
 			StartPage.ShowStartPage(StartPageTab.WordLists);
 		}
 
-		private void importList_Click(object sender, EventArgs e) {
+		void importList_Click(object sender, EventArgs e) {
 			ShowForm.Show<ImportForm>();
 		}
 
 		/// <summary>
 		/// Populates the list of recent Lists. Adds menu items which call OpenRecentFile on click.
 		/// </summary>
-		private void recentLists_DropDownOpening(object sender, EventArgs e) {
+		void recentLists_DropDownOpening(object sender, EventArgs e) {
 			recentLists.DropDownItems.Clear();
 
 			var recent = new RecentListStore();
@@ -742,7 +768,7 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		private void OpenRecentFile(object sender, EventArgs e) {
+		void OpenRecentFile(object sender, EventArgs e) {
 			ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
 			if (info.ID.HasValue)
 				ListBuilder.Open(info.ID.Value);
@@ -750,12 +776,16 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Dictionary Menu
-		private void editInformationToolStripMenuItem_Click(object sender, EventArgs e) {
-			new DictionaryInfoEditor(Dictionary, true).ShowDialog();
-			UpdateButtonNames();
+		void editInformation_Click(object sender, EventArgs e) {
+			var dr = new DictionaryInfoEditor(Dictionary, true).ShowDialog();
+
+			if (dr == DialogResult.OK) {
+				UpdateTitle();
+				UpdateButtonNames();
+			}
 		}
 
-		private void UpdateButtonNames() {
+		void UpdateButtonNames() {
 			// Set the menu items' Text to match the names of the dictionary sections.
 			// The mode switch button is based on these.
 			forwards.Text = Dictionary.FirstLanguage + "-" + Dictionary.SecondLanguage;
@@ -765,27 +795,27 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Columns[1].HeaderText = displayedSearchMode == SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
 		}
 
-		private void importDictionary_Click(object sender, EventArgs e) {
+		void importDictionary_Click(object sender, EventArgs e) {
 			ShowForm.Show<DictionaryImport>();
 		}
 		#endregion
 
 		#region Tools Menu
-		private void dictsFolder_Click(object sender, EventArgs e) {
+		void dictsFolder_Click(object sender, EventArgs e) {
 			DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
 			string path = System.IO.Path.Combine(DataStore.UserDataStore.Path, Configuration.DictionariesFolderName);
 			System.Diagnostics.Process.Start(path);
 		}
 
-		private void charMap_Click(object sender, EventArgs e) {
+		void charMap_Click(object sender, EventArgs e) {
 			System.Diagnostics.Process.Start("charmap.exe");
 		}
 
-		private void debugLog_Click(object sender, EventArgs e) {
+		void debugLog_Click(object sender, EventArgs e) {
 			ShowForm.Show<LogViewerForm>();
 		}
 
-		private void options_Click(object sender, EventArgs e) {
+		void options_Click(object sender, EventArgs e) {
 			ShowForm.Show<Preferences>();
 		}
 		#endregion

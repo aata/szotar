@@ -29,10 +29,10 @@
 			System.Windows.Forms.ToolStripMenuItem copy;
 			System.Windows.Forms.ToolStripMenuItem reverseLookup;
 			System.Windows.Forms.ToolStripMenuItem showStartPage;
-			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+			System.Windows.Forms.ToolStripSeparator fileSep;
 			System.Windows.Forms.ToolStripMenuItem searchMenu;
 			System.Windows.Forms.ToolStripMenuItem switchModeMenuItem;
-			System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
+			System.Windows.Forms.ToolStripSeparator searchSep1;
 			System.Windows.Forms.ToolStripMenuItem focusSearchFieldMenuItem;
 			System.Windows.Forms.ToolStripMenuItem clearSearch;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
@@ -43,7 +43,7 @@
 			System.Windows.Forms.ToolStripMenuItem newList;
 			System.Windows.Forms.ToolStripMenuItem openList;
 			System.Windows.Forms.ToolStripMenuItem importList;
-			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+			System.Windows.Forms.ToolStripSeparator listsSep;
 			System.Windows.Forms.ToolStripMenuItem dummyItem1;
 			System.Windows.Forms.ToolStripMenuItem dictionaryMenu;
 			System.Windows.Forms.ToolStripMenuItem editInformation;
@@ -53,9 +53,9 @@
 			System.Windows.Forms.ToolStripMenuItem dictsFolder;
 			System.Windows.Forms.ToolStripMenuItem charMap;
 			System.Windows.Forms.ToolStripMenuItem debugLog;
-			System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+			System.Windows.Forms.ToolStripSeparator toolsSep;
 			System.Windows.Forms.ToolStripMenuItem options;
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.forwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.backwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,19 +69,20 @@
 			this.switchMode = new System.Windows.Forms.Button();
 			this.ignoreLabel = new System.Windows.Forms.Label();
 			this.searchPanel = new System.Windows.Forms.Panel();
+			this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
 			this.ignoreCaseCheck = new System.Windows.Forms.CheckBox();
 			this.ignoreAccentsCheck = new System.Windows.Forms.CheckBox();
 			this.toolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.mainMenu = new System.Windows.Forms.MenuStrip();
-			this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
+			this.closeWindow = new System.Windows.Forms.ToolStripMenuItem();
 			addToList = new System.Windows.Forms.ToolStripMenuItem();
 			copy = new System.Windows.Forms.ToolStripMenuItem();
 			reverseLookup = new System.Windows.Forms.ToolStripMenuItem();
 			showStartPage = new System.Windows.Forms.ToolStripMenuItem();
-			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			fileSep = new System.Windows.Forms.ToolStripSeparator();
 			searchMenu = new System.Windows.Forms.ToolStripMenuItem();
 			switchModeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+			searchSep1 = new System.Windows.Forms.ToolStripSeparator();
 			focusSearchFieldMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			clearSearch = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
@@ -92,7 +93,7 @@
 			newList = new System.Windows.Forms.ToolStripMenuItem();
 			openList = new System.Windows.Forms.ToolStripMenuItem();
 			importList = new System.Windows.Forms.ToolStripMenuItem();
-			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+			listsSep = new System.Windows.Forms.ToolStripSeparator();
 			dummyItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			dictionaryMenu = new System.Windows.Forms.ToolStripMenuItem();
 			editInformation = new System.Windows.Forms.ToolStripMenuItem();
@@ -102,7 +103,7 @@
 			dictsFolder = new System.Windows.Forms.ToolStripMenuItem();
 			charMap = new System.Windows.Forms.ToolStripMenuItem();
 			debugLog = new System.Windows.Forms.ToolStripMenuItem();
-			toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			toolsSep = new System.Windows.Forms.ToolStripSeparator();
 			options = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
 			this.contextMenu.SuspendLayout();
@@ -135,10 +136,10 @@
 			resources.ApplyResources(showStartPage, "showStartPage");
 			showStartPage.Click += new System.EventHandler(this.showStartPage_Click);
 			// 
-			// toolStripSeparator2
+			// fileSep
 			// 
-			toolStripSeparator2.Name = "toolStripSeparator2";
-			resources.ApplyResources(toolStripSeparator2, "toolStripSeparator2");
+			fileSep.Name = "fileSep";
+			resources.ApplyResources(fileSep, "fileSep");
 			// 
 			// searchMenu
 			// 
@@ -146,7 +147,7 @@
             this.forwards,
             this.backwards,
             switchModeMenuItem,
-            toolStripMenuItem2,
+            searchSep1,
             focusSearchFieldMenuItem,
             clearSearch,
             toolStripMenuItem3,
@@ -176,10 +177,10 @@
 			resources.ApplyResources(switchModeMenuItem, "switchModeMenuItem");
 			switchModeMenuItem.Click += new System.EventHandler(this.switchModeMenuItem_Click);
 			// 
-			// toolStripMenuItem2
+			// searchSep1
 			// 
-			toolStripMenuItem2.Name = "toolStripMenuItem2";
-			resources.ApplyResources(toolStripMenuItem2, "toolStripMenuItem2");
+			searchSep1.Name = "searchSep1";
+			resources.ApplyResources(searchSep1, "searchSep1");
 			// 
 			// focusSearchFieldMenuItem
 			// 
@@ -191,7 +192,7 @@
 			// 
 			clearSearch.Name = "clearSearch";
 			resources.ApplyResources(clearSearch, "clearSearch");
-			clearSearch.Click += new System.EventHandler(this.clearSearchToolStripMenuItem_Click);
+			clearSearch.Click += new System.EventHandler(this.clearSearch_Click);
 			// 
 			// toolStripMenuItem3
 			// 
@@ -237,7 +238,7 @@
             newList,
             openList,
             importList,
-            toolStripMenuItem1,
+            listsSep,
             this.recentLists});
 			listMenu.Name = "listMenu";
 			resources.ApplyResources(listMenu, "listMenu");
@@ -261,10 +262,10 @@
 			resources.ApplyResources(importList, "importList");
 			importList.Click += new System.EventHandler(this.importList_Click);
 			// 
-			// toolStripMenuItem1
+			// listsSep
 			// 
-			toolStripMenuItem1.Name = "toolStripMenuItem1";
-			resources.ApplyResources(toolStripMenuItem1, "toolStripMenuItem1");
+			listsSep.Name = "listsSep";
+			resources.ApplyResources(listsSep, "listsSep");
 			// 
 			// recentLists
 			// 
@@ -292,7 +293,7 @@
 			// 
 			editInformation.Name = "editInformation";
 			resources.ApplyResources(editInformation, "editInformation");
-			editInformation.Click += new System.EventHandler(this.editInformationToolStripMenuItem_Click);
+			editInformation.Click += new System.EventHandler(this.editInformation_Click);
 			// 
 			// editEntries
 			// 
@@ -311,7 +312,7 @@
             dictsFolder,
             charMap,
             debugLog,
-            toolStripSeparator3,
+            toolsSep,
             options});
 			toolsMenu.Name = "toolsMenu";
 			resources.ApplyResources(toolsMenu, "toolsMenu");
@@ -334,10 +335,10 @@
 			resources.ApplyResources(debugLog, "debugLog");
 			debugLog.Click += new System.EventHandler(this.debugLog_Click);
 			// 
-			// toolStripSeparator3
+			// toolsSep
 			// 
-			toolStripSeparator3.Name = "toolStripSeparator3";
-			resources.ApplyResources(toolStripSeparator3, "toolStripSeparator3");
+			toolsSep.Name = "toolsSep";
+			resources.ApplyResources(toolsSep, "toolsSep");
 			// 
 			// options
 			// 
@@ -349,13 +350,14 @@
 			// 
 			this.exitMenuItem.Name = "exitMenuItem";
 			resources.ApplyResources(this.exitMenuItem, "exitMenuItem");
-			this.exitMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
 			// 
 			// fileMenu
 			// 
 			this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             showStartPage,
-            toolStripSeparator2,
+            this.closeWindow,
+            fileSep,
             this.exitMenuItem});
 			this.fileMenu.Name = "fileMenu";
 			resources.ApplyResources(this.fileMenu, "fileMenu");
@@ -371,15 +373,15 @@
 			this.grid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
 			this.grid.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
 			this.grid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle1.Font = new System.Drawing.Font("Verdana", 8.25F);
-			dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(2);
-			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-			dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-			dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-			this.grid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle2.Font = new System.Drawing.Font("Verdana", 8.25F);
+			dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(2);
+			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.grid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
 			this.grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.grid.ContextMenuStrip = this.contextMenu;
 			this.grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
@@ -436,6 +438,14 @@
 			this.searchPanel.Controls.Add(this.ignoreAccentsCheck);
 			this.searchPanel.Name = "searchPanel";
 			// 
+			// searchBox
+			// 
+			resources.ApplyResources(this.searchBox, "searchBox");
+			this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
+			this.searchBox.Name = "searchBox";
+			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
+			this.searchBox.PromptFont = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			// 
 			// ignoreCaseCheck
 			// 
 			resources.ApplyResources(this.ignoreCaseCheck, "ignoreCaseCheck");
@@ -470,13 +480,11 @@
             toolsMenu});
 			this.mainMenu.Name = "mainMenu";
 			// 
-			// searchBox
+			// closeWindow
 			// 
-			resources.ApplyResources(this.searchBox, "searchBox");
-			this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
-			this.searchBox.Name = "searchBox";
-			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
-			this.searchBox.PromptFont = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.closeWindow.Name = "closeWindow";
+			resources.ApplyResources(this.closeWindow, "closeWindow");
+			this.closeWindow.Click += new System.EventHandler(this.closeWindow_Click);
 			// 
 			// LookupForm
 			// 
@@ -522,6 +530,7 @@
 		private System.Windows.Forms.ToolStripMenuItem fileMenu;
 		private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem addTo;
+		private System.Windows.Forms.ToolStripMenuItem closeWindow;
 	}
 }
 

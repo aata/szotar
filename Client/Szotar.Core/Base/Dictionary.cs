@@ -62,4 +62,15 @@ namespace Szotar {
 		  System.Runtime.Serialization.StreamingContext context)
 			: base(info, context) { }
 	}
+
+	[Serializable]
+	public class DictionarySaveException : Exception {
+		public DictionarySaveException() { }
+		public DictionarySaveException(string message) : base(message) { }
+		public DictionarySaveException(string message, Exception inner) : base(message, inner) { }
+		protected DictionarySaveException(
+		  System.Runtime.Serialization.SerializationInfo info,
+		  System.Runtime.Serialization.StreamingContext context)
+			: base(info, context) { }
+	}
 }

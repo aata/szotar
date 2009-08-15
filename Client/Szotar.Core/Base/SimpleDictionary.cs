@@ -17,10 +17,13 @@ namespace Szotar {
 		public class Section : IDictionarySection {
 			IList<Entry> entries;
 			SimpleDictionary dictionary;
+			int fullyLoadedEntries;
 
-			public Section(IList<Entry> entries, SimpleDictionary dictionary) {
+			public Section(IList<Entry> entries, bool translationsLoaded, SimpleDictionary dictionary) {
 				this.entries = entries;
 				this.dictionary = dictionary;
+				if (translationsLoaded)
+					fullyLoadedEntries = entries.Count;
 			}
 
 			public SimpleDictionary Dictionary {
@@ -29,6 +32,10 @@ namespace Szotar {
 
 			public int HeadWords {
 				get { return entries.Count; }
+			}
+
+			public int FullyLoadedCount {
+				get { return fullyLoadedEntries; }
 			}
 
 			public IEnumerator<Entry> GetEnumerator() {
@@ -44,17 +51,41 @@ namespace Szotar {
 			}
 
 			public void GetFullEntry(Entry stub) {
-				//We've already got the full entry, so no work to do.
+				// We've already got the full entry, so no work to do.
 				if (stub.Translations != null)
 					return;
-				if (stub.Tag == null)
-					throw new ArgumentException("The in-memory dictionary entry has no entry tag, and cannot be fully loaded.");
+
+				System.Diagnostics.Debug.Assert(stub.Tag != null);
 
 				Entry full = dictionary.GetFullEntry(stub, this);
 				stub.Translations = full.Translations;
+				fullyLoadedEntries++;
+			}
 
-				// Actually, this should still be kept. It allows for saving the dictionary cache.
-				//stub.Tag = null;
+			public void FillOutPartialEntry(Entry partial, Entry full) {
+				if (partial.Translations == null) {
+					partial.Translations = full.Translations;
+					fullyLoadedEntries++;
+				}
+			}
+
+			public Entry FindEntry(string phrase) {
+				int lower = 0, upper = entries.Count - 1;
+
+				while (true) {
+					if (upper < lower)
+						return null;
+
+					int mid = lower + (upper - lower) / 2;
+
+					int c = phrase.CompareTo(entries[mid].Phrase);
+					if (c < 0)
+						upper = mid - 1;
+					else if (c > 0)
+						lower = mid + 1;
+					else
+						return entries[mid];
+				}
 			}
 		}
 
@@ -112,215 +143,258 @@ namespace Szotar {
 
 			Path = path;
 
-			if (full) {
-				// Get the revision ID so we can check if the cache is correct.
-				using (var info = new SimpleDictionary(path, poolStrings, false)) {
-					revisionID = info.revisionID;
+			bool alreadySorted;
+			LoadHeader(true, out alreadySorted);
 
-					// Knowing the name is useful too, for debugging.
-					Name = info.Name;
-				}
-
-				if (LoadCache()) {
-					Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
-					return;
-				}
+			if (!full) {
+				Metrics.LogMeasurement(string.Format("Loading {0} header", this.Name), timer.Elapsed);
+				return;
 			}
 
-			var forwardsEntries = new List<Entry>();
-			var backwardsEntries = new List<Entry>();
-
-			bool sorted = false;
-
-			this.forwards = new Section(forwardsEntries, this);
-			this.backwards = new Section(backwardsEntries, this);
-
-			StringPool pool = new StringPool();
-
-			OpenFile();
-			bool firstLine = true;
-
-			try {
-				while (!reader.EndOfStream) {
-					long bytePos;
-					string line = reader.ReadLine(out bytePos);
-
-					if (firstLine) {
-						if (line != magicNumber)
-							throw new DictionaryLoadException("The file you are loading is probably not a dictionary (wrong magic number!)");
-						firstLine = false;
-					}
-
-					if (line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
-						if (!full) {
-							Metrics.LogMeasurement(string.Format("Loaded {0} header", this.Name), timer.Elapsed);
-							return; // We got to the actual entries in the dictionary, but we just want the headers.
-						}
-
-						string rest = Uri.UnescapeDataString(line.Substring(2).Normalize());
-						switch (line[0]) {
-							case 'f': {
-									Entry e = new Entry(rest, null);
-									e.Tag = new EntryTag(forwards, bytePos);
-									forwardsEntries.Add(e);
-									break;
-								}
-							case 'b': {
-									Entry e = new Entry(rest, null);
-									e.Tag = new EntryTag(backwards, bytePos);
-									backwardsEntries.Add(e);
-									break;
-								}
-							case 't':
-								break;
-						}
-
-						continue;
-					}
-
-					// We're only looking for file-level properties, because Load doesn't need entry data.
-					string[] bits = line.Split(' ');
-					for (int i = 0; i < bits.Length; ++i)
-						bits[i] = Uri.UnescapeDataString(bits[i]);
-
-					if (bits.Length > 0) {
-						switch (bits[0]) {
-							case "author":
-								Author = bits[1];
-								break;
-							case "name":
-								Name = bits[1];
-								break;
-							case "url":
-								Url = bits[1];
-								break;
-							case "languages":
-								FirstLanguage = bits[1];
-								SecondLanguage = bits[2];
-								break;
-							case "language-codes":
-								FirstLanguageCode = bits[1];
-								SecondLanguageCode = bits[2];
-								break;
-							case "sorted":
-								sorted = true;
-								break;
-							case "headwords-hint":
-								this.SectionSizes = new int[] { int.Parse(bits[1]), int.Parse(bits[2]) };
-								break;
-							case "revision-id":
-								this.revisionID = bits[1];
-								break;
-							default:
-								break;
-						}
-					}
-				}
-			} catch (IOException ex) {
-				throw new DictionaryLoadException(ex.Message, ex);
+			if (LoadCache()) {
+				Metrics.LogMeasurement(string.Format("Loading {0} from cache", this.Name), timer.Elapsed);
+				return;
 			}
 
-			if (!sorted) {
-				Comparison<Entry> comparer = (a, b) => a.Phrase.CompareTo(b.Phrase);
-				forwardsEntries.Sort(comparer);
-				backwardsEntries.Sort(comparer);
-			}
-
-			if (!full && reader != null) {
-				reader.Dispose();
-				reader = null;
-			}
+			// TODO: Compare the time to load with/without translations.
+			LoadEntries(alreadySorted, false);
 
 			Metrics.LogMeasurement(string.Format("Loading {0} without cache", this.Name), timer.Elapsed);
 
 			SaveCache();
 		}
 
-		private void LoadMissingEntries() {
-			// TODO: Implement this.
-			// Instead of calling GetFullEntry for every entry, read the file sequentially.
-			// This should be faster.
+		public SimpleDictionary(Section forwards, Section backwards) {
+			this.forwards = forwards;
+			this.backwards = backwards;
 		}
 
 		protected void OpenFile() {
-			reader = new Utf8LineReader(Path);
+			if (reader != null)
+				reader.Seek(0);
+			else
+				reader = new Utf8LineReader(Path);
 		}
 
-		public Entry GetFullEntry(Entry entryStub, Section section) {
-			long bytePosition = (long)entryStub.Tag.Data;
-			Entry entry = null, current = null;
-			Translation lastTrans = null;
+		protected void CloseFile() {
+			if (reader != null) {
+				reader.Dispose();
+				reader = null;
+			}
+		}
 
-			if (reader == null)
-				OpenFile();
+		void SkipHeader() {
+			bool sorted;
+			LoadHeader(false, out sorted);
+		}
 
-			reader.Seek(bytePosition);
+		void LoadHeader(bool applyProperties, out bool sorted) {
+			long bytePos = 0;
+
+			OpenFile();
+
+			sorted = false;
+			bool firstLine = true;
+
 			while (!reader.EndOfStream) {
-				string line = reader.ReadLine();
-				ApplyLine(line, null, ref current, ref lastTrans);
+				string line = reader.ReadLine(out bytePos);
 
-				// We want to return if a new entry was defined and we already have an entry.
-				if (current != entry) {
-					if (entry != null)
-						return entry;
-					else
-						entry = current;
+				if (firstLine) {
+					if(line != magicNumber)
+						throw new DictionaryLoadException("The file being loaded is either corrupt or not a dictionary (wrong magic number).");
+
+					firstLine = false;
+					continue;
+				}
+
+				if (line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
+					reader.Seek(bytePos);
+					return;
+				}
+
+				if (!applyProperties)
+					continue;
+
+				string[] bits = line.Split(' ');
+				for (int i = 0; i < bits.Length; ++i)
+					bits[i] = Uri.UnescapeDataString(bits[i]);
+
+				if (bits.Length > 0) {
+					string bit1 = bits.Length > 1 ? bits[1] : string.Empty;
+					string bit2 = bits.Length > 2 ? bits[2] : string.Empty;
+
+					switch (bits[0]) {
+						case "author":
+							Author = bit1;
+							break;
+						case "name":
+							Name = bit1;
+							break;
+						case "url":
+							Url = bit1;
+							break;
+						case "languages":
+							FirstLanguage = bit1;
+							SecondLanguage = bit2;
+							break;
+						case "language-codes":
+							FirstLanguageCode = bit1;
+							SecondLanguageCode = bit2;
+							break;
+						case "sorted":
+							sorted = true;
+							break;
+						case "headwords-hint":
+							int first, second;
+							if(int.TryParse(bit1, out first) && int.TryParse(bit2, out second))
+								this.SectionSizes = new int[] { first, second };
+							break;
+						case "revision-id":
+							this.revisionID = bit1;
+							break;
+						default:
+							ProgramLog.Default.AddMessage(LogType.Debug, "Unknown dictionary file metadata in {0}: {1}", Name ?? Path, line);
+							break;
+					}
 				}
 			}
 
-			if (entry == null)
-				throw new ArgumentException("Got a null entry when loading from the given tag.", "entryStub");
-			// We reached the end of the file.
-			return entry;
+			// This would mean there's no entries in the dictionary.
+			ProgramLog.Default.AddMessage(LogType.Warning, "Dictionary {0} has no entries", Name ?? Path);
 		}
 
-		/// <summary>Takes a line from the dictionary source file and applies its properties to the entry and translation given, where applicable.
-		/// If the property is a translation, it will be added to the entry and <paramref name="lastTranslation"/> will be updated.
-		/// If the property defines a new entry, <paramref name="entry"/> will be updated and false will be returned.</summary>
-		/// <param name="pool">A string pool to pool strings in, if necessary.</param>
-		/// <param name="entry">Will be updated if a new entry is started.</param>
-		/// <param name="lastTranslation">Will be updated if a translation is added to the entry.</param>
-		/// <param name="bits">The individual parts of the line, unescaped.</param>
-		/// <returns><value>True</value> if the property could be applied to the entry, otherwise false (e.g. the property is a file-level property).</returns>
-		/// <remarks>Is the return value really needed?</remarks>
-		protected bool ApplyLine(string line, StringPool pool, ref Entry entry, ref Translation lastTranslation) {
-			pool = pool ?? new StringPool();
+		void LoadEntries(bool alreadySorted, bool loadTranslations) {
+			try {
+				var forwardsEntries = new List<Entry>();
+				var backwardsEntries = new List<Entry>();
+				this.forwards = new Section(forwardsEntries, loadTranslations, this);
+				this.backwards = new Section(backwardsEntries, loadTranslations, this);
 
-			if (line.StartsWith("t ")) {
-				var tr = Uri.UnescapeDataString(line.Substring(2).Normalize());
-				entry.Translations.Add(lastTranslation = new Translation(tr));
-				return true;
-			}
+				LoadEntriesWith(loadTranslations, (tag, entry) => {
+					if (tag == 'f')
+						forwardsEntries.Add(entry);
+					else
+						backwardsEntries.Add(entry);
+				});
 
-			// When called from Load, this doesn't actually get executed. Load special-cases those
-			// properties to load only the phrase, not the translation or metadata.
-			// Return true, I guess.
-			if (line.StartsWith("f ") || line.StartsWith("b ")) {
-				string headWord = Uri.UnescapeDataString(pool.Pool(line.Substring(2)).Normalize());
-				entry = new Entry(headWord, new List<Translation>());
-				return true;
-			} 
-
-			string[] bits = line.Split(' ');
-			for (int i = 0; i < bits.Length; ++i)
-				bits[i] = Uri.UnescapeDataString(bits[i]);
-
-			//Note: f, b, and t don't need %20, so we can't use bits.
-			if (bits.Length > 0) {
-				switch (bits[0]) {
-					//It may make more sense to have a separate string pool for PoS information.
-					case "ps":
-						//I've temporarily removed PoS, as it's going to be moved to Entry anyway. (Probably)
-						//lastTranslation.PartOfSpeech = pool.Pool(bits[1]);
-						break;
-
-					//It couldn't be applied. Return false so that the caller can try applying file-level properties.
-					default:
-						return false;
+				if (!alreadySorted) {
+					forwardsEntries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
+					backwardsEntries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
 				}
+			} catch (IOException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			} catch (ArgumentException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			} catch (UnauthorizedAccessException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
 			}
+		}
 
-			return true;
+		void LoadEntriesWith(bool loadTranslations, Action<char, Entry> action) {
+			try {
+				Entry entry = null;
+				char tag = 'f';
+
+				while (!reader.EndOfStream) {
+					long bytePos;
+					string line = reader.ReadLine(out bytePos);
+
+					if (line.StartsWith("f ") || line.StartsWith("b ") || line.StartsWith("t ")) {
+						string value = Uri.UnescapeDataString(line.Substring(2).Normalize());
+						switch (line[0]) {
+							case 'f':
+								if(entry != null)
+									action(tag, entry);
+
+								tag = 'f';
+								entry = new Entry(value, loadTranslations ? new List<Translation>() : null);
+								entry.Tag = new EntryTag(forwards, bytePos);
+								break;
+
+							case 'b':
+								if (entry != null)
+									action(tag, entry);
+
+								tag = 'b';
+								entry = new Entry(value, loadTranslations ? new List<Translation>() : null);
+								entry.Tag = new EntryTag(backwards, bytePos);
+								break;
+
+							case 't':
+								if (!loadTranslations)
+									break;
+
+								if(entry != null)
+									entry.Translations.Add(new Translation(value));
+								else
+									ProgramLog.Default.AddMessage(LogType.Error, "Dictionary {0} has a translation record before an entry was started", Name ?? Path);
+
+								break;
+
+							default:
+								ProgramLog.Default.AddMessage(LogType.Debug, "Unknown dictionary entry metadata in {0}: {1}", Name ?? Path, line);
+								break;
+						}
+					}
+				}
+
+				if (entry != null)
+					action(tag, entry);
+			} catch (IOException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			} catch (ArgumentException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			} catch (UnauthorizedAccessException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			}
+		}
+
+		private void PreloadPartialEntries() {
+			Metrics.Measure(string.Format("Preload loading entries of {0} before writing", this.Name), delegate {
+				foreach (var e in forwards)
+					e.FullyLoad();
+				foreach (var e in backwards)
+					e.FullyLoad();
+			});
+		}
+
+		protected Entry GetFullEntry(Entry entryStub, Section section) {
+			try {
+				if (reader == null)
+					OpenFile();
+
+				reader.Seek((long)entryStub.Tag.Data);
+
+				// Check that the entry in the file vaguely matches the data we have.
+				string filePhrase = Uri.UnescapeDataString(reader.ReadLine().Substring(2)).Normalize();
+				if (filePhrase != entryStub.Phrase)
+					throw new ArgumentException("The phrase found in the file differed from the entry's phrase.", "entryStub");
+
+				var translations = new List<Translation>();
+
+				while (!reader.EndOfStream) {
+					string line = reader.ReadLine();
+
+					if (line.StartsWith("f ") || line.StartsWith("b ")) {
+						entryStub.Translations = translations;
+						return entryStub;
+					}
+
+					if (line.StartsWith("t ")) {
+						var value = Uri.UnescapeDataString(line.Substring(2)).Normalize();
+						translations.Add(new Translation(value));
+					}
+				}
+
+				entryStub.Translations = translations;
+				return entryStub;
+			} catch (IOException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			} catch (ArgumentException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			} catch (UnauthorizedAccessException ex) {
+				throw new DictionaryLoadException(ex.Message, ex);
+			}
 		}
 
 		/// <summary>Escapes characters \0, %, space, \n and \r. Used to avoid wasting 
@@ -354,10 +428,7 @@ namespace Szotar {
 		/// as of yet, so currently we must write the file whether it's necessary or not.
 		/// </summary>
 		/// <param name="path">The file name (relative or absolute) to write to.</param>
-		public void Write(string path) {
-			// As soon as we start writing the file, the indices in the cache file will probably be invalid.
-			DestroyCache();
-
+		protected void Write(string path) {
 			// Update the revision ID. Instead of incrementing a number, pick a random GUID and use that.
 			// If incrementing were used, then if a dictionary were copied to a different computer, modified,
 			// and copied back to the original computer, where the dictionary had also been modified, the 
@@ -365,15 +436,14 @@ namespace Szotar {
 			// being invalid.
 			revisionID = Guid.NewGuid().ToString();
 
-			Metrics.Measure(string.Format("Writing dictionary {0} to file", this.Name), delegate {
-				Metrics.Measure(string.Format("Fully loading {0} before writing", this.Name), delegate {
-					// First, fully load any entry stubs before we start writing, to avoid massive data loss...
-					foreach (Entry e in ForwardsSection)
-						ForwardsSection.GetFullEntry(e);
-					foreach (Entry e in ReverseSection)
-						ReverseSection.GetFullEntry(e);
-				});
+			// If we're not writing cautiously, we can't read the entries on-demand while the temporary output file 
+			// is written.
+			if (path == Path)
+				CloseFile();
 
+			PreloadPartialEntries();
+
+			Metrics.Measure(string.Format("Writing dictionary {0} to file", this.Name), delegate {
 				// Now dispose of the reader so that we can unlock the file.
 				// The file needs to be truncated anyway, so it's not possible to share the file stream
 				// with the Line Reader.
@@ -410,8 +480,6 @@ namespace Szotar {
 					}
 				}
 			});
-
-			SaveCache();
 		}
 
 		/// <summary>
@@ -420,6 +488,8 @@ namespace Szotar {
 		/// <param name="type">Type of entry (usually 'b' or 'f')</param>
 		/// <param name="entry">Entry instance to be written</param>
 		void WriteEntry(LineWriter writer, string type, Entry entry) {
+			entry.FullyLoad();
+
 			// Reset the tag so that writing the cache can work.
 			entry.Tag = new EntryTag(entry.Tag.DictionarySection, writer.Position);
 
@@ -437,21 +507,42 @@ namespace Szotar {
 			}
 		}
 
-		public SimpleDictionary(Section forwards, Section backwards) {
-			this.forwards = forwards;
-			this.backwards = backwards;
-		}
-
-		public SimpleDictionary(IEnumerable<Entry> forwards, IEnumerable<Entry> backwards) {
-			this.forwards = new Section(new List<Entry>(forwards), this);
-			this.backwards = new Section(new List<Entry>(backwards), this);
-		}
-
 		public void Save() {
 			if (Path != null) {
-				Write(Path);
+				try {
+					string tempFile = P.GetTempFileName();
+					string backupFile = P.GetTempFileName();
+
+					// Write the new version to a temporary file, first. If that fails, the actual dictionary file
+					// is not modified.
+					Write(tempFile);
+
+					// Try to make a backup of the file. If that isn't possible for some reason, just
+					// delete it, since we've written the replacement file.
+					try {
+						CloseFile();
+						DestroyCache();
+						File.Move(Path, backupFile);
+					} catch (IOException) {
+						File.Delete(Path);
+					} catch (UnauthorizedAccessException) {
+						File.Delete(Path);
+					}
+
+					// Overwrite the dictionary file with the new version.
+					File.Move(tempFile, Path);
+					File.Delete(backupFile);
+
+					SaveCache();
+				} catch (IOException ex) {
+					throw new DictionarySaveException(ex.Message, ex);
+				} catch (UnauthorizedAccessException ex) {
+					throw new DictionarySaveException(ex.Message, ex);
+				} catch (ArgumentException ex) {
+					throw new DictionarySaveException(ex.Message, ex);
+				}
 			} else {
-				throw new InvalidOperationException();
+				throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
 			}
 		}
 
@@ -580,7 +671,7 @@ namespace Szotar {
 			int capacity = reader.ReadInt32();
 
 			var entries = new List<Entry>(capacity);
-			var section = new Section(entries, this);
+			var section = new Section(entries, false, this);
 
 			for (int i = 0; i < capacity; ++i)
 				entries.Add(LoadCacheEntry(reader, section));
@@ -590,11 +681,6 @@ namespace Szotar {
 
 		private Entry LoadCacheEntry(BinaryReader reader, Section section) {
 			string phrase = reader.ReadString();
-
-			//int translationCount = reader.ReadInt32();
-			//var translations = new List<Translation>(translationCount);
-			//for(int i = 0; i < translationCount; ++i)
-			//    translations.Add(new Translation(reader.ReadString()));
 
 			return new Entry(phrase, null) { Tag = new EntryTag(section, reader.ReadInt64()) };
 		}

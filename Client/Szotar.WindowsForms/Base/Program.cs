@@ -83,8 +83,10 @@ namespace Szotar.WindowsForms {
 			if (Application.OpenForms.Count == 0)
 				this.ExitThread();
 
-			if (Configuration.Default.NeedsSaving)
+			if (Configuration.Default.NeedsSaving) {
+				ProgramLog.Default.AddMessage(LogType.Debug, "Saving configuration");
 				Configuration.Default.Save();
+			}
 		}
 	}
 }
