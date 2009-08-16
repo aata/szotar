@@ -28,11 +28,10 @@
 			System.Windows.Forms.Label authorLabel;
 			System.Windows.Forms.Label urlLabel;
 			System.Windows.Forms.FlowLayoutPanel metaFlow;
-			System.Windows.Forms.ToolStripMenuItem listMenu;
+			System.Windows.Forms.ToolStripMenuItem fileMenu;
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-			System.Windows.Forms.ToolStripMenuItem copyAsMenu;
-			System.Windows.Forms.ToolStripMenuItem practice;
+			System.Windows.Forms.ToolStripMenuItem practiceMenu;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListBuilder));
 			this.namePanel = new System.Windows.Forms.Panel();
 			this.name = new System.Windows.Forms.TextBox();
@@ -44,9 +43,14 @@
 			this.save = new System.Windows.Forms.ToolStripMenuItem();
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.deleteList = new System.Windows.Forms.ToolStripMenuItem();
+			this.practiceThis = new System.Windows.Forms.ToolStripMenuItem();
+			this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.undo = new System.Windows.Forms.ToolStripMenuItem();
+			this.redo = new System.Windows.Forms.ToolStripMenuItem();
+			this.editSep1 = new System.Windows.Forms.ToolStripSeparator();
 			this.copyAsCsv = new System.Windows.Forms.ToolStripMenuItem();
 			this.pasteCSV = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.editSep2 = new System.Windows.Forms.ToolStripSeparator();
 			this.sort = new System.Windows.Forms.ToolStripMenuItem();
 			this.editMetadata = new System.Windows.Forms.ToolStripMenuItem();
 			this.swapAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,17 +62,15 @@
 			this.meta = new System.Windows.Forms.Panel();
 			this.shadow = new System.Windows.Forms.PictureBox();
 			this.icon = new System.Windows.Forms.PictureBox();
-			this.practiceThis = new System.Windows.Forms.ToolStripMenuItem();
 			this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
 			nameLabel = new System.Windows.Forms.Label();
 			authorLabel = new System.Windows.Forms.Label();
 			urlLabel = new System.Windows.Forms.Label();
 			metaFlow = new System.Windows.Forms.FlowLayoutPanel();
-			listMenu = new System.Windows.Forms.ToolStripMenuItem();
+			fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-			copyAsMenu = new System.Windows.Forms.ToolStripMenuItem();
-			practice = new System.Windows.Forms.ToolStripMenuItem();
+			practiceMenu = new System.Windows.Forms.ToolStripMenuItem();
 			metaFlow.SuspendLayout();
 			this.namePanel.SuspendLayout();
 			this.authorPanel.SuspendLayout();
@@ -121,7 +123,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(14364, 60);
+			metaFlow.Size = new System.Drawing.Size(15808, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -184,18 +186,18 @@
 			this.url.Size = new System.Drawing.Size(161, 22);
 			this.url.TabIndex = 1;
 			// 
-			// listMenu
+			// fileMenu
 			// 
-			listMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showStartPage,
             toolStripSeparator2,
             this.save,
             this.close,
             toolStripMenuItem1,
             this.deleteList});
-			listMenu.Name = "listMenu";
-			listMenu.Size = new System.Drawing.Size(37, 20);
-			listMenu.Text = "&File";
+			fileMenu.Name = "fileMenu";
+			fileMenu.Size = new System.Drawing.Size(37, 20);
+			fileMenu.Text = "&File";
 			// 
 			// showStartPage
 			// 
@@ -234,18 +236,56 @@
 			this.deleteList.Size = new System.Drawing.Size(159, 22);
 			this.deleteList.Text = "&Delete this List";
 			// 
-			// copyAsMenu
+			// practiceMenu
 			// 
-			copyAsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			practiceMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.practiceThis});
+			practiceMenu.Name = "practiceMenu";
+			practiceMenu.Size = new System.Drawing.Size(61, 20);
+			practiceMenu.Text = "&Practice";
+			// 
+			// practiceThis
+			// 
+			this.practiceThis.Name = "practiceThis";
+			this.practiceThis.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+			this.practiceThis.Size = new System.Drawing.Size(158, 22);
+			this.practiceThis.Text = "&This List";
+			this.practiceThis.Click += new System.EventHandler(this.practiceThis_Click);
+			// 
+			// editMenu
+			// 
+			this.editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.undo,
+            this.redo,
+            this.editSep1,
             this.copyAsCsv,
             this.pasteCSV,
-            this.toolStripSeparator1,
+            this.editSep2,
             this.sort,
             this.editMetadata,
             this.swapAll});
-			copyAsMenu.Name = "copyAsMenu";
-			copyAsMenu.Size = new System.Drawing.Size(39, 20);
-			copyAsMenu.Text = "&Edit";
+			this.editMenu.Name = "editMenu";
+			this.editMenu.Size = new System.Drawing.Size(39, 20);
+			this.editMenu.Text = "&Edit";
+			// 
+			// undo
+			// 
+			this.undo.Name = "undo";
+			this.undo.ShortcutKeyDisplayString = "Ctrl+Z";
+			this.undo.Size = new System.Drawing.Size(214, 22);
+			this.undo.Text = "&Undo";
+			// 
+			// redo
+			// 
+			this.redo.Name = "redo";
+			this.redo.ShortcutKeyDisplayString = "Ctrl+Y";
+			this.redo.Size = new System.Drawing.Size(214, 22);
+			this.redo.Text = "&Redo";
+			// 
+			// editSep1
+			// 
+			this.editSep1.Name = "editSep1";
+			this.editSep1.Size = new System.Drawing.Size(211, 6);
 			// 
 			// copyAsCsv
 			// 
@@ -264,10 +304,10 @@
 			this.pasteCSV.Text = "&Paste CSV";
 			this.pasteCSV.Click += new System.EventHandler(this.pasteCSV_Click);
 			// 
-			// toolStripSeparator1
+			// editSep2
 			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(211, 6);
+			this.editSep2.Name = "editSep2";
+			this.editSep2.Size = new System.Drawing.Size(211, 6);
 			// 
 			// sort
 			// 
@@ -293,9 +333,9 @@
 			// mainMenu
 			// 
 			this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            listMenu,
-            copyAsMenu,
-            practice});
+            fileMenu,
+            this.editMenu,
+            practiceMenu});
 			this.mainMenu.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
 			this.mainMenu.Location = new System.Drawing.Point(0, 0);
 			this.mainMenu.Name = "mainMenu";
@@ -359,22 +399,6 @@
 			this.icon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
 			this.icon.TabIndex = 0;
 			this.icon.TabStop = false;
-			// 
-			// practice
-			// 
-			practice.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.practiceThis});
-			practice.Name = "practice";
-			practice.Size = new System.Drawing.Size(61, 20);
-			practice.Text = "&Practice";
-			// 
-			// practiceThis
-			// 
-			this.practiceThis.Name = "practiceThis";
-			this.practiceThis.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-			this.practiceThis.Size = new System.Drawing.Size(158, 22);
-			this.practiceThis.Text = "&This List";
-			this.practiceThis.Click += new System.EventHandler(this.practiceThis_Click);
 			// 
 			// grid
 			// 
@@ -444,12 +468,16 @@
 		private System.Windows.Forms.ToolStripMenuItem deleteList;
 		private System.Windows.Forms.ToolStripMenuItem copyAsCsv;
 		private System.Windows.Forms.ToolStripMenuItem pasteCSV;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripSeparator editSep2;
 		private System.Windows.Forms.ToolStripMenuItem sort;
 		private System.Windows.Forms.ToolStripMenuItem editMetadata;
 		private System.Windows.Forms.ToolStripMenuItem swapAll;
 		private System.Windows.Forms.MenuStrip mainMenu;
 		private System.Windows.Forms.ToolStripMenuItem showStartPage;
 		private System.Windows.Forms.ToolStripMenuItem practiceThis;
+		private System.Windows.Forms.ToolStripSeparator editSep1;
+		private System.Windows.Forms.ToolStripMenuItem undo;
+		private System.Windows.Forms.ToolStripMenuItem redo;
+		private System.Windows.Forms.ToolStripMenuItem editMenu;
 	}
 }

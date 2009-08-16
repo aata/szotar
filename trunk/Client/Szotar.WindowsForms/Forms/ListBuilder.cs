@@ -59,6 +59,10 @@ namespace Szotar.WindowsForms.Forms {
 			deleteList.Click += new EventHandler(deleteList_Click);
 			grid.ColumnRatioChanged += new EventHandler(grid_ColumnRatioChanged);
 
+			undo.Click += delegate { list.Undo(); };
+			redo.Click += delegate { list.Redo(); };
+			editMenu.DropDownOpening += new EventHandler(editMenu_DropDownOpening);
+
 			swap.Click += new EventHandler(swap_Click);
 			remove.Click += new EventHandler(remove_Click);
 
@@ -153,6 +157,27 @@ namespace Szotar.WindowsForms.Forms {
 
 		private void UpdateTitle() {
 			Text = string.Format("{0} - {1}", list.Name, Application.ProductName);
+		}
+
+		void editMenu_DropDownOpening(object sender, EventArgs e) {
+			string undoDesc = list.UndoDescription;
+			string redoDesc = list.RedoDescription;
+
+			if (undoDesc == null) {
+				undo.Enabled = false;
+				undo.Text = Properties.Resources.Undo;
+			} else {
+				undo.Enabled = true;
+				undo.Text = string.Format(Properties.Resources.UndoSpecific, undoDesc);
+			}
+
+			if (redoDesc == null) {
+				redo.Enabled = false;
+				redo.Text = Properties.Resources.Redo;
+			} else {
+				redo.Enabled = true;
+				redo.Text = string.Format(Properties.Resources.RedoSpecific, redoDesc);
+			}
 		}
 
 		#region Metadata Bindings

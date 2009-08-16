@@ -41,23 +41,29 @@ namespace Szotar {
 		public int UndoItemCount { get { return undoItems.Count; } }
 		public int RedoItemCount { get { return redoItems.Count; } }
 
-		public IEnumerable<string> UndoItems {
+		public IEnumerable<string> UndoItemDescriptions {
 			get {
-				foreach (ICommand item in undoItems)
-					yield return item.Description;
+				for (int i = undoItems.Count - 1; i >= 0; ++i)
+					yield return undoItems[i].Description;
 			}
 		}
 
-		public IEnumerable<string> RedoItems {
+		public IEnumerable<string> RedoItemDescriptions {
 			get {
-				foreach (ICommand item in redoItems)
-					yield return item.Description;
+				for (int i = redoItems.Count - 1; i >= 0; ++i)
+					yield return redoItems[i].Description;
 			}
 		}
 
 		public void Do(ICommand item) {
 			item.Do();
 			undoItems.Add(item);
+			redoItems.Clear();
+		}
+
+		public void Clear() {
+			undoItems.Clear();
+			redoItems.Clear();
 		}
 	}
 }

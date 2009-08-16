@@ -651,7 +651,30 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return LocalizationProvider.Default.Strings["InternalOperation"] ?? "(Internal Operation)"; }
+				get {
+					string desc = null;
+					if (item.Phrase != oldItem.Phrase && item.Translation != oldItem.Translation) {
+					} else if(item.Phrase != oldItem.Phrase) {
+						desc = string.Format(
+							LocalizationProvider.Default.Strings["ChangedXToY"],
+							oldItem.Phrase,
+							item.Phrase);
+					} else if(item.Translation != oldItem.Translation) {
+						desc = string.Format(
+							LocalizationProvider.Default.Strings["ChangedXToY"],
+							oldItem.Translation,
+							item.Translation);
+					}
+
+					// If both or no items changed, use this.
+					desc = desc ?? 
+						string.Format(
+							LocalizationProvider.Default.Strings["ChangedItemToXandY"],
+							item.Phrase,
+							item.Translation);
+
+					return desc;
+				}
 			}
 		}
 
@@ -686,7 +709,7 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return LocalizationProvider.Default.Strings["Inserted1Item"] ?? "Inserted 1 item"; }
+				get { return LocalizationProvider.Default.Strings["Inserted1Item"]; }
 			}
 		}
 
@@ -721,7 +744,7 @@ namespace Szotar.Sqlite {
 			public override string Description {
 				get {
 					return string.Format(
-						LocalizationProvider.Default.Strings["InsertedNItems"] ?? "Inserted {0} items",
+						LocalizationProvider.Default.Strings["InsertedNItems"],
 						items.Count);
 				}
 			}
@@ -762,7 +785,7 @@ namespace Szotar.Sqlite {
 			public override string Description {
 				get {
 					return string.Format(
-						LocalizationProvider.Default.Strings["ChangedXToY"] ?? "Changed \"{0}\" to \"{1}\"", oldValue, newValue);
+						LocalizationProvider.Default.Strings["ChangedXToY"] ?? "Change \"{0}\" to \"{1}\"", oldValue, newValue);
 				}
 			}
 		}
@@ -827,7 +850,7 @@ namespace Szotar.Sqlite {
 			}
 
 			public override string Description {
-				get { return string.Format(LocalizationProvider.Default.Strings["DeletedNItems"] ?? "Deleted {0} items", items.Count); }
+				get { return string.Format(LocalizationProvider.Default.Strings["DeletedNItems"], items.Count); }
 			}
 		}
 
@@ -854,8 +877,18 @@ namespace Szotar.Sqlite {
 
 			public override string Description {
 				get {
-					return LocalizationProvider.Default.Strings["SwappedNRows"];
+					return string.Format(
+						LocalizationProvider.Default.Strings["SwappedNRows"],
+						Length(indices));
 				}
+			}
+
+			static int Length<T>(IEnumerable<T> list) {
+				int count = 0;
+				foreach (var x in list)
+					count++;
+
+				return count;
 			}
 		}
 
@@ -939,9 +972,25 @@ namespace Szotar.Sqlite {
 				UndoList.Undo(1);
 		}
 
+		public override string UndoDescription {
+			get {
+				foreach (string desc in UndoList.UndoItemDescriptions)
+					return desc;
+				return null;
+			}
+		}
+
 		public override void Redo() {
 			if (UndoList.RedoItemCount > 0)
 				UndoList.Redo(1);
+		}
+
+		public override string RedoDescription {
+			get {
+				foreach (string desc in UndoList.RedoItemDescriptions)
+					return desc;
+				return null;
+			}
 		}
 	}
 }

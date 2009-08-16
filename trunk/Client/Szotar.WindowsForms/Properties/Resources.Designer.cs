@@ -70,7 +70,16 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Changed {0} to {1}.
+        ///   Looks up a localized string similar to Change item to &apos;{0}&apos; and &apos;{1}&apos;.
+        /// </summary>
+        internal static string ChangedItemToXandY {
+            get {
+                return ResourceManager.GetString("ChangedItemToXandY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change &apos;{0}&apos; to &apos;{1}&apos;.
         /// </summary>
         internal static string ChangedXToY {
             get {
@@ -215,7 +224,7 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inserted 1 item.
+        ///   Looks up a localized string similar to Insert 1 item.
         /// </summary>
         internal static string Inserted1Item {
             get {
@@ -224,7 +233,7 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inserted {0} items.
+        ///   Looks up a localized string similar to Insert {0} items.
         /// </summary>
         internal static string InsertedNItems {
             get {
@@ -294,6 +303,24 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Redo.
+        /// </summary>
+        internal static string Redo {
+            get {
+                return ResourceManager.GetString("Redo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redo &quot;{0}&quot;.
+        /// </summary>
+        internal static string RedoSpecific {
+            get {
+                return ResourceManager.GetString("RedoSpecific", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search Results.
         /// </summary>
         internal static string SearchResults {
@@ -312,7 +339,7 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorted the list.
+        ///   Looks up a localized string similar to Sort.
         /// </summary>
         internal static string SortedList {
             get {
@@ -321,7 +348,7 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Swapped {0} rows.
+        ///   Looks up a localized string similar to Swap {0} rows.
         /// </summary>
         internal static string SwappedNRows {
             get {
@@ -342,6 +369,24 @@ namespace Szotar.WindowsForms.Properties {
         internal static string TranslationDefaultHeader {
             get {
                 return ResourceManager.GetString("TranslationDefaultHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Undo.
+        /// </summary>
+        internal static string Undo {
+            get {
+                return ResourceManager.GetString("Undo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Undo &quot;{0}&quot;.
+        /// </summary>
+        internal static string UndoSpecific {
+            get {
+                return ResourceManager.GetString("UndoSpecific", resourceCulture);
             }
         }
     }
