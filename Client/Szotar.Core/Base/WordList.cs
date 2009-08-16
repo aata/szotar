@@ -122,6 +122,16 @@ namespace Szotar {
 		public abstract void Undo();
 		public abstract void Redo();
 
+		/// <summary>
+		/// The description of the last undo item, or null if no items can be undone.
+		/// </summary>
+		public abstract string UndoDescription { get; }
+
+		/// <summary>
+		/// The description of the last redo item, or null if no items can be redone.
+		/// </summary>
+		public abstract string RedoDescription { get; }
+
 		public void GetListInfo() {
 			throw new NotImplementedException();
 		}

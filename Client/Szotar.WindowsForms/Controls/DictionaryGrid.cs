@@ -268,13 +268,13 @@ namespace Szotar.WindowsForms.Controls {
 				//In short, it's weird.
 				if (grid.IsCurrentRowDirty) {
 					Debug.WriteLine(string.Format("  Row was dirty.", e.RowIndex, e.ColumnIndex));
-					//Suppress the ListChangedType.ItemChanged event.
-					ignoreNextListChangedEvent = true;
 
+					ignoreNextListChangedEvent = true;
 					pairInEdit.Owner = source;
 					source[e.RowIndex] = pairInEdit;
 				} else
 					Debug.WriteLine(string.Format("  Row was not dirty.", e.RowIndex, e.ColumnIndex));
+
 				pairInEdit = null;
 				rowInEdit = null;
 			} else if (grid.ContainsFocus) {

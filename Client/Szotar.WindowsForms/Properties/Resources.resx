@@ -181,7 +181,7 @@
     <value>..\Resources\Images\TopInwardShadow.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ChangedXToY" xml:space="preserve">
-    <value>Changed {0} to {1}</value>
+    <value>Change '{0}' to '{1}'</value>
     <comment>Undo item description</comment>
   </data>
   <data name="DeletedNItems" xml:space="preserve">
@@ -189,11 +189,11 @@
     <comment>Undo stuff (NB: there is no "Deleted 1 Item" yet. Localising pluralisation isn't easy, anyway.)</comment>
   </data>
   <data name="Inserted1Item" xml:space="preserve">
-    <value>Inserted 1 item</value>
+    <value>Insert 1 item</value>
     <comment>Undo item description</comment>
   </data>
   <data name="InsertedNItems" xml:space="preserve">
-    <value>Inserted {0} items</value>
+    <value>Insert {0} items</value>
     <comment>Undo item description</comment>
   </data>
   <data name="InternalOperation" xml:space="preserve">
@@ -205,7 +205,7 @@
     <comment>Shown when searching for lists.</comment>
   </data>
   <data name="SwappedNRows" xml:space="preserve">
-    <value>Swapped {0} rows</value>
+    <value>Swap {0} rows</value>
     <comment>Undo item description</comment>
   </data>
   <data name="NTerms" xml:space="preserve">
@@ -219,7 +219,7 @@
     <value>Show more</value>
   </data>
   <data name="SortedList" xml:space="preserve">
-    <value>Sorted the list</value>
+    <value>Sort</value>
     <comment>Undo item description</comment>
   </data>
   <data name="ConfirmDeleteWordList" xml:space="preserve">
@@ -233,5 +233,21 @@
   </data>
   <data name="ConfirmKeepNewWordListCaption" xml:space="preserve">
     <value>Keep this word list?</value>
+  </data>
+  <data name="Redo" xml:space="preserve">
+    <value>Redo</value>
+  </data>
+  <data name="RedoSpecific" xml:space="preserve">
+    <value>Redo "{0}"</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="UndoSpecific" xml:space="preserve">
+    <value>Undo "{0}"</value>
+  </data>
+  <data name="ChangedItemToXandY" xml:space="preserve">
+    <value>Change item to '{0}' and '{1}'</value>
+    <comment>Undo item description</comment>
   </data>
 </root>
