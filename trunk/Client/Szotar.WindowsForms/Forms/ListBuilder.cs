@@ -9,6 +9,11 @@ using System.Windows.Forms;
 namespace Szotar.WindowsForms.Forms {
 	public partial class ListBuilder : Form {
 		WordList list;
+		bool isNewList = false;
+
+		Control queuedUpdateControl;
+		Action queuedUpdateAction;
+		Timer queuedUpdateTimer;
 
 		public WordList WordList { get { return list; } }
 
@@ -19,6 +24,7 @@ namespace Szotar.WindowsForms.Forms {
 					GuiConfiguration.UserNickname,
 					null, null, DateTime.Now)) 
 		{
+			isNewList = true;
 			MakeRecent();
 
 			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
@@ -58,6 +64,10 @@ namespace Szotar.WindowsForms.Forms {
 
 			WireListEvents();
 			MakeRecent();
+
+			queuedUpdateTimer = new Timer() { Interval = 150, Enabled = false };
+			components.Add(queuedUpdateTimer);
+			queuedUpdateTimer.Tick += new EventHandler(queuedUpdateTimer_Tick); 
 		}
 
 		/// <summary>Opens a ListBuilder for the given Word List, or focusses an existing ListBuilder 
@@ -92,6 +102,10 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void list_ListDeleted(object sender, EventArgs e) {
+			// Suppress the "would you like to keep this list?" message.
+			this.Closing -= new CancelEventHandler(ListBuilder_Closing);
+			UnwireListEvents();
+
 			Close();
 		}
 
@@ -133,17 +147,8 @@ namespace Szotar.WindowsForms.Forms {
 			list.SwapRows(rows);
 		}
 
-		// TODO: Get this working.
-		// Presumably using the underlying database's sort is easiest.
 		void sort_Click(object sender, EventArgs e) {
-			//List<TranslationPair> items = new List<TranslationPair>(list);
-			//items.Sort();
-			//editingList.RaiseListChangedEvents = false;
-			//editingList.Clear();
-			//foreach (TranslationPair pair in items)
-			//    editingList.Add(pair);
-			//editingList.RaiseListChangedEvents = true;
-			//editingList.ResetBindings();
+			list.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
 		}
 
 		private void UpdateTitle() {
@@ -151,6 +156,36 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		#region Metadata Bindings
+		void queuedUpdateTimer_Tick(object sender, EventArgs e) {
+			queuedUpdateTimer.Stop();
+
+			if (queuedUpdateControl != null && queuedUpdateAction != null) {
+				queuedUpdateControl = null;
+				queuedUpdateAction();
+			}
+		}
+
+		void QueueControlUpdate(Control control, Action action) {
+			if (queuedUpdateControl == control) {
+				queuedUpdateTimer.Stop();
+				queuedUpdateTimer.Start();
+				return;
+			}
+
+			// If there's already a queued update on a different control, execute it.
+			if (queuedUpdateControl != null) {
+				queuedUpdateTimer.Stop();
+				queuedUpdateAction();
+			}
+
+			queuedUpdateAction = action;
+			queuedUpdateControl = control;
+			queuedUpdateTimer.Start();
+		}
+
+		// TODO: The database will be updated every time a character is typed... not good.
+		// It would be better if the database update were delayed until no keys have been
+		// pressed for, say, 200 milliseconds.
 		void url_TextChanged(object sender, EventArgs e) {
 			list.Url = url.Text;
 		}
@@ -204,6 +239,22 @@ namespace Szotar.WindowsForms.Forms {
 
 		private void ListBuilder_Closing(object sender, CancelEventArgs e) {
 			UnwireListEvents();
+
+			if (isNewList && list.Count == 0) {
+				var dr = MessageBox.Show(
+					Properties.Resources.ConfirmKeepNewWordList,
+					Properties.Resources.ConfirmKeepNewWordListCaption,
+					MessageBoxButtons.YesNoCancel,
+					MessageBoxIcon.Question,
+					MessageBoxDefaultButton.Button1);
+
+				if (dr == DialogResult.Cancel) {
+					e.Cancel = true;
+					return;
+				} else if (dr == DialogResult.No) {
+					list.DeleteWordList();
+				}
+			}
 		}
 
 		private void editMetadata_Click(object sender, EventArgs e) {
@@ -307,11 +358,19 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void deleteList_Click(object sender, EventArgs e) {
-			// TODO: Confirm this (it can't yet be undone)
-			list.DeleteWordList();
+			var dr = MessageBox.Show(
+				Properties.Resources.ConfirmDeleteWordList,
+				Properties.Resources.ConfirmDeleteWordListCaption,
+				MessageBoxButtons.OKCancel,
+				MessageBoxIcon.Question,
+				MessageBoxDefaultButton.Button1);
 
-			// The form will close automatically, because deleting the list will 
-			// fire the list's ListDeleted event, which this form subscribes to.
+			if (dr == DialogResult.OK) {
+				list.DeleteWordList();
+
+				// The form will close automatically, because deleting the list will 
+				// fire the list's ListDeleted event, which this form subscribes to.
+			}
 		}
 
 		private void close_Click(object sender, EventArgs e) {

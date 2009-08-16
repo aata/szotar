@@ -43,6 +43,7 @@ namespace Szotar.Sqlite {
 		Worker worker;
 		BindingList<WordListEntry> list;
 		long? id;
+		bool raiseListEvents = true;
 
 		public SqliteDataStore DataStore { get; private set; }
 		public override long? ID {
@@ -61,7 +62,8 @@ namespace Szotar.Sqlite {
 		//Re-raise the ListChanged event with the SqliteWordList as the originator.
 		//Using BindingList as the in-memory list makes this very easy.
 		void list_ListChanged(object sender, ListChangedEventArgs e) {
-			RaiseListChanged(e);
+			if (raiseListEvents)
+				RaiseListChanged(e);
 		}
 
 		protected override void Dispose(bool disposing) {
@@ -189,6 +191,10 @@ namespace Szotar.Sqlite {
 			UndoList.Do(new Deletion(this, EnumRange(0, list.Count - 1)));
 		}
 
+		public override void Sort(Comparison<WordListEntry> comparison) {
+			UndoList.Do(new SortCommand(this, comparison));
+		}
+
 		protected IEnumerable<int> EnumRange(int from, int to) {
 			while (from <= to)
 				yield return from++;
@@ -223,6 +229,21 @@ namespace Szotar.Sqlite {
 			return list.GetEnumerator();
 		}
 		#endregion
+
+		/// <summary>
+		/// Disables list changed events during the duration of the update action, and then raises a Reset list event afterwards.
+		/// </summary>
+		/// <param name="update">The update action is allowed to work with the internal binding list 
+		/// for the duration of the update, to avoid adding new undo items.</param>
+		protected void PerformMajorUpdate(Action<BindingList<WordListEntry>> update) {
+			try {
+				raiseListEvents = false;
+				update(this.list);
+			} finally {
+				raiseListEvents = true;
+				list.ResetBindings();
+			}
+		}
 
 		#region Worker
 		//Worker does the dirty database work. It's nicer if it's separated from the rest of the list code.
@@ -289,9 +310,11 @@ namespace Szotar.Sqlite {
 				base.Dispose(disposing);
 			}
 
-			// Inserts a single item at the given index.
-			// This should be avoided unless there really is only one item to be added, because it
-			// will probably be quite slow.
+			/// <summary>
+			/// Inserts a single item at the given index.
+			/// </summary>
+			/// <remarks>This should be avoided unless there really is only one item to be added, 
+			/// because it will probably be quite slow with many items.</remarks>
 			public void Insert(int index, WordListEntry item) {
 				if (item == null)
 					throw new System.ArgumentNullException();
@@ -310,7 +333,9 @@ namespace Szotar.Sqlite {
 				}
 			}
 
-			//Inserts a list of entries at the given indices.
+			/// <summary>
+			/// Inserts a list of entries at the given indices.
+			/// </summary>
 			public void Insert(int index, IList<WordListEntry> entries) {
 				if (index < 0)
 					throw new System.ArgumentOutOfRangeException("index");
@@ -334,8 +359,11 @@ namespace Szotar.Sqlite {
 				}
 			}
 
-			//Inserts a list of (index, entry) into the database.
-			//This is used by the Deletion command's Redo method to speed up re-inserting the deleted entries.
+			/// <summary>
+			/// Inserts a list of (index, entry) into the database.
+			/// </summary>
+			/// <remarks>This is used by the Deletion command's Redo method to speed up re-inserting the deleted entries.</remarks>
+			/// <param name="entries"></param>
 			public void Insert(IList<KeyValuePair<int, WordListEntry>> entries) {
 				if (entries.Count == 0)
 					return;
@@ -536,6 +564,45 @@ namespace Szotar.Sqlite {
 				sb.Append(@");");
 
 				ExecuteSQL(sb.ToString(), list.ID);
+			}
+
+			// Renumbers the items by setting the ListPosition property on the moved 
+			// item to be the negation of the new index. When all movements have taken place,
+			// the negatively-indexed items are set to positive.
+			// 
+			// It is the caller's responsibility to ensure that the movements relation is a
+			// bijection: if it is not, two items may end up with the same index!
+			public void ReorderList(Action<Action<int, int>> movements) {
+				using (var txn = Connection.BeginTransaction()) {
+					using (var cmd = Connection.CreateCommand()) {
+						cmd.CommandText =
+							@"UPDATE VocabItems
+								SET ListPosition = ? 
+								WHERE SetID = ? AND ListPosition = ?";
+
+						var setID = cmd.CreateParameter();
+						setID.Value = this.list.ID.Value;
+						cmd.Parameters.Add(setID);
+
+						var newPos = cmd.CreateParameter();
+						cmd.Parameters.Add(newPos);
+
+						var oldPos = cmd.CreateParameter();
+						cmd.Parameters.Add(oldPos);
+
+						Action<int, int> moveItem = (from, to) => {
+							oldPos.Value = from;
+							newPos.Value = -to - 1; // Otherwise, 0 maps to 0.
+							cmd.ExecuteNonQuery();
+						};
+					}
+
+					ExecuteSQL(
+						@"UPDATE VocabItems
+							SET ListPosition = -(ListPosition + 1)
+							WHERE SetID = ? AND ListPosition < 0",
+						this.list.ID.Value);
+				}
 			}
 		}
 		#endregion
@@ -789,6 +856,81 @@ namespace Szotar.Sqlite {
 				get {
 					return LocalizationProvider.Default.Strings["SwappedNRows"];
 				}
+			}
+		}
+
+		// Sorts the list, storing a list of movements required to get from the unsorted list to
+		// the sorted list, which can be used to reverse the operation.
+		protected class SortCommand : Command {
+			struct Movement {
+				public int FromIndex;
+				public int ToIndex;
+			};
+
+			Comparison<WordListEntry> comparison;
+			List<Movement> movements = new List<Movement>();
+
+			public SortCommand(SqliteWordList owner, Comparison<WordListEntry> comparison) 
+				: base(owner)
+			{
+				if (comparison == null)
+					throw new ArgumentNullException("comparison");
+
+				this.comparison = comparison;
+			}
+
+			public override void Do() {
+				var original = new List<WordListEntry>(owner);
+
+				var sorted = new List<WordListEntry>(owner);
+				sorted.Sort(comparison);
+
+				// Generate the list of item movements.
+				for (int i = 0; i < original.Count; ++i) {
+					int newIndex = sorted.IndexOf(original[i]);
+
+					System.Diagnostics.Debug.Assert(newIndex >= 0);
+
+					movements.Add(new Movement {
+						FromIndex = i,
+						ToIndex = newIndex
+					});
+				}
+
+				owner.PerformMajorUpdate(list => {
+					// BindingList doesn't have a Sort method: no problem, though.
+					list.Clear();
+					foreach (var e in sorted)
+						list.Add(e);
+
+					worker.ReorderList(move => {
+						foreach (var movement in movements)
+							move(movement.FromIndex, movement.ToIndex);
+					});
+				});
+			}
+
+			public override void Undo() {
+				owner.PerformMajorUpdate(list => {
+					var sorted = new List<WordListEntry>(list);
+					list.Clear();
+
+					for (int i = 0; i < sorted.Count; ++i)
+						list.Add(null);
+
+						// Perform the movements backwards.
+						foreach (var m in movements)
+							list[m.FromIndex] = sorted[m.ToIndex];
+
+					worker.ReorderList(move => {
+						foreach (var movement in movements)
+							move(movement.ToIndex, movement.FromIndex);
+					});
+				});
+			}
+
+			public override string Description {
+				get { return LocalizationProvider.Default.Strings["SortedList"]; }
 			}
 		}
 

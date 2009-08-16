@@ -124,9 +124,6 @@
     <value>Phrase</value>
     <comment>Used as a list header.</comment>
   </data>
-  <data name="WouldYouLikeToSaveThisList" xml:space="preserve">
-    <value>This list has not been saved. Do you want to save it now?</value>
-  </data>
   <data name="DefaultListName" xml:space="preserve">
     <value>Untitled</value>
   </data>
@@ -189,7 +186,7 @@
   </data>
   <data name="DeletedNItems" xml:space="preserve">
     <value>Deleted {0} items</value>
-    <comment>Undo stuff (NB: there is no "Deleted 1 Item" yet)</comment>
+    <comment>Undo stuff (NB: there is no "Deleted 1 Item" yet. Localising pluralisation isn't easy, anyway.)</comment>
   </data>
   <data name="Inserted1Item" xml:space="preserve">
     <value>Inserted 1 item</value>
@@ -220,5 +217,21 @@
   </data>
   <data name="ShowMore" xml:space="preserve">
     <value>Show more</value>
+  </data>
+  <data name="SortedList" xml:space="preserve">
+    <value>Sorted the list</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="ConfirmDeleteWordList" xml:space="preserve">
+    <value>Are you sure you want to delete this word list? This operation cannot be undone.</value>
+  </data>
+  <data name="ConfirmDeleteWordListCaption" xml:space="preserve">
+    <value>Confirm deleting word list</value>
+  </data>
+  <data name="ConfirmKeepNewWordList" xml:space="preserve">
+    <value>This word list has does not have any entries. Do you want to save it anyway? (Pressing 'No' will delete this word list.)</value>
+  </data>
+  <data name="ConfirmKeepNewWordListCaption" xml:space="preserve">
+    <value>Keep this word list?</value>
   </data>
 </root>

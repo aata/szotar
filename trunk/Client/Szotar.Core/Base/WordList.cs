@@ -109,6 +109,7 @@ namespace Szotar {
 
 		public abstract void DeleteWordList();
 		public abstract void Insert(int index, IList<WordListEntry> range);
+		public abstract void Sort(Comparison<WordListEntry> comparison);
 
 		public event EventHandler ListDeleted;
 		internal void RaiseDeleted() {

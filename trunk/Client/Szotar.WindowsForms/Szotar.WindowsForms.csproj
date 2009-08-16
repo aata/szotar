@@ -327,6 +327,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Strings\Errors.resx">
       <SubType>Designer</SubType>
@@ -344,11 +345,13 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Base\RtlAwareMessageBox.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Strings\Errors.Designer.cs">
       <DependentUpon>Errors.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Resources\Strings\ImporterDescriptions.Designer.cs">
       <DependentUpon>ImporterDescriptions.resx</DependentUpon>
