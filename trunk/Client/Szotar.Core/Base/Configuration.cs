@@ -428,6 +428,9 @@ namespace Szotar {
 					} catch (InvalidCastException e) {
 						ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while saving {0}: {1}", k.Key, e.Message);
 					}
+				} else {
+					// The setting was never converted from JSON, so it's still in JSON form.
+					dict.Items.Add(k.Key, json);
 				}
 			}
 
