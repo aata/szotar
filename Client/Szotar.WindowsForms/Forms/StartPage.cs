@@ -318,7 +318,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void importDictionary_Click(object sender, EventArgs e) {
-			new DictionaryImport().Show();
+			ShowForm.Show<DictionaryImport>();
 		}
 
 		private void openDictionary_Click(object sender, EventArgs e) {
