@@ -31,12 +31,12 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DictionaryInfoEditor));
 			this.save = new System.Windows.Forms.Button();
 			this.group = new System.Windows.Forms.GroupBox();
-			this.cancel = new System.Windows.Forms.Button();
-			this.name = new System.Windows.Forms.TextBox();
-			this.author = new System.Windows.Forms.TextBox();
-			this.url = new System.Windows.Forms.TextBox();
-			this.firstLanguage = new System.Windows.Forms.TextBox();
 			this.secondLanguage = new System.Windows.Forms.TextBox();
+			this.firstLanguage = new System.Windows.Forms.TextBox();
+			this.url = new System.Windows.Forms.TextBox();
+			this.author = new System.Windows.Forms.TextBox();
+			this.name = new System.Windows.Forms.TextBox();
+			this.cancel = new System.Windows.Forms.Button();
 			nameLabel = new System.Windows.Forms.Label();
 			authorLabel = new System.Windows.Forms.Label();
 			urlLabel = new System.Windows.Forms.Label();
@@ -44,6 +44,51 @@
 			secondLanguageLabel = new System.Windows.Forms.Label();
 			this.group.SuspendLayout();
 			this.SuspendLayout();
+			// 
+			// nameLabel
+			// 
+			nameLabel.AutoSize = true;
+			nameLabel.Location = new System.Drawing.Point(7, 27);
+			nameLabel.Name = "nameLabel";
+			nameLabel.Size = new System.Drawing.Size(36, 13);
+			nameLabel.TabIndex = 0;
+			nameLabel.Text = "Name";
+			// 
+			// authorLabel
+			// 
+			authorLabel.AutoSize = true;
+			authorLabel.Location = new System.Drawing.Point(7, 71);
+			authorLabel.Name = "authorLabel";
+			authorLabel.Size = new System.Drawing.Size(43, 13);
+			authorLabel.TabIndex = 2;
+			authorLabel.Text = "Author";
+			// 
+			// urlLabel
+			// 
+			urlLabel.AutoSize = true;
+			urlLabel.Location = new System.Drawing.Point(7, 115);
+			urlLabel.Name = "urlLabel";
+			urlLabel.Size = new System.Drawing.Size(27, 13);
+			urlLabel.TabIndex = 4;
+			urlLabel.Text = "URL";
+			// 
+			// firstLanguageLabel
+			// 
+			firstLanguageLabel.AutoSize = true;
+			firstLanguageLabel.Location = new System.Drawing.Point(7, 159);
+			firstLanguageLabel.Name = "firstLanguageLabel";
+			firstLanguageLabel.Size = new System.Drawing.Size(81, 13);
+			firstLanguageLabel.TabIndex = 6;
+			firstLanguageLabel.Text = "First language";
+			// 
+			// secondLanguageLabel
+			// 
+			secondLanguageLabel.AutoSize = true;
+			secondLanguageLabel.Location = new System.Drawing.Point(7, 203);
+			secondLanguageLabel.Name = "secondLanguageLabel";
+			secondLanguageLabel.Size = new System.Drawing.Size(97, 13);
+			secondLanguageLabel.TabIndex = 4;
+			secondLanguageLabel.Text = "Second language";
 			// 
 			// save
 			// 
@@ -77,88 +122,14 @@
 			this.group.TabIndex = 0;
 			this.group.TabStop = false;
 			// 
-			// cancel
+			// secondLanguage
 			// 
-			this.cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.cancel.Location = new System.Drawing.Point(324, 251);
-			this.cancel.Name = "cancel";
-			this.cancel.Size = new System.Drawing.Size(75, 23);
-			this.cancel.TabIndex = 11;
-			this.cancel.Text = "&Cancel";
-			this.cancel.UseVisualStyleBackColor = true;
-			// 
-			// nameLabel
-			// 
-			nameLabel.AutoSize = true;
-			nameLabel.Location = new System.Drawing.Point(7, 27);
-			nameLabel.Name = "nameLabel";
-			nameLabel.Size = new System.Drawing.Size(36, 13);
-			nameLabel.TabIndex = 0;
-			nameLabel.Text = "Name";
-			// 
-			// name
-			// 
-			this.name.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			this.secondLanguage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.name.Location = new System.Drawing.Point(76, 22);
-			this.name.Name = "name";
-			this.name.Size = new System.Drawing.Size(304, 22);
-			this.name.TabIndex = 1;
-			// 
-			// authorLabel
-			// 
-			authorLabel.AutoSize = true;
-			authorLabel.Location = new System.Drawing.Point(7, 71);
-			authorLabel.Name = "authorLabel";
-			authorLabel.Size = new System.Drawing.Size(43, 13);
-			authorLabel.TabIndex = 2;
-			authorLabel.Text = "Author";
-			// 
-			// author
-			// 
-			this.author.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.author.Location = new System.Drawing.Point(76, 66);
-			this.author.Name = "author";
-			this.author.Size = new System.Drawing.Size(304, 22);
-			this.author.TabIndex = 3;
-			// 
-			// urlLabel
-			// 
-			urlLabel.AutoSize = true;
-			urlLabel.Location = new System.Drawing.Point(7, 115);
-			urlLabel.Name = "urlLabel";
-			urlLabel.Size = new System.Drawing.Size(27, 13);
-			urlLabel.TabIndex = 4;
-			urlLabel.Text = "URL";
-			// 
-			// url
-			// 
-			this.url.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.url.Location = new System.Drawing.Point(76, 110);
-			this.url.Name = "url";
-			this.url.Size = new System.Drawing.Size(304, 22);
-			this.url.TabIndex = 5;
-			// 
-			// firstLanguageLabel
-			// 
-			firstLanguageLabel.AutoSize = true;
-			firstLanguageLabel.Location = new System.Drawing.Point(7, 159);
-			firstLanguageLabel.Name = "firstLanguageLabel";
-			firstLanguageLabel.Size = new System.Drawing.Size(81, 13);
-			firstLanguageLabel.TabIndex = 6;
-			firstLanguageLabel.Text = "First language";
-			// 
-			// secondLanguageLabel
-			// 
-			secondLanguageLabel.AutoSize = true;
-			secondLanguageLabel.Location = new System.Drawing.Point(7, 203);
-			secondLanguageLabel.Name = "secondLanguageLabel";
-			secondLanguageLabel.Size = new System.Drawing.Size(97, 13);
-			secondLanguageLabel.TabIndex = 4;
-			secondLanguageLabel.Text = "Second language";
+			this.secondLanguage.Location = new System.Drawing.Point(124, 198);
+			this.secondLanguage.Name = "secondLanguage";
+			this.secondLanguage.Size = new System.Drawing.Size(256, 22);
+			this.secondLanguage.TabIndex = 9;
 			// 
 			// firstLanguage
 			// 
@@ -169,14 +140,43 @@
 			this.firstLanguage.Size = new System.Drawing.Size(256, 22);
 			this.firstLanguage.TabIndex = 7;
 			// 
-			// secondLanguage
+			// url
 			// 
-			this.secondLanguage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			this.url.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 						| System.Windows.Forms.AnchorStyles.Right)));
-			this.secondLanguage.Location = new System.Drawing.Point(124, 198);
-			this.secondLanguage.Name = "secondLanguage";
-			this.secondLanguage.Size = new System.Drawing.Size(256, 22);
-			this.secondLanguage.TabIndex = 9;
+			this.url.Location = new System.Drawing.Point(76, 110);
+			this.url.Name = "url";
+			this.url.Size = new System.Drawing.Size(304, 22);
+			this.url.TabIndex = 5;
+			// 
+			// author
+			// 
+			this.author.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.author.Location = new System.Drawing.Point(76, 66);
+			this.author.Name = "author";
+			this.author.Size = new System.Drawing.Size(304, 22);
+			this.author.TabIndex = 3;
+			// 
+			// name
+			// 
+			this.name.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.name.Location = new System.Drawing.Point(76, 22);
+			this.name.Name = "name";
+			this.name.Size = new System.Drawing.Size(304, 22);
+			this.name.TabIndex = 1;
+			// 
+			// cancel
+			// 
+			this.cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.cancel.Location = new System.Drawing.Point(324, 251);
+			this.cancel.Name = "cancel";
+			this.cancel.Size = new System.Drawing.Size(75, 23);
+			this.cancel.TabIndex = 11;
+			this.cancel.Text = "&Cancel";
+			this.cancel.UseVisualStyleBackColor = true;
 			// 
 			// DictionaryInfoEditor
 			// 
@@ -193,6 +193,7 @@
 			this.MaximumSize = new System.Drawing.Size(100000, 324);
 			this.MinimumSize = new System.Drawing.Size(427, 324);
 			this.Name = "DictionaryInfoEditor";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Edit {0}";
 			this.group.ResumeLayout(false);
 			this.group.PerformLayout();

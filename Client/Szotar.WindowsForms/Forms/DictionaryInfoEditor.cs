@@ -51,7 +51,7 @@ namespace Szotar.WindowsForms.Forms {
 			if (saveOnClose) {
 				try {
 					dict.Save();
-				} catch (InvalidOperationException ex) {
+				} catch (DictionarySaveException ex) {
 					ProgramLog.Default.AddMessage(
 						LogType.Error,
 						"Error saving dictionary information for {0}: {1}",

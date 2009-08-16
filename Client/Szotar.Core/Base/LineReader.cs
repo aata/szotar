@@ -27,9 +27,12 @@ namespace Szotar {
 
 		// If we're starting from the beginning of the file, we need to skip the BOM since it's
 		// not part of the file. If we're starting partway through, there's no need to do that.
-		public Utf8LineReader(string path, bool skipBOM) {
+		//
+		// It may seem strange allowing specifying the FileAccess, but it is useful as a safeguard
+		// against other people already having the file open with e.g. FileAccess.Write and FileShare.Read.
+		Utf8LineReader(string path, bool skipBOM, FileAccess access, FileShare share) {
 			disposeStream = true;
-			stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+			stream = new FileStream(path, FileMode.Open, access, share);
 
 			encoding = Encoding.UTF8;
 			decoder = encoding.GetDecoder();
@@ -44,12 +47,12 @@ namespace Szotar {
 				SkipBOM();
 		}
 
-		public Utf8LineReader(string path)
-			: this(path, true)
+		public Utf8LineReader(string path, FileAccess access, FileShare share)
+			: this(path, true, access, share)
 		{ }
 
-		public Utf8LineReader(string path, long bytePosition)
-			: this(path, false) 
+		public Utf8LineReader(string path, long bytePosition, FileAccess access, FileShare share)
+			: this(path, false, access, share) 
 		{
 			stream.Seek(bytePosition, SeekOrigin.Begin);
 			position = bytePosition;

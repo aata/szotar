@@ -172,8 +172,26 @@ namespace Szotar {
 		protected void OpenFile() {
 			if (reader != null)
 				reader.Seek(0);
-			else
-				reader = new Utf8LineReader(Path);
+			else {
+				try {
+					// We don't actually write to the file, but requesting ReadWrite access ensures
+					// that nobody else has the file open for writing (unless someone else set FileShare.Write,
+					// but that's unlikely, and this program doesn't do that).
+					//
+					// Opening with FileAccess.Read would mean that other programs could have the file open and 
+					// modify it, thus invaliding the file offsets stored in the partially-loaded entries.
+					//
+					// We need to open with FileShare.Read because the main window and other programs need to 
+					// read the dictionary header to populate the list. (This should probably change.)
+					reader = new Utf8LineReader(Path, FileAccess.ReadWrite, FileShare.Read);
+				} catch (IOException e) {
+					throw new DictionaryLoadException(e.Message, e);
+				} catch (ArgumentException e) {
+					throw new DictionaryLoadException(e.Message, e);
+				} catch (UnauthorizedAccessException e) {
+					throw new DictionaryLoadException(e.Message, e);
+				}
+			}
 		}
 
 		protected void CloseFile() {
@@ -531,6 +549,14 @@ namespace Szotar {
 
 					// Overwrite the dictionary file with the new version.
 					File.Move(tempFile, Path);
+
+					// Try to open the file again, so that other people can't modify it.
+					// If it fails, we can try again later.
+					try {
+						OpenFile();
+					} catch (IOException) {
+					} catch (UnauthorizedAccessException) { }
+
 					File.Delete(backupFile);
 
 					SaveCache();
