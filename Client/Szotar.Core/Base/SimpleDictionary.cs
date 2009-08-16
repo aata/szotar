@@ -144,6 +144,7 @@ namespace Szotar {
 			Path = path;
 
 			bool alreadySorted;
+			OpenFile(full);
 			LoadHeader(true, out alreadySorted);
 
 			if (!full) {
@@ -169,7 +170,7 @@ namespace Szotar {
 			this.backwards = backwards;
 		}
 
-		protected void OpenFile() {
+		protected void OpenFile(bool full) {
 			if (reader != null)
 				reader.Seek(0);
 			else {
@@ -183,7 +184,17 @@ namespace Szotar {
 					//
 					// We need to open with FileShare.Read because the main window and other programs need to 
 					// read the dictionary header to populate the list. (This should probably change.)
-					reader = new Utf8LineReader(Path, FileAccess.ReadWrite, FileShare.Read);
+					
+					// Of course, if we're just reading the dictionary header, we only request read access.
+					var access = full ? FileAccess.ReadWrite : FileAccess.Read;
+
+					// If we're only loading a header, we have to set FileShare.ReadWrite or the call 
+					// fails if the file is already open for ReadWrite.
+					// If we can open the file for Read access, it should be safe to read from without it 
+					// being modified (when writing to the dictionary, we specify FileShare.None).
+					var share = full ? FileShare.Read : FileShare.ReadWrite;
+
+					reader = new Utf8LineReader(Path, access, share);
 				} catch (IOException e) {
 					throw new DictionaryLoadException(e.Message, e);
 				} catch (ArgumentException e) {
@@ -209,7 +220,7 @@ namespace Szotar {
 		void LoadHeader(bool applyProperties, out bool sorted) {
 			long bytePos = 0;
 
-			OpenFile();
+			reader.Seek(0);
 
 			sorted = false;
 			bool firstLine = true;
@@ -379,7 +390,7 @@ namespace Szotar {
 		protected Entry GetFullEntry(Entry entryStub, Section section) {
 			try {
 				if (reader == null)
-					OpenFile();
+					OpenFile(true);
 
 				reader.Seek((long)entryStub.Tag.Data);
 
@@ -470,7 +481,7 @@ namespace Szotar {
 					reader = null;
 				}
 
-				using (Stream stream = File.Open(path, FileMode.Create)) {
+				using (var stream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
 					using (var writer = new LineWriter(stream)) {
 						writer.WriteLine(magicNumber);
 
@@ -553,7 +564,7 @@ namespace Szotar {
 					// Try to open the file again, so that other people can't modify it.
 					// If it fails, we can try again later.
 					try {
-						OpenFile();
+						OpenFile(true);
 					} catch (IOException) {
 					} catch (UnauthorizedAccessException) { }
 

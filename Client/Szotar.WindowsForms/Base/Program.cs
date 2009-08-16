@@ -84,7 +84,6 @@ namespace Szotar.WindowsForms {
 				this.ExitThread();
 
 			if (Configuration.Default.NeedsSaving) {
-				ProgramLog.Default.AddMessage(LogType.Debug, "Saving configuration");
 				Configuration.Default.Save();
 			}
 		}
