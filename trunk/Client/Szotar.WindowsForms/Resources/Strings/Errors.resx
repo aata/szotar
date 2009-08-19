@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CannotOpenDatabase" xml:space="preserve">
+    <value>The program database cannot be opened. The message given was: {1}{0}</value>
+    <comment>{1} = \n\n</comment>
+  </data>
   <data name="CannotUpgradeDatabaseToVersion" xml:space="preserve">
     <value>Cannot upgrade the database to version {0}</value>
   </data>
@@ -126,6 +130,14 @@
   </data>
   <data name="CouldNotLoadDictionaryCaption" xml:space="preserve">
     <value>Error opening dictionary</value>
+  </data>
+  <data name="DllNotFound" xml:space="preserve">
+    <value>A file required for this program to run, {0}, was not found. To run this program from a zip file, please extract the entire zip file.</value>
+    <comment>Dll file name</comment>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>The file "{0}" was not found. Perhaps it was deleted or moved elsewhere?{2}{1}</value>
+    <comment>{0} = File name, {1} = Reason, {2} = \n\n</comment>
   </data>
   <data name="ImportFailedWithMessage" xml:space="preserve">
     <value>The import failed with the message: {1}{0}</value>

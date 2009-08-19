@@ -32,5 +32,30 @@ namespace Szotar.WindowsForms {
 				Resources.Errors.NewerDatabaseVersion,
 				Application.ProductName);
 		}
+
+		public static void DllNotFound(string dll, System.IO.FileNotFoundException e) {
+			ShowError(
+				Application.ProductName,
+				Resources.Errors.DllNotFound,
+				dll);
+		}
+
+		public static void CannotOpenDatabase(Exception e) {
+			ShowError(
+				Application.ProductName,
+				Resources.Errors.CannotOpenDatabase,
+				e.Message,
+				"\n\n");
+		}
+
+		// A generic file not found message.
+		public static void FileNotFound(System.IO.FileNotFoundException e) {
+			ShowError(
+				Application.ProductName,
+				Resources.Errors.FileNotFound,
+				e.FileName,
+				e.Message,
+				"\n\n");
+		}
 	}
 }
