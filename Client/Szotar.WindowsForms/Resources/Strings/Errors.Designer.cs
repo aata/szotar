@@ -130,15 +130,42 @@ namespace Szotar.WindowsForms.Resources {
             get {
                 return ResourceManager.GetString("TheOperationWasCancelled", resourceCulture);
             }
-        }
+		}
 
 		/// <summary>
 		///   Looks up a localized string similar to The program data was created by a newer version of this program. Please upgrade {0} to the latest version to use the program.
 		/// </summary>
 		internal static string NewerDatabaseVersion {
 			get {
-				
+
 				return ResourceManager.GetString("NewerDatabaseVersion", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to A file required for this program to run, {0}, was not found.
+		/// </summary>
+		internal static string DllNotFound {
+			get {
+				return ResourceManager.GetString("DllNotFound", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to The program database cannot be opened. The message given was: {1}{0}
+		/// </summary>
+		internal static string CannotOpenDatabase {
+			get {
+				return ResourceManager.GetString("CannotOpenDatabase", resourceCulture);
+			}
+		}
+
+		/// <summary>
+		///   Looks up a localized string similar to The file "{0}" was not found. Perhaps it was deleted or moved elsewhere?{2}{1}
+		/// </summary>
+		internal static string FileNotFound {
+			get {
+				return ResourceManager.GetString("FileNotFound", resourceCulture);
 			}
 		}
     }
