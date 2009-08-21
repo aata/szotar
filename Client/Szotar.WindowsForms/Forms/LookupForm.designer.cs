@@ -55,7 +55,7 @@
 			System.Windows.Forms.ToolStripMenuItem debugLog;
 			System.Windows.Forms.ToolStripSeparator toolsSep;
 			System.Windows.Forms.ToolStripMenuItem options;
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.forwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.backwards = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,6 +63,7 @@
 			this.recentLists = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.closeWindow = new System.Windows.Forms.ToolStripMenuItem();
 			this.grid = new System.Windows.Forms.DataGridView();
 			this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.addTo = new System.Windows.Forms.ToolStripMenuItem();
@@ -74,7 +75,6 @@
 			this.ignoreAccentsCheck = new System.Windows.Forms.CheckBox();
 			this.toolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.mainMenu = new System.Windows.Forms.MenuStrip();
-			this.closeWindow = new System.Windows.Forms.ToolStripMenuItem();
 			addToList = new System.Windows.Forms.ToolStripMenuItem();
 			copy = new System.Windows.Forms.ToolStripMenuItem();
 			reverseLookup = new System.Windows.Forms.ToolStripMenuItem();
@@ -362,6 +362,12 @@
 			this.fileMenu.Name = "fileMenu";
 			resources.ApplyResources(this.fileMenu, "fileMenu");
 			// 
+			// closeWindow
+			// 
+			this.closeWindow.Name = "closeWindow";
+			resources.ApplyResources(this.closeWindow, "closeWindow");
+			this.closeWindow.Click += new System.EventHandler(this.closeWindow_Click);
+			// 
 			// grid
 			// 
 			this.grid.AllowUserToAddRows = false;
@@ -373,15 +379,15 @@
 			this.grid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
 			this.grid.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
 			this.grid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle2.Font = new System.Drawing.Font("Verdana", 8.25F);
-			dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(2);
-			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-			dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-			dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-			this.grid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle1.Font = new System.Drawing.Font("Verdana", 8.25F);
+			dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(2);
+			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.grid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
 			this.grid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.grid.ContextMenuStrip = this.contextMenu;
 			this.grid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
@@ -396,7 +402,6 @@
 			this.grid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
 			this.grid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
 			this.grid.VirtualMode = true;
-			this.grid.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grid_MouseDown);
 			this.grid.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grid_CellMouseDoubleClick);
 			// 
 			// contextMenu
@@ -479,12 +484,6 @@
             dictionaryMenu,
             toolsMenu});
 			this.mainMenu.Name = "mainMenu";
-			// 
-			// closeWindow
-			// 
-			this.closeWindow.Name = "closeWindow";
-			resources.ApplyResources(this.closeWindow, "closeWindow");
-			this.closeWindow.Click += new System.EventHandler(this.closeWindow_Click);
 			// 
 			// LookupForm
 			// 

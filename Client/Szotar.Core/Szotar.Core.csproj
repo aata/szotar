@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\Configuration.cs" />
+    <Compile Include="Base\CSV.cs" />
     <Compile Include="Base\DataStore.cs" />
     <Compile Include="Base\Delegates.cs" />
     <Compile Include="Base\Dictionary.cs" />

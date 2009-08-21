@@ -28,14 +28,6 @@ using System.Text;
 // The UI should ensure that only one UI element is providing editing services 
 // for the word list, to avoid undo-related confusion.
 
-// To work around this somewhat, the WordList class will provide for out-of-band
-// updates that aren't stored in the undo list. This makes writing ICommand 
-// objects more difficult as they should preserve out-of-band changes when they
-// undone and then re-done. For example, inserting a WordListEntry, updating its 
-// TimesFailed count out-of-band, then undoing the insertion and re-doing it 
-// should re-insert the *edited* row, not the original row. Such cases are
-// usually marked in the comments where they occur.
-
 // Note: it should be an error to perform deletion or insertion commands out-of-band, 
 // as such things could cause normal undo/redo functionality to fail.
 namespace Szotar.Sqlite {
@@ -44,6 +36,7 @@ namespace Szotar.Sqlite {
 		BindingList<WordListEntry> list;
 		long? id;
 		bool raiseListEvents = true;
+		UndoList<Command> undoList;
 
 		public SqliteDataStore DataStore { get; private set; }
 		public override long? ID {
@@ -54,8 +47,9 @@ namespace Szotar.Sqlite {
 			DataStore = store;
 			id = setID;
 			worker = new Worker(store, this);
-			list = new BindingList<WordListEntry>(worker.GetAllEntries());
+			undoList = new UndoList<Command>();
 
+			list = new BindingList<WordListEntry>(worker.GetAllEntries());
 			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
 		}
 
@@ -158,41 +152,45 @@ namespace Szotar.Sqlite {
 		public override void Insert(int index, WordListEntry item) {
 			if (index > Count || index < 0)
 				throw new ArgumentOutOfRangeException("index");
-			UndoList.Do(new Insertion(this, index, item));
+			undoList.Do(new Insertion(this, index, item));
 		}
 
 		public override void Insert(int index, IList<WordListEntry> items) {
 			if (index > Count || index < 0)
 				throw new ArgumentOutOfRangeException("index");
-			UndoList.Do(new MultipleInsertion(this, index, items));
+			undoList.Do(new MultipleInsertion(this, index, items));
 		}
 
 		public override bool Remove(WordListEntry item) {
 			bool existed = list.Contains(item);
-			UndoList.Do(new Deletion(this, IndexOf(item)));
+			undoList.Do(new Deletion(this, IndexOf(item)));
 			return existed;
 		}
 
 		public override void RemoveAt(int index) {
 			if (index >= Count || index < 0)
 				throw new ArgumentOutOfRangeException("index");
-			UndoList.Do(new Deletion(this, index));
+			undoList.Do(new Deletion(this, index));
 		}
 
-		public override void RemoveAt(IEnumerable<int> indices) {
-			UndoList.Do(new Deletion(this, indices));
+		public override void RemoveAt(IList<int> indices) {
+			undoList.Do(new Deletion(this, indices));
 		}
 
-		public override void SwapRows(IEnumerable<int> indices) {
-			UndoList.Do(new SwapRowsCommand(this, indices));
+		public override void SwapRows(IList<int> indices) {
+			undoList.Do(new SwapRowsCommand(this, indices));
 		}
 
 		public override void Clear() {
-			UndoList.Do(new Deletion(this, EnumRange(0, list.Count - 1)));
+			undoList.Do(new Deletion(this, EnumRange(0, list.Count - 1)));
 		}
 
 		public override void Sort(Comparison<WordListEntry> comparison) {
-			UndoList.Do(new SortCommand(this, comparison));
+			undoList.Do(new SortCommand(this, comparison));
+		}
+
+		public override void MoveRows(IList<int> rows, int destinationRowIndex) {
+			undoList.Do(new MoveRowsCommand(this, rows, destinationRowIndex));
 		}
 
 		protected IEnumerable<int> EnumRange(int from, int to) {
@@ -218,7 +216,7 @@ namespace Szotar.Sqlite {
 
 		public override WordListEntry this[int index] {
 			get { return list[index]; }
-			set { UndoList.Do(new SetItem(this, index, value)); }
+			set { undoList.Do(new SetItem(this, index, value)); }
 		}
 
 		public override int IndexOf(WordListEntry item) {
@@ -235,14 +233,21 @@ namespace Szotar.Sqlite {
 		/// </summary>
 		/// <param name="update">The update action is allowed to work with the internal binding list 
 		/// for the duration of the update, to avoid adding new undo items.</param>
-		protected void PerformMajorUpdate(Action<BindingList<WordListEntry>> update) {
+		protected void PerformMajorUpdate(Action update) {
 			try {
 				raiseListEvents = false;
-				update(this.list);
+				update();
 			} finally {
 				raiseListEvents = true;
 				list.ResetBindings();
 			}
+		}
+
+		protected void MaybePerformMajorUpdate(bool major, Action update) {
+			if (major)
+				PerformMajorUpdate(update);
+			else
+				update();
 		}
 
 		#region Worker
@@ -607,6 +612,7 @@ namespace Szotar.Sqlite {
 		}
 		#endregion
 
+		#region Commands
 		protected abstract class Command : ICommand {
 			protected SqliteWordList owner;
 			protected Worker worker;
@@ -622,6 +628,7 @@ namespace Szotar.Sqlite {
 			public abstract void Undo();
 			public virtual void Redo() { Do(); }
 			public abstract string Description { get; }
+			public abstract int AffectedRows { get; }
 		}
 
 		///<summary>Updates an entire item in the list.</summary>
@@ -676,6 +683,10 @@ namespace Szotar.Sqlite {
 					return desc;
 				}
 			}
+
+			public override int AffectedRows {
+				get { return 1; }
+			}
 		}
 
 		///<summary>Inserts one item into the list.</summary>
@@ -691,25 +702,21 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Do() {
-				// Safe with respect to external changes.
-				// Obviously the item cannot be changed while it is not part of the list.
 				worker.Insert(index, item);
 				list.Insert(index, item);
 			}
 
 			public override void Undo() {
-				// Needed for safeness with respect to external changes.
-				// I write this with the practice functionality in mind: if practicing and editing a list concurrently,
-				// the undo situation gets a bit hairy. There should only be one *editor* open for the list at once, but
-				// there may be other things which are changing the list (e.g. practice window).
-				item = list[index];
-
 				worker.RemoveAt(index);
 				list.RemoveAt(index);
 			}
 
 			public override string Description {
 				get { return LocalizationProvider.Default.Strings["Inserted1Item"]; }
+			}
+
+			public override int AffectedRows {
+				get { return 1; }
 			}
 		}
 
@@ -734,11 +741,8 @@ namespace Szotar.Sqlite {
 			public override void Undo() {
 				worker.RemoveAt(index, items.Count);
 
-				// Sidestep oddities related to OOB changes by re-reading the items as they are now.
-				for (int i = 0; i < items.Count; ++i) {
-					items[i] = list[index];
+				for (int i = 0; i < items.Count; ++i)
 					list.RemoveAt(index);
-				}
 			}
 
 			public override string Description {
@@ -747,6 +751,10 @@ namespace Szotar.Sqlite {
 						LocalizationProvider.Default.Strings["InsertedNItems"],
 						items.Count);
 				}
+			}
+
+			public override int AffectedRows {
+				get { return items.Count; }
 			}
 		}
 
@@ -775,10 +783,6 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Undo() {
-				// Again, sidestep oddities related to OOB changes. 
-				// This is probably very unlikely to happen with the SetValue command, however.
-				newValue = (T)list[index].GetProperty(property);
-
 				SetTo(oldValue);
 			}
 
@@ -787,6 +791,10 @@ namespace Szotar.Sqlite {
 					return string.Format(
 						LocalizationProvider.Default.Strings["ChangedXToY"] ?? "Change \"{0}\" to \"{1}\"", oldValue, newValue);
 				}
+			}
+
+			public override int AffectedRows {
+				get { return 1; }
 			}
 		}
 
@@ -852,14 +860,18 @@ namespace Szotar.Sqlite {
 			public override string Description {
 				get { return string.Format(LocalizationProvider.Default.Strings["DeletedNItems"], items.Count); }
 			}
+
+			public override int AffectedRows {
+				get { return items.Count; }
+			}
 		}
 
 		/// <summary>Swaps the phrase and translation of the entries at the given indices. Safe with regards to
 		/// out-of-band changes, since it stores no data.</summary>
 		protected class SwapRowsCommand : Command {
-			IEnumerable<int> indices;
+			IList<int> indices;
 
-			public SwapRowsCommand(SqliteWordList owner, IEnumerable<int> indices)
+			public SwapRowsCommand(SqliteWordList owner, IList<int> indices)
 				: base(owner)
 			{
 				this.indices = indices;
@@ -879,16 +891,12 @@ namespace Szotar.Sqlite {
 				get {
 					return string.Format(
 						LocalizationProvider.Default.Strings["SwappedNRows"],
-						Length(indices));
+						indices.Count);
 				}
 			}
 
-			static int Length<T>(IEnumerable<T> list) {
-				int count = 0;
-				foreach (var x in list)
-					count++;
-
-				return count;
+			public override int AffectedRows {
+				get { return indices.Count; }
 			}
 		}
 
@@ -930,7 +938,7 @@ namespace Szotar.Sqlite {
 					});
 				}
 
-				owner.PerformMajorUpdate(list => {
+				owner.PerformMajorUpdate(delegate {
 					// BindingList doesn't have a Sort method: no problem, though.
 					list.Clear();
 					foreach (var e in sorted)
@@ -944,7 +952,7 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Undo() {
-				owner.PerformMajorUpdate(list => {
+				owner.PerformMajorUpdate(delegate {
 					var sorted = new List<WordListEntry>(list);
 					list.Clear();
 
@@ -965,32 +973,144 @@ namespace Szotar.Sqlite {
 			public override string Description {
 				get { return LocalizationProvider.Default.Strings["SortedList"]; }
 			}
+
+			public override int AffectedRows {
+				get { return movements.Count; }
+			}
+		}
+
+		// Moves a set of rows within the list to a specific row index.
+		// If multiple rows are moved, they retain their order in the list, and are all inserted
+		// at the given position.
+		protected class MoveRowsCommand : Command {
+			List<int> rows;
+			int destination;
+			int shiftedDestination;
+
+			public MoveRowsCommand(SqliteWordList owner, IList<int> rows, int destination)
+				: base(owner)
+			{
+				foreach (int i in rows)
+					if (i < 0 || i >= list.Count)
+						throw new ArgumentException("rows");
+
+				if (destination < 0 || destination > list.Count)
+					throw new ArgumentException("destination");
+
+				// We require that the list of rows is in ascending order.
+				this.rows = new List<int>(rows);
+				this.rows.Sort();
+
+				this.destination = destination;
+			}
+
+			public override void Do() {
+				// Get the values being moved, so we can insert them later.
+				var values = new List<WordListEntry>(rows.Count);
+
+				// Account for the index shift caused by removing items.
+				// Alternately, we could remove the items backwards. But we don't.
+				int shift = 0;
+				shiftedDestination = destination;
+
+				foreach (int i in rows) {
+					values.Add(list[i - shift]);
+					list.RemoveAt(i - shift);
+
+					shift++;
+					if (i < destination)
+						shiftedDestination--;
+				}
+
+				foreach (var entry in values)
+					list.Insert(shiftedDestination, entry);
+
+				// The database modification is simpler when expressed as a removal and re-insertion.
+				// (It would be possible to speed this up with a dedicated function, but much more complex.)
+				worker.RemoveAt(rows);
+
+				// The shifted destination is the correct place to insert.
+				worker.Insert(shiftedDestination, values);
+			}
+
+			public override void Undo() {
+				var values = new List<WordListEntry>(rows.Count);
+
+				for (int i = 0; i < rows.Count; ++i) {
+					values.Add(list[shiftedDestination]);
+					list.RemoveAt(shiftedDestination);
+				}
+
+				for (int i = 0; i < rows.Count; ++i)
+					list.Insert(rows[i], values[i]);
+
+				// Again, the database modification code is more simply expressed in terms of removals and insertions.
+				worker.RemoveAt(shiftedDestination, rows.Count);
+
+				var insertions = new List<KeyValuePair<int, WordListEntry>>(rows.Count);
+				for (int i = 0; i < rows.Count; ++i)
+					insertions.Add(new KeyValuePair<int, WordListEntry>(rows[i], values[i]));
+
+				worker.Insert(insertions);
+			}
+
+			public override string Description {
+				get {
+					if (rows.Count == 1)
+						return LocalizationProvider.Default.Strings["Moved1Row"];
+
+					return string.Format(LocalizationProvider.Default.Strings["MovedNRows"], rows.Count);
+				}
+			}
+
+			public override int AffectedRows {
+				get { return rows.Count; }
+			}
+		}
+
+		bool IsMajor(Command command) {
+			return command.AffectedRows > 8;
+		}
+		#endregion
+
+		#region Undo
+		void Do(Command command) {
+			MaybePerformMajorUpdate(IsMajor(command), delegate { 
+				undoList.Do(command); 
+			});
 		}
 
 		public override void Undo() {
-			if (UndoList.UndoItemCount > 0)
-				UndoList.Undo(1);
+			var cmd = undoList.UndoCommand;
+			if (cmd != null)
+				MaybePerformMajorUpdate(IsMajor(cmd), delegate { 
+					undoList.Undo(1); 
+				});
+		}
+
+		public override void Redo() {
+			var cmd = undoList.RedoCommand;
+			if (cmd != null)
+				MaybePerformMajorUpdate(IsMajor(cmd), delegate { 
+					undoList.Redo(1); 
+				});
 		}
 
 		public override string UndoDescription {
 			get {
-				foreach (string desc in UndoList.UndoItemDescriptions)
+				foreach (string desc in undoList.UndoItemDescriptions)
 					return desc;
 				return null;
 			}
-		}
-
-		public override void Redo() {
-			if (UndoList.RedoItemCount > 0)
-				UndoList.Redo(1);
 		}
 
 		public override string RedoDescription {
 			get {
-				foreach (string desc in UndoList.RedoItemDescriptions)
+				foreach (string desc in undoList.RedoItemDescriptions)
 					return desc;
 				return null;
 			}
 		}
+		#endregion
 	}
 }

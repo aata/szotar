@@ -6,11 +6,6 @@ using System.Diagnostics;
 
 namespace Szotar {
 	public abstract class WordList : IBindingList, IList<WordListEntry>, IDisposable, INotifyPropertyChanged {
-		public WordList() {
-			UndoList = new UndoList();
-		}
-
-		public UndoList UndoList { get; private set; }
 
 		#region Unneeded or redundant crap
 		bool IBindingList.AllowEdit { get { return true; } }
@@ -62,8 +57,8 @@ namespace Szotar {
 		public abstract IEnumerator<WordListEntry> GetEnumerator();
 
 		// Specific to WordList
-		public abstract void RemoveAt(IEnumerable<int> indices);
-		public abstract void SwapRows(IEnumerable<int> indices);
+		public abstract void RemoveAt(IList<int> indices);
+		public abstract void SwapRows(IList<int> indices);
 
 		public event ListChangedEventHandler ListChanged;
 		protected void RaiseListChanged(ListChangedEventArgs eventArgs) {
@@ -110,6 +105,7 @@ namespace Szotar {
 		public abstract void DeleteWordList();
 		public abstract void Insert(int index, IList<WordListEntry> range);
 		public abstract void Sort(Comparison<WordListEntry> comparison);
+		public abstract void MoveRows(IList<int> rows, int destinationRowIndex);
 
 		public event EventHandler ListDeleted;
 		internal void RaiseDeleted() {
@@ -131,10 +127,6 @@ namespace Szotar {
 		/// The description of the last redo item, or null if no items can be redone.
 		/// </summary>
 		public abstract string RedoDescription { get; }
-
-		public void GetListInfo() {
-			throw new NotImplementedException();
-		}
 	}
 
 	public class WordListEntry : System.ComponentModel.INotifyPropertyChanged {

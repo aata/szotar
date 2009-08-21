@@ -25,6 +25,7 @@ namespace Szotar.WindowsForms.Controls {
 			InitializeComponent();
 			InitializeGridStyles();
 			InitializeVirtualMode();
+			InitializeDragAndDrop();
 
 			this.Disposed += (s, e) => UnwireDataSourceEvents();
 			grid.ColumnWidthChanged += (s, e) => {
@@ -112,7 +113,8 @@ namespace Szotar.WindowsForms.Controls {
 					grid.Rows.Insert(e.NewIndex, row);
 					break;
 				case ListChangedType.Reset:
-					grid.Invalidate();
+					grid.CancelEdit();
+					UpdateData();
 					break;
 			}
 		}
@@ -177,8 +179,12 @@ namespace Szotar.WindowsForms.Controls {
 				// then we can't actually delete it from the data source. So we delete it from the grid. However, this raises a slight problem too: when
 				// the cell is deleted, the selection moves onto another cell -- we could end up deleting that cell, too, if we're not careful.
 				// 
-				// To mitigate this, we use the InternalSelectedIndices, not SelectedIndices: this returns the editing row too, unlike SelectedIndices.
-				// Then we remove the editing row, delete it, and use the previous selection to guide us in what else to delete.
+				// To mitigate this, we use the InternalSelectedIndices, not SelectedIndices: this returns rows not in the data source,
+				// unlike SelectedIndices. Then we remove the editing row, delete it, and use the previous selection to 
+				// guide us in what else to delete.
+				//
+				// Any other rows that aren't present in the data source (such as the New Row when it's not selected)
+				// are simply removed from the rowsToDelete.
 
 				var rowsToDelete = new List<int>(InternalSelectedIndices);
 
@@ -193,14 +199,18 @@ namespace Szotar.WindowsForms.Controls {
 
 				if (rowInEdit.HasValue && rowInEdit.Value >= source.Count) {
 					rowsToDelete.Remove(rowInEdit.Value);
-					grid.Rows.RemoveAt(rowInEdit.Value);
+					grid.CancelEdit();
 				}
+
+				rowsToDelete.RemoveAll(x => x >= source.Count);
 
 				source.RemoveAt(rowsToDelete);
 				e.Handled = true;
 			} else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control) {
 				source.Undo();
 				e.Handled = true;
+			} else if (e.KeyCode == Keys.C && e.Modifiers == Keys.Control) {
+				Clipboard.SetDataObject(MakeDataObjectFromSelection(), true);
 			} else if (
 				(e.KeyCode == Keys.Z && e.Modifiers == (Keys.Control | Keys.Shift)) ||
 				(e.KeyCode == Keys.Y && e.Modifiers == Keys.Control)) {
@@ -357,6 +367,180 @@ namespace Szotar.WindowsForms.Controls {
 				return null;
 
 			return row >= source.Count || row == rowInEdit ? pairInEdit : source[row];
+		}
+		#endregion
+
+		#region Drag and drop
+		// This code is mostly taken from the DataGridView FAQ by Mark Rideout:
+		// http://www.windowsforms.net/Samples/Go%20To%20Market/DataGridView/DataGridView%20FAQ.doc
+
+		Rectangle dragBox; // When the cursor moves outside of this, the drag starts.
+		WordListEntries dragData;
+
+		void InitializeDragAndDrop() {
+			grid.AllowDrop = true;
+			grid.DragOver += new DragEventHandler(grid_DragOver);
+			grid.DragDrop += new DragEventHandler(grid_DragDrop);
+			grid.MouseDown += new MouseEventHandler(grid_MouseDown);
+			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
+		}
+
+		void grid_MouseMove(object sender, MouseEventArgs e) {
+			if (e.Button != MouseButtons.Left)
+				return;
+
+			if (dragBox != Rectangle.Empty && !dragBox.Contains(e.Location)) {
+				var data = new DataObject();
+				dragData.SetData(data);
+
+				var result = grid.DoDragDrop(data, DragDropEffects.Move | DragDropEffects.Copy | DragDropEffects.Scroll);
+				dragBox = Rectangle.Empty;
+
+				// This doesn't exactly look great in the undo list.
+				// It's very unlikely that we'll be able to tie together undo items related to multiple lists, though.
+				if (result == DragDropEffects.Move)
+					source.RemoveAt(dragData.Indices);
+			}
+		}
+
+		public DataObject MakeDataObjectFromSelection() {
+			var wle = new WordListEntries(source, new List<int>(SelectedIndices));
+			var data = new DataObject();
+			wle.SetData(data);
+			return data;
+		}
+
+		void grid_MouseDown(object sender, MouseEventArgs e) {
+			if (e.Button != MouseButtons.Left)
+				return;
+
+			int dragRow = grid.HitTest(e.X, e.Y).RowIndex;
+
+			// Don't drag the New Row.
+			if (dragRow != -1 && dragRow < source.Count) {
+				var dragSize = SystemInformation.DragSize;
+				dragBox = new Rectangle(
+					new Point(
+						e.X - dragSize.Width / 2,
+						e.Y - dragSize.Height / 2),
+					dragSize);
+
+				dragData = new WordListEntries(source, new[] { dragRow });
+			} else {
+				dragBox = Rectangle.Empty;
+			}
+		}
+
+		// Chooses at which index the row will be dropped, given mouse co-ordinates.
+		int GetDropRow(int x, int y) {
+			var hit = grid.HitTest(x, y).RowIndex;
+
+			if (hit == -1) {
+				if (grid.RowCount > 0) {
+					if(y >= grid.GetRowDisplayRectangle(grid.RowCount - 1, false).Bottom)
+						return source.Count;
+					return 0;
+				} else {
+					return 0;
+				}
+			}			
+
+
+			// TODO: Figure out if this still works with multiple rows being dragged
+			// If you drag a row onto itself, we don't want to move it at all.
+			if (dragData.Indices.Contains(hit))
+				return hit;
+			
+
+			// For example, the New Row was dropped onto.
+			if (hit >= source.Count)
+				return source.Count;
+
+			// If we're on the top half of a row, we drop above the row.
+			// If we're on the bottom half of a row, we drop below the row.
+			var rect = grid.GetRowDisplayRectangle(hit, false);
+			var middle = rect.Top + rect.Height / 2;
+
+			if (y > middle)
+				return Math.Min(hit + 1, source.Count);
+
+			return hit;
+		}
+
+		void grid_DragDrop(object sender, DragEventArgs e) {
+			var clientPoint = grid.PointToClient(new Point(e.X, e.Y));
+			int dropRow = GetDropRow(clientPoint.X, clientPoint.Y);
+
+			if (dropRow < 0)
+				return;
+			if (dropRow >= source.Count)
+				dropRow = source.Count;
+
+			var entries = e.Data.GetData(typeof(WordListEntries)) as WordListEntries;
+			var searchResults = e.Data.GetData(typeof(SearchResult[])) as SearchResult[];
+			var text = e.Data.GetData(DataFormats.UnicodeText) ?? e.Data.GetData(DataFormats.Text);
+
+			if(entries != null && entries.WordList == this.source) {
+				// Copying from the grid to itself requires a bit more care.
+
+				if (e.Effect == DragDropEffects.Move) {
+					// Dragging rows from this grid to itself: i.e. re-ordering the rows.
+					source.MoveRows(entries.Indices, dropRow);
+
+					// Set the drag result to None, so that the results won't be removed *again*.
+					e.Effect = DragDropEffects.None;
+				} else {
+					CopyRowsFromTo(entries, dropRow);
+				}
+
+			} else if (entries != null) {
+				// Copying/moving from some other word list
+				CopyRowsFromTo(entries, dropRow);
+
+			} else if (searchResults != null) {
+				var results = new List<WordListEntry>(searchResults.Length);
+				foreach(var result in searchResults)
+					results.Add(new WordListEntry(source, result.Phrase, result.Translation));
+
+				source.Insert(dropRow, results);
+
+			} else if (text != null) {
+				// Inserting textual data dragged from who-knows-where into the list.
+				// TODO: Drag event for text?
+			}
+		}
+
+		void CopyRowsFromTo(WordListEntries entries, int dropRow) {
+			var copies = new List<WordListEntry>();
+			foreach (int i in entries.Indices)
+				copies.Add(new WordListEntry(source, entries.WordList[i].Phrase, entries.WordList[i].Translation));
+
+			source.Insert(dropRow, copies);
+		}
+
+		void grid_DragOver(object sender, DragEventArgs e) {
+			bool hasEntries = e.Data.GetDataPresent(typeof(WordListEntries));
+			bool hasText = e.Data.GetDataPresent(DataFormats.UnicodeText) || e.Data.GetDataPresent(DataFormats.Text);
+			bool hasSearchResults = e.Data.GetDataPresent(typeof(SearchResult[]));
+
+			// Shift = 4, Ctrl = 8
+			bool copyOverride = (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy && (e.KeyState & 8) == 8;
+			bool moveOverride = (e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move && (e.KeyState & 4) == 4;
+
+			if (hasEntries) {
+				e.Effect = DragDropEffects.Move;
+			} else if (hasText || hasSearchResults) {
+				e.Effect = DragDropEffects.Copy;
+			} else {
+				e.Effect = DragDropEffects.None;
+			}
+
+			if (e.Effect != DragDropEffects.None) {
+				if (copyOverride)
+					e.Effect = DragDropEffects.Copy;
+				else if (moveOverride)
+					e.Effect = DragDropEffects.Move;
+			}
 		}
 		#endregion
 
