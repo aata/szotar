@@ -258,6 +258,24 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Moved a row.
+        /// </summary>
+        internal static string Moved1Row {
+            get {
+                return ResourceManager.GetString("Moved1Row", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Moved {0} rows.
+        /// </summary>
+        internal static string MovedNRows {
+            get {
+                return ResourceManager.GetString("MovedNRows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Next.
         /// </summary>
         internal static string NextCommand {

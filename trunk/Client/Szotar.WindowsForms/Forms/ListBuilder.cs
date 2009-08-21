@@ -136,11 +136,11 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void remove_Click(object sender, EventArgs e) {
-			list.RemoveAt(grid.SelectedIndices);
+			list.RemoveAt(new List<int>(grid.SelectedIndices));
 		}
 
 		void swap_Click(object sender, EventArgs e) {
-			list.SwapRows(grid.SelectedIndices);
+			list.SwapRows(new List<int>(grid.SelectedIndices));
 		}
 
 		void swapAll_Click(object sender, EventArgs e) {
@@ -480,6 +480,15 @@ namespace Szotar.WindowsForms.Forms {
 		private void pasteCSV_Click(object sender, EventArgs e) {
 			int validCSV, validTSV;
 			List<List<string>> csv, tsv;
+
+			// TODO: Look at getting CSV directly from the clipboard.
+			// It's more work than it sounds: there doesn't seem to be a consensus on what the exact
+			// format of that data is.
+			// Excel in particular writes it in UTF-8 (or the windows code page, according to some)
+			// with a null terminator.
+
+			// It's plain text: use guesswork to figure out if it's TSV or CSV.
+			// Tab-separated is rarer, so if it works with tabs, it's probably that.
 			string text = Clipboard.GetText();
 			csv = ParseCSV(',', text, out validCSV);
 			tsv = ParseCSV('\t', text, out validTSV);

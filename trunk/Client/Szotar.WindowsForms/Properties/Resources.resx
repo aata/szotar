@@ -250,4 +250,12 @@
     <value>Change item to '{0}' and '{1}'</value>
     <comment>Undo item description</comment>
   </data>
+  <data name="Moved1Row" xml:space="preserve">
+    <value>Moved a row</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="MovedNRows" xml:space="preserve">
+    <value>Moved {0} rows</value>
+    <comment>Undo item description</comment>
+  </data>
 </root>

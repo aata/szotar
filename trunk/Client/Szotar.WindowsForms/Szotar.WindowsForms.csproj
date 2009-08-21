@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="Base\ShowForm.cs" />
     <Compile Include="Base\ThemeUtilities.cs" />
+    <Compile Include="Base\WordListEntries.cs" />
     <Compile Include="Controls\ListViewNF.cs">
       <SubType>Component</SubType>
     </Compile>

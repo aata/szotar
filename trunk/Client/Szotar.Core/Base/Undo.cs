@@ -8,11 +8,13 @@ namespace Szotar {
 		string Description { get; }
 	}
 
-	public class UndoList {
+	public class UndoList<T>
+		where T : ICommand
+	{
 		// The newest undo items are at the end of the list.
-		List<ICommand> undoItems = new List<ICommand>();
+		List<T> undoItems = new List<T>();
 		// The newest redo items are at the end of the list.
-		List<ICommand> redoItems = new List<ICommand>();
+		List<T> redoItems = new List<T>();
 
 		public void Undo(int count) {
 			if (count > UndoItemCount)
@@ -41,10 +43,28 @@ namespace Szotar {
 		public int UndoItemCount { get { return undoItems.Count; } }
 		public int RedoItemCount { get { return redoItems.Count; } }
 
+		public T UndoCommand {
+			get {
+				if (undoItems.Count > 0)
+					return undoItems[undoItems.Count - 1];
+				else
+					return default(T);
+			}
+		}
+
 		public IEnumerable<string> UndoItemDescriptions {
 			get {
 				for (int i = undoItems.Count - 1; i >= 0; ++i)
 					yield return undoItems[i].Description;
+			}
+		}
+
+		public T RedoCommand {
+			get {
+				if (redoItems.Count > 0)
+					return redoItems[redoItems.Count - 1];
+				else
+					return default(T);
 			}
 		}
 
@@ -55,7 +75,7 @@ namespace Szotar {
 			}
 		}
 
-		public void Do(ICommand item) {
+		public void Do(T item) {
 			item.Do();
 			undoItems.Add(item);
 			redoItems.Clear();

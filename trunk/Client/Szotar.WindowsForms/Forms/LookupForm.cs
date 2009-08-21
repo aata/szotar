@@ -117,6 +117,8 @@ namespace Szotar.WindowsForms.Forms {
 
 			AdjustGridRowHeight();
 
+			InitializeDragAndDrop();
+
 			searchBox.RealTextChanged += new EventHandler(searchBox_RealTextChanged);
 
 			// Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
@@ -476,27 +478,6 @@ namespace Szotar.WindowsForms.Forms {
 			FocusSearchField();
 		}
 
-		private class DraggableRowSet {
-			IList<TranslationPair> rows;
-
-			public DraggableRowSet(List<SearchResult> rows) {
-				this.rows = rows.ConvertAll(x => new TranslationPair(x.Phrase, x.Translation));
-			}
-
-			public override string ToString() {
-				var sb = new System.Text.StringBuilder();
-				foreach (TranslationPair row in rows) {
-					sb.AppendLine(string.Format("{0} -- {1}", row.Phrase, row.Translation));
-				}
-
-				return sb.ToString();
-			}
-		}
-
-		private void grid_MouseDown(object sender, MouseEventArgs e) {
-			// TODO: Re-add working dragging code
-		}
-
 		/// <summary>Performs a reverse-lookup of the cell that was double-clicked.</summary>
 		/// <remarks>This is somewhat redundant now that the tooltips do this too, but
 		/// the tooltips are quite limited, and it is harder to interact with them.</remarks>
@@ -598,6 +579,80 @@ namespace Szotar.WindowsForms.Forms {
 		public int SelectedRowCount() {
 			// The SelectedRows and SelectedColumns collections can be inefficient [BPSWFDC].
 			return grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
+		}
+		#endregion
+
+		#region Drag and drop
+		Rectangle dragBox;
+
+		void InitializeDragAndDrop() {
+			grid.MouseDown += new MouseEventHandler(grid_MouseDown);
+			grid.MouseMove += new MouseEventHandler(grid_MouseMove_Drag);
+		}
+
+		void grid_MouseDown(object sender, MouseEventArgs e) {
+			if (e.Button == MouseButtons.Left) {
+				var dragSize = SystemInformation.DragSize;
+
+				dragBox = new Rectangle(
+					e.X - dragSize.Width / 2,
+					e.Y - dragSize.Height / 2,
+					dragSize.Width,
+					dragSize.Height);
+			}
+		}
+
+		List<SearchResult> SelectedResults() {
+			var list = new List<SearchResult>();
+
+			for (int i = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+				i >= 0;
+				i = grid.Rows.GetNextRow(i, DataGridViewElementStates.Selected)) 
+			{
+				if (i <= results.Count)
+					list.Add(results[i]);
+			}
+
+			return list;
+		}
+
+		void grid_MouseMove_Drag(object sender, MouseEventArgs e) {
+			if (e.Button != MouseButtons.Left)
+				return;
+
+			if (dragBox != Rectangle.Empty && !dragBox.Contains(e.Location)) {
+				var data = MakeDataObjectFromSelection();
+
+				grid.DoDragDrop(data, DragDropEffects.Copy | DragDropEffects.Scroll);
+				dragBox = Rectangle.Empty;
+			}
+		}
+
+		DataObject MakeDataObjectFromSelection() {
+			var data = new DataObject();
+
+			var selection = SelectedResults().ToArray();
+			data.SetData(typeof(SearchResult[]), selection);
+
+			var sb = new StringBuilder();
+
+			// Add CSV formatted data.
+			foreach (var sr in selection) {
+				CsvUtilities.AppendCSVValue(sb, sr.Phrase);
+				sb.Append(',');
+				CsvUtilities.AppendCSVValue(sb, sr.Translation);
+				sb.AppendLine();
+			}
+			data.SetData(DataFormats.CommaSeparatedValue, sb.ToString());
+
+			// Add plain text representation.
+			sb.Length = 0;
+			foreach (var sr in selection)
+				sb.Append(sr.Phrase).Append(" -- ").AppendLine(sr.Translation);
+			data.SetData(DataFormats.UnicodeText, sb.ToString());
+			data.SetData(DataFormats.Text, sb.ToString());
+
+			return data;
 		}
 		#endregion
 
@@ -897,21 +952,13 @@ namespace Szotar.WindowsForms.Forms {
 			lb.Show();
 		}
 
-		// TODO: This may be better copying as CSV. 
-		// TODO: It also needs to support copying in some format that ListBuilder can paste.
-		// TODO: Dragging wouldn't hurt either.
 		private void copy_Click(object sender, EventArgs e) {
 			int rowCount = grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
 			if (rowCount <= 0)
 				return;
 
-			var sb = new System.Text.StringBuilder(rowCount * 16);
-
-			foreach (SearchResult result in GetSelectedResults()) {
-				sb.Append(result.Phrase).Append(" -- ").Append(result.Translation).AppendLine();
-			}
-
-			Clipboard.SetText(sb.ToString());
+			var data = MakeDataObjectFromSelection();
+			Clipboard.SetDataObject(data, true);
 		}
 
 		/// <summary>
