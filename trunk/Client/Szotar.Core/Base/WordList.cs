@@ -236,5 +236,9 @@ namespace Szotar {
 				Debug.Assert(value.IndexOf(this) == -1);
 			}
 		}
+
+		public WordListEntry Clone() {
+			return new WordListEntry(owner, phrase, translation);
+		}
 	}
 }

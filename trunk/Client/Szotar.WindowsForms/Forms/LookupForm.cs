@@ -146,6 +146,7 @@ namespace Szotar.WindowsForms.Forms {
 			this.InputLanguageChanged += new InputLanguageChangedEventHandler(LookupForm_InputLanguageChanged);
 			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
 			this.KeyUp += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
+			grid.KeyUp += new KeyEventHandler(grid_KeyUp);
 
 			mainMenu.Renderer = contextMenu.Renderer = toolStripPanel.Renderer = new ToolStripAeroRenderer(ToolbarTheme.CommunicationsToolbar);
 			exitMenuItem.Text = string.Format(exitMenuItem.Text, Application.ProductName);
@@ -602,20 +603,6 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		List<SearchResult> SelectedResults() {
-			var list = new List<SearchResult>();
-
-			for (int i = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
-				i >= 0;
-				i = grid.Rows.GetNextRow(i, DataGridViewElementStates.Selected)) 
-			{
-				if (i <= results.Count)
-					list.Add(results[i]);
-			}
-
-			return list;
-		}
-
 		void grid_MouseMove_Drag(object sender, MouseEventArgs e) {
 			if (e.Button != MouseButtons.Left)
 				return;
@@ -631,8 +618,8 @@ namespace Szotar.WindowsForms.Forms {
 		DataObject MakeDataObjectFromSelection() {
 			var data = new DataObject();
 
-			var selection = SelectedResults().ToArray();
-			data.SetData(typeof(SearchResult[]), selection);
+			var selection = new List<TranslationPair>(GetSelectedTranslationPairs()).ToArray();
+			data.SetData(typeof(TranslationPair[]), selection);
 
 			var sb = new StringBuilder();
 
@@ -653,6 +640,15 @@ namespace Szotar.WindowsForms.Forms {
 			data.SetData(DataFormats.Text, sb.ToString());
 
 			return data;
+		}
+		#endregion
+
+		#region Clipboard
+		void grid_KeyUp(object sender, KeyEventArgs e) {
+			if (e.Modifiers == Keys.Control && e.KeyCode == Keys.C) {
+				Clipboard.SetDataObject(MakeDataObjectFromSelection());
+				e.Handled = true;
+			}
 		}
 		#endregion
 

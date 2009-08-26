@@ -1,23 +1,25 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Szotar {
 	/// <summary>
 	/// Represents a translation of a phrase, supporting property binding and cloning interfaces.
 	/// </summary>
 	[System.Diagnostics.DebuggerDisplay("{Phrase} -> {Translation}")]
-	public class TranslationPair : INotifyPropertyChanged, IComparable<TranslationPair>, ICloneable {
+	[Serializable]
+	public class TranslationPair
+		: INotifyPropertyChanged
+		, IComparable<TranslationPair>
+		, ISerializable
+	{
 		string phrase, translation;
 		string phraseNA;
-		bool mutable;
-		object fullEntryHandle;
 
 		public string Phrase {
 			get { return phrase; }
 			set {
-				if (!mutable)
-					throw new InvalidOperationException("An attempt was made to modify a frozen TranslationPair.");
 				phrase = value;
 				phraseNA = Searcher.RemoveAccents(phrase);
 				OnPropertyChanged("Phrase");
@@ -28,17 +30,9 @@ namespace Szotar {
 		public string Translation {
 			get { return translation; }
 			set {
-				if (!mutable)
-					throw new InvalidOperationException("TranslationPair is not mutable.");
 				translation = value;
 				OnPropertyChanged("Translation");
 			}
-		}
-
-		[Browsable(false)]
-		public object Tag {
-			get { return fullEntryHandle; }
-			set { fullEntryHandle = value; }
 		}
 
 		/// <summary>The phrase without any accents. This is used for speeding up the search.</summary>
@@ -51,14 +45,6 @@ namespace Szotar {
 		public TranslationPair(string phrase, string translation) {
 			this.phrase = phrase;
 			this.translation = translation;
-			mutable = false;
-			phraseNA = Searcher.RemoveAccents(phrase);
-		}
-
-		public TranslationPair(string phrase, string translation, bool mutable) {
-			this.phrase = phrase;
-			this.translation = translation;
-			this.mutable = mutable;
 			phraseNA = Searcher.RemoveAccents(phrase);
 		}
 
@@ -68,17 +54,6 @@ namespace Szotar {
 			phrase = string.Empty;
 			translation = string.Empty;
 			phraseNA = string.Empty;
-			mutable = true;
-		}
-
-		[Browsable(false)]
-		public bool Mutable {
-			get { return mutable; }
-			protected set { mutable = value; OnPropertyChanged("Mutable"); }
-		}
-
-		public void Freeze() {
-			mutable = false;
 		}
 
 		public override string ToString() {
@@ -97,8 +72,14 @@ namespace Szotar {
 			return phrase.CompareTo(other.phrase);
 		}
 
-		public object Clone() {
-			return new TranslationPair(phrase, translation, mutable);
+		public void GetObjectData(SerializationInfo info, StreamingContext context) {
+			info.AddValue("Phrase", phrase);
+			info.AddValue("Translation", translation);
+		}
+
+		protected TranslationPair(SerializationInfo info, StreamingContext context) {
+			phrase = info.GetValue("Phrase", typeof(string)) as string ?? string.Empty;
+			translation = info.GetValue("Translation", typeof(string)) as string ?? string.Empty;
 		}
 	}
 	

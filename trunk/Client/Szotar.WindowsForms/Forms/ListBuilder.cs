@@ -402,68 +402,9 @@ namespace Szotar.WindowsForms.Forms {
 			Close();
 		}
 
-		// The 'valid' count is the count of rows which produced two columns when parsed.
-		List<List<string>> ParseCSV(char delim, string text, out int validCount) {
-			validCount = 0;
-			var lines = new List<List<string>>();
-			var line = new List<string>();
-
-			using (var reader = new StringReader(text)) {
-				char last = '\0', c;
-				int read;
-				bool escaped = false;
-				var cur = new StringBuilder();
-				while ((read = reader.Read()) != -1) {
-					c = (char)read;
-					if (c == '"') {
-						if (last == '"')
-							cur.Append(c);
-						else if (last == delim)
-							escaped = !escaped;
-						else
-							cur.Append(c);
-					} else if (c == '\r') {
-					} else if (c == '\n') {
-						if (escaped) {
-							// Newlines aren't useful to us. Replace them with spaces instead.
-							cur.Append(' ');
-						} else {
-							line.Add(cur.ToString());
-							cur.Length = 0;
-							lines.Add(line);
-							line = new List<string>();
-						}
-					} else if (c == delim) {
-						if (escaped) {
-							cur.Append(c);
-						} else {
-							line.Add(cur.ToString());
-							cur.Length = 0;
-						}
-					} else {
-						cur.Append(c);
-					}
-
-					last = c;
-				}
-
-				if (cur.Length > 0)
-					line.Add(cur.ToString());
-			}
-
-			if (line.Count > 0)
-				lines.Add(line);
-
-			foreach (var x in lines)
-				if (x.Count >= 2)
-					validCount++;
-
-			return lines;
-		}
-
 		// For now, simply insert the new items at the end of the list.
 		// There might be a better way to do this.
-		void Paste(List<List<string>> lines) {
+		void Paste(List<List<string>> lines, int? row) {
 			var entries = new List<WordListEntry>();
 
 			foreach (var line in lines)
@@ -471,7 +412,7 @@ namespace Szotar.WindowsForms.Forms {
 					entries.Add(new WordListEntry(list, line[0], line[1]));
 
 			if (entries.Count > 0) {
-				list.Insert(list.Count, entries);
+				list.Insert(row ?? list.Count, entries);
 				grid.Refresh(); // XXX Is this necessary?
 			}
 		}
@@ -490,13 +431,13 @@ namespace Szotar.WindowsForms.Forms {
 			// It's plain text: use guesswork to figure out if it's TSV or CSV.
 			// Tab-separated is rarer, so if it works with tabs, it's probably that.
 			string text = Clipboard.GetText();
-			csv = ParseCSV(',', text, out validCSV);
-			tsv = ParseCSV('\t', text, out validTSV);
+			csv = CsvUtilities.ParseCSV(',', text, out validCSV);
+			tsv = CsvUtilities.ParseCSV('\t', text, out validTSV);
 
 			if (validTSV >= validCSV)
-				Paste(tsv);
+				Paste(tsv, null);
 			else
-				Paste(csv);
+				Paste(csv, null);
 		}
 
 		private void practiceThis_Click(object sender, EventArgs e) {

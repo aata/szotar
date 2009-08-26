@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace Szotar {
 	public interface ISearchDataSource : IEnumerable<Entry> {

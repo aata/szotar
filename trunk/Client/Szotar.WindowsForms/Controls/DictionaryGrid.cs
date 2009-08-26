@@ -172,51 +172,62 @@ namespace Szotar.WindowsForms.Controls {
 
 		void grid_KeyUp(object sender, KeyEventArgs e) {
 			if (e.KeyCode == Keys.Delete && e.Modifiers == Keys.None) {
-				// When the delete key is pressed, the selected rows are deleted. To do this, we don't actually delete the rows 
-				// from the grid: we delete the rows from the DataSource, and let the binding take care of the rest.
-				// 
-				// There's a snag, however: the editing row. If a row is in edit and hasn't been added to the list yet (i.e. rowInEdit >= source.Count)
-				// then we can't actually delete it from the data source. So we delete it from the grid. However, this raises a slight problem too: when
-				// the cell is deleted, the selection moves onto another cell -- we could end up deleting that cell, too, if we're not careful.
-				// 
-				// To mitigate this, we use the InternalSelectedIndices, not SelectedIndices: this returns rows not in the data source,
-				// unlike SelectedIndices. Then we remove the editing row, delete it, and use the previous selection to 
-				// guide us in what else to delete.
-				//
-				// Any other rows that aren't present in the data source (such as the New Row when it's not selected)
-				// are simply removed from the rowsToDelete.
-
-				var rowsToDelete = new List<int>(InternalSelectedIndices);
-
-				Debug.Print("Deleting rows:");
-				foreach (int row in rowsToDelete) {
-					Debug.Print("  Row {0}: {1} -- {2}{3}",
-						row,
-						grid[0, row].Value,
-						grid[1, row].Value,
-						row == rowInEdit ? " (being edited)" : "");
-				}
-
-				if (rowInEdit.HasValue && rowInEdit.Value >= source.Count) {
-					rowsToDelete.Remove(rowInEdit.Value);
-					grid.CancelEdit();
-				}
-
-				rowsToDelete.RemoveAll(x => x >= source.Count);
-
-				source.RemoveAt(rowsToDelete);
+				DeleteSelection();
 				e.Handled = true;
 			} else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control) {
 				source.Undo();
 				e.Handled = true;
 			} else if (e.KeyCode == Keys.C && e.Modifiers == Keys.Control) {
-				Clipboard.SetDataObject(MakeDataObjectFromSelection(), true);
+				Copy();
+				e.Handled = true;
+			} else if (e.KeyCode == Keys.X && e.Modifiers == Keys.Control) {
+				Cut();
+				e.Handled = true;
+			} else if (e.KeyCode == Keys.V && e.Modifiers == Keys.Control) {
+				Paste();
+				e.Handled = true;
 			} else if (
 				(e.KeyCode == Keys.Z && e.Modifiers == (Keys.Control | Keys.Shift)) ||
 				(e.KeyCode == Keys.Y && e.Modifiers == Keys.Control)) {
 				source.Redo();
 				e.Handled = true;
 			}
+		}
+
+		void DeleteSelection() {
+			// When the delete key is pressed, the selected rows are deleted. To do this, we don't actually delete the rows 
+			// from the grid: we delete the rows from the DataSource, and let the binding take care of the rest.
+			// 
+			// There's a snag, however: the editing row. If a row is in edit and hasn't been added to the list yet (i.e. rowInEdit >= source.Count)
+			// then we can't actually delete it from the data source. So we delete it from the grid. However, this raises a slight problem too: when
+			// the cell is deleted, the selection moves onto another cell -- we could end up deleting that cell, too, if we're not careful.
+			// 
+			// To mitigate this, we use the InternalSelectedIndices, not SelectedIndices: this returns rows not in the data source,
+			// unlike SelectedIndices. Then we remove the editing row, delete it, and use the previous selection to 
+			// guide us in what else to delete.
+			//
+			// Any other rows that aren't present in the data source (such as the New Row when it's not selected)
+			// are simply removed from the rowsToDelete.
+
+			var rowsToDelete = new List<int>(InternalSelectedIndices);
+
+			Debug.Print("Deleting rows:");
+			foreach (int row in rowsToDelete) {
+				Debug.Print("  Row {0}: {1} -- {2}{3}",
+					row,
+					grid[0, row].Value,
+					grid[1, row].Value,
+					row == rowInEdit ? " (being edited)" : "");
+			}
+
+			if (rowInEdit.HasValue && rowInEdit.Value >= source.Count) {
+				rowsToDelete.Remove(rowInEdit.Value);
+				grid.CancelEdit();
+			}
+
+			rowsToDelete.RemoveAll(x => x >= source.Count);
+
+			source.RemoveAt(rowsToDelete);
 		}
 
 		void grid_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e) {
@@ -370,6 +381,66 @@ namespace Szotar.WindowsForms.Controls {
 		}
 		#endregion
 
+		#region Copy and paste
+		public DataObject MakeDataObjectFromSelection() {
+			return Selection().MakeDataObject();
+		}
+
+		public WordListEntries Selection() {
+			var entries = new List<WordListEntry>();
+			foreach (var i in SelectedIndices)
+				entries.Add(source[i]);
+
+			return new WordListEntries(source, entries);
+		}
+
+		void PutSelectionOnClipboard(bool remove) {
+			var entries = new List<WordListEntry>();
+			var indices = new List<int>(SelectedIndices);
+			foreach (var i in indices) {
+				if(remove)
+					entries.Add(new WordListEntry(null, source[i].Phrase, source[i].Translation));
+				else
+					entries.Add(source[i]);
+			}
+
+			Clipboard.SetDataObject(new WordListEntries(null, entries).MakeDataObject());
+			if (remove)
+				source.RemoveAt(indices);
+		}
+
+		public void Cut() {
+			PutSelectionOnClipboard(true);
+		}
+
+		public void Copy() {
+			PutSelectionOnClipboard(false);
+		}
+
+		void Paste(WordListEntries entries, int? row) {
+			// Clone the entries if they're from a different word list.
+			// Maybe this is a bit paranoid.
+			for (int i = 0; i < entries.Items.Count; ++i)
+				if (entries.Items[i].Owner != source)
+					entries.Items[i] = entries.Items[i].Clone();
+
+			source.Insert(row ?? source.Count, entries.Items);
+		}
+
+		public void Paste() {
+			int row = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+			if (row < 0 || row >= source.Count)
+				row = source.Count;
+
+			var data = Clipboard.GetDataObject();
+			var entries = WordListEntries.FromDataObject(data);
+
+			if (entries != null) {
+				Paste(entries, row);
+			}
+		}
+		#endregion
+
 		#region Drag and drop
 		// This code is mostly taken from the DataGridView FAQ by Mark Rideout:
 		// http://www.windowsforms.net/Samples/Go%20To%20Market/DataGridView/DataGridView%20FAQ.doc
@@ -390,24 +461,23 @@ namespace Szotar.WindowsForms.Controls {
 				return;
 
 			if (dragBox != Rectangle.Empty && !dragBox.Contains(e.Location)) {
-				var data = new DataObject();
-				dragData.SetData(data);
+				var data = dragData.MakeDataObject();
 
 				var result = grid.DoDragDrop(data, DragDropEffects.Move | DragDropEffects.Copy | DragDropEffects.Scroll);
 				dragBox = Rectangle.Empty;
 
 				// This doesn't exactly look great in the undo list.
 				// It's very unlikely that we'll be able to tie together undo items related to multiple lists, though.
-				if (result == DragDropEffects.Move)
-					source.RemoveAt(dragData.Indices);
-			}
-		}
+				if (result == DragDropEffects.Move) {
+					var indices = new List<int>();
+					foreach (var entry in dragData.Items) {
+						int i = source.IndexOf(entry);
+						indices.Add(i);
+					}
 
-		public DataObject MakeDataObjectFromSelection() {
-			var wle = new WordListEntries(source, new List<int>(SelectedIndices));
-			var data = new DataObject();
-			wle.SetData(data);
-			return data;
+					source.RemoveAt(indices);
+				}
+			}
 		}
 
 		void grid_MouseDown(object sender, MouseEventArgs e) {
@@ -425,7 +495,7 @@ namespace Szotar.WindowsForms.Controls {
 						e.Y - dragSize.Height / 2),
 					dragSize);
 
-				dragData = new WordListEntries(source, new[] { dragRow });
+				dragData = new WordListEntries(source, new[] { source[dragRow] });
 			} else {
 				dragBox = Rectangle.Empty;
 			}
@@ -445,13 +515,11 @@ namespace Szotar.WindowsForms.Controls {
 				}
 			}			
 
-
 			// TODO: Figure out if this still works with multiple rows being dragged
 			// If you drag a row onto itself, we don't want to move it at all.
-			if (dragData.Indices.Contains(hit))
+			if (dragData != null && hit >= 0 && hit < source.Count && dragData.Items.Contains(source[hit]))
 				return hit;
 			
-
 			// For example, the New Row was dropped onto.
 			if (hit >= source.Count)
 				return source.Count;
@@ -476,16 +544,14 @@ namespace Szotar.WindowsForms.Controls {
 			if (dropRow >= source.Count)
 				dropRow = source.Count;
 
-			var entries = e.Data.GetData(typeof(WordListEntries)) as WordListEntries;
-			var searchResults = e.Data.GetData(typeof(SearchResult[])) as SearchResult[];
-			var text = e.Data.GetData(DataFormats.UnicodeText) ?? e.Data.GetData(DataFormats.Text);
+			var entries = WordListEntries.FromDataObject(e.Data);
 
 			if(entries != null && entries.WordList == this.source) {
 				// Copying from the grid to itself requires a bit more care.
 
 				if (e.Effect == DragDropEffects.Move) {
 					// Dragging rows from this grid to itself: i.e. re-ordering the rows.
-					source.MoveRows(entries.Indices, dropRow);
+					source.MoveRows(new List<int>(entries.Indices), dropRow);
 
 					// Set the drag result to None, so that the results won't be removed *again*.
 					e.Effect = DragDropEffects.None;
@@ -494,26 +560,15 @@ namespace Szotar.WindowsForms.Controls {
 				}
 
 			} else if (entries != null) {
-				// Copying/moving from some other word list
+				// Copying/moving from some other word list, or a non-wordlist source
 				CopyRowsFromTo(entries, dropRow);
-
-			} else if (searchResults != null) {
-				var results = new List<WordListEntry>(searchResults.Length);
-				foreach(var result in searchResults)
-					results.Add(new WordListEntry(source, result.Phrase, result.Translation));
-
-				source.Insert(dropRow, results);
-
-			} else if (text != null) {
-				// Inserting textual data dragged from who-knows-where into the list.
-				// TODO: Drag event for text?
 			}
 		}
 
 		void CopyRowsFromTo(WordListEntries entries, int dropRow) {
 			var copies = new List<WordListEntry>();
-			foreach (int i in entries.Indices)
-				copies.Add(new WordListEntry(source, entries.WordList[i].Phrase, entries.WordList[i].Translation));
+			foreach (var e in entries.Items)
+				copies.Add(e.Clone());
 
 			source.Insert(dropRow, copies);
 		}
@@ -521,7 +576,7 @@ namespace Szotar.WindowsForms.Controls {
 		void grid_DragOver(object sender, DragEventArgs e) {
 			bool hasEntries = e.Data.GetDataPresent(typeof(WordListEntries));
 			bool hasText = e.Data.GetDataPresent(DataFormats.UnicodeText) || e.Data.GetDataPresent(DataFormats.Text);
-			bool hasSearchResults = e.Data.GetDataPresent(typeof(SearchResult[]));
+			bool hasSearchResults = e.Data.GetDataPresent(typeof(TranslationPair[]));
 
 			// Shift = 4, Ctrl = 8
 			bool copyOverride = (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy && (e.KeyState & 8) == 8;
