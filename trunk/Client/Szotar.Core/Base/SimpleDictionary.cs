@@ -108,8 +108,10 @@ namespace Szotar {
 
 			private SimpleDictionary FromWeak(NullWeakReference<SimpleDictionary> weak) {
 				var dict = weak.Target;
-				if (dict != null)
-					return dict;
+				if (dict != null) {
+					if(!dict.Disposed)
+						return dict;
+				}
 
 				return new SimpleDictionary(Path);
 			}
@@ -388,6 +390,8 @@ namespace Szotar {
 		}
 
 		protected Entry GetFullEntry(Entry entryStub, Section section) {
+			System.Diagnostics.Debug.Assert(!Disposed);
+
 			try {
 				if (reader == null)
 					OpenFile(true);
@@ -754,6 +758,8 @@ namespace Szotar {
 		#endregion
 
 		#region Dispose
+		public bool Disposed { get; private set; }
+
 		public void Dispose() {
 			Dispose(true);
 
@@ -765,6 +771,8 @@ namespace Szotar {
 				if (reader != null)
 					reader.Dispose();
 			}
+
+			Disposed = true;
 		}
 		#endregion
 	}
