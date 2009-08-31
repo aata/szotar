@@ -55,6 +55,9 @@ namespace Szotar.WindowsForms {
 		}
 
 		public static WordListEntries FromDataObject(IDataObject data) {
+			if (data == null)
+				return null;
+
 			var wle = data.GetData(typeof(WordListEntries)) as WordListEntries;
 			if (wle != null)
 				return wle;
@@ -68,8 +71,14 @@ namespace Szotar.WindowsForms {
 			}
 
 			// Try to parse as CSV.
-			string text = Clipboard.GetText();
+			return FromDelimitedText(GetText(data));			
+		}
 
+		private static string GetText(IDataObject data) {
+			return (data.GetData("UnicodeText") as string) ?? (data.GetData("Text") as string);
+		}
+
+		static WordListEntries FromDelimitedText(string text) {
 			if (text != null) {
 				int validCSV, validTSV;
 				var csv = CsvUtilities.ParseCSV(',', text, out validCSV);
@@ -85,6 +94,17 @@ namespace Szotar.WindowsForms {
 			}
 
 			return null;
+		}
+
+		public static bool CanConvertFrom(IDataObject data) {
+			if (data == null)
+				return false;
+
+			if (data.GetDataPresent(typeof(WordListEntries)) || data.GetDataPresent(typeof(TranslationPair[])))
+				return true;
+
+			var r = FromDelimitedText(GetText(data));
+			return r != null && r.Items.Count > 0;
 		}
 
 		// Serialize by converting into a KeyValuePair<string, string>[].

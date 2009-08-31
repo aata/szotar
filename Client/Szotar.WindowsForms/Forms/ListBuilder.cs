@@ -62,9 +62,19 @@ namespace Szotar.WindowsForms.Forms {
 			undo.Click += delegate { list.Undo(); };
 			redo.Click += delegate { list.Redo(); };
 			editMenu.DropDownOpening += new EventHandler(editMenu_DropDownOpening);
+			itemContextMenu.Opening += new CancelEventHandler(itemContextMenu_Opening);
+
+			cutMI.Click += delegate { grid.Cut(); };
+			copyMI.Click += delegate { grid.Copy(); };
+			pasteMI.Click += delegate { grid.Paste(); };
+			cutCM.Click += delegate { grid.Cut(); };
+			copyCM.Click += delegate { grid.Copy(); };
+			pasteCM.Click += delegate { grid.Paste(); };
 
 			swap.Click += new EventHandler(swap_Click);
-			remove.Click += new EventHandler(remove_Click);
+
+			deleteMI.Click += new EventHandler(remove_Click);
+			deleteCM.Click += new EventHandler(remove_Click);
 
 			WireListEvents();
 			MakeRecent();
@@ -159,6 +169,18 @@ namespace Szotar.WindowsForms.Forms {
 			Text = string.Format("{0} - {1}", list.Name, Application.ProductName);
 		}
 
+		bool CanCut() {
+			return CanCopy();
+		}
+
+		bool CanCopy() {
+			return grid.SelectionSize > 0;
+		}
+
+		bool CanPaste() {
+			return grid.CanPaste;
+		}
+
 		void editMenu_DropDownOpening(object sender, EventArgs e) {
 			string undoDesc = list.UndoDescription;
 			string redoDesc = list.RedoDescription;
@@ -178,6 +200,16 @@ namespace Szotar.WindowsForms.Forms {
 				redo.Enabled = true;
 				redo.Text = string.Format(Properties.Resources.RedoSpecific, redoDesc);
 			}
+
+			cutMI.Enabled = CanCut();
+			copyMI.Enabled = CanCopy();
+			pasteMI.Enabled = CanPaste();
+		}
+
+		void itemContextMenu_Opening(object sender, CancelEventArgs e) {
+			cutCM.Enabled = CanCut();
+			copyCM.Enabled = CanCopy();
+			pasteCM.Enabled = CanPaste();
 		}
 
 		#region Metadata Bindings

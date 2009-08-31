@@ -32,6 +32,8 @@
 			System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 			System.Windows.Forms.ToolStripMenuItem practiceMenu;
+			System.Windows.Forms.ToolStripSeparator editSep2;
+			System.Windows.Forms.ToolStripSeparator contextSep1;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListBuilder));
 			this.namePanel = new System.Windows.Forms.Panel();
 			this.name = new System.Windows.Forms.TextBox();
@@ -48,21 +50,28 @@
 			this.undo = new System.Windows.Forms.ToolStripMenuItem();
 			this.redo = new System.Windows.Forms.ToolStripMenuItem();
 			this.editSep1 = new System.Windows.Forms.ToolStripSeparator();
+			this.cutMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.copyMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.pasteMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.copyAsCsv = new System.Windows.Forms.ToolStripMenuItem();
 			this.pasteCSV = new System.Windows.Forms.ToolStripMenuItem();
-			this.editSep2 = new System.Windows.Forms.ToolStripSeparator();
+			this.editSep3 = new System.Windows.Forms.ToolStripSeparator();
 			this.sort = new System.Windows.Forms.ToolStripMenuItem();
 			this.editMetadata = new System.Windows.Forms.ToolStripMenuItem();
 			this.swapAll = new System.Windows.Forms.ToolStripMenuItem();
 			this.mainMenu = new System.Windows.Forms.MenuStrip();
 			this.itemContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.cutCM = new System.Windows.Forms.ToolStripMenuItem();
+			this.copyCM = new System.Windows.Forms.ToolStripMenuItem();
+			this.pasteCM = new System.Windows.Forms.ToolStripMenuItem();
 			this.swap = new System.Windows.Forms.ToolStripMenuItem();
-			this.remove = new System.Windows.Forms.ToolStripMenuItem();
+			this.deleteCM = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.meta = new System.Windows.Forms.Panel();
 			this.shadow = new System.Windows.Forms.PictureBox();
 			this.icon = new System.Windows.Forms.PictureBox();
 			this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
+			this.deleteMI = new System.Windows.Forms.ToolStripMenuItem();
 			nameLabel = new System.Windows.Forms.Label();
 			authorLabel = new System.Windows.Forms.Label();
 			urlLabel = new System.Windows.Forms.Label();
@@ -71,6 +80,8 @@
 			toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			practiceMenu = new System.Windows.Forms.ToolStripMenuItem();
+			editSep2 = new System.Windows.Forms.ToolStripSeparator();
+			contextSep1 = new System.Windows.Forms.ToolStripSeparator();
 			metaFlow.SuspendLayout();
 			this.namePanel.SuspendLayout();
 			this.authorPanel.SuspendLayout();
@@ -123,7 +134,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(15808, 60);
+			metaFlow.Size = new System.Drawing.Size(17252, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -252,15 +263,31 @@
 			this.practiceThis.Text = "&This List";
 			this.practiceThis.Click += new System.EventHandler(this.practiceThis_Click);
 			// 
+			// editSep2
+			// 
+			editSep2.ForeColor = System.Drawing.SystemColors.ControlText;
+			editSep2.Name = "editSep2";
+			editSep2.Size = new System.Drawing.Size(211, 6);
+			// 
+			// contextSep1
+			// 
+			contextSep1.Name = "contextSep1";
+			contextSep1.Size = new System.Drawing.Size(149, 6);
+			// 
 			// editMenu
 			// 
 			this.editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undo,
             this.redo,
             this.editSep1,
+            this.cutMI,
+            this.copyMI,
+            this.pasteMI,
+            this.deleteMI,
+            editSep2,
             this.copyAsCsv,
             this.pasteCSV,
-            this.editSep2,
+            this.editSep3,
             this.sort,
             this.editMetadata,
             this.swapAll});
@@ -287,13 +314,34 @@
 			this.editSep1.Name = "editSep1";
 			this.editSep1.Size = new System.Drawing.Size(211, 6);
 			// 
+			// cutMI
+			// 
+			this.cutMI.Name = "cutMI";
+			this.cutMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+			this.cutMI.Size = new System.Drawing.Size(214, 22);
+			this.cutMI.Text = "Cu&t";
+			// 
+			// copyMI
+			// 
+			this.copyMI.Name = "copyMI";
+			this.copyMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+			this.copyMI.Size = new System.Drawing.Size(214, 22);
+			this.copyMI.Text = "&Copy";
+			// 
+			// pasteMI
+			// 
+			this.pasteMI.Name = "pasteMI";
+			this.pasteMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+			this.pasteMI.Size = new System.Drawing.Size(214, 22);
+			this.pasteMI.Text = "&Paste";
+			// 
 			// copyAsCsv
 			// 
 			this.copyAsCsv.Name = "copyAsCsv";
 			this.copyAsCsv.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
 						| System.Windows.Forms.Keys.C)));
 			this.copyAsCsv.Size = new System.Drawing.Size(214, 22);
-			this.copyAsCsv.Text = "&Copy as CSV";
+			this.copyAsCsv.Text = "Cop&y as CSV";
 			// 
 			// pasteCSV
 			// 
@@ -301,13 +349,13 @@
 			this.pasteCSV.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
 						| System.Windows.Forms.Keys.V)));
 			this.pasteCSV.Size = new System.Drawing.Size(214, 22);
-			this.pasteCSV.Text = "&Paste CSV";
+			this.pasteCSV.Text = "P&aste CSV";
 			this.pasteCSV.Click += new System.EventHandler(this.pasteCSV_Click);
 			// 
-			// editSep2
+			// editSep3
 			// 
-			this.editSep2.Name = "editSep2";
-			this.editSep2.Size = new System.Drawing.Size(211, 6);
+			this.editSep3.Name = "editSep3";
+			this.editSep3.Size = new System.Drawing.Size(211, 6);
 			// 
 			// sort
 			// 
@@ -346,22 +394,48 @@
 			// itemContextMenu
 			// 
 			this.itemContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cutCM,
+            this.copyCM,
+            this.pasteCM,
+            contextSep1,
             this.swap,
-            this.remove});
+            this.deleteCM});
 			this.itemContextMenu.Name = "itemContextMenu";
-			this.itemContextMenu.Size = new System.Drawing.Size(118, 48);
+			this.itemContextMenu.Size = new System.Drawing.Size(153, 142);
+			// 
+			// cutCM
+			// 
+			this.cutCM.Name = "cutCM";
+			this.cutCM.ShortcutKeyDisplayString = "Ctrl+X";
+			this.cutCM.Size = new System.Drawing.Size(152, 22);
+			this.cutCM.Text = "C&ut";
+			// 
+			// copyCM
+			// 
+			this.copyCM.Name = "copyCM";
+			this.copyCM.ShortcutKeyDisplayString = "Ctrl+C";
+			this.copyCM.Size = new System.Drawing.Size(152, 22);
+			this.copyCM.Text = "&Copy";
+			// 
+			// pasteCM
+			// 
+			this.pasteCM.Name = "pasteCM";
+			this.pasteCM.ShortcutKeyDisplayString = "Ctrl+V";
+			this.pasteCM.Size = new System.Drawing.Size(152, 22);
+			this.pasteCM.Text = "&Paste";
 			// 
 			// swap
 			// 
 			this.swap.Name = "swap";
-			this.swap.Size = new System.Drawing.Size(117, 22);
+			this.swap.Size = new System.Drawing.Size(152, 22);
 			this.swap.Text = "&Swap";
 			// 
-			// remove
+			// deleteCM
 			// 
-			this.remove.Name = "remove";
-			this.remove.Size = new System.Drawing.Size(117, 22);
-			this.remove.Text = "&Remove";
+			this.deleteCM.Name = "deleteCM";
+			this.deleteCM.ShortcutKeyDisplayString = "Del";
+			this.deleteCM.Size = new System.Drawing.Size(152, 22);
+			this.deleteCM.Text = "&Delete";
 			// 
 			// meta
 			// 
@@ -415,6 +489,13 @@
 			this.grid.Size = new System.Drawing.Size(361, 379);
 			this.grid.TabIndex = 8;
 			// 
+			// deleteMI
+			// 
+			this.deleteMI.Name = "deleteMI";
+			this.deleteMI.ShortcutKeyDisplayString = "Del";
+			this.deleteMI.Size = new System.Drawing.Size(214, 22);
+			this.deleteMI.Text = "&Delete";
+			// 
 			// ListBuilder
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -451,7 +532,7 @@
 
 		private System.Windows.Forms.ContextMenuStrip itemContextMenu;
 		private System.Windows.Forms.ToolStripMenuItem swap;
-		private System.Windows.Forms.ToolStripMenuItem remove;
+		private System.Windows.Forms.ToolStripMenuItem deleteCM;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private System.Windows.Forms.Panel meta;
 		private Szotar.WindowsForms.Controls.DictionaryGrid grid;
@@ -468,7 +549,7 @@
 		private System.Windows.Forms.ToolStripMenuItem deleteList;
 		private System.Windows.Forms.ToolStripMenuItem copyAsCsv;
 		private System.Windows.Forms.ToolStripMenuItem pasteCSV;
-		private System.Windows.Forms.ToolStripSeparator editSep2;
+		private System.Windows.Forms.ToolStripSeparator editSep3;
 		private System.Windows.Forms.ToolStripMenuItem sort;
 		private System.Windows.Forms.ToolStripMenuItem editMetadata;
 		private System.Windows.Forms.ToolStripMenuItem swapAll;
@@ -479,5 +560,12 @@
 		private System.Windows.Forms.ToolStripMenuItem undo;
 		private System.Windows.Forms.ToolStripMenuItem redo;
 		private System.Windows.Forms.ToolStripMenuItem editMenu;
+		private System.Windows.Forms.ToolStripMenuItem cutMI;
+		private System.Windows.Forms.ToolStripMenuItem copyMI;
+		private System.Windows.Forms.ToolStripMenuItem pasteMI;
+		private System.Windows.Forms.ToolStripMenuItem cutCM;
+		private System.Windows.Forms.ToolStripMenuItem copyCM;
+		private System.Windows.Forms.ToolStripMenuItem pasteCM;
+		private System.Windows.Forms.ToolStripMenuItem deleteMI;
 	}
 }

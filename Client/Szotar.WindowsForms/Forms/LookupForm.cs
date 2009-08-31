@@ -51,6 +51,7 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
+		#region Initialization
 		public LookupForm(IBilingualDictionary dictionary)
 			: this() {
 			components.Add(new DisposableComponent(new LookupFormFileIsInUse(this, dictionary.Path)));
@@ -157,6 +158,7 @@ namespace Szotar.WindowsForms.Forms {
 			this.PerformLayout();
 			searchBox.Focus();
 		}
+		#endregion
 
 		#region Appearance
 		/// <summary>Colours a cell differently based on how well the result matched the search term
@@ -646,9 +648,21 @@ namespace Szotar.WindowsForms.Forms {
 		#region Clipboard
 		void grid_KeyUp(object sender, KeyEventArgs e) {
 			if (e.Modifiers == Keys.Control && e.KeyCode == Keys.C) {
-				Clipboard.SetDataObject(MakeDataObjectFromSelection());
+				CopySelection();
 				e.Handled = true;
 			}
+		}
+
+		void CopySelection() {
+			if (SelectedRowCount() <= 0)
+				return;
+
+			var data = MakeDataObjectFromSelection();
+			Clipboard.SetDataObject(data, true);
+		}
+
+		bool CanCopy() {
+			return SelectedRowCount() > 0;
 		}
 		#endregion
 
@@ -827,6 +841,14 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Dictionary Menu
+		private void dictionaryMenu_DropDownOpening(object sender, EventArgs e) {
+			copyMI.Enabled = CanCopy();
+		}
+
+		private void copyMI_Click(object sender, EventArgs e) {
+			CopySelection();
+		}
+
 		void editInformation_Click(object sender, EventArgs e) {
 			var dr = new DictionaryInfoEditor(Dictionary, true).ShowDialog();
 
@@ -873,6 +895,8 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Context Menu
 		private void contextMenu_Opening(object sender, CancelEventArgs _) {
+			copyCM.Enabled = CanCopy();			
+
 			var open = new List<long>();
 
 			addTo.DropDownItems.Clear();
@@ -888,7 +912,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			// Clone it, if it exists, or make a new one.
 			var recent = Configuration.RecentLists != null ? new List<ListInfo>(Configuration.RecentLists) : new List<ListInfo>();
-			recent.RemoveAll(r => open.IndexOf(r.ID.Value) > -1);
+			recent.RemoveAll(r => open.Contains(r.ID.Value));
 
 			if (recent.Count > 0 && open.Count > 0)
 				addTo.DropDownItems.Add(new ToolStripSeparator());
@@ -948,13 +972,8 @@ namespace Szotar.WindowsForms.Forms {
 			lb.Show();
 		}
 
-		private void copy_Click(object sender, EventArgs e) {
-			int rowCount = grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
-			if (rowCount <= 0)
-				return;
-
-			var data = MakeDataObjectFromSelection();
-			Clipboard.SetDataObject(data, true);
+		void copyCM_Click(object sender, EventArgs e) {
+			CopySelection();
 		}
 
 		/// <summary>

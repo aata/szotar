@@ -417,6 +417,12 @@ namespace Szotar.WindowsForms.Controls {
 			PutSelectionOnClipboard(false);
 		}
 
+		public bool CanPaste {
+			get {
+				return WordListEntries.CanConvertFrom(Clipboard.GetDataObject());
+			}
+		}
+
 		void Paste(WordListEntries entries, int? row) {
 			// Clone the entries if they're from a different word list.
 			// Maybe this is a bit paranoid.
