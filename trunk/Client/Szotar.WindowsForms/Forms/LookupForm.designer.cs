@@ -26,7 +26,6 @@
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.ToolStripMenuItem addToList;
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LookupForm));
-			System.Windows.Forms.ToolStripMenuItem copy;
 			System.Windows.Forms.ToolStripMenuItem reverseLookup;
 			System.Windows.Forms.ToolStripMenuItem showStartPage;
 			System.Windows.Forms.ToolStripSeparator fileSep;
@@ -61,6 +60,9 @@
 			this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ignoreCaseMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.recentLists = new System.Windows.Forms.ToolStripMenuItem();
+			this.copyMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.dictSep1 = new System.Windows.Forms.ToolStripSeparator();
+			this.copyCM = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.closeWindow = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,7 +78,6 @@
 			this.toolStripPanel = new System.Windows.Forms.ToolStripPanel();
 			this.mainMenu = new System.Windows.Forms.MenuStrip();
 			addToList = new System.Windows.Forms.ToolStripMenuItem();
-			copy = new System.Windows.Forms.ToolStripMenuItem();
 			reverseLookup = new System.Windows.Forms.ToolStripMenuItem();
 			showStartPage = new System.Windows.Forms.ToolStripMenuItem();
 			fileSep = new System.Windows.Forms.ToolStripSeparator();
@@ -117,12 +118,6 @@
 			addToList.Name = "addToList";
 			resources.ApplyResources(addToList, "addToList");
 			addToList.Click += new System.EventHandler(this.addToList_Click);
-			// 
-			// copy
-			// 
-			copy.Name = "copy";
-			resources.ApplyResources(copy, "copy");
-			copy.Click += new System.EventHandler(this.copy_Click);
 			// 
 			// reverseLookup
 			// 
@@ -283,11 +278,25 @@
 			// dictionaryMenu
 			// 
 			dictionaryMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyMI,
+            this.dictSep1,
             editInformation,
             editEntries,
             importDictionary});
 			dictionaryMenu.Name = "dictionaryMenu";
 			resources.ApplyResources(dictionaryMenu, "dictionaryMenu");
+			dictionaryMenu.DropDownOpening += new System.EventHandler(this.dictionaryMenu_DropDownOpening);
+			// 
+			// copyMI
+			// 
+			this.copyMI.Name = "copyMI";
+			resources.ApplyResources(this.copyMI, "copyMI");
+			this.copyMI.Click += new System.EventHandler(this.copyMI_Click);
+			// 
+			// dictSep1
+			// 
+			this.dictSep1.Name = "dictSep1";
+			resources.ApplyResources(this.dictSep1, "dictSep1");
 			// 
 			// editInformation
 			// 
@@ -297,8 +306,8 @@
 			// 
 			// editEntries
 			// 
-			editEntries.Name = "editEntries";
 			resources.ApplyResources(editEntries, "editEntries");
+			editEntries.Name = "editEntries";
 			// 
 			// importDictionary
 			// 
@@ -345,6 +354,12 @@
 			options.Name = "options";
 			resources.ApplyResources(options, "options");
 			options.Click += new System.EventHandler(this.options_Click);
+			// 
+			// copyCM
+			// 
+			this.copyCM.Name = "copyCM";
+			resources.ApplyResources(this.copyCM, "copyCM");
+			this.copyCM.Click += new System.EventHandler(this.copyCM_Click);
 			// 
 			// exitMenuItem
 			// 
@@ -409,7 +424,7 @@
 			this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             addToList,
             this.addTo,
-            copy,
+            this.copyCM,
             reverseLookup});
 			this.contextMenu.Name = "listBuilderMenu";
 			resources.ApplyResources(this.contextMenu, "contextMenu");
@@ -530,6 +545,9 @@
 		private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem addTo;
 		private System.Windows.Forms.ToolStripMenuItem closeWindow;
+		private System.Windows.Forms.ToolStripMenuItem copyMI;
+		private System.Windows.Forms.ToolStripSeparator dictSep1;
+		private System.Windows.Forms.ToolStripMenuItem copyCM;
 	}
 }
 

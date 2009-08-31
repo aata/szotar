@@ -127,26 +127,10 @@
   <data name="addToList.Text" xml:space="preserve">
     <value>&amp;Add to new word list</value>
   </data>
-  <metadata name="copy.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="copy.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+C</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="copy.ShowShortcutKeys" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="copy.Size" type="System.Drawing.Size, System.Drawing">
-    <value>198, 22</value>
-  </data>
-  <data name="copy.Text" xml:space="preserve">
-    <value>&amp;Copy</value>
-  </data>
   <metadata name="reverseLookup.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="reverseLookup.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
     <value>Ctrl+R</value>
   </data>
@@ -300,8 +284,11 @@
   <metadata name="newList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <data name="newList.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+N</value>
+  </data>
   <data name="newList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>155, 22</value>
   </data>
   <data name="newList.Text" xml:space="preserve">
     <value>&amp;New</value>
@@ -309,8 +296,11 @@
   <metadata name="openList.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <data name="openList.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+O</value>
+  </data>
   <data name="openList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>155, 22</value>
   </data>
   <data name="openList.Text" xml:space="preserve">
     <value>&amp;Open...</value>
@@ -319,7 +309,7 @@
     <value>False</value>
   </metadata>
   <data name="importList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>155, 22</value>
   </data>
   <data name="importList.Text" xml:space="preserve">
     <value>&amp;Import...</value>
@@ -328,7 +318,7 @@
     <value>False</value>
   </metadata>
   <data name="listsSep.Size" type="System.Drawing.Size, System.Drawing">
-    <value>133, 6</value>
+    <value>152, 6</value>
   </data>
   <metadata name="dummyItem1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
@@ -340,7 +330,7 @@
     <value>Dummy Item</value>
   </data>
   <data name="recentLists.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 22</value>
+    <value>155, 22</value>
   </data>
   <data name="recentLists.Text" xml:space="preserve">
     <value>&amp;Recent Lists</value>
@@ -354,11 +344,26 @@
   <metadata name="dictionaryMenu.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <data name="copyMI.ShortcutKeyDisplayString" xml:space="preserve">
+    <value />
+  </data>
+  <data name="copyMI.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+C</value>
+  </data>
+  <data name="copyMI.Size" type="System.Drawing.Size, System.Drawing">
+    <value>194, 22</value>
+  </data>
+  <data name="copyMI.Text" xml:space="preserve">
+    <value>&amp;Copy selection</value>
+  </data>
+  <data name="dictSep1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>191, 6</value>
+  </data>
   <metadata name="editInformation.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
   <data name="editInformation.Size" type="System.Drawing.Size, System.Drawing">
-    <value>160, 22</value>
+    <value>194, 22</value>
   </data>
   <data name="editInformation.Text" xml:space="preserve">
     <value>Edit &amp;Information</value>
@@ -366,8 +371,12 @@
   <metadata name="editEntries.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="editEntries.Enabled" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="editEntries.Size" type="System.Drawing.Size, System.Drawing">
-    <value>160, 22</value>
+    <value>194, 22</value>
   </data>
   <data name="editEntries.Text" xml:space="preserve">
     <value>Edit &amp;Entries</value>
@@ -376,7 +385,7 @@
     <value>False</value>
   </metadata>
   <data name="importDictionary.Size" type="System.Drawing.Size, System.Drawing">
-    <value>160, 22</value>
+    <value>194, 22</value>
   </data>
   <data name="importDictionary.Text" xml:space="preserve">
     <value>&amp;Import...</value>
@@ -438,6 +447,15 @@
   <data name="toolsMenu.Text" xml:space="preserve">
     <value>&amp;Tools</value>
   </data>
+  <data name="copyCM.ShortcutKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+C</value>
+  </data>
+  <data name="copyCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="copyCM.Text" xml:space="preserve">
+    <value>&amp;Copy</value>
+  </data>
   <data name="exitMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>159, 22</value>
   </data>
@@ -460,7 +478,7 @@
     <value>Top, Bottom, Left, Right</value>
   </data>
   <metadata name="contextMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>128, 12</value>
+    <value>105, 5</value>
   </metadata>
   <data name="addTo.Size" type="System.Drawing.Size, System.Drawing">
     <value>198, 22</value>
@@ -469,7 +487,7 @@
     <value>A&amp;dd to</value>
   </data>
   <data name="contextMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>199, 92</value>
+    <value>199, 114</value>
   </data>
   <data name="&gt;&gt;contextMenu.Name" xml:space="preserve">
     <value>contextMenu</value>
@@ -685,7 +703,7 @@
     <value>2</value>
   </data>
   <metadata name="mainMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>0, 0</value>
+    <value>4, 7</value>
   </metadata>
   <data name="mainMenu.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>None</value>
@@ -742,7 +760,7 @@
     <value>True</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>51</value>
+    <value>38</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>7, 13</value>
@@ -760,12 +778,6 @@
     <value>addToList</value>
   </data>
   <data name="&gt;&gt;addToList.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;copy.Name" xml:space="preserve">
-    <value>copy</value>
-  </data>
-  <data name="&gt;&gt;copy.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;reverseLookup.Name" xml:space="preserve">
@@ -912,6 +924,18 @@
   <data name="&gt;&gt;dictionaryMenu.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;copyMI.Name" xml:space="preserve">
+    <value>copyMI</value>
+  </data>
+  <data name="&gt;&gt;copyMI.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dictSep1.Name" xml:space="preserve">
+    <value>dictSep1</value>
+  </data>
+  <data name="&gt;&gt;dictSep1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;editInformation.Name" xml:space="preserve">
     <value>editInformation</value>
   </data>
@@ -964,6 +988,12 @@
     <value>options</value>
   </data>
   <data name="&gt;&gt;options.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;copyCM.Name" xml:space="preserve">
+    <value>copyCM</value>
+  </data>
+  <data name="&gt;&gt;copyCM.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;exitMenuItem.Name" xml:space="preserve">
