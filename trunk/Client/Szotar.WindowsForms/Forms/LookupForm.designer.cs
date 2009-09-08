@@ -463,8 +463,6 @@
 			resources.ApplyResources(this.searchBox, "searchBox");
 			this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
 			this.searchBox.Name = "searchBox";
-			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
-			this.searchBox.PromptFont = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			// 
 			// ignoreCaseCheck
 			// 

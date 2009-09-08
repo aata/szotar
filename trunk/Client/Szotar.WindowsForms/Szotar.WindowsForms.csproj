@@ -141,7 +141,7 @@
       <DependentUpon>QuizletSetSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\SearchBox.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\SearchBox.designer.cs">
       <DependentUpon>SearchBox.cs</DependentUpon>

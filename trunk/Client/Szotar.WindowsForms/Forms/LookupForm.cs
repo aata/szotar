@@ -120,7 +120,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			InitializeDragAndDrop();
 
-			searchBox.RealTextChanged += new EventHandler(searchBox_RealTextChanged);
+			searchBox.TextChanged += new EventHandler(searchBox_TextChanged);
 
 			// Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
@@ -256,7 +256,7 @@ namespace Szotar.WindowsForms.Forms {
 			ISearchDataSource dict = this.GetSectionBySearchMode(this.SearchMode);
 			SearchMode finalSearchMode = this.SearchMode;
 
-			string search = searchBox.RealText.Trim().Normalize();
+			string search = searchBox.Text.Trim().Normalize();
 
 			results = new List<SearchResult>();
 			int foundAt = -1;
@@ -470,7 +470,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Misc Control Events
 		/// <summary>Updates the current search results to reflect the new search terms.</summary>
-		private void searchBox_RealTextChanged(object sender, EventArgs e) {
+		private void searchBox_TextChanged(object sender, EventArgs e) {
 			UpdateResults();
 		}
 
