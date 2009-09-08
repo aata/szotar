@@ -105,8 +105,6 @@
             this.searchBox.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.searchBox.Location = new System.Drawing.Point(7, 7);
             this.searchBox.Name = "searchBox";
-            this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
-            this.searchBox.PromptFont = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.searchBox.PromptText = "Search";
             this.searchBox.Size = new System.Drawing.Size(451, 21);
             this.searchBox.TabIndex = 1;

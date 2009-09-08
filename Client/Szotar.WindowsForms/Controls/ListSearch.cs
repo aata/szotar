@@ -67,7 +67,7 @@ namespace Szotar.WindowsForms.Controls {
 				ListViewGroup group = new ListViewGroup(storeName);
 				results.Groups.Add(group);
 				foreach (ListInfo list in store.GetLists()) {
-					if (searchBox.RealText.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
+					if (searchBox.Text.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
 						continue;
 
 					if (results.Items.Count > maxCount)
@@ -83,10 +83,10 @@ namespace Szotar.WindowsForms.Controls {
 				}
 			}
 
-			if (!string.IsNullOrEmpty(searchBox.RealText)) {
+			if (!string.IsNullOrEmpty(searchBox.Text)) {
 				var group = new ListViewGroup(Properties.Resources.SearchResults);
 				results.Groups.Add(group);
-				foreach (var wsr in DataStore.Database.SearchAllEntries(searchBox.RealText)) {
+				foreach (var wsr in DataStore.Database.SearchAllEntries(searchBox.Text)) {
 					if (results.Items.Count > maxCount)
 						return false;
 

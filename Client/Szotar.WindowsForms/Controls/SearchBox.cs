@@ -7,140 +7,95 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
-	public partial class SearchBox : TextBox {
-		internal String promptText;
-		internal Font promptFont;
-		internal Font realFont;
-		internal Color realForeColor;
-		internal Color promptColor;
-		internal bool isPrompting = true;
+	public partial class SearchBox : UserControl {
+		string text, promptText;
+		Font font, promptFont;
+		Color foreColor, promptForeColor;
 
-		internal bool wasPrompting = false;
+		TextBox textBox;
 
 		public SearchBox() {
 			InitializeComponent();
 
-			if (DesignMode == false) {
-				realFont = Font;
-				realForeColor = ForeColor;
+			text = string.Empty;
+			prompting = true;
 
-				this.GotFocus += new EventHandler(SearchBox_Enter);
-				this.LostFocus += new EventHandler(SearchBox_Leave);
+			textBox = new TextBox { Dock = DockStyle.Fill };
+			textBox.GotFocus += new EventHandler(SearchBox_Enter);
+			textBox.LostFocus += new EventHandler(SearchBox_Leave);
+			textBox.TextChanged += new EventHandler(SearchBox_TextChanged);
+			Controls.Add(textBox);
 
-				Text = string.Empty;
-				SetPrompt();
+			foreColor = SystemColors.ControlText;
+			promptForeColor = SystemColors.GrayText;
 
-				TextChanged += (s, e) => {
-					// Don't raise the RealTextChanged event when the text is changing due to the
-					// prompt being set or unset. This is shitty, but it works.
-					if (wasPrompting == IsPrompting) {
-						var h = RealTextChanged;
-						if (h != null)
-							h(s, e);
-					}
-					wasPrompting = IsPrompting;
-				};
-			}
+			promptFont = new Font(Font, FontStyle.Italic);
+
+			components = components ?? new Container();
+			components.Add(new DisposableComponent(promptFont));
+
+			canPrompt = true;
+
+			UpdatePrompt();
 		}
 
-		/// <summary>Sets the base font of the SearchBox instance.</summary>
-		/// <remarks>Designer-generated code constructs a SearchBox *then* sets the font, so for DPI-awareness (as an example) we must track changes to the Font.</remarks>
-		public override Font Font {
-			get { return base.Font; }
-			set {
-				realFont = value;
-				base.Font = value;
-			}
-		}
-
-		void SearchBox_Leave(object sender, EventArgs e) {
-			if (Text.Length == 0) {
-				isPrompting = true;
-				SetPrompt();
-			}
-		}
-
-		internal void ClearPrompt() {
-			if (this.DesignMode == true)
-				return;
-
-			isPrompting = false;
-
-			base.Font = realFont;
-			base.Text = String.Empty;
-			ForeColor = realForeColor;
-		}
-
-		internal void SetPrompt() {
-			if (this.DesignMode == true)
-				return;
-
-			if (isPrompting) {
-				if (PromptFont != null)
-					base.Font = PromptFont;
-				base.Text = promptText;
-				ForeColor = SystemColors.GrayText;
-			}
-		}
-
-		public string RealText {
-			get {
-				if (isPrompting)
-					return String.Empty;
-				else
-					return Text;
+		void SearchBox_TextChanged(object sender, EventArgs e) {
+			if (!canPrompt && textBox.Text != text) {
+				Text = textBox.Text;
+				OnTextChanged(new EventArgs());
 			}
 		}
 
 		public override string Text {
 			get {
-				return base.Text;
+				return text;
 			}
 			set {
-				if (string.IsNullOrEmpty(value))
-					SetPrompt();
-				else if (isPrompting)
-					ClearPrompt();
+				if (text == value)
+					return;
 
-				base.Text = value;
+				textBox.Text = value ?? string.Empty;
+				text = value ?? string.Empty;
+				if (canPrompt)
+					OnTextChanged(new EventArgs());
+				Prompting = string.IsNullOrEmpty(text);
 			}
 		}
 
-		public bool IsPrompting {
-			get { return isPrompting; }
+		bool canPrompt, prompting;
+		protected bool Prompting {
+			get {
+				return prompting;
+			}
+			set {
+				if (value == prompting)
+					return;
+
+				prompting = value;
+				UpdatePrompt(); 
+			}
 		}
 
-		/// <summary>
-		/// Clears the prompt and resets the font to the original font.
-		/// </summary>
+		void SearchBox_Leave(object sender, EventArgs e) {
+			canPrompt = true;
+			UpdatePrompt();
+		}
+
 		void SearchBox_Enter(object sender, EventArgs e) {
-			if (isPrompting) {
-				ClearPrompt();
-			}
+			canPrompt = false;
+			UpdatePrompt();
 		}
 
-		/// <summary>
-		/// The font which will be used to display the search prompt.
-		/// </summary>
-		[Browsable(true)]
-		public Font PromptFont {
-			get {
-				if (promptFont == null)
-					return new Font(realFont, FontStyle.Italic);
-				return promptFont;
+		void UpdatePrompt() {
+			if (canPrompt && prompting) {
+				textBox.Font = promptFont;
+				textBox.Text = promptText;
+				textBox.ForeColor = promptForeColor;
+			} else {
+				textBox.Font = font;
+				textBox.Text = text;
+				textBox.ForeColor = foreColor;
 			}
-			set { promptFont = value; SetPrompt(); }
-		}
-
-		/// <summary>
-		/// The color which will be used to display the search prompt.
-		/// </summary>
-		[Browsable(true)]
-		public Color PromptColor {
-			get {
-				return SystemColors.GrayText;
-			}
-			set { promptColor = value; SetPrompt(); }
 		}
 
 		/// <summary>
@@ -153,9 +108,14 @@ namespace Szotar.WindowsForms.Controls {
 					return "Search";
 				return promptText;
 			}
-			set { promptText = value; SetPrompt(); }
+			set { 
+				promptText = value; 
+				UpdatePrompt();
+			}
 		}
 
-		public EventHandler RealTextChanged;
+		public void SelectAll() {
+			textBox.SelectAll();
+		}
 	}
 }

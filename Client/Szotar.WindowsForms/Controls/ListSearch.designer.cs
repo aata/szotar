@@ -49,8 +49,6 @@
 			this.searchBox.ForeColor = System.Drawing.SystemColors.ControlText;
 			this.searchBox.Location = new System.Drawing.Point(0, 0);
 			this.searchBox.Name = "searchBox";
-			this.searchBox.PromptColor = System.Drawing.SystemColors.GrayText;
-			this.searchBox.PromptFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic);
 			this.searchBox.PromptText = "Search";
 			this.searchBox.Size = new System.Drawing.Size(387, 20);
 			this.searchBox.TabIndex = 0;
