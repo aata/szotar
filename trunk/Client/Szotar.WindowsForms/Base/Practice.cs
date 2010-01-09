@@ -116,7 +116,19 @@ namespace Szotar.WindowsForms {
 		public IPracticeWindow Source { get; private set; }
 		public PracticeItem CurrentItem { get; private set; }
 		public int Length { get { return Source.ItemCount; } }
-		public int Position { get { return Source.Position - fore.Count; } }
+		public int Position { 
+			get {
+				var pos = Source.Position - fore.Count;
+
+				if (CurrentItem != null)
+					pos--;
+
+				while (pos < 0)
+					pos += Source.ItemCount;
+
+				return pos;
+			}
+		}
 
 		public Navigator(IPracticeWindow source) {
 			Source = source;
@@ -384,7 +396,7 @@ namespace Szotar.WindowsForms {
 		}
 
 		public void Update() {
-			position.Text = string.Format("{0}/{1}", Navigator.Position, Navigator.Length);
+			position.Text = string.Format("{0}/{1}", Navigator.Position + 1, Navigator.Length);
 		}
 	}
 }
