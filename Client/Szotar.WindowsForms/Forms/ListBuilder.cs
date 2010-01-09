@@ -26,8 +26,6 @@ namespace Szotar.WindowsForms.Forms {
 		{
 			isNewList = true;
 			MakeRecent();
-
-			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
 		}
 
 		public ListBuilder(WordList wordList) {
@@ -41,6 +39,7 @@ namespace Szotar.WindowsForms.Forms {
 			author.Text = list.Author;
 			url.Text = list.Url;
 
+			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
 			meta.Height = GuiConfiguration.ListBuilderMetadataSectionHeight;
 
 			this.Layout += new LayoutEventHandler(ListBuilder_Layout);

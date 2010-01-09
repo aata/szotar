@@ -674,15 +674,15 @@ namespace Szotar.WindowsForms.Controls {
 				if (value == columnRatio)
 					return;
 
-				columnRatio = value;
-				EventHandler h = ColumnRatioChanged;
-				if (h != null)
-					h(this, new EventArgs());
-
 				if (grid.Columns.Count >= 2) {
 					grid.Columns[0].FillWeight = value;
 					grid.Columns[1].FillWeight = 1.0f - value;
 				}
+
+				columnRatio = value;
+				EventHandler h = ColumnRatioChanged;
+				if (h != null)
+					h(this, new EventArgs());
 			}
 		}
 		#endregion
