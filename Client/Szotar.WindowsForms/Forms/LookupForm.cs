@@ -129,6 +129,17 @@ namespace Szotar.WindowsForms.Forms {
 
 			// Bind an empty result set to the grid: this causes the columns to be created.
 			grid.DataSource = results = new List<SearchResult>();
+			grid.RowUnshared += (s, e) => {
+				if (e.Row.Index >= results.Count)
+					return;
+
+				var result = results[e.Row.Index];
+
+				ProgramLog.Default.AddMessage(LogType.Debug, "LookupForm: Row #{0} has become unshared: {1}, {2}",
+					e.Row.Index,
+					result.Phrase,
+					result.Translation);
+			};
 
 			// By now, the columns should have been created.
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -602,6 +613,21 @@ namespace Szotar.WindowsForms.Forms {
 					e.Y - dragSize.Height / 2,
 					dragSize.Width,
 					dragSize.Height);
+			} else if (e.Button == MouseButtons.Right) {
+				// If the right-clicked item is outside the current selection, select that item.
+				// This is more like how normal list boxes work.
+				if (e.Button == MouseButtons.Right) {
+					int row = grid.HitTest(e.X, e.Y).RowIndex;
+
+					if (row >= 0 && row < grid.RowCount && (grid.Rows.GetRowState(row) 
+							& DataGridViewElementStates.Selected) == DataGridViewElementStates.None) {
+						grid.ClearSelection();
+					
+						// TODO: This makes the row become unshared. I have no idea how to stop this
+						// happening.
+						grid.Rows[row].Selected = true;
+					}
+				}
 			}
 		}
 
