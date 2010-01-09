@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace Szotar.WindowsForms.Controls {
 	public partial class SearchBox : UserControl {
 		string text, promptText;
-		Font font, promptFont;
+		Font promptFont;
 		Color foreColor, promptForeColor;
 
 		TextBox textBox;
@@ -92,7 +92,7 @@ namespace Szotar.WindowsForms.Controls {
 				textBox.Text = promptText;
 				textBox.ForeColor = promptForeColor;
 			} else {
-				textBox.Font = font;
+				textBox.Font = Font;
 				textBox.Text = text;
 				textBox.ForeColor = foreColor;
 			}
