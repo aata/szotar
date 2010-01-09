@@ -487,6 +487,19 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		void grid_MouseDown(object sender, MouseEventArgs e) {
+			// If the right-clicked item is outside the current selection, select that item.
+			// This is more like how normal list boxes work.
+			if (e.Button == MouseButtons.Right) {
+				int row = grid.HitTest(e.X, e.Y).RowIndex;
+
+				if(row >= 0 && row < source.Count && 
+					(grid.Rows.GetRowState(row) & DataGridViewElementStates.Selected) == DataGridViewElementStates.None) 
+				{
+					grid.ClearSelection();
+					grid.Rows[row].Selected = true;
+				}
+			}
+
 			if (e.Button != MouseButtons.Left)
 				return;
 
