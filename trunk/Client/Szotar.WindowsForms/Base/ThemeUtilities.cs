@@ -73,5 +73,9 @@ namespace Szotar.WindowsForms {
 
 			return true;
 		}
+
+		public static void SetWindowTheme(Control control, string theme) {
+			NativeMethods.SetWindowTheme(control.Handle, theme, null);
+		}
 	}
 }
