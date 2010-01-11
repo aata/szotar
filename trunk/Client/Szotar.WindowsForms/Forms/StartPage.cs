@@ -29,6 +29,7 @@ namespace Szotar.WindowsForms.Forms {
 			recentLists.ItemActivate += new EventHandler(recentLists_ItemActivate);
 			recentLists.Resize += new EventHandler((s, e) => recentLists.Columns[0].Width = recentLists.ClientSize.Width);
 			recentLists.Columns[0].Width = recentLists.ClientSize.Width;
+			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
 
 			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
 
@@ -161,6 +162,15 @@ namespace Szotar.WindowsForms.Forms {
 					lv.Items.Add(item);
 				}
 			});
+		}
+
+		void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
+			foreach (ListViewItem item in recentLists.Items) {
+				if ((long?)item.Tag == e.SetID) {
+					recentLists.Items.Remove(item);
+					return;
+				}
+			}
 		}
 		#endregion
 
