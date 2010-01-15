@@ -136,14 +136,15 @@ namespace Szotar.Sqlite {
 			return (long)lastInsertCommand.ExecuteScalar();
 		}
 
-		protected void ExecuteSQL(string sql, params object[] parameters) {
+		// Returns the number of rows affected.
+		protected int ExecuteSQL(string sql, params object[] parameters) {
 			using (DbCommand command = conn.CreateCommand()) {
 				command.CommandText = sql;
 
 				foreach (object p in parameters)
 					AddParameter(command, p);
 
-				command.ExecuteNonQuery();
+				return command.ExecuteNonQuery();
 			}
 		}
 
@@ -413,6 +414,19 @@ namespace Szotar.Sqlite {
 			}
 		}
 
+		public bool UpdateWordListEntry(long setID, string oldPhrase, string oldTranslation, 
+			string newPhrase, string newTranslation) 
+		{
+			// TODO: LIMIT 1?
+			int rows = ExecuteSQL(@"
+				UPDATE VocabItems
+				SET Phrase = ?, Translation = ?
+				WHERE Phrase = ? AND Translation = ?", 
+				setID, newPhrase, newTranslation, oldPhrase, oldTranslation);
+
+			return rows > 0;
+		}
+
 		//This function also raised the ListDeleted event on the WordList, if one exists.
 		public void DeleteWordList(long setID) {
 			NullWeakReference<SqliteWordList> wlr;
@@ -511,15 +525,14 @@ namespace Szotar.Sqlite {
 				if (reader.FieldCount != 3)
 					throw new System.Data.StrongTypingException("Practice query should only return 3 columns");
 
-				if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2))
-					throw new System.Data.StrongTypingException("Practice query returned a null value in one of the columns");
-
 				while (reader.Read()) {
-					var item = new PracticeItem() {
-						SetID = reader.GetInt64(0),
-						Phrase = reader.GetString(1),
-						Translation = reader.GetString(2)
-					};
+					if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2))
+						throw new System.Data.StrongTypingException("Practice query returned a null value in one of the columns");
+
+					var item = new PracticeItem(
+						reader.GetInt64(0),
+						reader.GetString(1),
+						reader.GetString(2));
 
 					output.Add(item);
 				}
