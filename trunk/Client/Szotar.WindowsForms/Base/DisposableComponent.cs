@@ -9,13 +9,16 @@ namespace Szotar.WindowsForms {
 
 		public DisposableComponent(IDisposable thing) {
 			this.thing = thing;
+			if (thing == null)
+				ProgramLog.Default.AddMessage(LogType.Error, "DisposableComponent: passed a null IDisposable");
 		}
 
 		public void Dispose() {
 			EventHandler ev = Disposed;
 			if (ev != null)
 				ev(this, new EventArgs());
-			thing.Dispose();
+			if(thing != null)
+				thing.Dispose();
 		}
 	}
 }
