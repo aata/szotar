@@ -96,5 +96,25 @@ namespace Szotar.WindowsForms {
 			get { return Default.Get<bool>("LogViewerShowErrors", true); }
 			set { Default.Set("LogViewerShowErrors", value); }
 		}
+
+		public static bool PracticeFixSpaces {
+			get { return Default.Get<bool>("PracticeFixSpaces", true); }
+			set { Default.Set("PracticeFixSpaces", value); }
+		}
+
+		public static bool PracticeFixPunctuation {
+			get { return Default.Get<bool>("PracticeFixPunctuation", true); }
+			set { Default.Set("PracticeFixPunctuation", value); }
+		}
+
+		public static bool PracticeFixParentheses {
+			get { return Default.Get<bool>("PracticeFixParentheses", true); }
+			set { Default.Set("PracticeFixParentheses", value); }
+		}
+
+		public static bool PracticeFixCase {
+			get { return Default.Get<bool>("PracticeFixCase", true); }
+			set { Default.Set("PracticeFixCase", value); }
+		}
 	}
 }

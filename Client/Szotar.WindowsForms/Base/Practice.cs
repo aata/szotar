@@ -27,6 +27,7 @@ namespace Szotar.WindowsForms {
 		void MarkFailure(PracticeItem item);
 
 		PracticeItem FetchNextItem();
+		IList<PracticeItem> GetAllItems();
 
 		ToolStrip Controls { get; }
 		Panel GameArea { get; }

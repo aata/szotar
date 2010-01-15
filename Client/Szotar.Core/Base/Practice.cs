@@ -3,9 +3,15 @@ using System.Collections.Generic;
 
 namespace Szotar {
 	public class PracticeItem {
-		public string Phrase { get; set; }
-		public string Translation { get; set; }
-		public long SetID { get; set; }
+		public long SetID { get; protected set; }
+		public string Phrase { get; protected set; }
+		public string Translation { get; protected set; }
+
+		public PracticeItem(long setID, string phrase, string translation) {
+			Phrase = phrase;
+			Translation = translation;
+			SetID = setID;
+		}
 	}
 
 	/// <summary>A circular queue of PracticeItems, which shuffles itself every time it repeats.</summary>
@@ -21,6 +27,12 @@ namespace Szotar {
 			Index = 0;
 			Laps = 0;
 			Shuffle();
+		}
+
+		public IList<PracticeItem> AllItems {
+			get {
+				return items;
+			}
 		}
 
 		void Shuffle() {
