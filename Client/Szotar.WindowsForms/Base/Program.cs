@@ -106,14 +106,14 @@ namespace Szotar.WindowsForms {
 			Application.Idle += new EventHandler(Application_Idle);
 		}
 
+		[System.Diagnostics.DebuggerStepThrough]
 		void Application_Idle(object sender, EventArgs e) {
 			// ApplicationContext also calls ExitThread, except it only waits for one form.
 			if (Application.OpenForms.Count == 0)
 				this.ExitThread();
 
-			if (Configuration.Default.NeedsSaving) {
+			if (Configuration.Default.NeedsSaving)
 				Configuration.Default.Save();
-			}
 		}
 	}
 }
