@@ -219,8 +219,29 @@ namespace Szotar.WindowsForms {
 		}
 	};
 
+	class SwapMenu : MenuStrip {
+		LearnMode mode;
+
+		public SwapMenu(LearnMode mode) {
+			this.mode = mode;
+
+			var optionsItem = new ToolStripMenuItem("&Options");
+			Items.Add(optionsItem);
+
+			var swapItem = new ToolStripMenuItem("Swap phrase/translation");
+			swapItem.Click += delegate {
+				mode.Swap = !mode.Swap;
+			};
+
+			optionsItem.DropDownOpening += delegate {
+				swapItem.Checked = mode.Swap;
+			};
+			optionsItem.DropDownItems.Add(swapItem);
+		}
+	}
+
 	// TODO: Actually log the results, allowing swapping phrase/translation, smaller phrase font for long phrases
-	// TODO: Overview at end of round and end of game
+	// TODO: Overview at end of game
 	// TODO: Still get the "default beep" sound when pressing enter on the translation (even when correct). Why?
 	public class LearnMode : Mode {
 		Label phrase, scoreLabel, answer;
@@ -250,6 +271,7 @@ namespace Szotar.WindowsForms {
 			public PracticeItem Item { get; set; }
 			public string Guess { get; set; }
 			public bool Correct { get; set; }
+			public bool Swapped { get; set; }
 		};
 
 		List<IList<Attempt>> rounds;
@@ -257,6 +279,7 @@ namespace Szotar.WindowsForms {
 		IList<PracticeItem> items;
 		int index;
 		int score;
+		bool swap;
 
 		public LearnMode()
 			: base("Learn") {
@@ -300,6 +323,8 @@ namespace Szotar.WindowsForms {
 			overrideButton.Click += delegate { Override(items[index], lastGuess); };
 			editButton.Click += new EventHandler(editButton_Click);
 			roundOverview.KeyUp += new KeyEventHandler(roundOverview_KeyUp);
+
+			MergeMenu(new SwapMenu(this));
 
 			Update();
 			Layout();
@@ -362,16 +387,39 @@ namespace Szotar.WindowsForms {
 		}
 
 		void Shuffle<T>(IList<T> items) {
+			ShuffleRange(items, 0, items.Count);
+		}
+
+		void ShuffleRange<T>(IList<T> items, int start, int count) {
 			// Fisher-Yates shuffle
-			int n = items.Count;
+			int n = count;
 			while (n > 1) {
 				n--;
 				int k = random.Next(n + 1);
-				var t = items[k];
-				items[k] = items[n];
-				items[n] = t;
+				var t = items[start + k];
+				items[start + k] = items[start + n];
+				items[start + n] = t;
 			}
 		}
+
+		public bool Swap {
+			get { return swap; }
+			set {
+				if (swap != value) {
+					swap = value;
+
+					// Shuffle the remaining items so you don't get the same one again (which would be too easy.)
+					// This could also be done by simply moving the current item to the back of the list and shifting
+					// the rest frontwards.
+					ShuffleRange(items, index, items.Count - index);
+					Update();
+					Layout();
+				}
+			}
+		}
+
+		string CurrentPhrase { get { return swap ? items[index].Translation : items[index].Phrase; } }
+		string CurrentTranslation { get { return swap ? items[index].Phrase : items[index].Translation; } }
 
 		void ReportGuess(PracticeItem item, bool correct) {
 			// TODO: Add to practice log.
@@ -389,7 +437,7 @@ namespace Szotar.WindowsForms {
 
 		void Correct(PracticeItem item, string guess) {
 			ReportGuess(item, true);
-			currentRound.Add(new Attempt { Correct = true, Guess = guess, Item = item });
+			currentRound.Add(new Attempt { Correct = true, Guess = guess, Item = item, Swapped = Swap });
 			score++;
 
 			NextPhrase();
@@ -412,7 +460,7 @@ namespace Szotar.WindowsForms {
 		// and continues their miserable existence.
 		void AcceptFailure(PracticeItem item, string guess) {
 			ReportGuess(item, false);
-			currentRound.Add(new Attempt { Item = item, Guess = guess, Correct = false });
+			currentRound.Add(new Attempt { Item = item, Guess = guess, Correct = false, Swapped = Swap });
 			NextPhrase();
 		}
 
@@ -421,7 +469,7 @@ namespace Szotar.WindowsForms {
 			if (fadingOutAnswer)
 				return;
 
-			if (answerChecker.IsAcceptable(affirmation.Text, items[index].Translation)) {
+			if (answerChecker.IsAcceptable(affirmation.Text, CurrentTranslation)) {
 				fadingOutAnswer = true;
 
 				FadeOutText(fadeOutInterval, affirmation, delegate {
@@ -485,7 +533,7 @@ namespace Szotar.WindowsForms {
 			}
 
 			if (e.KeyCode == Keys.Return) {
-				bool correct = answerChecker.IsAcceptable(translation.Text, items[index].Translation);
+				bool correct = answerChecker.IsAcceptable(translation.Text, CurrentTranslation);
 				lastGuess = translation.Text;
 
 				// TODO: Remove this or make it optional
@@ -527,8 +575,8 @@ namespace Szotar.WindowsForms {
 				roundOverview.UpdateScore(rounds.Count + 1, currentRound.Count, score);
 
 			if (items.Count > 0 && index < items.Count) {
-				phrase.Text = items[index].Phrase;
-				answer.Text = items[index].Translation;
+				phrase.Text = CurrentPhrase;
+				answer.Text = CurrentTranslation;
 				if (state == State.Guessing)
 					translation.Clear();
 				if (state == State.ViewingAnswer)
