@@ -6,7 +6,7 @@ using System.Drawing;
 namespace Szotar.WindowsForms {
 	// Checks answers, ignoring case, extraneous spaces and punctuation, and parenthesised 
 	// clauses (based on configuration).
-	public class AnswerChecker {
+	class AnswerChecker {
 		bool fixSpaces, fixPunct, fixParens, fixCase;
 
 		public AnswerChecker() {
@@ -100,7 +100,7 @@ namespace Szotar.WindowsForms {
 		}
 	}
 
-	public class RoundOverview : UserControl {
+	class RoundOverview : UserControl {
 		TableLayoutPanel table;
 		Label roundNo = new Label();
 		Label correctLabel = new Label(), incorrectLabel = new Label();
@@ -110,7 +110,7 @@ namespace Szotar.WindowsForms {
 
 		public RoundOverview() : this(0, 0, 0) { }
 
-		internal void UpdateScore(int round, int count, int correct) {
+		public void UpdateScore(int round, int count, int correct) {
 			roundNo.Text = string.Format("End of round {0}", round);
 
 			int incorrect = count - correct;
@@ -121,31 +121,47 @@ namespace Szotar.WindowsForms {
 			correctRatio.Text = RatioToPercentage(correct, count);
 			incorrectRatio.Text = RatioToPercentage(incorrect, count);
 			prompt.Text = "Press any key to continue";
+
+			Layout();
 		}
 
 		public RoundOverview(int round, int count, int correct) {
-			UpdateScore(round, count, correct);
+			// TODO: Make theme-aware.
+			correctCount.ForeColor = correctLabel.ForeColor = correctRatio.ForeColor = Color.FromArgb(32, 128, 32);
+			incorrectCount.ForeColor = incorrectLabel.ForeColor = incorrectRatio.ForeColor = Color.FromArgb(128, 16, 16);
 
-			Font = new Font(Font.FontFamily, Font.Size * 1.6f);
-			roundNo.Font = new Font(Font.FontFamily, roundNo.Font.Size * 1.4f, FontStyle.Bold);
+			Font = new Font(Font.FontFamily, Font.Size * 1.4f);
+			FontFamily titleFontFamily = Array.Exists(FontFamily.Families, x => x.Name == "Cambria") 
+				? new FontFamily("Cambria")
+				: roundNo.Font.FontFamily;
+
+			roundNo.Font = new Font(titleFontFamily, Font.Size * 2.0f, FontStyle.Bold);
 			Disposed += delegate {
 				Font.Dispose();
 				roundNo.Font.Dispose();
 			};
+			
+			prompt.ForeColor = SystemColors.GrayText;
 
-			table = new TableLayoutPanel() { RowCount = 4, ColumnCount = 3 };
+			table = new TableLayoutPanel() { RowCount = 4, ColumnCount = 3 }; 
 			
 			foreach (var label in new[] { roundNo, correctLabel, incorrectLabel, correctCount, incorrectCount, correctRatio, incorrectRatio, prompt }) {
+				label.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Top;
+				label.TextAlign = ContentAlignment.MiddleLeft;
 				label.AutoSize = true;
-				label.TextAlign = ContentAlignment.MiddleCenter;
 				table.Controls.Add(label);
 			}
 
-			for (int i = 0; i < table.RowCount; ++i)
-				table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+			prompt.TextAlign = ContentAlignment.MiddleCenter;
 
-			for (int i = 1; i < table.ColumnCount; ++i)
-				table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+			table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+			table.RowStyles.Add(new RowStyle(SizeType.Percent, 0.5f));
+			table.RowStyles.Add(new RowStyle(SizeType.Percent, 0.5f));
+			table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 1.0f));
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
 			// Row 0: Header
 			table.SetRow(roundNo, 0); 
@@ -173,9 +189,11 @@ namespace Szotar.WindowsForms {
 			table.SetColumn(prompt, 0);
 			table.SetColumnSpan(prompt, 3);
 
-			//table.Dock = DockStyle.Fill;
-
 			Controls.Add(table);
+
+			Resize += delegate { Layout(); };
+
+			UpdateScore(round, count, correct);
 		}
 
 		string RatioToPercentage(int nom, int denom) {
@@ -185,10 +203,19 @@ namespace Szotar.WindowsForms {
 			return string.Format("{0:D}%", nom * 100 / denom);
 		}
 
-		protected override void OnLayout(LayoutEventArgs e) {
-			base.OnLayout(e);
+		new void Layout() {
+			int width = Math.Max(
+				Math.Max(correctLabel.PreferredWidth, incorrectLabel.PreferredWidth)
+					+ Math.Max(correctCount.PreferredWidth, incorrectCount.PreferredWidth)
+					+ Math.Max(correctRatio.PreferredWidth, incorrectRatio.PreferredWidth),
+				Math.Max(prompt.PreferredWidth, roundNo.PreferredWidth));
+			table.Width = Math.Min(width * 7 / 5, ClientSize.Width);
 
-			// TODO: Centre the table.
+			int height = roundNo.PreferredHeight + correctLabel.PreferredHeight + incorrectLabel.PreferredHeight + prompt.PreferredHeight;
+			table.Height = Math.Min(height * 7 / 5, ClientSize.Height);
+
+			table.Left = (ClientSize.Width - table.Width) / 2;
+			table.Top = (ClientSize.Height - table.Height) / 2;
 		}
 	};
 
@@ -256,7 +283,7 @@ namespace Szotar.WindowsForms {
 			affirmation = new TextBox() { Font = font };
 			overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = "&override" };
 			editButton = new Button() { Font = GameArea.FindForm().Font, Text = "&edit" };
-			roundOverview = new RoundOverview();
+			roundOverview = new RoundOverview() { Dock = DockStyle.Fill };
 
 			GameArea.Controls.Add(phrase);
 			GameArea.Controls.Add(scoreLabel);
@@ -330,6 +357,7 @@ namespace Szotar.WindowsForms {
 			if (items.Count > 0)
 				state = State.Guessing;
 			else
+				// TODO: Add a new state, completed, which shows the final scores and all rounds of the game.
 				state = State.ViewingResults;
 		}
 
