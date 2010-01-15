@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using System.Diagnostics;
 
 namespace Szotar.WindowsForms.Forms {
+	// TODO: Set window title based on what is being practiced, and what mode is being used.
+	//       However, this may need word list combos and named combos.
 	public partial class PracticeWindow : Form, IPracticeWindow {
 		PracticeQueue queue;
 		IPracticeMode mode;
@@ -20,7 +22,7 @@ namespace Szotar.WindowsForms.Forms {
 			var terms = DataStore.Database.GetItems(items);
 			if (terms.Count > 0) {
 				queue = new PracticeQueue(terms);
-				SetMode(new FlashcardMode());
+				SetMode(new LearnMode());
 			}
 
 			this.FormClosed += delegate {
@@ -29,7 +31,8 @@ namespace Szotar.WindowsForms.Forms {
 			};
 
 			components = components ?? new Container();
-			components.Add(new DisposableComponent(mode));
+			if(mode != null)
+				components.Add(new DisposableComponent(mode));
 		}
 
 		private void SetMode(IPracticeMode mode) {
@@ -52,6 +55,10 @@ namespace Szotar.WindowsForms.Forms {
 
 		public PracticeItem FetchNextItem() {
 			return queue.TakeOne();
+		}
+
+		public IList<PracticeItem> GetAllItems() {
+			return queue.AllItems;
 		}
 
 		ToolStrip IPracticeWindow.Controls {
