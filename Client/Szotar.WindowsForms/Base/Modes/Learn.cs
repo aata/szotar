@@ -6,6 +6,7 @@ using System.Drawing;
 namespace Szotar.WindowsForms {
 	// Checks answers, ignoring case, extraneous spaces and punctuation, and parenthesised 
 	// clauses (based on configuration).
+	// TODO: Uncouple this from GuiConfiguration, or at least remove the SettingChanged handler.
 	class AnswerChecker {
 		bool fixSpaces, fixPunct, fixParens, fixCase;
 
@@ -16,6 +17,10 @@ namespace Szotar.WindowsForms {
 			fixCase = GuiConfiguration.PracticeFixCase;
 
 			Configuration.Default.SettingChanged += new EventHandler<SettingChangedEventArgs>(OnSettingChanged);
+		}
+
+		public void RemoveEventHandlers() {
+			Configuration.Default.SettingChanged -= new EventHandler<SettingChangedEventArgs>(OnSettingChanged);
 		}
 
 		void OnSettingChanged(object sender, SettingChangedEventArgs e) {
@@ -219,28 +224,51 @@ namespace Szotar.WindowsForms {
 		}
 	};
 
-	class SwapMenu : MenuStrip {
+	class OptionsMenu : MenuStrip {
 		LearnMode mode;
+		ToolStripMenuItem swapItem, optionsItem;
 
-		public SwapMenu(LearnMode mode) {
+		public OptionsMenu(LearnMode mode) {
 			this.mode = mode;
 
-			var optionsItem = new ToolStripMenuItem("&Options");
+			optionsItem = new ToolStripMenuItem("&Options");
 			Items.Add(optionsItem);
 
-			var swapItem = new ToolStripMenuItem("Swap phrase/translation");
+			swapItem = new ToolStripMenuItem("Swap phrase/translation");
 			swapItem.Click += delegate {
 				mode.Swap = !mode.Swap;
 			};
 
-			optionsItem.DropDownOpening += delegate {
-				swapItem.Checked = mode.Swap;
-			};
+			optionsItem.DropDownOpening += new EventHandler(optionsItem_DropDownOpening);
 			optionsItem.DropDownItems.Add(swapItem);
+			optionsItem.DropDownItems.Add(new ToolStripSeparator());
+
+			AddFixupItem("Ignore spaces in answer", "PracticeFixSpaces", optionsItem);
+			AddFixupItem("Ignore punctuation in answer", "PracticeFix", optionsItem);
+			AddFixupItem("Ignore parenthesized text in answer", "PracticeFixSpaces", optionsItem);
+			AddFixupItem("Ignore case in answer", "PracticeFixSpaces", optionsItem);
+		}
+
+		void optionsItem_DropDownOpening(object sender, EventArgs e) {
+			swapItem.Checked = mode.Swap;
+			foreach (ToolStripItem item in optionsItem.DropDownItems) {
+				var menuItem = item as ToolStripMenuItem;
+				if (menuItem != null && menuItem.Tag is string)
+					menuItem.Checked = GuiConfiguration.GetPracticeFixupSetting((string)menuItem.Tag);
+			}
+		}
+
+		void AddFixupItem(string text, string setting, ToolStripMenuItem parent) {
+			var item = new ToolStripMenuItem(text);
+			item.Tag = setting;
+			item.Click += delegate {
+				GuiConfiguration.SetPracticeFixupSetting(setting, !GuiConfiguration.GetPracticeFixupSetting(setting));
+			};
+			parent.DropDownItems.Add(item);
 		}
 	}
 
-	// TODO: Actually log the results, allowing swapping phrase/translation, smaller phrase font for long phrases
+	// TODO: Actually log the results
 	// TODO: Overview at end of game
 	// TODO: Still get the "default beep" sound when pressing enter on the translation (even when correct). Why?
 	public class LearnMode : Mode {
@@ -251,7 +279,7 @@ namespace Szotar.WindowsForms {
 		Button editButton;
 		RoundOverview roundOverview;
 
-		Font font, scoreFont;
+		Font font, smallFont, extraSmallFont, scoreFont;
 		Random random;
 
 		AnswerChecker answerChecker = new AnswerChecker();
@@ -282,7 +310,8 @@ namespace Szotar.WindowsForms {
 		bool swap;
 
 		public LearnMode()
-			: base("Learn") {
+			: base("Learn")
+		{
 			random = new Random();
 		}
 
@@ -297,6 +326,8 @@ namespace Szotar.WindowsForms {
 
 			// UI
 			font = new Font(GameArea.FindForm().Font.FontFamily, 24);
+			smallFont = new Font(GameArea.FindForm().Font.FontFamily, 16);
+			extraSmallFont = new Font(GameArea.FindForm().Font.FontFamily, 12);
 			scoreFont = new Font(GameArea.FindForm().Font.FontFamily, 16);
 
 			phrase = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
@@ -324,7 +355,7 @@ namespace Szotar.WindowsForms {
 			editButton.Click += new EventHandler(editButton_Click);
 			roundOverview.KeyUp += new KeyEventHandler(roundOverview_KeyUp);
 
-			MergeMenu(new SwapMenu(this));
+			MergeMenu(new OptionsMenu(this));
 
 			Update();
 			Layout();
@@ -354,6 +385,7 @@ namespace Szotar.WindowsForms {
 		public override void Stop() {
 			base.Stop();
 
+			answerChecker.RemoveEventHandlers();
 			GameArea.Resize -= new EventHandler(OnGameAreaResize);
 		}
 
@@ -564,7 +596,10 @@ namespace Szotar.WindowsForms {
 
 				if(timer != null)
 					timer.Dispose();
+
 				font.Dispose();
+				smallFont.Dispose();
+				extraSmallFont.Dispose();
 			}
 
 			base.Dispose(disposing);
@@ -642,6 +677,20 @@ namespace Szotar.WindowsForms {
 		protected void Layout() {
 			SizeToWidth(translation);
 			SizeToWidth(affirmation);
+
+			using (var g = phrase.CreateGraphics()) {
+				int sizeRatio = (int)g.MeasureString(phrase.Text, font).Width / GameArea.ClientSize.Width;
+				if (sizeRatio >= 2)
+					phrase.Font = extraSmallFont;
+				else if (sizeRatio >= 1)
+					phrase.Font = smallFont;
+				else
+					phrase.Font = font;
+			}
+
+			phrase.MaximumSize = new Size(
+				GameArea.ClientSize.Width - phrase.Padding.Horizontal,
+				GameArea.ClientSize.Height - phrase.Padding.Vertical);
 
 			var height = 0;
 			foreach (var c in new Control[] { phrase, answer, affirmation, translation })
