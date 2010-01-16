@@ -105,6 +105,20 @@ namespace Szotar.WindowsForms {
 		}
 	}
 
+	static class AnswerColors {
+		public static Color Correct {
+			get {
+				return Color.FromArgb(32, 128, 32);
+			}
+		}
+
+		public static Color Incorrect {
+			get {
+				return Color.FromArgb(128, 16, 16);
+			}
+		}
+	}
+
 	class RoundOverview : UserControl {
 		TableLayoutPanel table;
 		Label roundNo = new Label();
@@ -132,8 +146,8 @@ namespace Szotar.WindowsForms {
 
 		public RoundOverview(int round, int count, int correct) {
 			// TODO: Make theme-aware.
-			correctCount.ForeColor = correctLabel.ForeColor = correctRatio.ForeColor = Color.FromArgb(32, 128, 32);
-			incorrectCount.ForeColor = incorrectLabel.ForeColor = incorrectRatio.ForeColor = Color.FromArgb(128, 16, 16);
+			correctCount.ForeColor = correctLabel.ForeColor = correctRatio.ForeColor = AnswerColors.Correct;
+			incorrectCount.ForeColor = incorrectLabel.ForeColor = incorrectRatio.ForeColor = AnswerColors.Incorrect;
 
 			Font = new Font(Font.FontFamily, Font.Size * 1.4f);
 			FontFamily titleFontFamily = Array.Exists(FontFamily.Families, x => x.Name == "Cambria") 
@@ -224,6 +238,147 @@ namespace Szotar.WindowsForms {
 		}
 	};
 
+	class GameOverview : UserControl {
+		FlowLayoutPanel flow;
+
+		Font headerFont, textFont;
+
+		public GameOverview(LearnMode mode) {
+			flow = new FlowLayoutPanel() { 
+				Dock = DockStyle.Fill, 
+				FlowDirection = FlowDirection.TopDown, 
+				WrapContents = false,
+				AutoScroll = true
+			};
+
+			headerFont = new Font(mode.GameArea.Font.FontFamily, mode.GameArea.Font.Size * 1.8f, FontStyle.Bold);
+			textFont = new Font(mode.GameArea.Font.FontFamily, mode.GameArea.Font.Size, FontStyle.Regular);
+
+			Controls.Add(flow);
+		}
+
+		protected override void Dispose(bool disposing) {
+			base.Dispose(disposing);
+
+			if (disposing) {
+				headerFont.Dispose();
+				textFont.Dispose();
+			}
+		}
+
+		public void UpdateOverview(IList<IList<Attempt>> rounds) {
+			flow.Controls.Clear();
+			flow.WrapContents = false;
+
+			int i = 1;
+			foreach (var round in rounds) {
+				var headerFlow = new FlowLayoutPanel {
+					FlowDirection = FlowDirection.LeftToRight,
+					WrapContents = false,
+					AutoSize = true
+				};
+
+				var header = new Label() { Font = headerFont, AutoSize = true };
+				header.Text = string.Format("Round {0}", i++);
+				headerFlow.Controls.Add(header);
+
+				var score = new Label() { Font = headerFont, AutoSize = true, ForeColor = AnswerColors.Correct };
+				int correct = 0;
+				foreach (var attempt in round)
+					if (attempt.Correct)
+						correct++;
+				score.Text = string.Format("{0}/{1} — {2}%", 
+					correct, 
+					round.Count, 
+					round.Count > 0 ? correct * 100 / round.Count : 100);
+
+				headerFlow.Controls.Add(score);
+
+				flow.Controls.Add(headerFlow);
+				flow.Controls.Add(MakeTable(round));
+			}
+
+			Layout();
+		}
+
+		public TableLayoutPanel MakeTable(IList<Attempt> round) {
+			var table = new TableLayoutPanel {
+				RowCount = round.Count,
+				ColumnCount = 4
+			};
+
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+			int i = 0;
+			foreach (var attempt in round) {
+				table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+				var ordinal = new Label {
+					Text = string.Format("{0}.", ++i),
+					TextAlign = ContentAlignment.MiddleRight
+				};
+
+				var word = new Label {
+					Text = attempt.Swapped ? attempt.Item.Translation : attempt.Item.Phrase,
+					ForeColor = attempt.Correct ? AnswerColors.Correct : AnswerColors.Incorrect,
+					TextAlign = ContentAlignment.MiddleLeft
+				};
+
+				var arrow = new Label {
+					Text = "→",
+					TextAlign = ContentAlignment.MiddleCenter
+				};
+
+				var translation = new Label {
+					Text = Text = attempt.Swapped ? attempt.Item.Phrase : attempt.Item.Translation,
+					TextAlign = ContentAlignment.MiddleLeft
+				};
+
+				int j = 0;
+				foreach (Label label in new[] { ordinal, word, arrow, translation }) {
+					label.AutoSize = true;
+					label.Font = textFont;
+					table.Controls.Add(label);
+					table.SetRow(label, i - 1);
+					table.SetColumn(label, j++);
+				}
+			}
+
+			table.AutoSize = true;
+			table.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+			table.Margin = new Padding(table.Margin.Left * 4, table.Margin.Top, table.Margin.Right, table.Margin.Bottom);
+			return table;
+		}
+
+		protected override void OnResize(EventArgs e) {
+			base.OnResize(e);
+
+			Layout();
+		}
+
+		// TODO: This is still pretty slow. Find a faster way.
+		new void Layout() {
+			flow.SuspendLayout();
+			foreach (var control in flow.Controls) {
+				var table = control as TableLayoutPanel;
+				if (table != null) {
+					table.SuspendLayout();
+					foreach(var tableControl in table.Controls) {
+						var label = tableControl as Label;
+						if (label != null)
+							label.MaximumSize = new Size(ClientSize.Width * 3 / 7, int.MaxValue);
+					}
+					table.ResumeLayout();
+				}
+			}
+			flow.ResumeLayout();
+		}
+	};
+
+	// TODO: Add items in the file menu that open the word lists currently being learnt.
 	class OptionsMenu : MenuStrip {
 		LearnMode mode;
 		ToolStripMenuItem swapItem, optionsItem;
@@ -268,6 +423,13 @@ namespace Szotar.WindowsForms {
 		}
 	}
 
+	class Attempt {
+		public PracticeItem Item { get; set; }
+		public string Guess { get; set; }
+		public bool Correct { get; set; }
+		public bool Swapped { get; set; }
+	};
+
 	// TODO: Actually log the results
 	// TODO: Overview at end of game
 	// TODO: Still get the "default beep" sound when pressing enter on the translation (even when correct). Why?
@@ -278,6 +440,7 @@ namespace Szotar.WindowsForms {
 		Button overrideButton;
 		Button editButton;
 		RoundOverview roundOverview;
+		GameOverview gameOverview;
 
 		Font font, smallFont, extraSmallFont, scoreFont;
 		Random random;
@@ -287,20 +450,14 @@ namespace Szotar.WindowsForms {
 		enum State {
 			Guessing,
 			ViewingAnswer,
-			ViewingResults
+			RoundOverview,
+			GameOverview
 		}
 
 		State state;
 		Timer timer;
 		int fadeOutInterval = 250;
 		string lastGuess;
-
-		class Attempt {
-			public PracticeItem Item { get; set; }
-			public string Guess { get; set; }
-			public bool Correct { get; set; }
-			public bool Swapped { get; set; }
-		};
 
 		List<IList<Attempt>> rounds;
 		IList<Attempt> currentRound;
@@ -338,6 +495,7 @@ namespace Szotar.WindowsForms {
 			overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = "&override" };
 			editButton = new Button() { Font = GameArea.FindForm().Font, Text = "&edit" };
 			roundOverview = new RoundOverview() { Dock = DockStyle.Fill };
+			gameOverview = new GameOverview(this) { Dock = DockStyle.Fill };
 
 			GameArea.Controls.Add(phrase);
 			GameArea.Controls.Add(scoreLabel);
@@ -347,6 +505,7 @@ namespace Szotar.WindowsForms {
 			GameArea.Controls.Add(overrideButton);
 			GameArea.Controls.Add(editButton);
 			GameArea.Controls.Add(roundOverview);
+			GameArea.Controls.Add(gameOverview);
 
 			translation.TextChanged += delegate { Layout(); };
 			translation.KeyUp += new KeyEventHandler(translation_KeyUp);
@@ -414,8 +573,7 @@ namespace Szotar.WindowsForms {
 			if (items.Count > 0)
 				state = State.Guessing;
 			else
-				// TODO: Add a new state, completed, which shows the final scores and all rounds of the game.
-				state = State.ViewingResults;
+				state = State.GameOverview;
 		}
 
 		void Shuffle<T>(IList<T> items) {
@@ -459,7 +617,7 @@ namespace Szotar.WindowsForms {
 
 		void NextPhrase() {
 			if (++index >= items.Count)
-				state = State.ViewingResults;
+				state = State.RoundOverview;
 			else
 				state = State.Guessing;
 
@@ -606,8 +764,10 @@ namespace Szotar.WindowsForms {
 		}
 
 		protected void Update() {
-			if (state == State.ViewingResults)
+			if (state == State.RoundOverview)
 				roundOverview.UpdateScore(rounds.Count + 1, currentRound.Count, score);
+			else if (state == State.GameOverview)
+				gameOverview.UpdateOverview(rounds);
 
 			if (items.Count > 0 && index < items.Count) {
 				phrase.Text = CurrentPhrase;
@@ -621,19 +781,22 @@ namespace Szotar.WindowsForms {
 
 			affirmation.Tag = affirmation.Visible = state == State.ViewingAnswer;
 			translation.Tag = translation.Visible = state == State.Guessing;
-			scoreLabel.Tag = scoreLabel.Visible = state != State.ViewingResults;
-			phrase.Tag = phrase.Visible = state != State.ViewingResults;
+			scoreLabel.Tag = scoreLabel.Visible = state != State.RoundOverview && state != State.GameOverview;
+			phrase.Tag = phrase.Visible = state != State.RoundOverview && state != State.GameOverview;
 			answer.Tag = answer.Visible = state == State.ViewingAnswer;
 			overrideButton.Tag = overrideButton.Visible = state == State.ViewingAnswer;
 			editButton.Tag = editButton.Visible = state == State.ViewingAnswer || state == State.Guessing;
-			roundOverview.Tag = roundOverview.Visible = state == State.ViewingResults;
+			roundOverview.Tag = roundOverview.Visible = state == State.RoundOverview;
+			gameOverview.Tag = gameOverview.Visible = state == State.GameOverview;
 
 			if (state == State.Guessing)
 				translation.Focus();
 			else if (state == State.ViewingAnswer)
 				affirmation.Focus();
-			else if (state == State.ViewingResults)
+			else if (state == State.RoundOverview)
 				roundOverview.Focus();
+			else if (state == State.GameOverview)
+				gameOverview.Focus();
 		}
 
 		// TODO: Make the font smaller when the form is small?
