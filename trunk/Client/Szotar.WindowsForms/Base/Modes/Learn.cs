@@ -514,6 +514,13 @@ namespace Szotar.WindowsForms {
 			editButton.Click += new EventHandler(editButton_Click);
 			roundOverview.KeyUp += new KeyEventHandler(roundOverview_KeyUp);
 
+			// Stop the beep sound being produced when Enter is pressed.
+			// (Handling KeyUp is not sufficient to stop this.)
+			translation.KeyPress += (s, e) => {
+				if (e.KeyChar == '\r')
+					e.Handled = true;
+			};
+
 			MergeMenu(new OptionsMenu(this));
 
 			Update();
