@@ -837,21 +837,29 @@ namespace Szotar.WindowsForms {
 			}
 		}
 
+		void ChooseLabelFont(Label label) {
+			if ((bool?)label.Tag != true)
+				return;
+
+			using (var g = label.CreateGraphics()) {
+				int sizeRatio = (int)g.MeasureString(label.Text, font).Width / GameArea.ClientSize.Width;
+				if (sizeRatio >= 2)
+					label.Font = extraSmallFont;
+				else if (sizeRatio >= 1)
+					label.Font = smallFont;
+				else
+					label.Font = font;
+			}
+		}
+
 		protected void Layout() {
 			SizeToWidth(translation);
 			SizeToWidth(affirmation);
 
-			using (var g = phrase.CreateGraphics()) {
-				int sizeRatio = (int)g.MeasureString(phrase.Text, font).Width / GameArea.ClientSize.Width;
-				if (sizeRatio >= 2)
-					phrase.Font = extraSmallFont;
-				else if (sizeRatio >= 1)
-					phrase.Font = smallFont;
-				else
-					phrase.Font = font;
-			}
+			ChooseLabelFont(phrase);
+			ChooseLabelFont(answer);
 
-			phrase.MaximumSize = new Size(
+			phrase.MaximumSize = answer.MaximumSize = new Size(
 				GameArea.ClientSize.Width - phrase.Padding.Horizontal,
 				GameArea.ClientSize.Height - phrase.Padding.Vertical);
 
