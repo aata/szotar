@@ -97,6 +97,15 @@ namespace Szotar.WindowsForms {
 			set { Default.Set("LogViewerShowErrors", value); }
 		}
 
+		// This makes it easier to change the default if necessary. (See OptionsMenu in Learn.cs, for example.)
+		public static bool GetPracticeFixupSetting(string setting) {
+			return Default.Get<bool>(setting, true);
+		}
+
+		public static void SetPracticeFixupSetting(string setting, bool value) {
+			Default.Set(setting, value);
+		}
+
 		public static bool PracticeFixSpaces {
 			get { return Default.Get<bool>("PracticeFixSpaces", true); }
 			set { Default.Set("PracticeFixSpaces", value); }
