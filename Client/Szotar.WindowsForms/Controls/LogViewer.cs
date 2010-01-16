@@ -9,7 +9,6 @@ namespace Szotar.WindowsForms.Controls {
 		public LogViewer() {
 			InitializeComponent();
 
-			// TODO: Load from configuration
 			showMetrics = metrics.Checked = GuiConfiguration.LogViewerShowMetrics;
 			showDebug = debug.Checked = GuiConfiguration.LogViewerShowDebug;
 			showWarnings = warning.Checked = GuiConfiguration.LogViewerShowWarnings;
@@ -36,19 +35,18 @@ namespace Szotar.WindowsForms.Controls {
 			};
 
 			log = ProgramLog.Default;
-			log.MessageAdded += new EventHandler<LogEventArgs>(log_MessageAdded);
 
 			UpdateView();
 		}
 
-		void log_MessageAdded(object sender, LogEventArgs e) {
+		public void AddMessage(LogMessage message) {
 			if (InvokeRequired) {
-				Invoke(new Action(delegate { log_MessageAdded(sender, e); }));
+				Invoke(new Action(delegate { AddMessage(message); }));
 				return;
 			}
 
-			if (Filter(e.Message)) {
-				list.Items.Add(MakeItem(e.Message));
+			if (Filter(message)) {
+				list.Items.Add(MakeItem(message));
 				ScrollToEnd();
 			}
 		}
