@@ -29,7 +29,7 @@ namespace Szotar.WindowsForms.Forms {
 			recentLists.ItemActivate += new EventHandler(recentLists_ItemActivate);
 			recentLists.Resize += new EventHandler((s, e) => recentLists.Columns[0].Width = recentLists.ClientSize.Width);
 			recentLists.Columns[0].Width = recentLists.ClientSize.Width;
-			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
+			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(WordListDeleted);
 
 			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
 
@@ -75,6 +75,7 @@ namespace Szotar.WindowsForms.Forms {
 		// Unhook event handlers attached to external objects, to prevent keeping this object alive unnecessarily.
 		void OnFormClosed(object sender, FormClosedEventArgs e) {
 			Configuration.Default.SettingChanged -= new EventHandler<SettingChangedEventArgs>(SettingChanged);
+			DataStore.Database.WordListDeleted -= new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(WordListDeleted);
 		}
 
 		void SettingChanged(object sender, SettingChangedEventArgs e) {
@@ -164,7 +165,7 @@ namespace Szotar.WindowsForms.Forms {
 			});
 		}
 
-		void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
+		void WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
 			foreach (ListViewItem item in recentLists.Items) {
 				if ((long?)item.Tag == e.SetID) {
 					recentLists.Items.Remove(item);
