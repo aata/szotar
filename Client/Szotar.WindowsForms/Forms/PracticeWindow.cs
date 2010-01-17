@@ -22,7 +22,19 @@ namespace Szotar.WindowsForms.Forms {
 			var terms = DataStore.Database.GetItems(items);
 			if (terms.Count > 0) {
 				queue = new PracticeQueue(terms);
-				SetMode(new LearnMode());
+
+				// TODO: Decided the default based on a setting.
+				switch (whichMode) {
+					case PracticeMode.Flashcards:
+						SetMode(new FlashcardMode());
+						break;
+
+					case PracticeMode.Default:
+					case PracticeMode.Learn:
+					default:
+						SetMode(new LearnMode());
+						break;
+				}
 			}
 
 			this.FormClosed += delegate {
@@ -43,8 +55,8 @@ namespace Szotar.WindowsForms.Forms {
 		public PracticeWindow()
 			: this(new ListSearchResult[] { }, PracticeMode.SearchMode) { }
 
-		public static void OpenNewSession(IList<ListSearchResult> items) {
-			new PracticeWindow(items, PracticeMode.Default).Show();
+		public static void OpenNewSession(PracticeMode mode, IList<ListSearchResult> items) {
+			new PracticeWindow(items, mode).Show();
 		}
 
 		public void MarkSuccess(PracticeItem item) {

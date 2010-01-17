@@ -471,13 +471,22 @@ namespace Szotar.WindowsForms.Forms {
 				Paste(csv, null);
 		}
 
-		private void practiceThis_Click(object sender, EventArgs e) {
+		private void Practice(PracticeMode mode) {
 			if (!list.ID.HasValue) {
 				ProgramLog.Default.AddMessage(LogType.Error, "WordList {0} has no ID", list.Name);
 				return;
 			}
 
-			PracticeWindow.OpenNewSession(new[] { new ListSearchResult(list.ID.Value) });
+			PracticeWindow.OpenNewSession(mode, new[] { new ListSearchResult(list.ID.Value) });
+
+		}
+
+		private void flashcards_Click(object sender, EventArgs e) {
+			Practice(PracticeMode.Flashcards);
+		}
+
+		private void learn_Click(object sender, EventArgs e) {
+			Practice(PracticeMode.Learn);
 		}
 	}
 }

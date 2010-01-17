@@ -134,7 +134,7 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		void PracticeSelectedRecentLists() {
+		void PracticeSelectedRecentLists(PracticeMode mode) {
 			var lists = new List<ListSearchResult>();
 
 			foreach (ListViewItem item in recentLists.SelectedItems) {
@@ -143,7 +143,7 @@ namespace Szotar.WindowsForms.Forms {
 					lists.Add(new ListSearchResult(id.Value));
 			}
 
-			PracticeLists(lists);
+			PracticeLists(mode, lists);
 		}
 
 		private void PopulateRecentLists() {
@@ -235,7 +235,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void practiceList_Click(object sender, EventArgs e) {
-			PracticeLists(listSearch.Accept());
+			PracticeLists(PracticeMode.Default, listSearch.Accept());
 		}
 
 		T? NullableMin<T>(T? x, T? y)
@@ -274,7 +274,7 @@ namespace Szotar.WindowsForms.Forms {
 				ListBuilder.Open(open.SetID).ScrollToPosition(open.Position ?? 0);
 		}
 
-		private void PracticeLists(IList<ListSearchResult> chosen) {
+		private void PracticeLists(PracticeMode mode, IList<ListSearchResult> chosen) {
 			var items = new List<ListSearchResult>();
 
 			if (chosen == null || chosen.Count == 0)
@@ -286,7 +286,7 @@ namespace Szotar.WindowsForms.Forms {
 					items.Add(item);
 			}
 
-			PracticeWindow.OpenNewSession(items);
+			PracticeWindow.OpenNewSession(mode, items);
 		}
 		#endregion
 
@@ -298,11 +298,22 @@ namespace Szotar.WindowsForms.Forms {
 				OpenLists(listSearch.Accept());
 		}
 
-		private void practiceListMI_Click(object sender, EventArgs e) {
+		private void flashcardsListMI_Click(object sender, EventArgs e) {
 			if (ActiveControl == recentLists)
-				PracticeSelectedRecentLists();
+				PracticeSelectedRecentLists(PracticeMode.Flashcards);
 			else if (ActiveControl == listSearch)
-				PracticeLists(listSearch.Accept());
+				PracticeLists(PracticeMode.Flashcards, listSearch.Accept());
+		}
+
+		private void learnListMI_Click(object sender, EventArgs e) {
+			if (ActiveControl == recentLists)
+				PracticeSelectedRecentLists(PracticeMode.Learn);
+			else if (ActiveControl == listSearch)
+				PracticeLists(PracticeMode.Learn, listSearch.Accept());
+		}
+
+		private void newListMI_Click(object sender, EventArgs e) {
+			new ListBuilder().Show();
 		}
 		#endregion
 
@@ -396,7 +407,7 @@ namespace Szotar.WindowsForms.Forms {
 			ShowForm.Show<Preferences>();
 		}
 
-		private void aboutToolStripMenuItem_Click(object sender, EventArgs e) {
+		private void about_Click(object sender, EventArgs e) {
 			ShowForm.Show<About>();
 		}
 		#endregion
