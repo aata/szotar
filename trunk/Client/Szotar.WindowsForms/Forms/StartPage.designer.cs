@@ -25,7 +25,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.ToolStripMenuItem openListMI;
-			System.Windows.Forms.ToolStripMenuItem practiceListMI;
+			System.Windows.Forms.ToolStripMenuItem flashcardsListMI;
 			System.Windows.Forms.ToolStripMenuItem file;
 			System.Windows.Forms.ToolStripMenuItem close;
 			System.Windows.Forms.ToolStripSeparator fileSep;
@@ -54,6 +54,8 @@
 			this.imageListSmall = new System.Windows.Forms.ImageList(this.components);
 			this.recentLists = new Szotar.WindowsForms.Controls.ListViewNF();
 			this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.learnListMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.practiceTable = new System.Windows.Forms.TableLayoutPanel();
 			this.reportBug = new System.Windows.Forms.LinkLabel();
 			this.fileSystemWatcher = new System.IO.FileSystemWatcher();
@@ -68,8 +70,9 @@
 			this.dictionariesAuthorColumn = new System.Windows.Forms.ColumnHeader();
 			this.practiceTab = new System.Windows.Forms.TabPage();
 			this.listSearch = new Szotar.WindowsForms.Controls.ListSearch();
+			this.newListMI = new System.Windows.Forms.ToolStripMenuItem();
 			openListMI = new System.Windows.Forms.ToolStripMenuItem();
-			practiceListMI = new System.Windows.Forms.ToolStripMenuItem();
+			flashcardsListMI = new System.Windows.Forms.ToolStripMenuItem();
 			file = new System.Windows.Forms.ToolStripMenuItem();
 			close = new System.Windows.Forms.ToolStripMenuItem();
 			fileSep = new System.Windows.Forms.ToolStripSeparator();
@@ -108,16 +111,16 @@
 			// 
 			openListMI.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
 			openListMI.Name = "openListMI";
-			openListMI.Size = new System.Drawing.Size(116, 22);
+			openListMI.Size = new System.Drawing.Size(152, 22);
 			openListMI.Text = "&Open";
 			openListMI.Click += new System.EventHandler(this.openListMI_Click);
 			// 
-			// practiceListMI
+			// flashcardsListMI
 			// 
-			practiceListMI.Name = "practiceListMI";
-			practiceListMI.Size = new System.Drawing.Size(116, 22);
-			practiceListMI.Text = "&Practice";
-			practiceListMI.Click += new System.EventHandler(this.practiceListMI_Click);
+			flashcardsListMI.Name = "flashcardsListMI";
+			flashcardsListMI.Size = new System.Drawing.Size(152, 22);
+			flashcardsListMI.Text = "&Familiarize";
+			flashcardsListMI.Click += new System.EventHandler(this.flashcardsListMI_Click);
 			// 
 			// file
 			// 
@@ -163,19 +166,19 @@
 			// debugLog
 			// 
 			debugLog.Name = "debugLog";
-			debugLog.Size = new System.Drawing.Size(152, 22);
+			debugLog.Size = new System.Drawing.Size(132, 22);
 			debugLog.Text = "&Debug Log";
 			debugLog.Click += new System.EventHandler(this.debugLog_Click);
 			// 
 			// toolsSep
 			// 
 			toolsSep.Name = "toolsSep";
-			toolsSep.Size = new System.Drawing.Size(149, 6);
+			toolsSep.Size = new System.Drawing.Size(129, 6);
 			// 
 			// options
 			// 
 			options.Name = "options";
-			options.Size = new System.Drawing.Size(152, 22);
+			options.Size = new System.Drawing.Size(132, 22);
 			options.Text = "&Options";
 			options.Click += new System.EventHandler(this.options_Click);
 			// 
@@ -305,9 +308,24 @@
 			// 
 			this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             openListMI,
-            practiceListMI});
+            this.newListMI,
+            this.toolStripSeparator1,
+            flashcardsListMI,
+            this.learnListMI});
 			this.listContextMenu.Name = "listContextMenu";
-			this.listContextMenu.Size = new System.Drawing.Size(117, 48);
+			this.listContextMenu.Size = new System.Drawing.Size(153, 120);
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+			// 
+			// learnListMI
+			// 
+			this.learnListMI.Name = "learnListMI";
+			this.learnListMI.Size = new System.Drawing.Size(152, 22);
+			this.learnListMI.Text = "&Learn";
+			this.learnListMI.Click += new System.EventHandler(this.learnListMI_Click);
 			// 
 			// practiceTable
 			// 
@@ -398,9 +416,9 @@
 			// about
 			// 
 			about.Name = "about";
-			about.Size = new System.Drawing.Size(152, 22);
+			about.Size = new System.Drawing.Size(107, 22);
 			about.Text = "&About";
-			about.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+			about.Click += new System.EventHandler(this.about_Click);
 			// 
 			// fileSystemWatcher
 			// 
@@ -540,6 +558,13 @@
 			this.listSearch.TabIndex = 6;
 			this.listSearch.ListsChosen += new System.EventHandler<Szotar.WindowsForms.Controls.ListsChosenEventArgs>(this.listSearch_ListsChosen);
 			// 
+			// newListMI
+			// 
+			this.newListMI.Name = "newListMI";
+			this.newListMI.Size = new System.Drawing.Size(152, 22);
+			this.newListMI.Text = "&New";
+			this.newListMI.Click += new System.EventHandler(this.newListMI_Click);
+			// 
 			// StartPage
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -595,6 +620,9 @@
 		private System.Windows.Forms.ColumnHeader dictionariesAuthorColumn;
 		private System.Windows.Forms.TabPage practiceTab;
 		private Szotar.WindowsForms.Controls.ListSearch listSearch;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripMenuItem learnListMI;
+		private System.Windows.Forms.ToolStripMenuItem newListMI;
 
 	}
 }

@@ -45,7 +45,7 @@
 			this.save = new System.Windows.Forms.ToolStripMenuItem();
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.deleteList = new System.Windows.Forms.ToolStripMenuItem();
-			this.practiceThis = new System.Windows.Forms.ToolStripMenuItem();
+			this.flashcards = new System.Windows.Forms.ToolStripMenuItem();
 			this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.undo = new System.Windows.Forms.ToolStripMenuItem();
 			this.redo = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,6 +53,7 @@
 			this.cutMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.copyMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.pasteMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.deleteMI = new System.Windows.Forms.ToolStripMenuItem();
 			this.copyAsCsv = new System.Windows.Forms.ToolStripMenuItem();
 			this.pasteCSV = new System.Windows.Forms.ToolStripMenuItem();
 			this.editSep3 = new System.Windows.Forms.ToolStripSeparator();
@@ -71,7 +72,7 @@
 			this.shadow = new System.Windows.Forms.PictureBox();
 			this.icon = new System.Windows.Forms.PictureBox();
 			this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
-			this.deleteMI = new System.Windows.Forms.ToolStripMenuItem();
+			this.learn = new System.Windows.Forms.ToolStripMenuItem();
 			nameLabel = new System.Windows.Forms.Label();
 			authorLabel = new System.Windows.Forms.Label();
 			urlLabel = new System.Windows.Forms.Label();
@@ -134,7 +135,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(17252, 60);
+			metaFlow.Size = new System.Drawing.Size(17613, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -250,18 +251,19 @@
 			// practiceMenu
 			// 
 			practiceMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.practiceThis});
+            this.flashcards,
+            this.learn});
 			practiceMenu.Name = "practiceMenu";
 			practiceMenu.Size = new System.Drawing.Size(61, 20);
 			practiceMenu.Text = "&Practice";
 			// 
-			// practiceThis
+			// flashcards
 			// 
-			this.practiceThis.Name = "practiceThis";
-			this.practiceThis.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-			this.practiceThis.Size = new System.Drawing.Size(158, 22);
-			this.practiceThis.Text = "&This List";
-			this.practiceThis.Click += new System.EventHandler(this.practiceThis_Click);
+			this.flashcards.Name = "flashcards";
+			this.flashcards.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+			this.flashcards.Size = new System.Drawing.Size(171, 22);
+			this.flashcards.Text = "&Familiarize";
+			this.flashcards.Click += new System.EventHandler(this.flashcards_Click);
 			// 
 			// editSep2
 			// 
@@ -272,7 +274,7 @@
 			// contextSep1
 			// 
 			contextSep1.Name = "contextSep1";
-			contextSep1.Size = new System.Drawing.Size(149, 6);
+			contextSep1.Size = new System.Drawing.Size(141, 6);
 			// 
 			// editMenu
 			// 
@@ -334,6 +336,13 @@
 			this.pasteMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
 			this.pasteMI.Size = new System.Drawing.Size(214, 22);
 			this.pasteMI.Text = "&Paste";
+			// 
+			// deleteMI
+			// 
+			this.deleteMI.Name = "deleteMI";
+			this.deleteMI.ShortcutKeyDisplayString = "Del";
+			this.deleteMI.Size = new System.Drawing.Size(214, 22);
+			this.deleteMI.Text = "&Delete";
 			// 
 			// copyAsCsv
 			// 
@@ -401,40 +410,40 @@
             this.swap,
             this.deleteCM});
 			this.itemContextMenu.Name = "itemContextMenu";
-			this.itemContextMenu.Size = new System.Drawing.Size(153, 142);
+			this.itemContextMenu.Size = new System.Drawing.Size(145, 120);
 			// 
 			// cutCM
 			// 
 			this.cutCM.Name = "cutCM";
 			this.cutCM.ShortcutKeyDisplayString = "Ctrl+X";
-			this.cutCM.Size = new System.Drawing.Size(152, 22);
+			this.cutCM.Size = new System.Drawing.Size(144, 22);
 			this.cutCM.Text = "C&ut";
 			// 
 			// copyCM
 			// 
 			this.copyCM.Name = "copyCM";
 			this.copyCM.ShortcutKeyDisplayString = "Ctrl+C";
-			this.copyCM.Size = new System.Drawing.Size(152, 22);
+			this.copyCM.Size = new System.Drawing.Size(144, 22);
 			this.copyCM.Text = "&Copy";
 			// 
 			// pasteCM
 			// 
 			this.pasteCM.Name = "pasteCM";
 			this.pasteCM.ShortcutKeyDisplayString = "Ctrl+V";
-			this.pasteCM.Size = new System.Drawing.Size(152, 22);
+			this.pasteCM.Size = new System.Drawing.Size(144, 22);
 			this.pasteCM.Text = "&Paste";
 			// 
 			// swap
 			// 
 			this.swap.Name = "swap";
-			this.swap.Size = new System.Drawing.Size(152, 22);
+			this.swap.Size = new System.Drawing.Size(144, 22);
 			this.swap.Text = "&Swap";
 			// 
 			// deleteCM
 			// 
 			this.deleteCM.Name = "deleteCM";
 			this.deleteCM.ShortcutKeyDisplayString = "Del";
-			this.deleteCM.Size = new System.Drawing.Size(152, 22);
+			this.deleteCM.Size = new System.Drawing.Size(144, 22);
 			this.deleteCM.Text = "&Delete";
 			// 
 			// meta
@@ -489,12 +498,12 @@
 			this.grid.Size = new System.Drawing.Size(361, 379);
 			this.grid.TabIndex = 8;
 			// 
-			// deleteMI
+			// learn
 			// 
-			this.deleteMI.Name = "deleteMI";
-			this.deleteMI.ShortcutKeyDisplayString = "Del";
-			this.deleteMI.Size = new System.Drawing.Size(214, 22);
-			this.deleteMI.Text = "&Delete";
+			this.learn.Name = "learn";
+			this.learn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
+			this.learn.Size = new System.Drawing.Size(171, 22);
+			this.learn.Text = "&Learn";
 			// 
 			// ListBuilder
 			// 
@@ -555,7 +564,7 @@
 		private System.Windows.Forms.ToolStripMenuItem swapAll;
 		private System.Windows.Forms.MenuStrip mainMenu;
 		private System.Windows.Forms.ToolStripMenuItem showStartPage;
-		private System.Windows.Forms.ToolStripMenuItem practiceThis;
+		private System.Windows.Forms.ToolStripMenuItem flashcards;
 		private System.Windows.Forms.ToolStripSeparator editSep1;
 		private System.Windows.Forms.ToolStripMenuItem undo;
 		private System.Windows.Forms.ToolStripMenuItem redo;
@@ -567,5 +576,6 @@
 		private System.Windows.Forms.ToolStripMenuItem copyCM;
 		private System.Windows.Forms.ToolStripMenuItem pasteCM;
 		private System.Windows.Forms.ToolStripMenuItem deleteMI;
+		private System.Windows.Forms.ToolStripMenuItem learn;
 	}
 }
