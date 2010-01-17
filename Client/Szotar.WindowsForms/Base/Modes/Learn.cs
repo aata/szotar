@@ -389,19 +389,20 @@ namespace Szotar.WindowsForms {
 			optionsItem = new ToolStripMenuItem("&Options");
 			Items.Add(optionsItem);
 
-			swapItem = new ToolStripMenuItem("Swap phrase/translation");
+			swapItem = new ToolStripMenuItem("&Swap phrase/translation");
 			swapItem.Click += delegate {
 				mode.Swap = !mode.Swap;
 			};
+			swapItem.ShortcutKeys = Keys.Control | Keys.I;
 
 			optionsItem.DropDownOpening += new EventHandler(optionsItem_DropDownOpening);
 			optionsItem.DropDownItems.Add(swapItem);
 			optionsItem.DropDownItems.Add(new ToolStripSeparator());
-
-			AddFixupItem("Ignore spaces in answer", "PracticeFixSpaces", optionsItem);
-			AddFixupItem("Ignore punctuation in answer", "PracticeFix", optionsItem);
-			AddFixupItem("Ignore parenthesized text in answer", "PracticeFixSpaces", optionsItem);
-			AddFixupItem("Ignore case in answer", "PracticeFixSpaces", optionsItem);
+			
+			AddFixupItem("Ignore sp&aces in answer", "PracticeFixSpaces", optionsItem);
+			AddFixupItem("Ignore &punctuation in answer", "PracticeFixPunctuation", optionsItem);
+			AddFixupItem("Ignore pa&renthesized text in answer", "PracticeFixParentheses", optionsItem);
+			AddFixupItem("Ignore &case in answer", "PracticeFixCase", optionsItem);
 		}
 
 		void optionsItem_DropDownOpening(object sender, EventArgs e) {
@@ -431,8 +432,6 @@ namespace Szotar.WindowsForms {
 	};
 
 	// TODO: Actually log the results
-	// TODO: Overview at end of game
-	// TODO: Still get the "default beep" sound when pressing enter on the translation (even when correct). Why?
 	public class LearnMode : Mode {
 		Label phrase, scoreLabel, answer;
 		TextBox translation; // The user enters their guess into this.
