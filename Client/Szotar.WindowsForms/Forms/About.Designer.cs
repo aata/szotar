@@ -24,6 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
 			System.Windows.Forms.TableLayoutPanel table;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(About));
 			this.webLink = new System.Windows.Forms.LinkLabel();
 			this.version = new System.Windows.Forms.Label();
 			this.productName = new System.Windows.Forms.Label();
@@ -99,6 +100,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(321, 171);
 			this.Controls.Add(table);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(243, 140);
 			this.Name = "About";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
