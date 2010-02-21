@@ -430,20 +430,58 @@ namespace Szotar.WindowsForms.Controls {
 				if (entries.Items[i].Owner != source)
 					entries.Items[i] = entries.Items[i].Clone();
 
-			source.Insert(row ?? source.Count, entries.Items);
+			int actualRow = row ?? source.Count;
+			source.Insert(actualRow, entries.Items);
+
+			if (!IsRowVisible(actualRow))
+				grid.FirstDisplayedScrollingRowIndex = actualRow;
 		}
 
 		public void Paste() {
 			int row = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+
+			// If there's no item selected, just paste at the end.
 			if (row < 0 || row >= source.Count)
 				row = source.Count;
 
 			var data = Clipboard.GetDataObject();
 			var entries = WordListEntries.FromDataObject(data);
 
-			if (entries != null) {
+			if (entries != null && entries.Items.Count > 0) {
 				Paste(entries, row);
+			} else {
+				string text = Clipboard.GetText().Trim();
+				if (text.Contains("\n"))
+					return;
+
+				// If the cell is being edited, Ctrl-V will be handled by the textbox itself
+				// so this code is only visited when a paste occurs with textual data on an
+				// entry which isn't currently being edited.
+
+				WordListEntry item = RowSource(row);
+				if (item == null || row == rowInEdit) {
+					Paste(new WordListEntries(source, new[] { new WordListEntry(source, text, string.Empty) }), row);
+					return;
+				}
+
+				string phrase = item.Phrase, translation = item.Translation;
+				if(grid.CurrentCellAddress.X == 0)
+					phrase = text;
+				else
+					translation = text;
+
+				if (row >= 0 && row < source.Count) {
+					// Re-create the row source so that an undo list entry gets made.
+					source[row] = new WordListEntry(source, phrase, translation);
+
+					if(!IsRowVisible(row))
+						grid.FirstDisplayedScrollingRowIndex = row;
+				}
 			}
+		}
+
+		bool IsRowVisible(int row) {
+			return row >= grid.FirstDisplayedScrollingRowIndex && row <= grid.FirstDisplayedScrollingRowIndex + grid.DisplayedRowCount(false);
 		}
 		#endregion
 

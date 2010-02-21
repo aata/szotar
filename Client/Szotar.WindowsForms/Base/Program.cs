@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms {
-	using Szotar.Json;
-
 	static class Program {
 		[STAThread]
 		static void Main() {
@@ -65,15 +63,22 @@ namespace Szotar.WindowsForms {
 					if (string.IsNullOrEmpty(dict))
 						goto case "StartPage";
 
+					Exception error = null;
+
 					try {
 						DictionaryInfo info = new SimpleDictionary.Info(dict);
 						new Forms.LookupForm(info).Show();
-					} catch (System.IO.IOException) { // TODO: Access/permission exceptions?
+					} catch (System.IO.IOException e) { // TODO: Access/permission exceptions?
+						error = e;
 						goto case "StartPage";
-					} catch (DictionaryLoadException) {
+					} catch (DictionaryLoadException e) {
+						error = e;
 						// Maybe there should be some UI for this (it's there, but not loadable?)...
 						goto case "StartPage";
 					}
+
+					if (error != null)
+						ProgramLog.Default.AddMessage(LogType.Error, "Could not load dictionary {0}: {1}", dict, error.Message);
 
 					break;
 			}
@@ -87,7 +92,6 @@ namespace Szotar.WindowsForms {
 			if (recent != null) {
 				recent.RemoveAll(r => r.ID == e.SetID);
 				Configuration.RecentLists = recent;
-				Configuration.Save();
 			}
 		}
 
