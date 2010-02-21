@@ -273,6 +273,11 @@ namespace Szotar.WindowsForms.Controls {
 					//(But only if we're actually doing something! Don't move this back out of the if statement!)
 					ignoreNextListChangedEvent = true;
 
+					if (pairInEdit.Phrase == null)
+						pairInEdit.Phrase = string.Empty;
+					if (pairInEdit.Translation == null)
+						pairInEdit.Translation = string.Empty;
+
 					pairInEdit.AddTo(source, source.Count);
 					pairInEdit = null;
 					rowInEdit = null;
@@ -310,7 +315,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		//Create a new TranslationPair when the user edits the row for new records.
 		void grid_NewRowNeeded(object sender, DataGridViewRowEventArgs e) {
-			pairInEdit = new WordListEntry(null);
+			pairInEdit = new WordListEntry(null, null, null);
 			rowInEdit = grid.Rows.Count - 1;
 
 			Debug.Print("New row added to the grid: e.Row = {0}, rowInEdit = {1}", e.Row, rowInEdit.Value);
@@ -433,8 +438,7 @@ namespace Szotar.WindowsForms.Controls {
 			int actualRow = row ?? source.Count;
 			source.Insert(actualRow, entries.Items);
 
-			if (!IsRowVisible(actualRow))
-				grid.FirstDisplayedScrollingRowIndex = actualRow;
+			SelectRowBlock(actualRow, entries.Items.Count);
 		}
 
 		public void Paste() {
@@ -560,36 +564,40 @@ namespace Szotar.WindowsForms.Controls {
 
 		// Chooses at which index the row will be dropped, given mouse co-ordinates.
 		int GetDropRow(int x, int y) {
-			var hit = grid.HitTest(x, y).RowIndex;
+			var hit = grid.HitTest(x, y);
 
-			if (hit == -1) {
-				if (grid.RowCount > 0) {
-					if(y >= grid.GetRowDisplayRectangle(grid.RowCount - 1, false).Bottom)
-						return source.Count;
+			// If we're not dropped onto a row, figure out where is the best place to
+			// put the dropped items.
+			if (hit.Type == DataGridViewHitTestType.ColumnHeader) {
+				return 0;
+			} else if (hit.Type == DataGridViewHitTestType.None) {
+				return source.Count;
+			} else if (hit.RowIndex == -1) {
+				if (y <= 0)
 					return 0;
-				} else {
-					return 0;
-				}
-			}			
+				return source.Count;
+			}
+
+			int row = hit.RowIndex;
 
 			// TODO: Figure out if this still works with multiple rows being dragged
 			// If you drag a row onto itself, we don't want to move it at all.
-			if (dragData != null && hit >= 0 && hit < source.Count && dragData.Items.Contains(source[hit]))
-				return hit;
+			if (dragData != null && row >= 0 && row < source.Count && dragData.Items.Contains(source[row]))
+				return row;
 			
 			// For example, the New Row was dropped onto.
-			if (hit >= source.Count)
+			if (row >= source.Count)
 				return source.Count;
 
 			// If we're on the top half of a row, we drop above the row.
 			// If we're on the bottom half of a row, we drop below the row.
-			var rect = grid.GetRowDisplayRectangle(hit, false);
+			var rect = grid.GetRowDisplayRectangle(row, false);
 			var middle = rect.Top + rect.Height / 2;
 
 			if (y > middle)
-				return Math.Min(hit + 1, source.Count);
+				return Math.Min(row + 1, source.Count);
 
-			return hit;
+			return row;
 		}
 
 		void grid_DragDrop(object sender, DragEventArgs e) {
@@ -603,10 +611,15 @@ namespace Szotar.WindowsForms.Controls {
 
 			var entries = WordListEntries.FromDataObject(e.Data);
 
+			// Were the entries moved or copied?
+			bool moved = false;
+
 			if(entries != null && entries.WordList == this.source) {
 				// Copying from the grid to itself requires a bit more care.
 
 				if (e.Effect == DragDropEffects.Move) {
+					moved = true;
+
 					// Dragging rows from this grid to itself: i.e. re-ordering the rows.
 					source.MoveRows(new List<int>(entries.Indices), dropRow);
 
@@ -620,6 +633,40 @@ namespace Szotar.WindowsForms.Controls {
 				// Copying/moving from some other word list, or a non-wordlist source
 				CopyRowsFromTo(entries, dropRow);
 			}
+
+			// TODO: This doesn't seem to work if the drop row is the last row in the grid.
+			if (entries != null && entries.Items.Count > 0) {
+				int firstRow = dropRow;
+
+				// If we're moving, not copying, we don't know where the rows were actually put,
+				// because the rows may have been shifted. Instead, find where they actually are.
+				if (moved)
+					firstRow = source.IndexOf(entries.Items[0]);
+
+				if (firstRow > -1)
+					SelectRowBlock(firstRow, entries.Items.Count);
+			}
+		}
+
+		// Selects a contiguous block of rows and changes the active cell to the be the first cell
+		// of the first row of that block.
+		void SelectRowBlock(int firstRow, int count) {
+			// Make sure the rows are visible, at least partially.
+			if (!IsRowVisible(firstRow))
+				grid.FirstDisplayedScrollingRowIndex = firstRow;
+
+			grid.ClearSelection();
+
+			// TODO: This will make the rows become unshared, but I don't see any better way 
+			// to modify the selection.
+			for (int i = firstRow; i < firstRow + count; ++i)
+				grid.Rows[i].Selected = true;
+
+			// We need to change this because the currently active row and the row selection are
+			// separate things. Typing or pressing F2 acts on the active row, which need not even 
+			// be part of the selection.
+			// TODO: This also makes the row become unshared.
+			grid.CurrentCell = grid.Rows[firstRow].Cells[0];
 		}
 
 		void CopyRowsFromTo(WordListEntries entries, int dropRow) {
@@ -652,6 +699,27 @@ namespace Szotar.WindowsForms.Controls {
 					e.Effect = DragDropEffects.Copy;
 				else if (moveOverride)
 					e.Effect = DragDropEffects.Move;
+			}
+
+			// Scroll if the mouse is close to the top or bottom of the grid.
+			if (e.Effect != DragDropEffects.None) {
+				var clientPoint = grid.PointToClient(new Point(e.X, e.Y));
+				var hitTest = grid.HitTest(clientPoint.X, clientPoint.Y);
+				var rowIndex = hitTest.RowIndex;
+
+				if (hitTest.Type == DataGridViewHitTestType.ColumnHeader)
+					rowIndex = 0;
+				else if (hitTest.Type == DataGridViewHitTestType.None)
+					rowIndex = grid.RowCount;
+
+				if (rowIndex != -1) {
+					if (rowIndex < grid.FirstDisplayedScrollingRowIndex + 2
+						&& grid.FirstDisplayedScrollingRowIndex > 0)
+						grid.FirstDisplayedScrollingRowIndex--;
+					else if (rowIndex >= grid.FirstDisplayedScrollingRowIndex + grid.DisplayedRowCount(false) - 2
+						&& grid.FirstDisplayedScrollingRowIndex + grid.DisplayedRowCount(false) < grid.RowCount)
+						grid.FirstDisplayedScrollingRowIndex++;
+				}
 			}
 		}
 		#endregion
@@ -797,23 +865,30 @@ namespace Szotar.WindowsForms.Controls {
 			if (source == null)
 				return;
 
-			if (e.RowIndex == grid.RowCount - 1 && grid.AllowUserToAddRows) {
-				//This is the new record row, not being typed in
+			bool showEditPrompt =
+				(e.RowIndex == rowInEdit && string.IsNullOrEmpty(pairInEdit.Phrase) && string.IsNullOrEmpty(pairInEdit.Translation))
+				|| (e.RowIndex == grid.RowCount - 1 && grid.AllowUserToAddRows);
+
+			if (showEditPrompt)
 				e.CellStyle.NullValue = e.ColumnIndex == 0 ? "Add Phrase Here" : "Add Translation Here";
+			
+			if (e.ColumnIndex == grid.CurrentCellAddress.X && e.RowIndex == grid.CurrentCellAddress.Y) {
+				e.CellStyle.BackColor = e.CellStyle.SelectionBackColor = Color.DarkSlateBlue;
+				e.CellStyle.ForeColor = e.CellStyle.SelectionForeColor = Color.White;
+				return;
+			}
+
+			if (showEditPrompt) {
+				//This is either the new record row, not being typed in, or the new record row which is now being edited.
 				e.CellStyle.BackColor = Color.BurlyWood;
 				e.CellStyle.SelectionBackColor = Color.BurlyWood;
 				e.CellStyle.ForeColor = Color.White;
 				e.CellStyle.SelectionForeColor = Color.White;
 				return;
-			} else if (e.RowIndex >= source.Count) {
-				//Don't style the temporary row for now. It doesn't work very well.
+			}
 
-				//This row was the new record row, but the user typed in it.
-				//e.CellStyle.Font = new Font(e.CellStyle.Font, FontStyle.Bold);
-				//if(ShowMutableRows)
-				//    e.CellStyle.BackColor = (e.RowIndex % 2 == 0) ? Color.LightGoldenrodYellow : Color.PaleGoldenrod;
-				//else
-				//    e.CellStyle.BackColor = (e.RowIndex % 2 == 0) ? Color.WhiteSmoke : Color.White;
+			if (e.RowIndex >= source.Count) {
+				//Don't style the temporary row for now. It doesn't work very well.
 				return;
 			}
 
@@ -822,7 +897,8 @@ namespace Szotar.WindowsForms.Controls {
 				rowSource = source[e.RowIndex];
 
 			e.CellStyle.BackColor = (e.RowIndex % 2 == 0) ? SystemColors.Control : SystemColors.ControlLightLight;
-			e.CellStyle.SelectionBackColor = (e.RowIndex % 2 == 0) ? Color.SteelBlue : Color.DeepSkyBlue;
+			//e.CellStyle.SelectionBackColor = (e.RowIndex % 2 == 0) ? Color.SteelBlue : Color.DeepSkyBlue;
+			e.CellStyle.SelectionBackColor = (e.RowIndex % 2 == 0) ? Color.SteelBlue : Color.SkyBlue;
 			e.CellStyle.SelectionForeColor = Color.Black;
 		}
 		#endregion
