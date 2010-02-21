@@ -46,6 +46,7 @@
 			this.close = new System.Windows.Forms.ToolStripMenuItem();
 			this.deleteList = new System.Windows.Forms.ToolStripMenuItem();
 			this.flashcards = new System.Windows.Forms.ToolStripMenuItem();
+			this.learn = new System.Windows.Forms.ToolStripMenuItem();
 			this.editMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.undo = new System.Windows.Forms.ToolStripMenuItem();
 			this.redo = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,7 +73,6 @@
 			this.shadow = new System.Windows.Forms.PictureBox();
 			this.icon = new System.Windows.Forms.PictureBox();
 			this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
-			this.learn = new System.Windows.Forms.ToolStripMenuItem();
 			nameLabel = new System.Windows.Forms.Label();
 			authorLabel = new System.Windows.Forms.Label();
 			urlLabel = new System.Windows.Forms.Label();
@@ -135,7 +135,7 @@
 			metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			metaFlow.Location = new System.Drawing.Point(73, 7);
 			metaFlow.Name = "metaFlow";
-			metaFlow.Size = new System.Drawing.Size(17613, 60);
+			metaFlow.Size = new System.Drawing.Size(18696, 60);
 			metaFlow.TabIndex = 2;
 			// 
 			// namePanel
@@ -265,6 +265,13 @@
 			this.flashcards.Text = "&Familiarize";
 			this.flashcards.Click += new System.EventHandler(this.flashcards_Click);
 			// 
+			// learn
+			// 
+			this.learn.Name = "learn";
+			this.learn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
+			this.learn.Size = new System.Drawing.Size(171, 22);
+			this.learn.Text = "&Learn";
+			// 
 			// editSep2
 			// 
 			editSep2.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -274,7 +281,7 @@
 			// contextSep1
 			// 
 			contextSep1.Name = "contextSep1";
-			contextSep1.Size = new System.Drawing.Size(141, 6);
+			contextSep1.Size = new System.Drawing.Size(149, 6);
 			// 
 			// editMenu
 			// 
@@ -319,21 +326,21 @@
 			// cutMI
 			// 
 			this.cutMI.Name = "cutMI";
-			this.cutMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+			this.cutMI.ShortcutKeyDisplayString = "Ctrl+X";
 			this.cutMI.Size = new System.Drawing.Size(214, 22);
 			this.cutMI.Text = "Cu&t";
 			// 
 			// copyMI
 			// 
 			this.copyMI.Name = "copyMI";
-			this.copyMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+			this.copyMI.ShortcutKeyDisplayString = "Ctrl+C";
 			this.copyMI.Size = new System.Drawing.Size(214, 22);
 			this.copyMI.Text = "&Copy";
 			// 
 			// pasteMI
 			// 
 			this.pasteMI.Name = "pasteMI";
-			this.pasteMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+			this.pasteMI.ShortcutKeyDisplayString = "Ctrl+V";
 			this.pasteMI.Size = new System.Drawing.Size(214, 22);
 			this.pasteMI.Text = "&Paste";
 			// 
@@ -410,40 +417,40 @@
             this.swap,
             this.deleteCM});
 			this.itemContextMenu.Name = "itemContextMenu";
-			this.itemContextMenu.Size = new System.Drawing.Size(145, 120);
+			this.itemContextMenu.Size = new System.Drawing.Size(153, 142);
 			// 
 			// cutCM
 			// 
 			this.cutCM.Name = "cutCM";
 			this.cutCM.ShortcutKeyDisplayString = "Ctrl+X";
-			this.cutCM.Size = new System.Drawing.Size(144, 22);
+			this.cutCM.Size = new System.Drawing.Size(152, 22);
 			this.cutCM.Text = "C&ut";
 			// 
 			// copyCM
 			// 
 			this.copyCM.Name = "copyCM";
 			this.copyCM.ShortcutKeyDisplayString = "Ctrl+C";
-			this.copyCM.Size = new System.Drawing.Size(144, 22);
+			this.copyCM.Size = new System.Drawing.Size(152, 22);
 			this.copyCM.Text = "&Copy";
 			// 
 			// pasteCM
 			// 
 			this.pasteCM.Name = "pasteCM";
 			this.pasteCM.ShortcutKeyDisplayString = "Ctrl+V";
-			this.pasteCM.Size = new System.Drawing.Size(144, 22);
+			this.pasteCM.Size = new System.Drawing.Size(152, 22);
 			this.pasteCM.Text = "&Paste";
 			// 
 			// swap
 			// 
 			this.swap.Name = "swap";
-			this.swap.Size = new System.Drawing.Size(144, 22);
+			this.swap.Size = new System.Drawing.Size(152, 22);
 			this.swap.Text = "&Swap";
 			// 
 			// deleteCM
 			// 
 			this.deleteCM.Name = "deleteCM";
 			this.deleteCM.ShortcutKeyDisplayString = "Del";
-			this.deleteCM.Size = new System.Drawing.Size(144, 22);
+			this.deleteCM.Size = new System.Drawing.Size(152, 22);
 			this.deleteCM.Text = "&Delete";
 			// 
 			// meta
@@ -497,13 +504,6 @@
 			this.grid.ShowMutableRows = false;
 			this.grid.Size = new System.Drawing.Size(361, 379);
 			this.grid.TabIndex = 8;
-			// 
-			// learn
-			// 
-			this.learn.Name = "learn";
-			this.learn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-			this.learn.Size = new System.Drawing.Size(171, 22);
-			this.learn.Text = "&Learn";
 			// 
 			// ListBuilder
 			// 
