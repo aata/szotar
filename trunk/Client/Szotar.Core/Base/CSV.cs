@@ -32,10 +32,8 @@ namespace Szotar {
 					if (c == '"') {
 						if (last == '"')
 							cur.Append(c);
-						else if (last == delim)
+						else // TODO: Check that there aren't any more cases. I believe this is correct.
 							escaped = !escaped;
-						else
-							cur.Append(c);
 					} else if (c == '\r') {
 					} else if (c == '\n') {
 						if (escaped) {
