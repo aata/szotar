@@ -582,24 +582,32 @@ namespace Szotar.Sqlite {
 					using (var cmd = Connection.CreateCommand()) {
 						cmd.CommandText =
 							@"UPDATE VocabItems
-								SET ListPosition = ? 
-								WHERE SetID = ? AND ListPosition = ?";
+								SET ListPosition = $NewPos 
+								WHERE SetID = $SetID AND ListPosition = $OldPos";
+
+						var newPos = cmd.CreateParameter();
+						newPos.ParameterName = "NewPos";
+						cmd.Parameters.Add(newPos);
 
 						var setID = cmd.CreateParameter();
+						setID.ParameterName = "SetID";
 						setID.Value = this.list.ID.Value;
 						cmd.Parameters.Add(setID);
 
-						var newPos = cmd.CreateParameter();
-						cmd.Parameters.Add(newPos);
-
 						var oldPos = cmd.CreateParameter();
+						oldPos.ParameterName = "OldPos";
 						cmd.Parameters.Add(oldPos);
 
 						Action<int, int> moveItem = (from, to) => {
+							if (from == to)
+								return;
+
 							oldPos.Value = from;
 							newPos.Value = -to - 1; // Otherwise, 0 maps to 0.
 							cmd.ExecuteNonQuery();
 						};
+
+						movements(moveItem);
 					}
 
 					ExecuteSQL(
@@ -607,6 +615,8 @@ namespace Szotar.Sqlite {
 							SET ListPosition = -(ListPosition + 1)
 							WHERE SetID = ? AND ListPosition < 0",
 						this.list.ID.Value);
+
+					txn.Commit();
 				}
 			}
 		}
