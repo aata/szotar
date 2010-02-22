@@ -1015,6 +1015,12 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Do() {
+				// TODO: Also extend this check to a group of contiguous rows being moved into itself,
+				// and move it into its constructor so that less work is done on undo/redo.
+				bool useless = rows.Count == 1 && (destination == rows[0] || destination == rows[0] + 1);
+				if (useless)
+					return;
+
 				// Get the values being moved, so we can insert them later.
 				var values = new List<WordListEntry>(rows.Count);
 

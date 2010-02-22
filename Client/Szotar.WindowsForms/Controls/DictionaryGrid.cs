@@ -502,8 +502,10 @@ namespace Szotar.WindowsForms.Controls {
 			grid.DragDrop += new DragEventHandler(grid_DragDrop);
 			grid.MouseDown += new MouseEventHandler(grid_MouseDown);
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
+			grid.DragLeave += new EventHandler(grid_DragLeave);
 		}
 
+		// Starts a drag operation if the mouse leaves the drag box with the button held down.
 		void grid_MouseMove(object sender, MouseEventArgs e) {
 			if (e.Button != MouseButtons.Left)
 				return;
@@ -528,6 +530,8 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
+		// Computes the drag box. When the mouse leaves this with the button held down, the drag and drop
+		// operation starts. Also modifies the right-click behaviour.
 		void grid_MouseDown(object sender, MouseEventArgs e) {
 			// If the right-clicked item is outside the current selection, select that item.
 			// This is more like how normal list boxes work.
@@ -600,7 +604,12 @@ namespace Szotar.WindowsForms.Controls {
 			return row;
 		}
 
+		// Finishes the drag operation and updates the selection.
 		void grid_DragDrop(object sender, DragEventArgs e) {
+			// Remove the drop marker, and make sure it's painted over.
+			dropMarkerRow = null;
+			grid.Invalidate();
+
 			var clientPoint = grid.PointToClient(new Point(e.X, e.Y));
 			int dropRow = GetDropRow(clientPoint.X, clientPoint.Y);
 
@@ -677,7 +686,25 @@ namespace Szotar.WindowsForms.Controls {
 			source.Insert(dropRow, copies);
 		}
 
+		// Determine the drag effect (copy/move), scroll the grid, and update the drop marker.
 		void grid_DragOver(object sender, DragEventArgs e) {
+			var clientPoint = grid.PointToClient(new Point(e.X, e.Y));
+			var hitTest = grid.HitTest(clientPoint.X, clientPoint.Y);
+			int rowIndex = hitTest.RowIndex;
+
+			// Determine where the drop marker is. If it hasn't moved, there's no need to repaint anything.
+			// If it has moved, repaint the row it was on and the row it is moving to.
+			int? newDropMarkerRow = rowIndex == -1 ? (int?)null : rowIndex;
+			if (newDropMarkerRow != dropMarkerRow) {
+				if (dropMarkerRow.HasValue)
+					grid.InvalidateRow(dropMarkerRow.Value);
+
+				dropMarkerRow = newDropMarkerRow;
+
+				if(newDropMarkerRow.HasValue)
+					grid.InvalidateRow(newDropMarkerRow.Value);
+			}
+
 			bool hasEntries = e.Data.GetDataPresent(typeof(WordListEntries));
 			bool hasText = e.Data.GetDataPresent(DataFormats.UnicodeText) || e.Data.GetDataPresent(DataFormats.Text);
 			bool hasSearchResults = e.Data.GetDataPresent(typeof(TranslationPair[]));
@@ -686,13 +713,12 @@ namespace Szotar.WindowsForms.Controls {
 			bool copyOverride = (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy && (e.KeyState & 8) == 8;
 			bool moveOverride = (e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move && (e.KeyState & 4) == 4;
 
-			if (hasEntries) {
+			if (hasEntries)
 				e.Effect = DragDropEffects.Move;
-			} else if (hasText || hasSearchResults) {
+			else if (hasText || hasSearchResults)
 				e.Effect = DragDropEffects.Copy;
-			} else {
+			else
 				e.Effect = DragDropEffects.None;
-			}
 
 			if (e.Effect != DragDropEffects.None) {
 				if (copyOverride)
@@ -703,10 +729,6 @@ namespace Szotar.WindowsForms.Controls {
 
 			// Scroll if the mouse is close to the top or bottom of the grid.
 			if (e.Effect != DragDropEffects.None) {
-				var clientPoint = grid.PointToClient(new Point(e.X, e.Y));
-				var hitTest = grid.HitTest(clientPoint.X, clientPoint.Y);
-				var rowIndex = hitTest.RowIndex;
-
 				if (hitTest.Type == DataGridViewHitTestType.ColumnHeader)
 					rowIndex = 0;
 				else if (hitTest.Type == DataGridViewHitTestType.None)
@@ -721,6 +743,31 @@ namespace Szotar.WindowsForms.Controls {
 						grid.FirstDisplayedScrollingRowIndex++;
 				}
 			}
+		}
+
+		// Stop drawing the drop marker while the cursor is outside the grid.
+		void grid_DragLeave(object sender, EventArgs e) {
+			if (dropMarkerRow.HasValue) {
+				int row = dropMarkerRow.Value;
+				
+				dropMarkerRow = null;
+				grid.InvalidateRow(row);
+			}
+		}
+
+		// When dragging and dropping, the row index on which the drop marker will be drawn.
+		int? dropMarkerRow;
+
+		void DrawDropMarker(object sender, PaintEventArgs e) {
+			if (dropMarkerRow == null)
+				return;
+
+			var rect = grid.GetRowDisplayRectangle(dropMarkerRow.Value, false);
+			rect.Height = 2;
+
+			// A dark gray colour that doesn't appear to merge with the column headers.
+			using (var brush = new SolidBrush(Color.FromArgb(64, 64, 64)))
+				e.Graphics.FillRectangle(brush, rect);
 		}
 		#endregion
 
@@ -859,6 +906,8 @@ namespace Szotar.WindowsForms.Controls {
 			grid.AllowUserToOrderColumns = false;
 
 			grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+			grid.Paint += new PaintEventHandler(DrawDropMarker);
 		}
 
 		void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
