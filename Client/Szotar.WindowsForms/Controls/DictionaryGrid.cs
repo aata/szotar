@@ -9,6 +9,80 @@ using System.Collections;
 using System.Diagnostics;
 
 namespace Szotar.WindowsForms.Controls {
+	// Fixes the behaviour of the DataGridView with regards to item selection.
+	class MouseFixDataGridView : DataGridView {
+		public class CancelableMouseEventArgs : MouseEventArgs {
+			public bool Cancel { get; set; }
+
+			public CancelableMouseEventArgs(MouseEventArgs args) 
+				: base(args.Button, args.Clicks, args.X, args.Y, args.Delta)
+			{ }
+		}
+
+		public new event EventHandler<CancelableMouseEventArgs> MouseDown;
+		public new event EventHandler<CancelableMouseEventArgs> MouseUp;
+
+		protected override void OnMouseDown(MouseEventArgs e) {
+			var f = MouseDown;
+			var ce = new CancelableMouseEventArgs(e);
+			if (f != null)
+				f(this, ce);
+
+			if (ce.Cancel)
+				return;
+
+			base.OnMouseDown(e);
+		}
+
+		protected override void OnMouseUp(MouseEventArgs e) {
+			var f = MouseUp;
+			var ce = new CancelableMouseEventArgs(e);
+			if (f != null)
+				f(this, ce);
+
+			base.OnMouseUp(e);
+		}
+
+		public bool IsRowVisible(int row) {
+			return row >= FirstDisplayedScrollingRowIndex 
+				&& row <= FirstDisplayedScrollingRowIndex + DisplayedRowCount(false);
+		}
+
+		public void SelectRow(int row) {
+			ClearSelection();
+			SetCurrentCellAddressCore(0, row, true, true, true);
+			SetSelectedRowCore(row, true);
+
+			if (!IsRowVisible(row))
+				FirstDisplayedScrollingRowIndex = row;
+		}
+
+		// Selects a contiguous block of rows and changes the active cell to the be the first cell
+		// of the first row of that block.
+		public void SelectRowBlock(int firstRow, int count) {
+			ClearSelection();
+
+			// We need to change this because the currently active row and the row selection are
+			// separate things. Typing or pressing F2 acts on the active row, which need not even 
+			// be part of the selection.
+			// Apparently we also need to set the current cell prior to setting the selection, 
+			// otherwise the selection is reset to a single item.
+			SetCurrentCellAddressCore(0, firstRow, true, true, true);
+
+			for (int i = firstRow; i < firstRow + count; ++i)
+				SetSelectedRowCore(i, true);
+
+			// Make sure the rows are visible, at least partially.
+			if (!IsRowVisible(firstRow))
+				FirstDisplayedScrollingRowIndex = firstRow;
+		}
+
+		public void ToggleSelection(int row) {
+			bool selected = (Rows.GetRowState(row) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
+			SetSelectedRowCore(row, !selected);
+		}
+	}
+
 	[ToolboxBitmap(typeof(System.Windows.Forms.DataGridView))]
 	public partial class DictionaryGrid : UserControl {
 		WordList source;
@@ -438,7 +512,7 @@ namespace Szotar.WindowsForms.Controls {
 			int actualRow = row ?? source.Count;
 			source.Insert(actualRow, entries.Items);
 
-			SelectRowBlock(actualRow, entries.Items.Count);
+			grid.SelectRowBlock(actualRow, entries.Items.Count);
 		}
 
 		public void Paste() {
@@ -478,14 +552,10 @@ namespace Szotar.WindowsForms.Controls {
 					// Re-create the row source so that an undo list entry gets made.
 					source[row] = new WordListEntry(source, phrase, translation);
 
-					if(!IsRowVisible(row))
+					if(!grid.IsRowVisible(row))
 						grid.FirstDisplayedScrollingRowIndex = row;
 				}
 			}
-		}
-
-		bool IsRowVisible(int row) {
-			return row >= grid.FirstDisplayedScrollingRowIndex && row <= grid.FirstDisplayedScrollingRowIndex + grid.DisplayedRowCount(false);
 		}
 		#endregion
 
@@ -495,12 +565,14 @@ namespace Szotar.WindowsForms.Controls {
 
 		Rectangle dragBox; // When the cursor moves outside of this, the drag starts.
 		WordListEntries dragData;
+		int dragRow;
 
 		void InitializeDragAndDrop() {
 			grid.AllowDrop = true;
 			grid.DragOver += new DragEventHandler(grid_DragOver);
 			grid.DragDrop += new DragEventHandler(grid_DragDrop);
-			grid.MouseDown += new MouseEventHandler(grid_MouseDown);
+			grid.MouseDown += new EventHandler<MouseFixDataGridView.CancelableMouseEventArgs>(grid_MouseDown);
+			grid.MouseUp += new EventHandler<MouseFixDataGridView.CancelableMouseEventArgs>(grid_MouseUp);
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
 			grid.DragLeave += new EventHandler(grid_DragLeave);
 		}
@@ -511,6 +583,23 @@ namespace Szotar.WindowsForms.Controls {
 				return;
 
 			if (dragBox != Rectangle.Empty && !dragBox.Contains(e.Location)) {
+				clobberSelectionRowOnMouseUp = null;
+
+				bool hitSelectedRow = (grid.Rows.GetRowState(dragRow) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
+
+				// The drag data has to be computed when the mouse moves out of the drag rectangle, not on MouseDown,
+				// because we need to wait for the mouse down to possibly affect the selection (such as extending it
+				// or contracting it, which are done at MouseDown time).
+				var rows = new List<WordListEntry>();
+				if (hitSelectedRow) {
+					foreach (int row in InternalSelectedIndices)
+						rows.Add(source[row]);
+				} else {
+					rows.Add(source[dragRow]);
+					grid.SelectRow(dragRow);
+				}
+
+				dragData = new WordListEntries(source, rows);
 				var data = dragData.MakeDataObject();
 
 				var result = grid.DoDragDrop(data, DragDropEffects.Move | DragDropEffects.Copy | DragDropEffects.Scroll);
@@ -532,7 +621,9 @@ namespace Szotar.WindowsForms.Controls {
 
 		// Computes the drag box. When the mouse leaves this with the button held down, the drag and drop
 		// operation starts. Also modifies the right-click behaviour.
-		void grid_MouseDown(object sender, MouseEventArgs e) {
+		void grid_MouseDown(object sender, MouseFixDataGridView.CancelableMouseEventArgs e) {
+			clobberSelectionRowOnMouseUp = null;
+
 			// If the right-clicked item is outside the current selection, select that item.
 			// This is more like how normal list boxes work.
 			if (e.Button == MouseButtons.Right) {
@@ -549,7 +640,22 @@ namespace Szotar.WindowsForms.Controls {
 			if (e.Button != MouseButtons.Left)
 				return;
 
-			int dragRow = grid.HitTest(e.X, e.Y).RowIndex;
+			var hitTest = grid.HitTest(e.X, e.Y); 
+			dragRow = hitTest.RowIndex;
+
+			bool useDefaultSelectionLogic = false;
+
+			if (dragRow != -1) {
+				// We can safely extend the selection before dragging, but we must use the default selection
+				// logic, because only that has access to the location of the anchor cell, which is needed
+				// to extend a multiple selection.
+				switch (Control.ModifierKeys) {
+					case Keys.Shift:
+					case Keys.Control | Keys.Shift:
+						useDefaultSelectionLogic = true;
+						break;
+				}
+			}
 
 			// Don't drag the New Row.
 			if (dragRow != -1 && dragRow < source.Count) {
@@ -560,9 +666,56 @@ namespace Szotar.WindowsForms.Controls {
 						e.Y - dragSize.Height / 2),
 					dragSize);
 
-				dragData = new WordListEntries(source, new[] { source[dragRow] });
+				bool hitSelectedRow = (grid.Rows.GetRowState(dragRow) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
+
+				// Don't set the selection to the hit row, we might want to drag the current selection.
+				// The selection will be updated in the mouse up handler, so we save the row and column
+				// for that purpose.
+				if (hitSelectedRow && grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 1 && !useDefaultSelectionLogic) {
+					e.Cancel = true;
+					clobberSelectionRowOnMouseUp = dragRow;
+					clobberSelectionColumn = hitTest.ColumnIndex;
+					clobberSelectionModifiers = Control.ModifierKeys;
+				}
 			} else {
 				dragBox = Rectangle.Empty;
+			}
+		}
+
+		int? clobberSelectionRowOnMouseUp;
+		int clobberSelectionColumn;
+		bool clobberSelectionShift;
+		Keys clobberSelectionModifiers;
+
+		// Re-implements some of the behaviour that is filtered by the MouseDown filter because it would
+		// interfere with drag and drop.
+		void grid_MouseUp(object sender, MouseFixDataGridView.CancelableMouseEventArgs e) {
+			// If the user clicked on a cell and there's a multiple selection, set the selection
+			// to that. (We don't do this in MouseDown because it would interfere with dragging.)
+			if (e.Button == MouseButtons.Left && clobberSelectionRowOnMouseUp.HasValue) {
+				bool isCurrentCell =
+					clobberSelectionRowOnMouseUp.Value == grid.CurrentCellAddress.Y &&
+					clobberSelectionColumn == grid.CurrentCellAddress.X;
+
+				switch (clobberSelectionModifiers) {
+					case Keys.None:
+						grid.SelectRow(clobberSelectionRowOnMouseUp.Value);
+
+						// A click on the active cell begins editing the cell.
+						if (isCurrentCell)
+							grid.BeginEdit(true);
+						break;
+
+					case Keys.Shift:
+					case Keys.Shift | Keys.Control:
+						// Handled in MouseDown.
+						break;
+
+					case Keys.Control:
+						grid.ToggleSelection(clobberSelectionRowOnMouseUp.Value);
+						break;
+				}
+				
 			}
 		}
 
@@ -583,12 +736,7 @@ namespace Szotar.WindowsForms.Controls {
 			}
 
 			int row = hit.RowIndex;
-
-			// TODO: Figure out if this still works with multiple rows being dragged
-			// If you drag a row onto itself, we don't want to move it at all.
-			if (dragData != null && row >= 0 && row < source.Count && dragData.Items.Contains(source[row]))
-				return row;
-			
+		
 			// For example, the New Row was dropped onto.
 			if (row >= source.Count)
 				return source.Count;
@@ -653,29 +801,8 @@ namespace Szotar.WindowsForms.Controls {
 					firstRow = source.IndexOf(entries.Items[0]);
 
 				if (firstRow > -1)
-					SelectRowBlock(firstRow, entries.Items.Count);
+					grid.SelectRowBlock(firstRow, entries.Items.Count);
 			}
-		}
-
-		// Selects a contiguous block of rows and changes the active cell to the be the first cell
-		// of the first row of that block.
-		void SelectRowBlock(int firstRow, int count) {
-			// Make sure the rows are visible, at least partially.
-			if (!IsRowVisible(firstRow))
-				grid.FirstDisplayedScrollingRowIndex = firstRow;
-
-			grid.ClearSelection();
-
-			// TODO: This will make the rows become unshared, but I don't see any better way 
-			// to modify the selection.
-			for (int i = firstRow; i < firstRow + count; ++i)
-				grid.Rows[i].Selected = true;
-
-			// We need to change this because the currently active row and the row selection are
-			// separate things. Typing or pressing F2 acts on the active row, which need not even 
-			// be part of the selection.
-			// TODO: This also makes the row become unshared.
-			grid.CurrentCell = grid.Rows[firstRow].Cells[0];
 		}
 
 		void CopyRowsFromTo(WordListEntries entries, int dropRow) {

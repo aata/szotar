@@ -419,15 +419,21 @@ namespace Szotar.Sqlite {
 			}
 
 			/// <summary>Removes the items at the specified positions in the list.</summary>
+			/// TODO: This could be made faster by making the sorting optional.
 			public void RemoveAt(IEnumerable<int> indices) {
 				if (indices == null)
 					throw new System.ArgumentNullException();
 
+				var sorted = new List<int>(indices);
+				sorted.Sort();
+
+				int shift = 0;
+
 				using (var txn = Connection.BeginTransaction()) {
 					deleteCommandSetID.Value = list.ID;
 
-					foreach (int i in indices) {
-						deleteCommandListPosition.Value = i;
+					foreach (int i in sorted) {
+						deleteCommandListPosition.Value = i - shift++;
 						deleteCommand.ExecuteNonQuery();
 					}
 
@@ -996,6 +1002,7 @@ namespace Szotar.Sqlite {
 			List<int> rows;
 			int destination;
 			int shiftedDestination;
+			bool idempotent;
 
 			public MoveRowsCommand(SqliteWordList owner, IList<int> rows, int destination)
 				: base(owner)
@@ -1012,13 +1019,22 @@ namespace Szotar.Sqlite {
 				this.rows.Sort();
 
 				this.destination = destination;
+
+				// An optimisation: check if the operation would do nothing.
+				bool contiguous = true;
+				for (int i = 0; i < rows.Count - 1; ++i) {
+					if (rows[i] + 1 != rows[i + 1]) {
+						contiguous = false;
+						break;
+					}
+				}
+
+				idempotent = rows.Count == 0
+					|| (contiguous && destination >= rows[0] && destination < rows[0] + rows.Count);
 			}
 
 			public override void Do() {
-				// TODO: Also extend this check to a group of contiguous rows being moved into itself,
-				// and move it into its constructor so that less work is done on undo/redo.
-				bool useless = rows.Count == 1 && (destination == rows[0] || destination == rows[0] + 1);
-				if (useless)
+				if (idempotent)
 					return;
 
 				// Get the values being moved, so we can insert them later.
@@ -1038,8 +1054,9 @@ namespace Szotar.Sqlite {
 						shiftedDestination--;
 				}
 
+				var insertWhere = shiftedDestination;
 				foreach (var entry in values)
-					list.Insert(shiftedDestination, entry);
+					list.Insert(insertWhere++, entry);
 
 				// The database modification is simpler when expressed as a removal and re-insertion.
 				// (It would be possible to speed this up with a dedicated function, but much more complex.)
@@ -1050,6 +1067,9 @@ namespace Szotar.Sqlite {
 			}
 
 			public override void Undo() {
+				if (idempotent)
+					return;
+
 				var values = new List<WordListEntry>(rows.Count);
 
 				for (int i = 0; i < rows.Count; ++i) {

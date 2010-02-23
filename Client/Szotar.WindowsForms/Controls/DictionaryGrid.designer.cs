@@ -26,7 +26,7 @@
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-			this.grid = new System.Windows.Forms.DataGridView();
+			this.grid = new Szotar.WindowsForms.Controls.MouseFixDataGridView();
 			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -82,7 +82,7 @@
 
 		#endregion
 
-		private System.Windows.Forms.DataGridView grid;
+		private Szotar.WindowsForms.Controls.MouseFixDataGridView grid;
 
 
 	}

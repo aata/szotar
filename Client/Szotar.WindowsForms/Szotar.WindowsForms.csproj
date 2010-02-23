@@ -102,7 +102,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\DictionaryGrid.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\DictionaryGrid.designer.cs">
       <DependentUpon>DictionaryGrid.cs</DependentUpon>
@@ -420,11 +420,11 @@
   <ItemGroup>
     <PublishFile Include="System.Data.SQLite">
       <Visible>False</Visible>
-      <PublishState>Include</PublishState>
       <Group>
       </Group>
       <TargetPath>
       </TargetPath>
+      <PublishState>Include</PublishState>
       <FileType>Assembly</FileType>
     </PublishFile>
   </ItemGroup>
