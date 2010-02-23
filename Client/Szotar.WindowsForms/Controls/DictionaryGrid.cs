@@ -9,52 +9,200 @@ using System.Collections;
 using System.Diagnostics;
 
 namespace Szotar.WindowsForms.Controls {
-	// Fixes the behaviour of the DataGridView with regards to item selection.
+	/// <summary>Adds methods for programmatic selection, and facilitates multi-row drag and drop.</summary>
 	class MouseFixDataGridView : DataGridView {
-		public class CancelableMouseEventArgs : MouseEventArgs {
-			public bool Cancel { get; set; }
+		#region Drag and Drop
 
-			public CancelableMouseEventArgs(MouseEventArgs args) 
-				: base(args.Button, args.Clicks, args.X, args.Y, args.Delta)
-			{ }
+		// Delayed selection change.
+		bool deferredSelection;
+		int deferredSelectionRow;
+		int deferredSelectionColumn;
+		Keys deferredSelectionModifiers;
+
+		protected override void OnDragOver(DragEventArgs e) {
+			deferredSelection = false;
+
+			base.OnDragOver(e);
 		}
 
-		public new event EventHandler<CancelableMouseEventArgs> MouseDown;
-		public new event EventHandler<CancelableMouseEventArgs> MouseUp;
+		public Rectangle DragRectangle { get; protected set; }
+		public int DragRow { get; protected set; }
 
+		protected override void OnDragDrop(DragEventArgs e) {
+			try {
+				base.OnDragDrop(e);
+			} finally {
+				DragRectangle = Rectangle.Empty;
+			}
+		}
+
+		// Computes the drag box. When the mouse leaves this with the button held down, the drag and drop
+		// operation starts. Also modifies the right-click behaviour.
+		// This also defers some of the selection behaviour to the OnMouseUp routine, so that it doesn't
+		// interfere with drag and drop.
 		protected override void OnMouseDown(MouseEventArgs e) {
-			var f = MouseDown;
-			var ce = new CancelableMouseEventArgs(e);
-			if (f != null)
-				f(this, ce);
+			HitTestInfo hitTest;
 
-			if (ce.Cancel)
+			if (e.Button != MouseButtons.Left) {
+				// If the right-clicked item is outside the current selection, select that item.
+				// This is more like how normal list boxes work.
+				if (e.Button == MouseButtons.Right) {
+					hitTest = HitTest(e.X, e.Y);
+
+					if (hitTest.Type == DataGridViewHitTestType.Cell && !IsRowSelected(hitTest.RowIndex))
+						SelectRow(hitTest.RowIndex, hitTest.ColumnIndex);
+				}
+
+				base.OnMouseDown(e);
 				return;
+			}
+
+			hitTest = HitTest(e.X, e.Y);
+
+			// Don't drag the New Row.
+			if (hitTest.Type == DataGridViewHitTestType.Cell) {
+				int hitRow = hitTest.RowIndex;
+				DragRow = hitRow;
+
+				var dragSize = SystemInformation.DragSize;
+				DragRectangle = new Rectangle(
+					new Point(e.X - dragSize.Width / 2, e.Y - dragSize.Height / 2),
+					dragSize);
+
+				// We can safely extend the selection before dragging, but we must use the default selection
+				// logic, because only that has access to the location of the anchor cell, which is needed
+				// to extend a multiple selection.
+				bool useDefaultSelectionLogic = false;
+				switch (Control.ModifierKeys) {
+					case Keys.Shift:
+					case Keys.Control | Keys.Shift:
+						useDefaultSelectionLogic = true;
+						break;
+				}
+
+				// If there is currently a multiple selection and the user left-clicks on a part of that
+				// selection, we don't want to set the selection to the hit row, since the user might want 
+				// to drag the current selection.
+				// The selection will be updated in the mouse up handler, so we save the row and column
+				// for that purpose.
+				if (IsRowSelected(hitRow)
+					&& SelectedRowCount > 1
+					&& !useDefaultSelectionLogic) {
+					deferredSelection = true;
+					deferredSelectionRow = hitRow;
+					deferredSelectionColumn = hitTest.ColumnIndex;
+					deferredSelectionModifiers = Control.ModifierKeys;
+					return;
+				}
+			} else {
+				DragRectangle = Rectangle.Empty;
+			}
 
 			base.OnMouseDown(e);
 		}
 
+		// Re-implements some of the behaviour that is deferred by in OnMouseDown because it would
+		// interfere with drag and drop.
 		protected override void OnMouseUp(MouseEventArgs e) {
-			var f = MouseUp;
-			var ce = new CancelableMouseEventArgs(e);
-			if (f != null)
-				f(this, ce);
+			if (e.Button == MouseButtons.Left && deferredSelection) {
+				deferredSelection = false;
+
+				bool isCurrentCell =
+					deferredSelectionRow == CurrentCellAddress.Y &&
+					deferredSelectionColumn == CurrentCellAddress.X;
+
+				switch (deferredSelectionModifiers) {
+					case Keys.None:
+						SelectRow(deferredSelectionRow);
+
+						// A click on the active cell begins editing the cell.
+						if (isCurrentCell)
+							BeginEdit(true);
+						break;
+
+					case Keys.Shift:
+					case Keys.Shift | Keys.Control:
+						// Handled in MouseDown.
+						break;
+
+					case Keys.Control:
+						ToggleSelection(deferredSelectionRow);
+						break;
+				}
+			}
 
 			base.OnMouseUp(e);
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e) {
+			if (e.Button == MouseButtons.Left && !DragRectangle.IsEmpty && !DragRectangle.Contains(e.Location))
+				deferredSelection = false;
+
+			base.OnMouseMove(e);
 		}
 
 		public bool IsRowVisible(int row) {
 			return row >= FirstDisplayedScrollingRowIndex 
 				&& row <= FirstDisplayedScrollingRowIndex + DisplayedRowCount(false);
 		}
+		#endregion
 
-		public void SelectRow(int row) {
+		#region Drop Marker
+		int dropMarkerRow;
+
+		/// <summary>Places a drop marker at the specified row, removing any other drop markers.</summary>
+		/// <param name="row">The row to place a drop marker at, or -1 to not place a drop marker.</param>
+		public void PlaceDropMarker(int row) {
+			if (row == dropMarkerRow)
+				return;
+
+			if (dropMarkerRow != -1)
+				InvalidateRow(dropMarkerRow);
+
+			dropMarkerRow = row;
+
+			if(row != -1)
+				InvalidateRow(row);
+		}
+
+		/// <summary>Equivalent to PlaceDropMarker(-1).</summary>
+		public void RemoveDropMarker() {
+			if (dropMarkerRow != -1)
+				InvalidateRow(dropMarkerRow);
+
+			dropMarkerRow = -1;
+		}
+
+		protected override void OnPaint(PaintEventArgs e) {
+			base.OnPaint(e);
+
+			if (dropMarkerRow != -1) {
+				var rect = GetRowDisplayRectangle(dropMarkerRow, false);
+				rect.Height = 2; // SystemInformation.SizingBorderWidth;
+
+				if(rect.IntersectsWith(e.ClipRectangle))
+					using (var brush = new SolidBrush(Color.FromArgb(64, 64, 64)))
+						e.Graphics.FillRectangle(brush, rect);
+			}
+		}
+		#endregion
+
+		#region Selection
+		public bool IsRowSelected(int row) {
+			return (Rows.GetRowState(row) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
+		}
+
+		public void SelectRow(int row, int activeColumn) {
 			ClearSelection();
-			SetCurrentCellAddressCore(0, row, true, true, true);
+			SetCurrentCellAddressCore(activeColumn, row, true, true, true);
 			SetSelectedRowCore(row, true);
 
 			if (!IsRowVisible(row))
 				FirstDisplayedScrollingRowIndex = row;
+		}
+
+		public void SelectRow(int row) {
+			SelectRow(row, 0);
 		}
 
 		// Selects a contiguous block of rows and changes the active cell to the be the first cell
@@ -78,9 +226,18 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		public void ToggleSelection(int row) {
-			bool selected = (Rows.GetRowState(row) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
-			SetSelectedRowCore(row, !selected);
+			SetSelectedRowCore(row, !IsRowSelected(row));
 		}
+
+		/// <summary>
+		/// Returns the amount of rows selected rows, including the new row and any uncommited rows.
+		/// </summary>
+		public int SelectedRowCount {
+			get {
+				return Rows.GetRowCount(DataGridViewElementStates.Selected);
+			}
+		}
+		#endregion
 	}
 
 	[ToolboxBitmap(typeof(System.Windows.Forms.DataGridView))]
@@ -119,10 +276,6 @@ namespace Szotar.WindowsForms.Controls {
 		public DictionaryGrid(WordList dataSource)
 			: this() {
 			DataSource = dataSource;
-		}
-
-		void grid_DataError(object sender, DataGridViewDataErrorEventArgs e) {
-			e.ThrowException = false;
 		}
 
 		public void UpdateData() {
@@ -244,6 +397,10 @@ namespace Szotar.WindowsForms.Controls {
 			DataSource = null;
 		}
 
+		void grid_DataError(object sender, DataGridViewDataErrorEventArgs e) {
+			e.ThrowException = false;
+		}
+
 		void grid_KeyUp(object sender, KeyEventArgs e) {
 			if (e.KeyCode == Keys.Delete && e.Modifiers == Keys.None) {
 				DeleteSelection();
@@ -283,7 +440,7 @@ namespace Szotar.WindowsForms.Controls {
 			// Any other rows that aren't present in the data source (such as the New Row when it's not selected)
 			// are simply removed from the rowsToDelete.
 
-			var rowsToDelete = new List<int>(InternalSelectedIndices);
+			var rowsToDelete = new List<int>(SelectedRowIndices);
 
 			Debug.Print("Deleting rows:");
 			foreach (int row in rowsToDelete) {
@@ -467,7 +624,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		public WordListEntries Selection() {
 			var entries = new List<WordListEntry>();
-			foreach (var i in SelectedIndices)
+			foreach (var i in SelectedEntryIndices)
 				entries.Add(source[i]);
 
 			return new WordListEntries(source, entries);
@@ -475,7 +632,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		void PutSelectionOnClipboard(bool remove) {
 			var entries = new List<WordListEntry>();
-			var indices = new List<int>(SelectedIndices);
+			var indices = new List<int>(SelectedEntryIndices);
 			foreach (var i in indices) {
 				if(remove)
 					entries.Add(new WordListEntry(null, source[i].Phrase, source[i].Translation));
@@ -560,19 +717,15 @@ namespace Szotar.WindowsForms.Controls {
 		#endregion
 
 		#region Drag and drop
-		// This code is mostly taken from the DataGridView FAQ by Mark Rideout:
+		// This code is partly taken from/inspired by the DataGridView FAQ by Mark Rideout:
 		// http://www.windowsforms.net/Samples/Go%20To%20Market/DataGridView/DataGridView%20FAQ.doc
 
-		Rectangle dragBox; // When the cursor moves outside of this, the drag starts.
 		WordListEntries dragData;
-		int dragRow;
 
 		void InitializeDragAndDrop() {
 			grid.AllowDrop = true;
 			grid.DragOver += new DragEventHandler(grid_DragOver);
 			grid.DragDrop += new DragEventHandler(grid_DragDrop);
-			grid.MouseDown += new EventHandler<MouseFixDataGridView.CancelableMouseEventArgs>(grid_MouseDown);
-			grid.MouseUp += new EventHandler<MouseFixDataGridView.CancelableMouseEventArgs>(grid_MouseUp);
 			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
 			grid.DragLeave += new EventHandler(grid_DragLeave);
 		}
@@ -582,31 +735,34 @@ namespace Szotar.WindowsForms.Controls {
 			if (e.Button != MouseButtons.Left)
 				return;
 
-			if (dragBox != Rectangle.Empty && !dragBox.Contains(e.Location)) {
-				clobberSelectionRowOnMouseUp = null;
-
-				bool hitSelectedRow = (grid.Rows.GetRowState(dragRow) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
+			if (!grid.DragRectangle.IsEmpty && !grid.DragRectangle.Contains(e.Location)) {
+				bool hitSelectedRow = grid.IsRowSelected(grid.DragRow);
 
 				// The drag data has to be computed when the mouse moves out of the drag rectangle, not on MouseDown,
 				// because we need to wait for the mouse down to possibly affect the selection (such as extending it
 				// or contracting it, which are done at MouseDown time).
 				var rows = new List<WordListEntry>();
 				if (hitSelectedRow) {
-					foreach (int row in InternalSelectedIndices)
+					// TODO: This won't include the row currently being edited, if one exists!
+					foreach (int row in SelectedEntryIndices)
 						rows.Add(source[row]);
 				} else {
-					rows.Add(source[dragRow]);
-					grid.SelectRow(dragRow);
+					// TODO: For now, let's not try to drag uncommitted rows.
+					if (grid.DragRow < 0 || grid.DragRow > source.Count)
+						return;
+
+					rows.Add(source[grid.DragRow]);
+					grid.SelectRow(grid.DragRow);
 				}
 
 				dragData = new WordListEntries(source, rows);
 				var data = dragData.MakeDataObject();
 
 				var result = grid.DoDragDrop(data, DragDropEffects.Move | DragDropEffects.Copy | DragDropEffects.Scroll);
-				dragBox = Rectangle.Empty;
 
-				// This doesn't exactly look great in the undo list.
-				// It's very unlikely that we'll be able to tie together undo items related to multiple lists, though.
+				// If we moved the items, we have to delete the original ones now.
+				// This doesn't exactly look great in the undo list, but it's very unlikely that 
+				// we'll be able to tie together undo items related to multiple lists.
 				if (result == DragDropEffects.Move) {
 					var indices = new List<int>();
 					foreach (var entry in dragData.Items) {
@@ -619,110 +775,12 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-		// Computes the drag box. When the mouse leaves this with the button held down, the drag and drop
-		// operation starts. Also modifies the right-click behaviour.
-		void grid_MouseDown(object sender, MouseFixDataGridView.CancelableMouseEventArgs e) {
-			clobberSelectionRowOnMouseUp = null;
-
-			// If the right-clicked item is outside the current selection, select that item.
-			// This is more like how normal list boxes work.
-			if (e.Button == MouseButtons.Right) {
-				int row = grid.HitTest(e.X, e.Y).RowIndex;
-
-				if(row >= 0 && row < source.Count && 
-					(grid.Rows.GetRowState(row) & DataGridViewElementStates.Selected) == DataGridViewElementStates.None) 
-				{
-					grid.ClearSelection();
-					grid.Rows[row].Selected = true;
-				}
-			}
-
-			if (e.Button != MouseButtons.Left)
-				return;
-
-			var hitTest = grid.HitTest(e.X, e.Y); 
-			dragRow = hitTest.RowIndex;
-
-			bool useDefaultSelectionLogic = false;
-
-			if (dragRow != -1) {
-				// We can safely extend the selection before dragging, but we must use the default selection
-				// logic, because only that has access to the location of the anchor cell, which is needed
-				// to extend a multiple selection.
-				switch (Control.ModifierKeys) {
-					case Keys.Shift:
-					case Keys.Control | Keys.Shift:
-						useDefaultSelectionLogic = true;
-						break;
-				}
-			}
-
-			// Don't drag the New Row.
-			if (dragRow != -1 && dragRow < source.Count) {
-				var dragSize = SystemInformation.DragSize;
-				dragBox = new Rectangle(
-					new Point(
-						e.X - dragSize.Width / 2,
-						e.Y - dragSize.Height / 2),
-					dragSize);
-
-				bool hitSelectedRow = (grid.Rows.GetRowState(dragRow) & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected;
-
-				// Don't set the selection to the hit row, we might want to drag the current selection.
-				// The selection will be updated in the mouse up handler, so we save the row and column
-				// for that purpose.
-				if (hitSelectedRow && grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 1 && !useDefaultSelectionLogic) {
-					e.Cancel = true;
-					clobberSelectionRowOnMouseUp = dragRow;
-					clobberSelectionColumn = hitTest.ColumnIndex;
-					clobberSelectionModifiers = Control.ModifierKeys;
-				}
-			} else {
-				dragBox = Rectangle.Empty;
-			}
-		}
-
-		int? clobberSelectionRowOnMouseUp;
-		int clobberSelectionColumn;
-		bool clobberSelectionShift;
-		Keys clobberSelectionModifiers;
-
-		// Re-implements some of the behaviour that is filtered by the MouseDown filter because it would
-		// interfere with drag and drop.
-		void grid_MouseUp(object sender, MouseFixDataGridView.CancelableMouseEventArgs e) {
-			// If the user clicked on a cell and there's a multiple selection, set the selection
-			// to that. (We don't do this in MouseDown because it would interfere with dragging.)
-			if (e.Button == MouseButtons.Left && clobberSelectionRowOnMouseUp.HasValue) {
-				bool isCurrentCell =
-					clobberSelectionRowOnMouseUp.Value == grid.CurrentCellAddress.Y &&
-					clobberSelectionColumn == grid.CurrentCellAddress.X;
-
-				switch (clobberSelectionModifiers) {
-					case Keys.None:
-						grid.SelectRow(clobberSelectionRowOnMouseUp.Value);
-
-						// A click on the active cell begins editing the cell.
-						if (isCurrentCell)
-							grid.BeginEdit(true);
-						break;
-
-					case Keys.Shift:
-					case Keys.Shift | Keys.Control:
-						// Handled in MouseDown.
-						break;
-
-					case Keys.Control:
-						grid.ToggleSelection(clobberSelectionRowOnMouseUp.Value);
-						break;
-				}
-				
-			}
-		}
-
 		// Chooses at which index the row will be dropped, given mouse co-ordinates.
 		int GetDropRow(int x, int y) {
-			var hit = grid.HitTest(x, y);
+			return GetDropRow(x, y, grid.HitTest(x, y));
+		}
 
+		int GetDropRow(int x, int y, DataGridView.HitTestInfo hit) {
 			// If we're not dropped onto a row, figure out where is the best place to
 			// put the dropped items.
 			if (hit.Type == DataGridViewHitTestType.ColumnHeader) {
@@ -754,9 +812,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		// Finishes the drag operation and updates the selection.
 		void grid_DragDrop(object sender, DragEventArgs e) {
-			// Remove the drop marker, and make sure it's painted over.
-			dropMarkerRow = null;
-			grid.Invalidate();
+			grid.RemoveDropMarker();
 
 			var clientPoint = grid.PointToClient(new Point(e.X, e.Y));
 			int dropRow = GetDropRow(clientPoint.X, clientPoint.Y);
@@ -819,18 +875,7 @@ namespace Szotar.WindowsForms.Controls {
 			var hitTest = grid.HitTest(clientPoint.X, clientPoint.Y);
 			int rowIndex = hitTest.RowIndex;
 
-			// Determine where the drop marker is. If it hasn't moved, there's no need to repaint anything.
-			// If it has moved, repaint the row it was on and the row it is moving to.
-			int? newDropMarkerRow = rowIndex == -1 ? (int?)null : rowIndex;
-			if (newDropMarkerRow != dropMarkerRow) {
-				if (dropMarkerRow.HasValue)
-					grid.InvalidateRow(dropMarkerRow.Value);
-
-				dropMarkerRow = newDropMarkerRow;
-
-				if(newDropMarkerRow.HasValue)
-					grid.InvalidateRow(newDropMarkerRow.Value);
-			}
+			grid.PlaceDropMarker(GetDropRow(clientPoint.X, clientPoint.Y, hitTest));
 
 			bool hasEntries = e.Data.GetDataPresent(typeof(WordListEntries));
 			bool hasText = e.Data.GetDataPresent(DataFormats.UnicodeText) || e.Data.GetDataPresent(DataFormats.Text);
@@ -874,27 +919,47 @@ namespace Szotar.WindowsForms.Controls {
 
 		// Stop drawing the drop marker while the cursor is outside the grid.
 		void grid_DragLeave(object sender, EventArgs e) {
-			if (dropMarkerRow.HasValue) {
-				int row = dropMarkerRow.Value;
-				
-				dropMarkerRow = null;
-				grid.InvalidateRow(row);
+			grid.RemoveDropMarker();
+		}
+		#endregion
+
+		#region Selection 
+		/// <summary>Works like SelectedIndices, but returns the New Row too, if it is selected.</summary>
+		/// <remarks>The DataGridView.SelectedRows property is inefficient: it can cause shared rows
+		/// to become unshared, for one. It should be avoided.</remarks>
+		protected IEnumerable<int> SelectedRowIndices {
+			get {
+				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+					index >= 0;
+					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) 
+				{
+					yield return index;
+				}
 			}
 		}
 
-		// When dragging and dropping, the row index on which the drop marker will be drawn.
-		int? dropMarkerRow;
+		/// <summary>Returns the indices of the selected rows on the grid, in ascending order. 
+		/// If there is a New Row that has not yet been added to the data source, it is not included.</summary>
+		public IEnumerable<int> SelectedEntryIndices {
+			get {
+				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+					index >= 0;
+					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
+				{
+					if (index < source.Count)
+						yield return index;
+				}
+			}
+		}
 
-		void DrawDropMarker(object sender, PaintEventArgs e) {
-			if (dropMarkerRow == null)
-				return;
-
-			var rect = grid.GetRowDisplayRectangle(dropMarkerRow.Value, false);
-			rect.Height = 2;
-
-			// A dark gray colour that doesn't appear to merge with the column headers.
-			using (var brush = new SolidBrush(Color.FromArgb(64, 64, 64)))
-				e.Graphics.FillRectangle(brush, rect);
+		public int SelectedEntryCount {
+			get {
+				int count = grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
+				for (int i = source.Count; i < grid.RowCount; ++i)
+					if (grid.IsRowSelected(i))
+						count--;
+				return count;
+			}
 		}
 		#endregion
 
@@ -967,47 +1032,6 @@ namespace Szotar.WindowsForms.Controls {
 		}
 		#endregion
 
-		#region Selection
-		/// <summary>Works like SelectedIndices, but returns the New Row too, if it is selected.</summary>
-		/// <remarks>The DataGridView.SelectedRows property is inefficient: it can cause shared rows
-		/// to become unshared, for one. It should be avoided.</remarks>
-		protected IEnumerable<int> InternalSelectedIndices {
-			get {
-				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
-					index >= 0;
-					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
-				{
-					yield return index;
-				}
-			}
-		}
-
-		/// <summary>Returns the indices of the selected rows on the grid, in ascending order. 
-		/// If there is a New Row that has not yet been added to the data source, it is not included.</summary>
-		public IEnumerable<int> SelectedIndices {
-			get {
-				for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
-					index >= 0;
-					index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected))
-				{
-					if (index < source.Count)
-						yield return index;
-				}
-			}
-		}
-
-		public int SelectionSize {
-			get {
-				int count = grid.Rows.GetRowCount(DataGridViewElementStates.Selected);
-				//TODO: Test.
-				if (grid.Rows.Count > 0 && grid.AllowUserToAddRows && ((grid.Rows.GetRowState(grid.RowCount - 1) & DataGridViewElementStates.Selected) != 0))
-					count--;
-				Debug.Assert(count >= 0);
-				return count;
-			}
-		}
-		#endregion
-
 		#region Appearance
 		private void InitializeGridStyles() {
 			grid.CellFormatting += new DataGridViewCellFormattingEventHandler(grid_CellFormatting);
@@ -1033,8 +1057,6 @@ namespace Szotar.WindowsForms.Controls {
 			grid.AllowUserToOrderColumns = false;
 
 			grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-			grid.Paint += new PaintEventHandler(DrawDropMarker);
 		}
 
 		void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {

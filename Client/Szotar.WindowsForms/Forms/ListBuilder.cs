@@ -145,11 +145,11 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void remove_Click(object sender, EventArgs e) {
-			list.RemoveAt(new List<int>(grid.SelectedIndices));
+			list.RemoveAt(new List<int>(grid.SelectedEntryIndices));
 		}
 
 		void swap_Click(object sender, EventArgs e) {
-			list.SwapRows(new List<int>(grid.SelectedIndices));
+			list.SwapRows(new List<int>(grid.SelectedEntryIndices));
 		}
 
 		void swapAll_Click(object sender, EventArgs e) {
@@ -173,7 +173,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		bool CanCopy() {
-			return grid.SelectionSize > 0;
+			return grid.SelectedEntryCount > 0;
 		}
 
 		bool CanPaste() {
