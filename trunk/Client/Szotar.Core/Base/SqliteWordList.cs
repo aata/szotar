@@ -1030,7 +1030,7 @@ namespace Szotar.Sqlite {
 				}
 
 				idempotent = rows.Count == 0
-					|| (contiguous && destination >= rows[0] && destination < rows[0] + rows.Count);
+					|| (contiguous && destination >= rows[0] && destination <= rows[0] + rows.Count);
 			}
 
 			public override void Do() {
