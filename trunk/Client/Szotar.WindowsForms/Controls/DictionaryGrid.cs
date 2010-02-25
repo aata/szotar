@@ -148,7 +148,7 @@ namespace Szotar.WindowsForms.Controls {
 		#endregion
 
 		#region Drop Marker
-		int dropMarkerRow;
+		int dropMarkerRow = -1;
 
 		/// <summary>Places a drop marker at the specified row, removing any other drop markers.</summary>
 		/// <param name="row">The row to place a drop marker at, or -1 to not place a drop marker.</param>
