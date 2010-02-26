@@ -279,9 +279,8 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		public void UpdateData() {
-			var x = DataSource;
-			DataSource = null;
-			DataSource = x;
+			grid.RowCount = source.Count;
+			grid.Refresh();
 		}
 
 		#region Data Binding
@@ -353,7 +352,7 @@ namespace Szotar.WindowsForms.Controls {
 			set {
 				if (value == null) {
 					UnwireDataSourceEvents();
-					grid.RowCount = 1;
+					grid.Rows.Clear();
 					grid.Enabled = false;
 					source = null;
 				} else if (source != value) {
@@ -1029,6 +1028,11 @@ namespace Szotar.WindowsForms.Controls {
 				if (h != null)
 					h(this, new EventArgs());
 			}
+		}
+
+		public event DataGridViewCellMouseEventHandler ColumnHeaderMouseClick {
+			add { grid.ColumnHeaderMouseClick += value; }
+			remove { grid.ColumnHeaderMouseClick -= value; }
 		}
 		#endregion
 
