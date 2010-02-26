@@ -105,11 +105,13 @@ namespace Szotar.WindowsForms.Forms {
 		private void WireListEvents() {
 			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted += new EventHandler(list_ListDeleted);
+			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
 		}
 
 		private void UnwireListEvents() {
 			list.PropertyChanged -= new PropertyChangedEventHandler(list_PropertyChanged);
 			list.ListDeleted -= new EventHandler(list_ListDeleted);
+			list.ListChanged -= new ListChangedEventHandler(list_ListChanged);
 		}
 
 		void grid_ColumnRatioChanged(object sender, EventArgs e) {
@@ -166,12 +168,29 @@ namespace Szotar.WindowsForms.Forms {
 			list.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
 		}
 
-		// TODO: Reverse sort order if clicked again.
+		int? sortColumn;
+		bool sortAscending;
 		void grid_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e) {
-			if (e.ColumnIndex == 0)
-				list.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
-			else if(e.ColumnIndex == 1)
-				list.Sort((a, b) => a.Translation.CompareTo(b.Translation));
+			int direction = 1;
+
+			if (sortColumn == e.ColumnIndex) {
+				sortAscending = !sortAscending;
+				direction = sortAscending ? 1 : -1;
+			} else {
+				sortAscending = true;
+			}
+
+			if (e.ColumnIndex == 0) {
+				list.Sort((a, b) => direction * a.Phrase.CompareTo(b.Phrase));
+				sortColumn = 0;
+			} else if (e.ColumnIndex == 1) {
+				list.Sort((a, b) => direction * a.Translation.CompareTo(b.Translation));
+				sortColumn = 1;
+			}
+		}
+
+		void list_ListChanged(object sender, ListChangedEventArgs e) {
+			sortColumn = null;
 		}
 
 		private void UpdateTitle() {
