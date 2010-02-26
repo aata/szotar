@@ -63,6 +63,8 @@ namespace Szotar.WindowsForms.Forms {
 			editMenu.DropDownOpening += new EventHandler(editMenu_DropDownOpening);
 			itemContextMenu.Opening += new CancelEventHandler(itemContextMenu_Opening);
 
+			grid.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(grid_ColumnHeaderMouseClick);
+
 			cutMI.Click += delegate { grid.Cut(); };
 			copyMI.Click += delegate { grid.Copy(); };
 			pasteMI.Click += delegate { grid.Paste(); };
@@ -162,6 +164,14 @@ namespace Szotar.WindowsForms.Forms {
 
 		void sort_Click(object sender, EventArgs e) {
 			list.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
+		}
+
+		// TODO: Reverse sort order if clicked again.
+		void grid_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e) {
+			if (e.ColumnIndex == 0)
+				list.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
+			else if(e.ColumnIndex == 1)
+				list.Sort((a, b) => a.Translation.CompareTo(b.Translation));
 		}
 
 		private void UpdateTitle() {
