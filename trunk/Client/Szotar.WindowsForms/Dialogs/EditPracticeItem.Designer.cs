@@ -96,6 +96,7 @@
 			this.Controls.Add(this.ok);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "EditPracticeItem";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Edit entry";
 			this.ResumeLayout(false);
 			this.PerformLayout();
