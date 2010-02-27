@@ -536,6 +536,10 @@ namespace Szotar.WindowsForms {
 					dialog.Phrase,
 					dialog.Translation);
 
+				items[index] = new PracticeItem(items[index].SetID, dialog.Phrase, dialog.Translation);
+				Update();
+				Layout();
+
 				// TODO: This should possibly be made into an actual message, since it would go against 
 				// the user's expectations. However, explaining the reason why it didn't work would 
 				// be equally confusing.
