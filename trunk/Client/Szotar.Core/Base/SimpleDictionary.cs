@@ -648,6 +648,17 @@ namespace Szotar {
 			})).Start();
 		}
 
+		[Serializable]
+		public class CacheInvalidException : Exception {
+			public CacheInvalidException() { }
+			public CacheInvalidException(string message) : base(message) { }
+			public CacheInvalidException(string message, Exception inner) : base(message, inner) { }
+			protected CacheInvalidException(
+			  System.Runtime.Serialization.SerializationInfo info,
+			  System.Runtime.Serialization.StreamingContext context)
+				: base(info, context) { }
+		}
+
 		bool LoadCache() {
 			string path = CachePath();
 
@@ -695,21 +706,29 @@ namespace Szotar {
 						this.SecondLanguage = reader.ReadString();
 						this.SecondLanguageCode = reader.ReadString();
 
-						forwards = LoadCacheSection(reader);
-						backwards = LoadCacheSection(reader);
+						forwards = LoadCacheSection(reader, 0);
+						backwards = LoadCacheSection(reader, 1);
 
 						return true;
 					}
 				}
-			} catch (IOException) { // EndOfStreamException falls into this.
+			} catch (CacheInvalidException e) {
+				ProgramLog.Default.AddMessage(LogType.Warning, "Cache file for {0} was invalid: {1}", this.Name, e.Message);
+				File.Delete(path);
+				return false;
+			} catch (IOException e) { // EndOfStreamException falls into this.
 				// Maybe it's corrupt and this will fix it.
+				ProgramLog.Default.AddMessage(LogType.Warning, "Cache file for {0} was invalid: {1}", this.Name, e.Message);
 				File.Delete(path);
 				return false;
 			}
 		}
 
-		Section LoadCacheSection(BinaryReader reader) {
+		Section LoadCacheSection(BinaryReader reader, int sectionIndex) {
 			int capacity = reader.ReadInt32();
+
+			if (SectionSizes != null && SectionSizes[sectionIndex] != capacity)
+				throw new CacheInvalidException("The dictionary header indicates a different number of entries than the cache header.");
 
 			var entries = new List<Entry>(capacity);
 			var section = new Section(entries, false, this);
