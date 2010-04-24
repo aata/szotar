@@ -1,24 +1,30 @@
 #summary Screenshots of the program in action.
 #labels Featured
 
-These screenshots were taken using the Windows.Forms version on Windows Vista.
+<a href="http://img203.imageshack.us/i/searche.png/"><img src="http://img203.imageshack.us/img203/8691/searche.th.png" border="0"/></a>
 
-[http://asztal.net/projects/szotar/images/lookup.png]
+The main interface for looking up words. Info tips help to find out which of the translations is the most appropriate. The coloured rows indicate perfect matches with the search phrase and matches at the start of the entry.
 
-The main interface for looking up words.
+­
 
-[http://asztal.net/projects/szotar/images/infotips2.png]
+<a href="http://img22.imageshack.us/i/wordlisteditor.png/" target="_blank"><img src="http://img22.imageshack.us/img22/4181/wordlisteditor.th.png" border="0"/></a>
 
-Info tips help to find out which of the translations is the most appropriate. The coloured rows indicate perfect matches with the search phrase and matches at the start of the entry.
+Editing a list of vocabulary.
 
-[http://asztal.net/projects/szotar/images/listbuilder.png]
+­
 
-Building a list of vocabulary (this feature is likely to change significantly).
+<a href="http://img406.imageshack.us/i/practice.png/" target="_blank"><img src="http://img406.imageshack.us/img406/7672/practice.th.png" border="0"/></a>
 
-[http://asztal.net/projects/szotar/images/quizletimporter.png]
+Practicing some vocabulary.
 
-Search for and import vocabulary with the importer.
+­
 
-[http://asztal.net/projects/szotar/images/zbedicimporter.png]
+<a href="http://img718.imageshack.us/i/mainwindow.png/" target="_blank"><img src="http://img718.imageshack.us/img718/6871/mainwindow.th.png" border="0"/></a>
 
-Import a zbedic dictionary with relative ease. The zbedic importer is still young.
+The main window, showing recently-used vocabulary lists and dictionaries.
+
+­
+
+<a href="http://img227.imageshack.us/i/listsearch.png/" target="_blank"><img src="http://img227.imageshack.us/img227/1632/listsearch.th.png" border="0"/></a>
+
+Searching for a word list containing a specific term.
