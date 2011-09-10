@@ -174,7 +174,7 @@ namespace Szotar.WindowsForms.Forms {
 					// TODO: Sanitize file name!
 				}
 
-				imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dict";
+				imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dictx";
 
 				// We don't want to overwrite.
 				if (File.Exists(imported.Path)) {

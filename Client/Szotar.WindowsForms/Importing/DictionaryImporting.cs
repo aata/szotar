@@ -120,7 +120,9 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			if (shouldGenerateSecondHalf)
 				secondSection = GenerateSecondHalf(firstSection);
 
-			var dict = new SimpleDictionary(firstSection, secondSection);
+			//var dict = new SimpleDictionary(firstSection, secondSection);
+            var dict = SqliteDictionary.FromPath(System.IO.Path.GetTempFileName());
+            dict.AddEntries(firstSection, secondSection);
 
 			// It only has to be a guess, because the user can override it.
 			if (sectionInfo != null) {
@@ -242,7 +244,8 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 			list.Sort((a, b) => (a.Phrase.CompareTo(b.Phrase)));
 
 			SimpleDictionary.Section section = new SimpleDictionary.Section(list, true, null);
-
+            foreach (var e in list)
+                e.Tag = new EntryTag(section, null);
 			return section;
 		}
 
@@ -393,7 +396,10 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 
 				// This sort is needed because of the {hw} tag which can change the entry's headword.
 				entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
-				return new SimpleDictionary.Section(entries, true, null);
+				var section = new SimpleDictionary.Section(entries, true, null);
+                foreach (var e in entries)
+                    e.Tag = new EntryTag(section, null);
+                return section;
 			}
 
 			public event EventHandler<ProgressMessageEventArgs> ProgressChanged;

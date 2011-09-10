@@ -94,6 +94,7 @@ namespace Szotar {
 				using (SimpleDictionary dict = new SimpleDictionary(path, false, false))
 					Load(dict);
 
+                
 				GetFullInstance = () => new SimpleDictionary(Path);
 			}
 
@@ -613,11 +614,23 @@ namespace Szotar {
 
 			// We have to save a copy of the list of entries in case it gets modified while the thread is running.
 			var forwardsEntries = new List<Entry>(forwards.HeadWords);
-			foreach (var entry in forwards)
-				forwardsEntries.Add(entry.Clone());
+            bool haveTags = true;
+            foreach (var entry in forwards) {
+                forwardsEntries.Add(entry.Clone());
+                if (entry.Tag.Data == null)
+                    haveTags = false;
+            }
 			var backwardsEntries = new List<Entry>(backwards.HeadWords);
-			foreach (var entry in backwards)
-				backwardsEntries.Add(entry.Clone());
+            foreach (var entry in backwards) {
+                backwardsEntries.Add(entry.Clone());
+                if (entry.Tag.Data == null)
+                    haveTags = false;
+            }
+
+            if (!haveTags) {
+                // Can't write the dictionary cache because there aren't any entry tags.
+                return;
+            }
 
 			new Thread(new ThreadStart(delegate {
 				Metrics.Measure(string.Format("Saving dictionary cache for {0}", this.Name), delegate {

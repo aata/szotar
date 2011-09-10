@@ -28,17 +28,6 @@ namespace Szotar.Sqlite {
 			Init();
 		}
 
-		static DbConnection OpenDatabase(string path) {
-			string dir = IO.Path.GetDirectoryName(path);
-			if (!IO.Directory.Exists(dir))
-				IO.Directory.CreateDirectory(dir);
-#if !MONO
-			return new System.Data.SQLite.SQLiteConnection("Data Source=" + path);
-#else
-			return new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path);
-#endif
-		}
-
 		protected string Path {
 			get { return path; }
 		}
@@ -98,13 +87,29 @@ namespace Szotar.Sqlite {
 		}
 
 		protected void UpgradeSchemaInIncrements(int fromVersion, int toVersion) {
-			if (fromVersion >= toVersion)
-				throw new ArgumentException("Can't downgrade the application database. What happen?", "fromVersion");
+            using (var txn = conn.BeginTransaction()) {
+                if (fromVersion >= toVersion)
+                    throw new ArgumentException("Can't downgrade the application database. What happen?", "fromVersion");
 
-			for (; fromVersion < toVersion; ++fromVersion)
-				IncrementalUpgradeSchema(fromVersion + 1);
+                for (; fromVersion < toVersion; ++fromVersion)
+                    IncrementalUpgradeSchema(fromVersion + 1);
+
+
+                txn.Commit();
+            }
 		}
 
+        protected object GetMetadata(string name, object defaultValue) {
+            return Select(@"SELECT Value FROM Info WHERE Name = ?", name) ?? defaultValue;
+        }
+
+        protected void SetMetadata(string name, object value) {
+            if (Select(@"SELECT Value FROM Info WHERE Name = ?", name) == null)
+                ExecuteSQL(@"INSERT INTO Info (Name, Value) VALUES (?, ?)", name, value.ToString());
+            else
+                ExecuteSQL(@"UPDATE Info SET Value = ? WHERE Name = ?", value.ToString(), name);
+        }
+        
 		protected override void Dispose(bool disposing) {
 			if (disposing)
 				conn.Dispose();
@@ -115,14 +120,28 @@ namespace Szotar.Sqlite {
 
 	public abstract class SqliteObject : IDisposable {
 		protected DbConnection conn;
+        bool ownsConnection;
 
 		public SqliteObject(SqliteObject other) {
 			this.conn = other.conn;
+            ownsConnection = false;
 		}
 
 		protected SqliteObject(DbConnection connection) {
 			this.conn = connection;
+            ownsConnection = true;
 		}
+
+        protected static DbConnection OpenDatabase(string path) {
+            string dir = IO.Path.GetDirectoryName(path);
+            if (!IO.Directory.Exists(dir))
+                IO.Directory.CreateDirectory(dir);
+#if !MONO
+            return new System.Data.SQLite.SQLiteConnection("Data Source=" + path);
+#else
+			return new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path);
+#endif
+        }
 
 		/// <summary>
 		/// Get the ID of the last inserted row. This is equal to the primary key of that row, if one exists.
@@ -190,6 +209,8 @@ namespace Szotar.Sqlite {
 		}
 
 		protected virtual void Dispose(bool disposing) {
+            if(ownsConnection)
+                conn.Dispose();
 		}
 	}
 
@@ -202,14 +223,6 @@ namespace Szotar.Sqlite {
 
 		public SqliteDataStore(string path)
 			: base(path) {
-		}
-
-		protected override void UpgradeSchema(int fromVersion, int toVersion) {
-			using (var txn = Connection.BeginTransaction()) {
-				UpgradeSchemaInIncrements(fromVersion, toVersion);
-
-				txn.Commit();
-			}
 		}
 
 		protected override int ApplicationSchemaVersion() {
