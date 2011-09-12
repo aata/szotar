@@ -23,7 +23,6 @@ namespace Szotar.WindowsForms {
 		/// or if there is no existing instance, creates a new one.
 		/// </summary>
 		/// <typeparam name="T">The type of form to show.</typeparam>
-		/// <param name="predicate">A function that decides if an existing form is suitable to be shown.</param>
 		/// <param name="create">A function that creates a new form.</param>
 		/// <returns>The new or existing form.</returns>
 		public static T Show<T>(Func<T> create)

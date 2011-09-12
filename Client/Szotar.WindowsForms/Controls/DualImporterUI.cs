@@ -7,7 +7,6 @@ using System.Text;
 using System.Reflection;
 
 using System.Windows.Forms;
-using Szotar.WindowsForms.Importing.DictionaryImporting;
 using Szotar.WindowsForms.Importing;
 
 namespace Szotar.WindowsForms.Controls {
@@ -20,7 +19,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		private void PopulateImporterTypes() {
 			importerType.BeginUpdate();
-			Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			Assembly assembly = System.Reflection.Assembly.GetAssembly(typeof(IImporter<>));
 
 			foreach (Type type in assembly.GetTypes()) {
 				string name = null;
@@ -31,7 +30,8 @@ namespace Szotar.WindowsForms.Controls {
 					if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(IDictionarySection))
 						name = ((ImporterAttribute)attribute).Name;
 					else if (attribute is ImporterDescriptionAttribute)
-						description = ((ImporterDescriptionAttribute)attribute).GetLocalizedDescription(type, System.Globalization.CultureInfo.CurrentUICulture);
+                        description = ((ImporterDescriptionAttribute)attribute).Description ?? Resources.ImporterDescriptions.ResourceManager.GetString(
+                            ((ImporterDescriptionAttribute)attribute).ResourceIdentifier, System.Globalization.CultureInfo.CurrentUICulture) ?? description;
 				}
 
 				if (name != null) {

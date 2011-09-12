@@ -27,17 +27,18 @@ namespace Szotar.WindowsForms.Forms {
 
 				Attribute[] attributes = Attribute.GetCustomAttributes(type);
 				foreach (Attribute attribute in attributes) {
-					if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(IBilingualDictionary))
-						name = ((ImporterAttribute)attribute).Name;
-					else if (attribute is ImporterDescriptionAttribute)
-						description = ((ImporterDescriptionAttribute)attribute).GetLocalizedDescription(type, System.Globalization.CultureInfo.CurrentUICulture);
+                    if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(IBilingualDictionary))
+                        name = ((ImporterAttribute)attribute).Name;
+                    else if (attribute is ImporterDescriptionAttribute)
+                        description = Resources.ImporterDescriptions.ResourceManager.GetString(
+                            ((ImporterDescriptionAttribute)attribute).ResourceIdentifier, CultureInfo.CurrentUICulture) ?? description;
 				}
 
 				if (name != null) {
 					ImporterItem item = new ImporterItem(type, name, description);
 
 					// Not to be vain, or anything, but I think this should be the default choice of importer.
-					if (type == typeof(Importing.DictionaryImporting.DualSectionImporter)) {
+					if (type == typeof(Importing.DualSectionImporter)) {
 						select.Items.Insert(0, item);
 					} else {
 						select.Items.Add(item);
@@ -155,7 +156,7 @@ namespace Szotar.WindowsForms.Forms {
 				if (CurrentUI is Controls.ProgressUI) {
 					Controls.ProgressUI prog = (Controls.ProgressUI)CurrentUI;
 					prog.Percent = 100;
-					prog.Message = Properties.Resources.ImportFinished;
+                    prog.Message = Properties.Resources.ImportFinished;
 				}
 
 				this.imported = result;

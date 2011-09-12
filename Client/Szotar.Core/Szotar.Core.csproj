@@ -82,8 +82,10 @@
     <Compile Include="Base\DataStore.cs" />
     <Compile Include="Base\Delegates.cs" />
     <Compile Include="Base\Dictionary.cs" />
+    <Compile Include="Base\DictionaryImporting.cs" />
     <Compile Include="Base\DictionaryInfo.cs" />
     <Compile Include="Base\Entry.cs" />
+    <Compile Include="Base\Importing.cs" />
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\LineReader.cs" />
     <Compile Include="Base\LineWriter.cs" />

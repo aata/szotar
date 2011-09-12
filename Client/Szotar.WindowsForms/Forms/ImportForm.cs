@@ -29,12 +29,14 @@ namespace Szotar.WindowsForms.Forms {
 				string description = type.Name;
 
 				Attribute[] attributes = Attribute.GetCustomAttributes(type);
-				foreach (Attribute attribute in attributes) {
-					if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(WordList))
-						name = ((ImporterAttribute)attribute).Name;
-					else if (attribute is ImporterDescriptionAttribute)
-						description = ((ImporterDescriptionAttribute)attribute).GetLocalizedDescription(type, System.Globalization.CultureInfo.CurrentUICulture);
-				}
+                foreach (Attribute attribute in attributes) {
+                    if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(WordList))
+                        name = ((ImporterAttribute)attribute).Name;
+                    else if (attribute is ImporterDescriptionAttribute)
+                        description = Resources.ImporterDescriptions.ResourceManager.GetString(
+                            ((ImporterDescriptionAttribute)attribute).ResourceIdentifier, System.Globalization.CultureInfo.CurrentUICulture)
+                            ?? description;
+                }
 
 				if (name != null) {
 					importerSelection.Items.Add(new ImporterItem(type, name, description));
@@ -152,7 +154,7 @@ namespace Szotar.WindowsForms.Forms {
 				try {
 					importer.BeginImport();
 				} catch (ImportException ex) {
-					CurrentUI = new Szotar.WindowsForms.Controls.ErrorUI(ex.Message, ex.StackTrace);
+                    ImportFailed(ex);
 				}
 			}
 		}
