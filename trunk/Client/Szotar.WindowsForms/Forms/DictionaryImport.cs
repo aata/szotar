@@ -174,14 +174,15 @@ namespace Szotar.WindowsForms.Forms {
 					// TODO: Sanitize file name!
 				}
 
-				imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dictx";
+				string newPath = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dictx";
 
-				// We don't want to overwrite.
-				if (File.Exists(imported.Path)) {
-					name = Guid.NewGuid().ToString("D");
-					imported.Path = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ". dict";
-					imported.Save();
-				}
+				// We don't want to overwrite an existing dictionary.
+                if (File.Exists(newPath)) {
+                    name = Guid.NewGuid().ToString("D");
+                    newPath = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dictx";
+                }
+
+                imported.Path = newPath;
 
 				// If the dictionary can't save, we should delete the half-written file.
 				// TODO: this should probably avoid deleting the file if the error was caused

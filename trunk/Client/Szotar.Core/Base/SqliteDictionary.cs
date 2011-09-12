@@ -10,7 +10,6 @@ namespace Szotar {
 
         protected SqliteDictionary(string path)
             : base(path) {
-            Path = path;
             forwardsSection = new SqliteSection(this, 0);
             reverseSection = new SqliteSection(this, 1);
         }
@@ -72,16 +71,14 @@ namespace Szotar {
             }
             set {
                 string oldPath = Path;
-                conn.Dispose();
-                System.IO.File.Move(oldPath, value);
-                conn = OpenDatabase(value);
-                conn.Open();
+
+                base.Path = System.IO.Path.GetFullPath(value);
 
                 // Modify the list of open dictionaries.
                 oldPath = System.IO.Path.GetFullPath(oldPath);
                 if (openDicts.ContainsKey(oldPath)) {
                     openDicts.Remove(oldPath);
-                    openDicts.Add(System.IO.Path.GetFullPath(value), new NullWeakReference<SqliteDictionary>(this));
+                    openDicts[Path] = new NullWeakReference<SqliteDictionary>(this);
                 }
             }
         }

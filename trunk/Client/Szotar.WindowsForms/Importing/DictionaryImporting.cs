@@ -315,6 +315,104 @@ namespace Szotar.WindowsForms.Importing.DictionaryImporting {
 		void Cancel();
 	}
 
+    namespace Dbf {
+        using System.Data;
+        using System.Data.Common;
+
+        [Importer("DBF", typeof(IDictionarySection))]
+        [ImporterDescription("DBF Importer", "ImporterDescriptions", "Dbf")]
+        public class Importer : IDictionarySectionImporter {
+            long shouldCancel = 0L;
+
+            public SimpleDictionary.Section Import(string path, out SectionInfo info) {
+                var entries = new SortedDictionary<string, List<Translation>>();
+
+                using (var conn = Connect(path)) {
+                    int rows = 0;
+                    using (var getRowCount = conn.CreateCommand()) {
+                        getRowCount.CommandText = "SELECT COUNT(*) FROM SZOTAR;";
+                        rows = Convert.ToInt32(getRowCount.ExecuteScalar());
+                    }
+
+                    int row = 0, lastPercent = -1;
+                    using (var cmd = conn.CreateCommand()) {
+                        cmd.CommandText = "SELECT ANGOL, MAGYAR FROM SZOTAR;";
+                        using (var reader = cmd.ExecuteReader()) {
+                            while (reader.Read()) {
+                                row++;
+
+                                if (Interlocked.Read(ref shouldCancel) > 0)
+                                    throw new OperationCanceledException();
+                                var key = reader.GetString(0);
+                                var data = reader.GetString(1);
+
+                                int percent = row * 100 / (rows != 0 ? rows : 1);
+                                if (percent > lastPercent) {
+                                    OnProgressChanged(string.Format("Row {0} of {1}", row, rows), percent);
+                                    lastPercent = percent;
+                                }
+
+                                List<Translation> translations;
+                                if (entries.TryGetValue(key, out translations)) {
+                                    translations.Add(new Translation(data));
+                                } else {
+                                    entries.Add(key, new List<Translation>(new Translation[] { new Translation(data) }));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var actualEntries = new List<Entry>();
+                foreach(var kv in entries)
+                    actualEntries.Add(new Entry(kv.Key, kv.Value));
+                var section = new SimpleDictionary.Section(actualEntries, true, null);
+                foreach(var e in actualEntries)
+                    e.Tag = new EntryTag(section, null);
+
+                info = new SectionInfo {
+                    Date = DateTime.Now,
+                    ItemCount = actualEntries.Count,
+                    Size = 0,
+                    Name = "English-Hungarian"
+                };
+
+                return section;
+            }
+
+
+            private void OnProgressChanged(string message, int? percent) {
+                EventHandler<ProgressMessageEventArgs> temp = ProgressChanged;
+                if (temp != null)
+                    temp(this, new ProgressMessageEventArgs(message, percent));
+            }
+
+            DbConnection Connect(string path) {
+                var builder = new DbConnectionStringBuilder();
+                builder.Add("Provider", "Microsoft.Jet.OLEDB.4.0");
+                path = System.IO.Path.GetDirectoryName(path);
+                builder.Add("Data Source", path);
+                builder.Add("Extended Properties", "dBASE III");
+                var conn = new System.Data.OleDb.OleDbConnection(builder.ConnectionString);
+                conn.Open();
+                return conn;
+            }
+
+            public SectionInfo GetInfo(string path) {
+                return null;
+            }
+
+            public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
+
+            public void Cancel() {
+                Interlocked.Increment(ref shouldCancel);
+            }
+
+            public void Dispose() {
+            }
+        }
+    }
+
 	namespace Zbedic {
 		using GZipStream = System.IO.Compression.GZipStream;
 		using System.IO;
