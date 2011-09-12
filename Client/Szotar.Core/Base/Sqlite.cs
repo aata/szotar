@@ -30,6 +30,13 @@ namespace Szotar.Sqlite {
 
 		protected string Path {
 			get { return path; }
+            set {
+                conn.Close();
+                System.IO.File.Move(path, value);
+                path = value;
+                conn.ConnectionString = "Data Source=" + path;
+                conn.Open();
+            }
 		}
 
 		private void Init() {
