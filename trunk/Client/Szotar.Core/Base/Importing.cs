@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 
-namespace Szotar.WindowsForms.Importing {
+namespace Szotar {
 	[Serializable]
 	public class ImportException : Exception {
 		public ImportException(string message)
@@ -15,7 +15,7 @@ namespace Szotar.WindowsForms.Importing {
 
 	#region Attributes
 	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-	sealed class ImporterAttribute : Attribute {
+	public sealed class ImporterAttribute : Attribute {
 		// See the attribute guidelines at 
 		//  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
 		readonly string name;
@@ -36,41 +36,27 @@ namespace Szotar.WindowsForms.Importing {
 	}
 
 	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-	sealed class ImporterDescriptionAttribute : Attribute {
+    public sealed class ImporterDescriptionAttribute : Attribute {
 		// See the attribute guidelines at 
 		//  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
 		readonly string description;
-		readonly string resourceTableName;
 		readonly string resourceIdentifier;
 
 		public ImporterDescriptionAttribute(string description) {
 			this.description = description;
 		}
 
-		public ImporterDescriptionAttribute(string description, string resourceTableName, string resourceIdentifier) {
+		public ImporterDescriptionAttribute(string description, string resourceIdentifier) {
 			this.description = description;
-			this.resourceTableName = resourceTableName;
 			this.resourceIdentifier = resourceIdentifier;
 		}
 
-		public string PositionalString {
+		public string Description {
 			get { return description; }
-		}
-
-		public string ResourceTableName {
-			get { return resourceTableName; }
 		}
 
 		public string ResourceIdentifier {
 			get { return resourceIdentifier; }
-		}
-
-		public string GetLocalizedDescription(Type importer, System.Globalization.CultureInfo culture) {
-			if (resourceTableName == null)
-				return description;
-			System.Resources.ResourceManager rm = new System.Resources.ResourceManager("Szotar.WindowsForms.Resources.Strings." + resourceTableName, importer.Assembly);
-			string result = rm.GetString(resourceIdentifier, culture);
-			return result != null ? result : description;
 		}
 	}
 	#endregion
@@ -78,6 +64,24 @@ namespace Szotar.WindowsForms.Importing {
 	public interface INotifyProgress {
 		void SetProgressMessage(string message, int? percent);
 	}
+
+    public class ProgressMessageEventArgs : EventArgs {
+        readonly string message;
+        readonly int? percentage;
+
+        public ProgressMessageEventArgs(string message, int? percentage) {
+            this.message = message;
+            this.percentage = percentage;
+        }
+
+        public string Message {
+            get { return message; }
+        }
+
+        public int? Percentage {
+            get { return percentage; }
+        }
+    }
 
 	public class ImportCompletedEventArgs<T> : AsyncCompletedEventArgs {
 		T importedObject;
@@ -92,24 +96,6 @@ namespace Szotar.WindowsForms.Importing {
 				RaiseExceptionIfNecessary();
 				return importedObject;
 			}
-		}
-	}
-
-	public class ProgressMessageEventArgs : EventArgs {
-		readonly string message;
-		readonly int? percentage;
-
-		public ProgressMessageEventArgs(string message, int? percentage) {
-			this.message = message;
-			this.percentage = percentage;
-		}
-
-		public string Message {
-			get { return message; }
-		}
-
-		public int? Percentage {
-			get { return percentage; }
 		}
 	}
 

@@ -30,9 +30,14 @@ namespace Szotar {
             return dict;
         }
 
-        public void AddEntries(IEnumerable<Entry> forwards, IEnumerable<Entry> backwards) {
-            forwardsSection.AddEntries(forwards);
-            reverseSection.AddEntries(backwards);
+        public void AddEntries(IList<Entry> forwards, IList<Entry> backwards, Action<int, int> notify = null) {
+            if (notify == null) {
+                forwardsSection.AddEntries(forwards, null);
+                reverseSection.AddEntries(backwards, null);
+            } else {
+                forwardsSection.AddEntries(forwards, (i, n) => notify(i, n + backwards.Count));
+                forwardsSection.AddEntries(backwards, (i, n) => notify(i + forwards.Count, n + forwards.Count));
+            }
         }
 
         protected override void  Dispose(bool disposing) {
@@ -206,7 +211,7 @@ namespace Szotar {
 
         public int HeadWords {
             get {
-                return (int)Select(@"SELECT COUNT(*) FROM Phrases WHERE Section = ?", section);
+                return Convert.ToInt32(Select(@"SELECT COUNT(*) FROM Phrases WHERE Section = ?", section));
             }
         }
 
@@ -297,8 +302,11 @@ namespace Szotar {
             return (System.Collections.IEnumerator)this.GetEnumerator();
         }
 
-        public void AddEntries(IEnumerable<Entry> entries) {
-            using (var txn = conn.BeginTransaction()) {
+        public void AddEntries(IList<Entry> entries, Action<int, int> notify) {
+            int i = 0;
+            var txn = conn.BeginTransaction();
+
+            try {
                 using (var addPhrase = conn.CreateCommand()) {
                     var phraseParam = addPhrase.CreateParameter();
                     addPhrase.Parameters.Add(phraseParam);
@@ -318,7 +326,15 @@ namespace Szotar {
                             phraseParam.Value = e.Phrase;
                             addPhrase.ExecuteNonQuery();
 
-                            foreach(var t in e.Translations) {
+                            if (++i % 1024 == 0) {
+                                // txn.Commit();
+                                // txn.Dispose();
+                                // txn = conn.BeginTransaction();
+                                if (notify != null)
+                                    notify(i - 1, entries.Count);
+                            }
+
+                            foreach (var t in e.Translations) {
                                 ownerPhrase.Value = GetLastInsertRowID();
                                 translationParam.Value = t.Value;
                                 addTranslation.ExecuteNonQuery();
@@ -327,6 +343,8 @@ namespace Szotar {
                     }
                 }
                 txn.Commit();
+            } finally {
+                txn.Dispose();
             }
         }
 

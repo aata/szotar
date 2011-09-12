@@ -204,7 +204,7 @@ namespace Szotar.WindowsForms.Forms {
 		// There should either be a mechanism to refresh or a delay in the adding of this. If there is a delay, it should
 		// also take into account the possibility that the file has been deleted before the delay completed.
 		void fileSystemWatcher_Created(object sender, System.IO.FileSystemEventArgs e) {
-			if (System.IO.Path.GetExtension(e.FullPath) != ".dict")
+            if (System.IO.Path.GetExtension(e.FullPath) != ".dict" && System.IO.Path.GetExtension(e.FullPath) != ".dictx")
 				return;
 
 			var timer = new Timer();

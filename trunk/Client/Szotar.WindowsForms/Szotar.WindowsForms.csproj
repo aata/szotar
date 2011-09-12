@@ -81,6 +81,7 @@
     <AssemblyName>Szotar.WindowsForms</AssemblyName>
     <DefineConstants>MONO</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -170,7 +171,6 @@
     <Compile Include="Forms\LogViewerForm.Designer.cs">
       <DependentUpon>LogViewerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Importing\DictionaryImporting.cs" />
     <Compile Include="Base\FileIsInUse.cs" />
     <Compile Include="Base\NativeToolStripRenderer.cs" />
     <Compile Include="Base\Preferences.cs">
@@ -225,7 +225,7 @@
     <Compile Include="Forms\StartPage.designer.cs">
       <DependentUpon>StartPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Importing\Importing.cs" />
+    <Compile Include="Importing\DualSection.cs" />
     <Compile Include="Importing\ListImporting.cs" />
     <Compile Include="Preferences\Display.cs">
       <SubType>UserControl</SubType>
