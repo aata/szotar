@@ -63,8 +63,23 @@ namespace Szotar.WindowsForms.Forms {
 				importer = (IImporter<IBilingualDictionary>)item.Type.GetConstructor(new Type[] { }).Invoke(new object[] { });
 				WireImporterEvents();
 
-				// To do: add an "error message" UI on failure.
-				IImporterUI<IBilingualDictionary> newUI = importer.CreateUI();
+                IImporterUI<IBilingualDictionary> newUI = null;
+                foreach (Type t in Assembly.GetExecutingAssembly().GetTypes()) {
+                    var attr = Attribute.GetCustomAttribute(t, typeof(ImporterUIAttribute)) as ImporterUIAttribute;
+                    if (attr != null) {
+                        Activator.CreateInstance(attr.ImporterType);
+                        break;
+                    }
+                }
+
+                if (newUI == null) {
+                    CurrentUI = new Controls.ErrorUI("No UI for " + item.Name, "");
+                    UnwireImporterEvents();
+                    importer.Dispose();
+                    importer = null;
+                    return;
+                }
+
 				newUI.Finished += new EventHandler(this.ImporterUIFinished);
 				CurrentUI = (Control)newUI;
 			}

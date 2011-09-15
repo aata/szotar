@@ -25,6 +25,21 @@ namespace Szotar {
 
 		void Save();
 	}
+    
+    public interface IOneWayDictionary : IDisposable, ISearchDataSource {
+        string Name { get; set; }
+        string Author { get; set; }
+        string Path { get; set; }
+        string Url { get; set; }
+        string FirstLanguage { get; set; }
+        string SecondLanguage { get; set; }
+        string FirstLanguageCode { get; set; }
+        string SecondLanguageCode { get; set; }
+
+        void AddEntries(ICollection<Entry> entries); 
+
+        DictionaryInfo Info { get; }
+    }
 
 	public static class Dictionary {
 		public static IEnumerable<DictionaryInfo> GetAll() {

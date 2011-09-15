@@ -245,29 +245,27 @@ namespace Szotar {
             else
                 searchString = "%" + search.Replace("%", "%%") + "%";
 
-            using(var reader = SelectReader(
-                // TODO: Better phrase matching
-                @"TYPES Integer, String;
-                        SELECT PhraseID, Phrase FROM Phrases 
-                        WHERE Section = ? AND FilterPhrase(?, ?, Phrase, ?) = 1", section, ignoreCase ? 1 : 0, ignoreAccents ? 1 : 0, search)) {
-                
-                while (reader.Read()) {
-                    var sr = GetSearchResult(search, reader.GetString(1), reader.GetInt32(0));
-                    if (sr != null)
-                        yield return sr;
+            var srs = new List<SearchResult>();
+            Metrics.Measure("Search for " + search, delegate {
+                using (var reader = SelectReader(
+                    // TODO: Better phrase matching
+                    @"TYPES Integer, String, Integer;
+                        SELECT PhraseID, Phrase, 1 AS i FROM Phrases 
+                        WHERE Section = ? AND i != -1", ignoreCase ? 1 : 0, ignoreAccents ? 1 : 0, search, section)) {
+
+                    while (reader.Read()) {
+                        var sr = GetSearchResult(search, reader.GetString(1), reader.GetInt32(0), (MatchType)reader.GetInt32(2));
+                        if (sr != null)
+                            srs.Add(sr);
+                    }
                 }
-            }
+            });
+
+            return srs;
         }
 
-        SearchResult GetSearchResult(string search, string phrase, int phraseID) {
+        SearchResult GetSearchResult(string search, string phrase, int phraseID, MatchType matchType) {
             var entry = new Entry(phrase, null);
-            var matchType = MatchType.NormalMatch;
-            if (entry.Phrase == search)
-                matchType = MatchType.PerfectMatch;
-            else if (entry.Phrase.StartsWith(search))
-                matchType = MatchType.StartMatch;
-            if (string.IsNullOrEmpty(search))
-                matchType = MatchType.NormalMatch;
             entry.Tag = new EntryTag(this, phraseID);
             return new SearchResult(entry, matchType);
         }
@@ -355,9 +353,9 @@ namespace Szotar {
         }
     }
 
-    [SQLiteFunction(Name = "FilterPhrase", FuncType = FunctionType.Scalar, Arguments = 4)]
-    public class FilterPhrase : SQLiteFunction {
-        public FilterPhrase() {}
+    [SQLiteFunction(Name = "GetMatch", FuncType = FunctionType.Scalar, Arguments = 4)]
+    public class GetMatch : SQLiteFunction {
+        public GetMatch() { }
 
         public override object Invoke(object[] args) {
             var x = args[2].ToString();
@@ -365,12 +363,23 @@ namespace Szotar {
             bool ignoreCase = Convert.ToInt32(args[0]) == 1;
             bool ignoreAccents = Convert.ToInt32(args[1]) == 1;
 
-            if (ignoreAccents)
-                return Searcher.Contains(x, y, ignoreCase);
+            if (ignoreAccents) {
+                var mt = Searcher.GetMatch(x, y, ignoreCase);
+                if (mt == null)
+                    return -1;
+                return mt.Value;
+            }
 
-           if(x.IndexOf(y, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) >= 0)
-               return 1;
-           return 0;
+            var i = x.IndexOf(y, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+            if (i == 0) {
+                if (x.Length == y.Length)
+                    return (int)MatchType.PerfectMatch;
+                return (int)MatchType.StartMatch;
+            } else if (i > 0) {
+                return (int)MatchType.NormalMatch;
+            } else {
+                return -1;
+            }
         }
     }
 }

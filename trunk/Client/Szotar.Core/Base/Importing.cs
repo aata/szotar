@@ -14,26 +14,41 @@ namespace Szotar {
 	}
 
 	#region Attributes
-	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-	public sealed class ImporterAttribute : Attribute {
-		// See the attribute guidelines at 
-		//  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
-		readonly string name;
-		readonly Type type;
+    [global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    public sealed class ImporterAttribute : Attribute {
+        // See the attribute guidelines at 
+        //  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
+        readonly string name;
+        readonly Type type;
 
-		public ImporterAttribute(string name, Type type) {
-			this.name = name;
-			this.type = type;
-		}
+        public ImporterAttribute(string name, Type type) {
+            this.name = name;
+            this.type = type;
+        }
 
-		public string Name {
-			get { return name; }
-		}
+        public string Name {
+            get { return name; }
+        }
 
-		public Type Type {
-			get { return type; }
-		}
-	}
+        public Type Type {
+            get { return type; }
+        }
+    }
+
+    [global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    public sealed class ImporterUIAttribute : Attribute {
+        // See the attribute guidelines at 
+        //  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
+        readonly Type importerType;
+
+        public ImporterUIAttribute(Type importerType) {
+            this.importerType = importerType;
+        }
+
+        public Type ImporterType {
+            get { return importerType; }
+        }
+    }
 
 	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class ImporterDescriptionAttribute : Attribute {
