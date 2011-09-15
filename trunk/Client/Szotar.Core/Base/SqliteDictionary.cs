@@ -248,9 +248,8 @@ namespace Szotar {
             var srs = new List<SearchResult>();
             Metrics.Measure("Search for " + search, delegate {
                 using (var reader = SelectReader(
-                    // TODO: Better phrase matching
                     @"TYPES Integer, String, Integer;
-                        SELECT PhraseID, Phrase, 1 AS i FROM Phrases 
+                        SELECT PhraseID, Phrase, GetMatch(?, ?, Phrase, ?) AS i FROM Phrases 
                         WHERE Section = ? AND i != -1", ignoreCase ? 1 : 0, ignoreAccents ? 1 : 0, search, section)) {
 
                     while (reader.Read()) {
