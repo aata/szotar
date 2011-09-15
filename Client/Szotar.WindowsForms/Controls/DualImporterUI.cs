@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Szotar.WindowsForms.Importing;
 
 namespace Szotar.WindowsForms.Controls {
+    [ImporterUI(typeof(DualSectionImporter))]
 	public partial class DualImporterUI : UserControl, IImporterUI<IBilingualDictionary> {
 		Control currentUI;
 		DualSectionImporter importer;

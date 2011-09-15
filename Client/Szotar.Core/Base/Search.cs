@@ -189,13 +189,19 @@ namespace Szotar {
 
         // Determine if x contains y, irrespective of accented characters and standalone accents.
         public static bool Contains(string x, string y, bool ignoreCase) {
+            return GetMatch(x, y, ignoreCase) != null;
+        }
+
+        public static MatchType? GetMatch(string x, string y, bool ignoreCase) {
+            // return x.IndexOf(y, StringComparison.Ordinal); 
+
             if (string.IsNullOrEmpty(y))
-                return true;
+                return MatchType.NormalMatch;
 
             // Find the first non-accent char in y
             int firstY = -1;
             for (int i = 0; i < y.Length; ++i) {
-                if (char.GetUnicodeCategory(y[i]) != System.Globalization.UnicodeCategory.NonSpacingMark) {
+                if (!accentTable.IsAccent(y[i])) {
                     firstY = i;
                     break;
                 }
@@ -203,7 +209,7 @@ namespace Szotar {
 
             // No actual characters in y
             if (firstY == -1)
-                return true;
+                return MatchType.NormalMatch;
 
             // The first thing to do is to look for the first character of y in x.
             char searchFor = accentTable[y[firstY]];
@@ -213,7 +219,7 @@ namespace Szotar {
             for (int i = 0; i < x.Length; ++i) {
                 // Skip combining diacritics (some accented characters are made of a base character and a combining diacritic character.
                 // Unicode calls it a non-spacing mark.)
-                if (char.GetUnicodeCategory(x[i]) == System.Globalization.UnicodeCategory.NonSpacingMark)
+                if (accentTable.IsAccent(x[i]))
                     continue;
 
                 char cx = accentTable[x[i]];
@@ -221,19 +227,30 @@ namespace Szotar {
                     cx = char.ToLower(cx);
 
                 if (cx == searchFor) {
+                    int foundAt = i;
+
                     // Once we find it, iterate through x and y at the same time.
                     // If we reach the end of y without either running off the end of x
                     // or finding a non-match, x contains y.
                     for (int j = firstY; ; ) {
-                        while (i < x.Length && char.GetUnicodeCategory(x[i]) == System.Globalization.UnicodeCategory.NonSpacingMark)
+                        while (i < x.Length && accentTable.IsAccent(x[i]))
                             ++i;
+                        bool hasX = true;
                         if (i >= x.Length)
-                            return false;
+                            hasX = false;
 
-                        while (j < y.Length && char.GetUnicodeCategory(y[j]) == System.Globalization.UnicodeCategory.NonSpacingMark)
+                        while (j < y.Length && accentTable.IsAccent(y[j]))
                             ++j;
-                        if (j >= y.Length)
-                            return true;
+                        if (j >= y.Length) {
+                            if (foundAt > 0)
+                                return MatchType.NormalMatch;
+                            if (hasX)
+                                return MatchType.PerfectMatch;
+                            return MatchType.StartMatch; // Found y.
+                        }
+
+                        if (!hasX)
+                            return null;
 
                         cx = x[i];
                         char cy = accentTable[y[j]];
@@ -245,15 +262,23 @@ namespace Szotar {
                         if (cx != cy)
                             break;
 
-                        if (++j >= y.Length)
-                            return true;
                         if (++i >= x.Length)
-                            return false;
+                            hasX = false;
+                        if (++j >= y.Length) {
+                            if (foundAt > 0)
+                                return MatchType.NormalMatch;
+                            if (!hasX)
+                                return MatchType.PerfectMatch;
+                            return MatchType.StartMatch;
+                        }
+                        
+                        if (!hasX)
+                            return null;
                     }
                 }
             }
 
-            return false;
+            return null;
         }
 
         // Speeds up converting accented characters to non-accented characteres by way of
@@ -261,6 +286,14 @@ namespace Szotar {
         // the BMP are not currently supported.
         class AccentTable {
             char[] bmp = null;
+            bool[] isAccent = null;
+
+            public bool IsAccent(char c) {
+                if (isAccent == null)
+                    InitTable();
+
+                return isAccent[(int)c];
+            }
 
             public char this[char index] {
                 get {
@@ -276,32 +309,38 @@ namespace Szotar {
             }
 
             private void InitTable() {
-                bmp = new char[65536];
+                Metrics.Measure("Initializing accent removal table", delegate {
+                    bmp = new char[65536];
+                    isAccent = new bool[65536];
 
-                for (int i = 0; i < 65536; ++i) {
-                    char c = (char)i;
+                    for (int i = 0; i < 65536; ++i) {
+                        char c = (char)i;
 
-                    if (char.GetUnicodeCategory(c) == System.Globalization.UnicodeCategory.Surrogate)
-                        continue;
-
-                    // Normalize() throws exceptions on some characters because they aren't valid on their own.
-                    try {
-                        string denorm = new string(c, 1).Normalize(NormalizationForm.FormD);
-
-                        var sb = new StringBuilder(denorm.Length);
-                        foreach (char x in denorm) {
-                            if (char.GetUnicodeCategory(x) != System.Globalization.UnicodeCategory.NonSpacingMark) {
-                                bmp[i] = x;
-                                break;
-                            }
+                        var category = char.GetUnicodeCategory(c);
+                        if (category == System.Globalization.UnicodeCategory.NonSpacingMark) {
+                            isAccent[i] = true;
+                            continue;
                         }
-                    } catch (ArgumentException) { 
-                        // This character isn't a valid code point on its own
+
+                        if (category == System.Globalization.UnicodeCategory.Surrogate)
+                            continue;
+
+                        // Normalize() throws exceptions on some characters because they aren't valid on their own.
+                        try {
+                            string denorm = new string(c, 1).Normalize(NormalizationForm.FormD);
+
+                            foreach (char x in denorm) {
+                                if (char.GetUnicodeCategory(x) != System.Globalization.UnicodeCategory.NonSpacingMark) {
+                                    bmp[i] = x;
+                                    break;
+                                }
+                            }
+                        } catch (ArgumentException) {
+                            // This character isn't a valid code point on its own
+                        }
                     }
-                }
+                });
             }
         }
-
-        
     }
 }
