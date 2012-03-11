@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 using Szotar.WindowsForms.Importing;
 
@@ -19,32 +20,35 @@ namespace Szotar.WindowsForms.Forms {
 			this.Closed += new EventHandler(DictionaryImport_Closed);
 
 			select.BeginUpdate();
-			Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 
-			foreach (Type type in assembly.GetTypes()) {
-				string name = null;
-				string description = type.Name;
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                foreach (Type type in assembly.GetTypes()) {
+                    string name = null;
+                    string description = type.Name;
 
-				Attribute[] attributes = Attribute.GetCustomAttributes(type);
-				foreach (Attribute attribute in attributes) {
-                    if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(IBilingualDictionary))
-                        name = ((ImporterAttribute)attribute).Name;
-                    else if (attribute is ImporterDescriptionAttribute)
-                        description = Resources.ImporterDescriptions.ResourceManager.GetString(
-                            ((ImporterDescriptionAttribute)attribute).ResourceIdentifier, CultureInfo.CurrentUICulture) ?? description;
-				}
+                    Attribute[] attributes = Attribute.GetCustomAttributes(type);
+                    foreach (Attribute attribute in attributes) {
+                        if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(IBilingualDictionary))
+                            name = ((ImporterAttribute)attribute).Name;
+                        else if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(IDictionarySection))
+                            name = ((ImporterAttribute)attribute).Name;
+                        else if (attribute is ImporterDescriptionAttribute)
+                            description = Resources.ImporterDescriptions.ResourceManager.GetString(
+                                ((ImporterDescriptionAttribute)attribute).ResourceIdentifier, CultureInfo.CurrentUICulture) ?? description;
+                    }
 
-				if (name != null) {
-					ImporterItem item = new ImporterItem(type, name, description);
+                    if (name != null) {
+                        ImporterItem item = new ImporterItem(type, name, description);
 
-					// Not to be vain, or anything, but I think this should be the default choice of importer.
-					if (type == typeof(Importing.DualSectionImporter)) {
-						select.Items.Insert(0, item);
-					} else {
-						select.Items.Add(item);
-					}
-				}
-			}
+                        // Not to be vain, or anything, but I think this should be the default choice of importer.
+                        if (type == typeof(Importing.DualSectionImporter)) {
+                            select.Items.Insert(0, item);
+                        } else {
+                            select.Items.Add(item);
+                        }
+                    }
+                }
+            }
 
 			select.EndUpdate();
 
@@ -60,18 +64,27 @@ namespace Szotar.WindowsForms.Forms {
 					importer.Dispose();
 				}
 
-				importer = (IImporter<IBilingualDictionary>)item.Type.GetConstructor(new Type[] { }).Invoke(new object[] { });
-				WireImporterEvents();
-
                 IImporterUI<IBilingualDictionary> newUI = null;
-                foreach (Type t in Assembly.GetExecutingAssembly().GetTypes()) {
-                    var attr = Attribute.GetCustomAttribute(t, typeof(ImporterUIAttribute)) as ImporterUIAttribute;
-                    if (attr != null) {
-                        Activator.CreateInstance(attr.ImporterType);
-                        break;
-                    }
-                }
 
+                if (item.Type.GetInterfaces().Contains(typeof(IDictionarySectionImporter))) {
+                    var si = (IDictionarySectionImporter)item.Type.GetConstructor(new Type[] { }).Invoke(new object[] { });
+                    var dsi = new DualSectionImporter();
+                    newUI = new Controls.DictionarySectionUI(dsi, si);
+                    importer = dsi;
+                } else if(item.Type.IsSubclassOf(typeof(IBilingualDictionary))) {
+                    importer = (IImporter<IBilingualDictionary>)item.Type.GetConstructor(new Type[] { }).Invoke(new object[] { });
+
+                    foreach (Type t in importer.GetType().Assembly.GetTypes()) {
+                        var attr = Attribute.GetCustomAttribute(t, typeof(ImporterUIAttribute)) as ImporterUIAttribute;
+                        if (attr != null) {
+                            newUI = (IImporterUI<IBilingualDictionary>)Activator.CreateInstance(t, importer);
+                            break;
+                        }
+                    }
+				}
+
+                WireImporterEvents();
+                
                 if (newUI == null) {
                     CurrentUI = new Controls.ErrorUI("No UI for " + item.Name, "");
                     UnwireImporterEvents();
@@ -190,12 +203,12 @@ namespace Szotar.WindowsForms.Forms {
 					// TODO: Sanitize file name!
 				}
 
-				string newPath = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dictx";
+				string newPath = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dict";
 
 				// We don't want to overwrite an existing dictionary.
                 if (File.Exists(newPath)) {
                     name = Guid.NewGuid().ToString("D");
-                    newPath = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dictx";
+                    newPath = Path.Combine(Path.Combine(root, Configuration.DictionariesFolderName), name) + ".dict";
                 }
 
                 imported.Path = newPath;
