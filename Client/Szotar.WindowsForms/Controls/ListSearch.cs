@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 
 using WordSearchResult = Szotar.Sqlite.SqliteDataStore.WordSearchResult;
 
@@ -18,6 +19,8 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
+
+        readonly IListStore recentListStore;
 		public ListSearch() {
 			InitializeComponent();
 
@@ -26,7 +29,7 @@ namespace Szotar.WindowsForms.Controls {
 			if (ReallyDesignMode)
 				return;
 
-			listStores.Add(new RecentListStore());
+			listStores.Add(recentListStore = new RecentListStore());
 			listStores.Add(new SqliteListStore(DataStore.Database));
 
 			search.Click += (s, e) => UpdateResults();
@@ -62,6 +65,8 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private bool PopulateResults(int? maxCount) {
+            var recentLists = recentListStore.GetLists().ToList();
+
 			foreach (IListStore store in listStores) {
 				string storeName = store.Name;
 				ListViewGroup group = new ListViewGroup(storeName);
@@ -72,6 +77,9 @@ namespace Szotar.WindowsForms.Controls {
 
 					if (results.Items.Count > maxCount)
 						return false;
+
+                    if (store != recentListStore && recentLists.Count(a => a.ID == list.ID) > 0)
+                        continue;
 
 					ListViewItem item = new ListViewItem(
 						new string[] { list.Name, 
