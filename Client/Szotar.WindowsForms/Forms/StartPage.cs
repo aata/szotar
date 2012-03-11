@@ -9,9 +9,6 @@ namespace Szotar.WindowsForms.Forms {
 		public StartPage() {
 			InitializeComponent();
 
-			ThemeHelper.UseExplorerTheme(dictionaries, recentDictionaries, recentLists);
-			recentDictionaries.Scrollable = recentLists.Scrollable = false;
-			
 			// http://www.ben.geek.nz/controldesignmode-misbehaving/
 			if (System.ComponentModel.LicenseManager.UsageMode == System.ComponentModel.LicenseUsageMode.Designtime)
 				return;
@@ -19,16 +16,14 @@ namespace Szotar.WindowsForms.Forms {
 			exitProgram.Text = string.Format(exitProgram.Text, Application.ProductName);
 
 			PopulateDictionaries();
-			PopulateRecentDictionaries();
-			PopulateRecentLists();
+			PopulateRecentItems();
 
-			recentDictionaries.ItemActivate += new EventHandler(recentDictionaries_ItemActivate);
-			recentDictionaries.Resize += new EventHandler((s, e) => recentDictionaries.Columns[0].Width = recentDictionaries.ClientSize.Width);
-			recentDictionaries.Columns[0].Width = recentDictionaries.ClientSize.Width;
+			recentItems.ItemActivate += new EventHandler(recentItems_ItemActivate);
+			recentItems.Resize += new EventHandler((s, e) => recentItems.Columns[0].Width = recentItems.ClientSize.Width);
+			recentItems.Columns[0].Width = recentItems.ClientSize.Width;
+            recentItems.Groups.Add(dictsGroup);
+            recentItems.Groups.Add(listsGroup);
 
-			recentLists.ItemActivate += new EventHandler(recentLists_ItemActivate);
-			recentLists.Resize += new EventHandler((s, e) => recentLists.Columns[0].Width = recentLists.ClientSize.Width);
-			recentLists.Columns[0].Width = recentLists.ClientSize.Width;
 			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(WordListDeleted);
 
 			listSearch.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(listSearch_ListsChosen);
@@ -46,7 +41,10 @@ namespace Szotar.WindowsForms.Forms {
 			fileSystemWatcher.Renamed += new System.IO.RenamedEventHandler(fileSystemWatcher_Renamed);
 
 			Configuration.Default.SettingChanged += new EventHandler<SettingChangedEventArgs>(SettingChanged);
-			this.FormClosed += new FormClosedEventHandler(OnFormClosed);
+            this.FormClosed += new FormClosedEventHandler(OnFormClosed);
+            
+            recentItems.Scrollable = false;
+            ThemeHelper.UseExplorerTheme(dictionaries, recentItems);
 		}
 
 		private static void DistributeColumns(ListView lv, params int[] weights) {
@@ -80,38 +78,59 @@ namespace Szotar.WindowsForms.Forms {
 
 		void SettingChanged(object sender, SettingChangedEventArgs e) {
 			if (e.SettingName == "RecentLists") {
+                PopulateRecentItems();
 			} else if (e.SettingName == "RecentDictionaries") {
-				PopulateRecentDictionaries();
+				PopulateRecentItems();
 			}
 		}
 
-		#region Recent Dictionaries
-		void recentDictionaries_ItemActivate(object sender, EventArgs e) {
-			foreach (ListViewItem item in recentDictionaries.SelectedItems) {
+        #region Recent Items
+        ListViewGroup dictsGroup = new ListViewGroup("Recent Dictionaries");
+        ListViewGroup listsGroup = new ListViewGroup("Recent Word Lists");
+        private void PopulateRecentItems() {
+            var rd = GuiConfiguration.RecentDictionaries;
+            var mru = Configuration.RecentLists;
+
+            if (rd == null && mru == null) {
+                recentItems.Items.Clear();
+                return;
+            }
+
+            WithUpdate(recentItems, lv => {
+                lv.Items.Clear();
+
+                for (int i = 0; i < rd.Entries.Count; ++i) {
+                    if (System.IO.File.Exists(rd.Entries[i].Path)) {
+                        var item = new ListViewItem(new[] { rd.Entries[i].Name });
+                        item.Tag = rd.Entries[i];
+                        item.Text = rd.Entries[i].Name;
+                        item.ImageKey = "Dictionary";
+                        item.Group = dictsGroup;
+                        lv.Items.Add(item);
+                    }
+                }
+
+                for (int i = 0; i < 6 && i < mru.Count; ++i) {
+                    var item = new ListViewItem(new[] { mru[i].Name });
+                    item.Tag = mru[i].ID;
+                    item.Text = mru[i].Name;
+                    item.ImageKey = "List";
+                    item.Group = listsGroup;
+                    lv.Items.Add(item);
+                }
+            });
+        }
+        #endregion
+
+        #region Recent Dictionaries
+        void recentItems_ItemActivate(object sender, EventArgs e) {
+			foreach (ListViewItem item in recentItems.SelectedItems) {
 				if (item.Tag != null && item.Tag is DictionaryInfo)
-					LookupForm.OpenDictionary(item.Tag as DictionaryInfo);
+                    LookupForm.OpenDictionary(item.Tag as DictionaryInfo);
+                long? id = ListIDFromRecentList(item);
+                if (id != null)
+                    ListBuilder.Open(id.Value);
 			}
-		}
-
-		private void PopulateRecentDictionaries() {
-			var rd = GuiConfiguration.RecentDictionaries;
-			if(rd == null) {
-				recentDictionaries.Items.Clear();
-				return;
-			}
-
-			WithUpdate(recentDictionaries, lv => {
-				lv.Items.Clear();
-				for (int i = 0; i < rd.Entries.Count; ++i) {
-					if (System.IO.File.Exists(rd.Entries[i].Path)) {
-						var item = new ListViewItem(new[] { rd.Entries[i].Name });
-						item.Tag = rd.Entries[i];
-						item.Text = rd.Entries[i].Name;
-						item.ImageKey = "Dictionary";
-						lv.Items.Add(item);
-					}
-				}
-			});
 		}
 		#endregion
 
@@ -122,12 +141,8 @@ namespace Szotar.WindowsForms.Forms {
 			return null;
 		}
 
-		void recentLists_ItemActivate(object sender, EventArgs e) {
-			OpenSelectedRecentLists();
-		}
-
 		void OpenSelectedRecentLists() {			
-			foreach (ListViewItem item in recentLists.SelectedItems) {
+			foreach (ListViewItem item in recentItems.SelectedItems) {
 				long? id = ListIDFromRecentList(item);
 				if (id != null)
 					ListBuilder.Open(id.Value);
@@ -137,7 +152,7 @@ namespace Szotar.WindowsForms.Forms {
 		void PracticeSelectedRecentLists(PracticeMode mode) {
 			var lists = new List<ListSearchResult>();
 
-			foreach (ListViewItem item in recentLists.SelectedItems) {
+			foreach (ListViewItem item in recentItems.SelectedItems) {
 				long? id = ListIDFromRecentList(item);
 				if (id != null)
 					lists.Add(new ListSearchResult(id.Value));
@@ -146,34 +161,16 @@ namespace Szotar.WindowsForms.Forms {
 			PracticeLists(mode, lists);
 		}
 
-		private void PopulateRecentLists() {
-			var mru = Configuration.RecentLists;
-			if (mru == null) {
-				recentLists.Items.Clear();
-				return;
-			}
-
-			WithUpdate(recentLists, lv => {
-				lv.Items.Clear();
-				for (int i = 0; i < 6 && i < mru.Count; ++i) {
-					var item = new ListViewItem(new[] { mru[i].Name });
-					item.Tag = mru[i].ID;
-					item.Text = mru[i].Name;
-					item.ImageKey = "List";
-					lv.Items.Add(item);
-				}
-			});
-		}
-
 		void WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
-			foreach (ListViewItem item in recentLists.Items) {
-				if ((long?)item.Tag == e.SetID) {
-					recentLists.Items.Remove(item);
+			foreach (ListViewItem item in recentItems.Items) {
+				if (item.Tag is long && (long?)item.Tag == e.SetID) {
+                    recentItems.Items.Remove(item);
 					return;
 				}
 			}
 		}
 		#endregion
+        
 
 		#region File system watching
 		void fileSystemWatcher_Renamed(object sender, System.IO.RenamedEventArgs e) {
@@ -292,21 +289,21 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Context Menu
 		private void openListMI_Click(object sender, EventArgs e) {
-			if (ActiveControl == recentLists)
+			if (ActiveControl == recentItems)
 				OpenSelectedRecentLists();
 			else if (ActiveControl == listSearch)
 				OpenLists(listSearch.Accept());
 		}
 
 		private void flashcardsListMI_Click(object sender, EventArgs e) {
-			if (ActiveControl == recentLists)
+			if (ActiveControl == recentItems)
 				PracticeSelectedRecentLists(PracticeMode.Flashcards);
 			else if (ActiveControl == listSearch)
 				PracticeLists(PracticeMode.Flashcards, listSearch.Accept());
 		}
 
 		private void learnListMI_Click(object sender, EventArgs e) {
-			if (ActiveControl == recentLists)
+            if (ActiveControl == recentItems)
 				PracticeSelectedRecentLists(PracticeMode.Learn);
 			else if (ActiveControl == listSearch)
 				PracticeLists(PracticeMode.Learn, listSearch.Accept());
@@ -411,6 +408,21 @@ namespace Szotar.WindowsForms.Forms {
 			ShowForm.Show<About>();
 		}
 		#endregion
+
+        private void listContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e) {
+            bool showListEntries = false;
+
+            if (recentItems.SelectedItems.Count == 0)
+                e.Cancel = true;
+
+            foreach (ListViewItem item in recentItems.SelectedItems) {
+                if (item.Tag is long) {
+                    showListEntries = true;
+                    break;
+                }
+            }
+            newListMI.Enabled = listContextMenuSeparator.Enabled = flashcardsListMI.Enabled = learnListMI.Enabled = showListEntries;
+        }
 	}
 
 	public enum StartPageTab {
