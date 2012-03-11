@@ -5,13 +5,24 @@ using System.Data.Common;
 using System.Collections.Generic;
 
 namespace Szotar {
+    static class DbExtensions {
+        public static DbCommand AddParam(this DbCommand command, ref DbParameter param) {
+            command.Parameters.Add(param = command.CreateParameter());
+            return command;
+        }
+    }
+
     public class SqliteDictionary : Sqlite.SqliteDatabase, IBilingualDictionary {
-        SqliteSection forwardsSection, reverseSection;
+        Section forwardsSection, reverseSection;
+
+        List<DbCommand> commands;
 
         protected SqliteDictionary(string path)
             : base(path) {
-            forwardsSection = new SqliteSection(this, 0);
-            reverseSection = new SqliteSection(this, 1);
+            forwardsSection = new Section(this, true);
+            reverseSection = new Section(this, false);
+
+            InitCommands();
         }
 
         static Dictionary<string, NullWeakReference<SqliteDictionary>> openDicts
@@ -36,16 +47,18 @@ namespace Szotar {
                 reverseSection.AddEntries(backwards, null);
             } else {
                 forwardsSection.AddEntries(forwards, (i, n) => notify(i, n + backwards.Count));
-                forwardsSection.AddEntries(backwards, (i, n) => notify(i + forwards.Count, n + forwards.Count));
+                reverseSection.AddEntries(backwards, (i, n) => notify(i + forwards.Count, n + forwards.Count));
             }
         }
 
         protected override void  Dispose(bool disposing) {
-            forwardsSection.Dispose();
-            reverseSection.Dispose();
+            foreach (var cmd in commands)
+                cmd.Dispose();
+
  	        base.Dispose(disposing);
         }
 
+        #region Properties
         string name;
         public string Name {
             get {
@@ -114,14 +127,6 @@ namespace Szotar {
             }
         }
 
-        public IDictionarySection ForwardsSection {
-            get { return forwardsSection; }
-        }
-
-        public IDictionarySection ReverseSection {
-            get { return reverseSection; }
-        }
-
         string firstLanguage;
         public string FirstLanguage {
             get {
@@ -169,6 +174,220 @@ namespace Szotar {
                 SetMetadata("SecondLanguageCode", secondLanguageCode = value);
             }
         }
+        #endregion
+
+        #region SQL
+        DbCommand getRowCountF;
+        DbCommand getRowCountR;
+        DbCommand findWord;
+        DbParameter findWord_Value;
+        DbCommand getTranslations;
+        DbParameter getTranslations_Phrase;
+        DbCommand getPhrases;
+        DbParameter getPhrases_Translation;
+
+        DbCommand removeEntry;
+        DbParameter removeEntry_From;
+        DbParameter removeEntry_To;
+
+        DbCommand search;
+        DbParameter search_Term;
+        DbCommand searchCI;
+        DbParameter searchCI_Term;
+        DbCommand searchNA;
+        DbParameter searchNA_Term;
+        DbCommand searchCINA;
+        DbParameter searchCINA_Term;
+        DbCommand addWord;
+        DbParameter addWord_Value;
+        DbParameter addWord_ValueNA;
+        DbCommand addEntry;
+        DbParameter addEntry_From;
+        DbParameter addEntry_To;
+
+        void InitCommands() {
+            commands = new List<DbCommand>();
+
+            getRowCountF = CreateCommand("SELECT COUNT(FromID) FROM Entries GROUP BY FromID");
+            getRowCountR = CreateCommand("SELECT COUNT(ToID) FROM Entries GROUP BY ToID");
+
+            findWord = CreateCommand("SELECT WordID FROM Words WHERE Value = ?").AddParam(ref findWord_Value);
+
+            getTranslations = CreateCommand("SELECT Value FROM Words INNER JOIN Entries ON Entries.ToID = Words.WordID WHERE Entries.FromID = ?")
+                .AddParam(ref getTranslations_Phrase);
+
+            getPhrases = CreateCommand("SELECT Value FROM Words INNER JOIN Entries ON Entries.FromID = Words.WordID WHERE Entries.ToID = ?")
+                .AddParam(ref getPhrases_Translation);
+
+            removeEntry = CreateCommand(@"
+                DELETE From Entries WHERE FromID = $From AND ToID = $To;
+                UPDATE Words WHERE WordID = $From SET fCount = fCount - 1;
+                UPDATE Words WHERE WordID = $To SET rCount = rCount - 1;
+                DELETE From Words WHERE fCount <= 0 AND rCount <= 0;")
+                .AddParam(ref removeEntry_From)
+                .AddParam(ref removeEntry_To);
+            removeEntry_From.ParameterName = "From";
+            removeEntry_To.ParameterName = "To";
+
+            // Second parameter to GetMatch is ignoreAccents - we don't need it.
+            search = CreateCommand("SELECT WordID, Value, GetMatch(0, 0, Value, ?) AS MatchType FROM Words WHERE MatchType != -1;").AddParam(ref search_Term);
+            searchCI = CreateCommand("SELECT WordID, Value, GetMatch(1, 0, Value, ?) AS MatchType FROM Words WHERE MatchType != -1;").AddParam(ref searchCI_Term);
+            searchNA = CreateCommand("SELECT WordID, Value, GetMatch(0, 0, ValueNA, ?) AS MatchType FROM Words WHERE MatchType != -1;").AddParam(ref searchNA_Term);
+            searchCINA = CreateCommand("SELECT WordID, Value, GetMatch(1, 0, ValueNA, ?) AS MatchType FROM Words WHERE MatchType != -1;").AddParam(ref searchCINA_Term);
+
+            addWord = CreateCommand("INSERT INTO Words (Value, ValueNA, fCount, rCount) VALUES (?, ?, 0, 0);")
+                .AddParam(ref addWord_Value)
+                .AddParam(ref addWord_ValueNA);
+
+            addEntry = CreateCommand(@"
+                INSERT INTO Entries (FromID, ToID) VALUES ($From, $To);
+                UPDATE Words SET fCount = fCount + 1 WHERE WordID = $From;
+                UPDATE Words SET rCount = rCount + 1 WHERE WordID = $To;")
+                .AddParam(ref addEntry_From)
+                .AddParam(ref addEntry_To);
+            addEntry_From.ParameterName = "From";
+            addEntry_To.ParameterName = "To";
+                                                         
+        }
+
+        DbCommand CreateCommand(string commandText) {
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = commandText;
+            commands.Add(cmd);
+            return cmd;
+        }
+
+        void InitDatabase() {
+            ExecuteSQL(@"
+                CREATE TABLE Words (
+                    WordID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Value TEXT NOT NULL,
+                    ValueNA TEXT NOT NULL,
+                    fCount INTEGER NOT NULL,
+                    rCount INTEGER NOT NULL);
+
+                CREATE INDEX Words_IndexV ON Words (Value);
+                CREATE INDEX Words_IndexVN ON Words (ValueNA);
+
+                CREATE TABLE Entries (
+                    FromID INTEGER NOT NULL,
+                    ToID INTEGER NOT NULL);
+
+                CREATE INDEX Entries_IndexF ON Entries (FromID);
+                CREATE INDEX Entries_IndexT ON Entries (ToID);
+                ");
+        }
+        #endregion
+
+        class Section : IDictionarySection {
+            SqliteDictionary dict;
+            bool forwards;
+
+            public Section(SqliteDictionary dict, bool forwards) {
+                this.dict = dict;
+                this.forwards = forwards;
+            }
+
+            public int HeadWords {
+                get { 
+                    return Convert.ToInt32((forwards ? dict.getRowCountF : dict.getRowCountR).ExecuteScalar());
+                }
+            }
+
+            public void GetFullEntry(Entry entry) {
+                if (entry.Translations != null || entry.Tag == null || entry.Tag.Data == null)
+                    return;
+
+                long wordID = Convert.ToInt64(entry.Tag.Data);
+                var cmd = forwards ? dict.getTranslations : dict.getPhrases;
+                cmd.Parameters[0].Value = wordID;
+
+                var translations = new List<Translation>();
+                using (var reader = cmd.ExecuteReader()) {
+                    while (reader.Read())
+                        translations.Add(new Translation(reader.GetString(0)));
+                }
+
+                entry.Translations = translations;
+            }
+
+            public IEnumerable<SearchResult> Search(string search, bool ignoreAccents, bool ignoreCase) {
+                DbCommand command;
+
+                if (ignoreAccents)
+                    command = ignoreCase ? dict.searchCINA : dict.searchNA;
+                else
+                    command = ignoreCase ? dict.searchCI : dict.search;
+
+                command.Parameters[0].Value = search;
+
+                var results = new List<SearchResult>();
+                using (var reader = command.ExecuteReader()) {
+                    while (reader.Read()) {
+                        long wordID = reader.GetInt64(0);
+                        string word = reader.GetString(1);
+                        MatchType matchType = (MatchType)reader.GetInt32(2);
+
+                        var entry = new Entry(word, null);
+                        entry.Tag = new EntryTag(this, wordID);
+                        results.Add(new SearchResult(entry, matchType));
+                    }
+                }
+                return results;
+            }
+
+            public void AddEntries(IList<Entry> entries, Action<int, int> notify = null) {
+                using (var txn = dict.Connection.BeginTransaction()) {
+                    foreach (var e in entries)
+                        AddEntry(e);
+
+                    txn.Commit();
+                }
+            }
+
+            void AddEntry(Entry e) {
+                long from = FindOrAddWord(e.Phrase, e.PhraseNoAccents);
+
+                foreach (var tr in e.Translations) {
+                    long to = FindOrAddWord(tr.Value, Searcher.RemoveAccents(tr.Value));
+                    dict.addEntry_From.Value = from;
+                    dict.addEntry_To.Value = to;
+                    dict.addEntry.ExecuteNonQuery();
+                }
+            }
+
+            long FindOrAddWord(string word, string wordNA) {
+                dict.findWord_Value.Value = word;
+                object result = dict.findWord.ExecuteScalar();
+
+                if (result == null) {
+                    dict.addWord_Value.Value = word;
+                    dict.addWord_ValueNA.Value = wordNA;
+                    dict.addWord.ExecuteNonQuery();
+                    return dict.GetLastInsertRowID();
+                } else {
+                    return Convert.ToInt64(result);
+                }
+            }
+
+            public IEnumerator<Entry> GetEnumerator() {
+                // TODO: Specialize this.
+                foreach(var sr in Search("", false, false))
+                    yield return sr.Entry;
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+                return this.GetEnumerator();
+            }
+        }
+
+        public IDictionarySection ForwardsSection {
+            get { return forwardsSection; }
+        }
+
+        public IDictionarySection ReverseSection {
+            get { return reverseSection; }
+        }
 
         public void Save() {
         }
@@ -183,25 +402,9 @@ namespace Szotar {
                 default: throw new ArgumentOutOfRangeException("toVersion");
             }
         }
-
-        void InitDatabase() {
-            ExecuteSQL(@"
-                CREATE TABLE Phrases (
-                    PhraseID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Phrase TEXT NOT NULL,
-                    Section INTEGER NOT NULL);
-                
-                CREATE INDEX Phrases_IndexPS ON Phrases (Phrase, Section);
-
-                CREATE TABLE Translations (
-                    PhraseID INTEGER NOT NULL,
-                    Translation TEXT NOT NULL);
-
-                CREATE INDEX Translations_IndexT ON Translations (PhraseID);
-            ");
-        }
     }
 
+    [Obsolete]
     class SqliteSection : Sqlite.SqliteObject, IDictionarySection {
         int section;
 

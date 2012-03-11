@@ -15,11 +15,11 @@ namespace Szotar {
 		string revisionID = string.Empty;
 
 		public class Section : IDictionarySection {
-			IList<Entry> entries;
+			List<Entry> entries;
 			SimpleDictionary dictionary;
 			int fullyLoadedEntries;
 
-			public Section(IList<Entry> entries, bool translationsLoaded, SimpleDictionary dictionary) {
+			public Section(List<Entry> entries, bool translationsLoaded, SimpleDictionary dictionary) {
 				this.entries = entries;
 				this.dictionary = dictionary;
 				if (translationsLoaded)
@@ -87,6 +87,15 @@ namespace Szotar {
 						return entries[mid];
 				}
 			}
+
+            public void AddEntries(IList<Entry> entries, Action<int, int> notify) {
+                foreach (var entry in entries)
+                    this.entries.Add(entry);
+            }
+
+            public void Sort() {
+                entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
+            }
 		}
 
 		public class Info : DictionaryInfo {
@@ -309,10 +318,8 @@ namespace Szotar {
 						backwardsEntries.Add(entry);
 				});
 
-				if (!alreadySorted) {
-					forwardsEntries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
-					backwardsEntries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
-				}
+				if (!alreadySorted)
+                    Sort();
 			} catch (IOException ex) {
 				throw new DictionaryLoadException(ex.Message, ex);
 			} catch (ArgumentException ex) {
@@ -321,6 +328,11 @@ namespace Szotar {
 				throw new DictionaryLoadException(ex.Message, ex);
 			}
 		}
+
+        public void Sort() {
+            forwards.Sort();
+            backwards.Sort();
+        }
 
 		void LoadEntriesWith(bool loadTranslations, Action<char, Entry> action) {
 			try {
@@ -430,6 +442,17 @@ namespace Szotar {
 				throw new DictionaryLoadException(ex.Message, ex);
 			}
 		}
+
+        public void AddEntries(IList<Entry> forwards, IList<Entry> backwards, Action<int, int> notify = null) {
+            if (notify == null) {
+                this.forwards.AddEntries(forwards, null);
+                this.backwards.AddEntries(backwards, null);
+            } else {
+                this.forwards.AddEntries(forwards, (i, n) => notify(i, n + backwards.Count));
+                this.backwards.AddEntries(backwards, (i, n) => notify(i + forwards.Count, n + forwards.Count));
+            }
+        }
+
 
 		/// <summary>Escapes characters \0, %, space, \n and \r. Used to avoid wasting 
 		/// space URI encoding unicode values.</summary>

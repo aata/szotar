@@ -6,8 +6,8 @@ using System.Threading;
 namespace Szotar.WindowsForms.Importing {
     /// <summary>Imports a dictionary from two separate parts, each representing a different
     /// half of the dictionary.</summary>
-    [Importer("Default importer", typeof(IBilingualDictionary))]
-    [ImporterDescription("Imports and joins two halves of a dictionary", "DualSection")]
+    //[Importer("Default importer", typeof(IBilingualDictionary))]
+    //[ImporterDescription("Imports and joins two halves of a dictionary", "DualSection")]
     public class DualSectionImporter : IImporter<IBilingualDictionary> {
         AsyncOperation operation;
         protected IDictionarySectionImporter first, second;
@@ -34,7 +34,7 @@ namespace Szotar.WindowsForms.Importing {
         }
 
         public IImporterUI<IBilingualDictionary> CreateUI() {
-            return new Controls.DualImporterUI(this);
+            throw new NotSupportedException();
         }
 
         /// <summary>Begins the import with the first importer.</summary>
@@ -115,8 +115,10 @@ namespace Szotar.WindowsForms.Importing {
             if (shouldGenerateSecondHalf)
                 secondSection = GenerateSecondHalf(firstSection);
 
-            //var dict = new SimpleDictionary(firstSection, secondSection);
-            var dict = SqliteDictionary.FromPath(System.IO.Path.GetTempFileName());
+            var dict = new SimpleDictionary(firstSection, secondSection);
+            firstSection.Sort();
+            secondSection.Sort();
+            /*var dict = SqliteDictionary.FromPath(System.IO.Path.GetTempFileName());
             try {
                 dict.AddEntries(
                     System.Linq.Enumerable.ToArray(firstSection),
@@ -129,7 +131,7 @@ namespace Szotar.WindowsForms.Importing {
             } catch (OperationCanceledException ex) {
                 OnCompleted(null, ex, true, null);
                 return;
-            }
+            }*/
 
             // It only has to be a guess, because the user can override it.
             if (sectionInfo != null) {
