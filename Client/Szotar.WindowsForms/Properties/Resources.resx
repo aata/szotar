@@ -161,7 +161,7 @@
     <value>Import Finished</value>
     <comment>Used by dictionary importer as a progress message.</comment>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="DictionaryIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\dictionary.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -257,5 +257,12 @@
   <data name="MovedNRows" xml:space="preserve">
     <value>Moved {0} rows</value>
     <comment>Undo item description</comment>
+  </data>
+  <data name="RecentDictionaries" xml:space="preserve">
+    <value>Recent Dictionaries</value>
+  </data>
+  <data name="RecentWordLists" xml:space="preserve">
+    <value>Recent Word Lists</value>
+    <comment>A slightly less ambiguous version of RecentLists (used on the start page for example)</comment>
   </data>
 </root>
