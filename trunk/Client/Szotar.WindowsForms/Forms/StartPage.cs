@@ -85,8 +85,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
         #region Recent Items
-        ListViewGroup dictsGroup = new ListViewGroup("Recent Dictionaries");
-        ListViewGroup listsGroup = new ListViewGroup("Recent Word Lists");
+        ListViewGroup dictsGroup = new ListViewGroup(Properties.Resources.RecentDictionaries);
+        ListViewGroup listsGroup = new ListViewGroup(Properties.Resources.RecentWordLists);
         private void PopulateRecentItems() {
             var rd = GuiConfiguration.RecentDictionaries;
             var mru = Configuration.RecentLists;

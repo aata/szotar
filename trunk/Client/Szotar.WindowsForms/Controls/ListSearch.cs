@@ -68,7 +68,7 @@ namespace Szotar.WindowsForms.Controls {
             var recentLists = recentListStore.GetLists().ToList();
 
 			foreach (IListStore store in listStores) {
-				string storeName = store.Name;
+				string storeName = store == recentListStore ? Properties.Resources.RecentListStoreName : Properties.Resources.DefaultListStoreName;
 				ListViewGroup group = new ListViewGroup(storeName);
 				results.Groups.Add(group);
 				foreach (ListInfo list in store.GetLists()) {
