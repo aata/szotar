@@ -203,11 +203,11 @@ namespace Szotar.WindowsForms.Forms {
 			grid.RowTemplate.Height = pixels;
 
 			// Forces the grid to re-apply its template settings -- there must be a better way.
-			//UpdateResults();
-			if (grid.RowCount > 0) {
-				grid.Rows.SharedRow(0).Height = pixels;
-				grid.Invalidate();
-			}
+			UpdateResults();
+			//if (grid.RowCount > 0) {
+			//	grid.Rows.SharedRow(0).Height = pixels;
+			//	grid.Invalidate();
+			//}
 		}
 		#endregion
 
@@ -697,7 +697,7 @@ namespace Szotar.WindowsForms.Forms {
 		/// <summary>Shows the start page. Attempt to find an existing start page,
 		/// or create one if none exists.</summary>
 		private void showStartPage_Click(object sender, EventArgs e) {
-			StartPage.ShowStartPage(null);
+			ShowForm.Show<StartPage>();
 		}
 
 		private void closeWindow_Click(object sender, EventArgs e) {
@@ -831,7 +831,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void openList_Click(object sender, EventArgs e) {
-			StartPage.ShowStartPage(StartPageTab.WordLists);
+            ShowForm.Show<StartPage>();
 		}
 
 		void importList_Click(object sender, EventArgs e) {
