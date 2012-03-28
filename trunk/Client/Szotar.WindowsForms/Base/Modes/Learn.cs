@@ -89,8 +89,6 @@ namespace Szotar.WindowsForms {
 					if (wasSpace) {
 						if (isSpace)
 							add = false;
-						else
-							sb.Append(' ');
 					}
 
 					// This only occurs if c wasn't a punctuation mark -- thus, " ... " will be collapsed into " ".
@@ -101,7 +99,7 @@ namespace Szotar.WindowsForms {
 					sb.Append(c);
 			}
 
-			return sb.ToString();
+			return sb.ToString().Trim();
 		}
 	}
 
