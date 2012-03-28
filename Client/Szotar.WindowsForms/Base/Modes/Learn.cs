@@ -620,7 +620,7 @@ namespace Szotar.WindowsForms {
 		string CurrentTranslation { get { return swap ? items[index].Phrase : items[index].Translation; } }
 
 		void ReportGuess(PracticeItem item, bool correct) {
-			// TODO: Add to practice log.
+            DataStore.Database.AddPracticeHistory(item.SetID, item.Phrase, item.Translation, correct);
 		}
 
 		void NextPhrase() {
