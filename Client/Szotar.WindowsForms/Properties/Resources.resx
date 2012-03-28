@@ -132,7 +132,7 @@
     <comment>Used as a list header.</comment>
   </data>
   <data name="DefaultListStoreName" xml:space="preserve">
-    <value>Default</value>
+    <value>Word Lists</value>
   </data>
   <data name="FinishCommand" xml:space="preserve">
     <value>&amp;Finish</value>
@@ -264,5 +264,12 @@
   <data name="RecentWordLists" xml:space="preserve">
     <value>Recent Word Lists</value>
     <comment>A slightly less ambiguous version of RecentLists (used on the start page for example)</comment>
+  </data>
+  <data name="Dictionaries" xml:space="preserve">
+    <value>Dictionaries</value>
+  </data>
+  <data name="NEntries" xml:space="preserve">
+    <value>{0} entries</value>
+    <comment>Used to show how many entries a dictionary contains</comment>
   </data>
 </root>
