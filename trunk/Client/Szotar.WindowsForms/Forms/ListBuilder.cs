@@ -439,7 +439,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void showStartPage_Click(object sender, EventArgs e) {
-			StartPage.ShowStartPage(null);
+            ShowForm.Show<StartPage>();
 		}
 
 		private void deleteList_Click(object sender, EventArgs e) {

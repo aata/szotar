@@ -11,6 +11,7 @@ using WordSearchResult = Szotar.Sqlite.SqliteDataStore.WordSearchResult;
 namespace Szotar.WindowsForms.Controls {
 	public partial class ListSearch : UserControl {
 		private List<IListStore> listStores = new List<IListStore>();
+        private List<DictionaryInfo> dictionaries;
 
 		bool ReallyDesignMode {
 			get {
@@ -37,10 +38,21 @@ namespace Szotar.WindowsForms.Controls {
 			results.Resize += (s, e) => ResizeColumns();
 			Disposed += (s, e) => UnwireDBEvents();
 
-			ThemeHelper.UseExplorerTheme(results);
+            // It is much better to use a FileSystemWatcher and keep track of what dictionaries are available
+            // than loading the whole list of dictionaries each time the search term changes.
+            DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
+            dictionaries = Dictionary.GetAll().ToList();
+            fileSystemWatcher.Path = System.IO.Path.Combine(DataStore.UserDataStore.Path, Configuration.DictionariesFolderName);
+            fileSystemWatcher.Created += new System.IO.FileSystemEventHandler(fileSystemWatcher_Created);
+            fileSystemWatcher.Deleted += new System.IO.FileSystemEventHandler(fileSystemWatcher_Deleted);
+            fileSystemWatcher.Renamed += new System.IO.RenamedEventHandler(fileSystemWatcher_Renamed);
+            
+            ThemeHelper.UseExplorerTheme(results);
 
 			WireDBEvents();
 			UpdateResults();
+
+            this.Load += delegate { UpdateResults(); };
 		}
 
 		void WireDBEvents() {
@@ -65,6 +77,38 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private bool PopulateResults(int? maxCount) {
+            results.Groups.Clear();
+
+            if (ShowDictionaries) {
+                ListViewGroup dictsGroup = new ListViewGroup(Properties.Resources.Dictionaries);
+                results.Groups.Add(dictsGroup);
+
+                Action<DictionaryInfo> addItem = dict => {
+                    int entries = dict.SectionSizes == null ? 0 : dict.SectionSizes.Sum();
+
+                    var item = new ListViewItem(new string[] { 
+                        dict.Name, 
+                        entries > 0 ? string.Format(Properties.Resources.NEntries, entries) : string.Empty,
+                        dict.Author ?? string.Empty
+                    }, "Dictionary");
+                    item.Group = dictsGroup;
+                    item.Tag = dict;
+                    results.Items.Add(item);
+                };
+
+                string term = searchBox.Text.Trim().ToLower();
+                if (term.Length == 0) {
+                    dictsGroup.Header = Properties.Resources.RecentDictionaries;
+                    foreach(var dict in GuiConfiguration.RecentDictionaries.Entries)
+                        if (System.IO.File.Exists(dict.Path))
+                            addItem(dict);
+                } else { 
+                    foreach(var dict in dictionaries)
+                        if (dict.Name.ToLower().Contains(term))
+                            addItem(dict);
+                }
+            }
+
             var recentLists = recentListStore.GetLists().ToList();
 
 			foreach (IListStore store in listStores) {
@@ -84,7 +128,9 @@ namespace Szotar.WindowsForms.Controls {
 					ListViewItem item = new ListViewItem(
 						new string[] { list.Name, 
 						               list.Date.HasValue ? list.Date.Value.ToString() : string.Empty, 
-									   list.TermCount.HasValue ? string.Format(Properties.Resources.NTerms, list.TermCount.Value) : string.Empty });
+									   list.TermCount.HasValue ? string.Format(Properties.Resources.NTerms, list.TermCount.Value) : string.Empty },
+
+                        "List");
 					item.Tag = list;
 					item.Group = group;
 					results.Items.Add(item);
@@ -110,6 +156,68 @@ namespace Szotar.WindowsForms.Controls {
 
 			return true;
 		}
+
+        // Keeps the dictionary list up-to-date and adds/removes items from the UI when the file system changes.
+        #region File system watching
+        void fileSystemWatcher_Renamed(object sender, System.IO.RenamedEventArgs e)
+        {
+            foreach (ListViewItem item in results.Items)
+            {
+                var di = item.Tag as DictionaryInfo;
+                // The best test we can really do is Path.Equals. Hopefully that's good enough and normalisation
+                // issues won't exist.
+                if (di != null && System.IO.Path.Equals(di.Path, e.OldFullPath))
+                {
+                    di.Path = e.FullPath;
+                }
+            }
+
+            foreach (var di in dictionaries)
+                if (System.IO.Path.Equals(di.Path, e.OldFullPath))
+                    di.Path = e.FullPath;
+        }
+
+        void fileSystemWatcher_Deleted(object sender, System.IO.FileSystemEventArgs e)
+        {
+            foreach (ListViewItem item in results.Items)
+            {
+                var di = item.Tag as DictionaryInfo;
+                if (di != null && System.IO.Path.Equals(di.Path, e.FullPath))
+                {
+                    results.Items.Remove(item);
+                    // The item paths should be unique. If that isn't the case, there's something else wrong.
+                    // Thus we can safely return and avoid using the iterator after invalidating it.
+                    return;
+                }
+            }
+
+            dictionaries.RemoveAll(di => System.IO.Path.Equals(di.Path, e.FullPath));
+        }
+
+        // It seems like a bad idea to watch for created files. The files may not be fully written, and may even
+        // be locked, by the time the Created event is fired.
+        // There should either be a mechanism to refresh or a delay in the adding of this. If there is a delay, it should
+        // also take into account the possibility that the file has been deleted before the delay completed.
+        void fileSystemWatcher_Created(object sender, System.IO.FileSystemEventArgs e)
+        {
+            if (System.IO.Path.GetExtension(e.FullPath) != ".dict" && System.IO.Path.GetExtension(e.FullPath) != ".dictx")
+                return;
+
+            var timer = new Timer();
+            timer.Interval = 1000;
+            EventHandler handler = null;
+            handler = new EventHandler(delegate
+            {
+                timer.Stop();
+                timer.Tick -= handler;
+                timer.Dispose();
+                dictionaries = Dictionary.GetAll().ToList();
+                UpdateResults();
+            });
+            timer.Tick += handler;
+            timer.Start();
+        }
+        #endregion
 
 		private void UpdateResults() {
 			if (ReallyDesignMode)
@@ -146,14 +254,27 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void results_ItemActivate(object sender, EventArgs e) {
-			var lists = Accept();
+			var lists = AcceptLists();
+            var dicts = AcceptDictionaries();
 
 			var h = ListsChosen;
 			if (h != null)
-				h(this, new ListsChosenEventArgs(lists));
+				h(this, new ListsChosenEventArgs(lists, dicts));
 		}
 
-		public List<ListSearchResult> Accept() {
+        public List<DictionaryInfo> AcceptDictionaries() {
+            var dicts = new List<DictionaryInfo>();
+
+            foreach (ListViewItem item in results.SelectedItems) {
+                object tag = item.Tag;
+                if (tag is DictionaryInfo)
+                    dicts.Add((DictionaryInfo)tag);
+            }
+
+            return dicts;
+        }
+
+		public List<ListSearchResult> AcceptLists() {
 			var lists = new List<ListSearchResult>();
 
 			if (results.SelectedItems.Count == 0)
@@ -191,13 +312,19 @@ namespace Szotar.WindowsForms.Controls {
 		/// <summary>The maximum number of results shown before the list is truncated.</summary>
 		/// <remarks>If the value is null, all the results are shown.</remarks>
 		public int? MaxItems { get; set; }
+
+        [Browsable(true)]
+        [Description("Whether or not dictionaries are shown in the results view.")]
+        public bool ShowDictionaries { get; set; }
 	}
 
 	public class ListsChosenEventArgs : EventArgs {
+        public IList<DictionaryInfo> ChosenDictionaries { get; set; }
 		public IList<ListSearchResult> Chosen { get; set; }
 
-		public ListsChosenEventArgs(IList<ListSearchResult> ids) {
+		public ListsChosenEventArgs(IList<ListSearchResult> ids, IList<DictionaryInfo> dicts) {
 			Chosen = ids;
+            ChosenDictionaries = dicts;
 		}
 	}
 }
