@@ -447,6 +447,11 @@ namespace Szotar.Sqlite {
 			return rows > 0;
 		}
 
+        public void AddPracticeHistory(long setID, string phrase, string translation, bool correct) {
+            ExecuteSQL(@"INSERT INTO PracticeHistory (SetID, Phrase, Translation, Result, Created)
+                         VALUES (?, ?, ?, ?, datetime('now'))", setID, phrase, translation, correct ? 1 : 0);
+        }
+
 		//This function also raised the ListDeleted event on the WordList, if one exists.
 		public void DeleteWordList(long setID) {
 			NullWeakReference<SqliteWordList> wlr;
