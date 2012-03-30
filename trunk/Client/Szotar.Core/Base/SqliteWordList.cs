@@ -129,7 +129,6 @@ namespace Szotar.Sqlite {
 				RaisePropertyChanged("Date");
 			}
 		}
-		#endregion
 
 		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
 			int index = IndexOf(entry);
@@ -142,7 +141,8 @@ namespace Szotar.Sqlite {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
 			worker.SetProperty(index, property.ToString(), value);
-		}
+        }
+        #endregion
 
 		#region List implementation
 		public override void Add(WordListEntry item) {

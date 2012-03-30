@@ -38,6 +38,7 @@ namespace Szotar.WindowsForms.Forms {
 			name.Text = list.Name;
 			author.Text = list.Author;
 			url.Text = list.Url;
+            UpdateEntryCount();
 
 			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
 			meta.Height = GuiConfiguration.ListBuilderMetadataSectionHeight;
@@ -191,6 +192,9 @@ namespace Szotar.WindowsForms.Forms {
 
 		void list_ListChanged(object sender, ListChangedEventArgs e) {
 			sortColumn = null;
+
+            if (e.ListChangedType == ListChangedType.ItemAdded || e.ListChangedType == ListChangedType.ItemDeleted || e.ListChangedType == ListChangedType.Reset)
+                UpdateEntryCount();
 		}
 
 		private void UpdateTitle() {
@@ -284,6 +288,10 @@ namespace Szotar.WindowsForms.Forms {
 			MakeRecent();
 		}
 
+        void UpdateEntryCount() {
+            entriesLabel.Text = string.Format(Properties.Resources.NEntries, list.Count);
+        }
+
 		void list_PropertyChanged(object sender, PropertyChangedEventArgs e) {
 			switch (e.PropertyName) {
 				case "Name":
@@ -303,7 +311,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 		#endregion
 
-		public class ShadowTag {
+        #region Drop Shadow
+        public class ShadowTag {
 			public System.Drawing.Point Down { get; set; }
 			public int OriginalHeight { get; set; }
 		}
@@ -321,8 +330,9 @@ namespace Szotar.WindowsForms.Forms {
 		private void shadow_MouseDown(object sender, MouseEventArgs e) {
 			shadow.Tag = new ShadowTag { Down = e.Location, OriginalHeight = shadow.Height };
 		}
+        #endregion
 
-		private void ListBuilder_Closing(object sender, CancelEventArgs e) {
+        private void ListBuilder_Closing(object sender, CancelEventArgs e) {
 			UnwireListEvents();
 
 			if (isNewList && list.Count == 0) {
