@@ -211,6 +211,7 @@ namespace Szotar.WindowsForms {
 			}
 
 			GameArea.Resize += new EventHandler(GameArea_Resize);
+            GameArea.TopLevelControl.KeyDown += new KeyEventHandler(GameArea_KeyDown);
 
 			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea }) {
 				c.MouseUp += new MouseEventHandler(GameArea_MouseUp);
@@ -227,6 +228,10 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
+        void GameArea_KeyDown(object sender, KeyEventArgs e) {
+            GoForward();
+        }
+
 		private void SwapItems() {
 			swap = !swap;
 
@@ -238,6 +243,7 @@ namespace Szotar.WindowsForms {
 			base.Stop();
 
 			GameArea.Resize -= new EventHandler(GameArea_Resize);
+            GameArea.TopLevelControl.KeyDown -= new KeyEventHandler(GameArea_KeyDown);
 
 			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea })
 				c.MouseUp -= new MouseEventHandler(GameArea_MouseUp);

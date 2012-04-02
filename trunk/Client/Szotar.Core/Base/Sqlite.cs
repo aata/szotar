@@ -597,5 +597,23 @@ namespace Szotar.Sqlite {
 
 			return answer;
 		}
+
+        public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
+            // Join with VocabItems to avoid practicing items which have since been deleted or edited
+            var reader = this.SelectReader(@"
+                SELECT Phrase, Translation, SetID, SUM(Result) AS ResultSum, COUNT(Result) as ResultCount, Created 
+                FROM (SELECT PracticeHistory.Phrase, PracticeHistory.Translation, PracticeHistory.SetID, PracticeHistory.Result, PracticeHistory.Created 
+                      FROM PracticeHistory INNER JOIN VocabItems 
+                      ON PracticeHistory.Phrase = VocabItems.Phrase AND PracticeHistory.Translation = VocabItems.Translation 
+                      ORDER BY Created DESC)
+                GROUP BY Phrase, Translation 
+                ORDER BY ResultSum*1000/ResultCount ASC 
+                LIMIT " + limit.ToString());
+            var results = new List<PracticeItem>();
+            while (reader.Read()) {
+                results.Add(new PracticeItem(reader.GetInt64(2), reader.GetString(0), reader.GetString(1)));
+            }
+            return results;
+        }
 	}
 }

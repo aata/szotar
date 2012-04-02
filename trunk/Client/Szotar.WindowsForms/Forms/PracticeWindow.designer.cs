@@ -26,6 +26,7 @@
             System.Windows.Forms.ToolStripMenuItem file;
             System.Windows.Forms.ToolStripMenuItem showStartPage;
             System.Windows.Forms.ToolStripMenuItem exit;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PracticeWindow));
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.panel = new System.Windows.Forms.Panel();
@@ -91,6 +92,7 @@
             this.Controls.Add(this.panel);
             this.Controls.Add(this.mainMenu);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mainMenu;
             this.MinimumSize = new System.Drawing.Size(322, 212);
             this.Name = "PracticeWindow";

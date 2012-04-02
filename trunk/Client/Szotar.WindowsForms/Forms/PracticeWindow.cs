@@ -14,12 +14,14 @@ namespace Szotar.WindowsForms.Forms {
 		PracticeQueue queue;
 		IPracticeMode mode;
 
-		public PracticeWindow(IList<ListSearchResult> items, PracticeMode whichMode) {
+        public PracticeWindow(IList<ListSearchResult> items, PracticeMode whichMode)
+            : this(DataStore.Database.GetItems(items), whichMode) { }
+
+		public PracticeWindow(List<PracticeItem> terms, PracticeMode whichMode) {
 			InitializeComponent();
 
 			mainMenu.Renderer = new ToolStripAeroRenderer(ToolbarTheme.MediaToolbar);
 
-			var terms = DataStore.Database.GetItems(items);
 			if (terms.Count > 0) {
 				queue = new PracticeQueue(terms);
 
