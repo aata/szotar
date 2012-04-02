@@ -573,55 +573,77 @@ namespace Szotar {
 			}
 		}
 
-		public void Save() {
-			if (Path != null) {
-				try {
-					string tempFile = P.GetTempFileName();
-					string backupFile = P.GetTempFileName();
+        #region Background Save
+        Thread workerThread;
 
-					// Write the new version to a temporary file, first. If that fails, the actual dictionary file
-					// is not modified.
-					Write(tempFile);
+		public void BackgroundSaveWorker() {
+            Metrics.Measure("Saving dictionary: " + System.IO.Path.GetFileName(Path), delegate {
+                if (Path != null) {
+                    try {
+                        string tempFile = P.GetTempFileName();
+                        string backupFile = P.GetTempFileName();
 
-					// Try to make a backup of the file. If that isn't possible for some reason, just
-					// delete it, since we've written the replacement file.
-					try {
-						CloseFile();
-						DestroyCache();
-						File.Move(Path, backupFile);
-					} catch (IOException) {
-						File.Delete(Path);
-					} catch (UnauthorizedAccessException) {
-						File.Delete(Path);
-					}
+                        // Write the new version to a temporary file, first. If that fails, the actual dictionary file
+                        // is not modified.
+                        Write(tempFile);
 
-					// Overwrite the dictionary file with the new version.
-					File.Move(tempFile, Path);
+                        // Try to make a backup of the file. If that isn't possible for some reason, just
+                        // delete it, since we've written the replacement file.
+                        try {
+                            CloseFile();
+                            DestroyCache();
+                            File.Move(Path, backupFile);
+                        } catch (IOException) {
+                            File.Delete(Path);
+                        } catch (UnauthorizedAccessException) {
+                            File.Delete(Path);
+                        }
 
-					// Try to open the file again, so that other people can't modify it.
-					// If it fails, we can try again later.
-					try {
-						OpenFile(true);
-					} catch (IOException) {
-					} catch (UnauthorizedAccessException) { }
+                        // Overwrite the dictionary file with the new version.
+                        File.Move(tempFile, Path);
 
-					File.Delete(backupFile);
+                        // Try to open the file again, so that other people can't modify it.
+                        // If it fails, we can try again later.
+                        try {
+                            OpenFile(true);
+                        } catch (IOException) {
+                        } catch (UnauthorizedAccessException) { }
 
-					SaveCache();
-				} catch (IOException ex) {
-					throw new DictionarySaveException(ex.Message, ex);
-				} catch (UnauthorizedAccessException ex) {
-					throw new DictionarySaveException(ex.Message, ex);
-				} catch (ArgumentException ex) {
-					throw new DictionarySaveException(ex.Message, ex);
-				}
-			} else {
-				throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
-			}
+                        File.Delete(backupFile);
+
+                        SaveCache();
+                    } catch (IOException ex) {
+                        throw new DictionarySaveException(ex.Message, ex);
+                    } catch (UnauthorizedAccessException ex) {
+                        throw new DictionarySaveException(ex.Message, ex);
+                    } catch (ArgumentException ex) {
+                        throw new DictionarySaveException(ex.Message, ex);
+                    }
+                } else {
+                    throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
+                }
+            });
 		}
 
-		#region Caching
-		static readonly int CacheFormatVersion = 2;
+        public void Save() {
+            CancelBackgroundSave();
+
+            workerThread = new Thread(new ThreadStart(this.BackgroundSaveWorker));
+            workerThread.Start();
+        }
+
+        void CancelBackgroundSave() {
+            if (workerThread == null)
+                return;
+
+            workerThread.Abort();
+            workerThread.Join();
+            workerThread = null;
+        }
+        #endregion
+
+        #region Caching
+        static readonly int CacheFormatVersion = 2;
 
 		string CachePath() {
 			return P.ChangeExtension(Path, ".dict.cache");
