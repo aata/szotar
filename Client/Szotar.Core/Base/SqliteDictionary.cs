@@ -383,6 +383,10 @@ namespace Szotar {
             void IDictionarySection.EntryModified(Entry entry) {
                 throw new NotImplementedException();
             }
+
+            void IDictionarySection.RemoveEntries(IList<Entry> entries) {
+                throw new NotImplementedException();
+            }
         }
 
         public IDictionarySection ForwardsSection {
@@ -563,6 +567,10 @@ namespace Szotar {
         }
 
         void IDictionarySection.EntryModified(Entry entry) {
+            throw new NotImplementedException();
+        }
+
+        void IDictionarySection.RemoveEntries(IList<Entry> entries) {
             throw new NotImplementedException();
         }
     }

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 
 // This form displays a large amount of rows on the DataGridView control. For information on how to 
 // keep good performance with large datasets, see Best Practices for Scaling the Windows Forms 
@@ -897,6 +898,15 @@ namespace Szotar.WindowsForms.Forms {
 		void importDictionary_Click(object sender, EventArgs e) {
 			ShowForm.Show<DictionaryImport>();
 		}
+
+        private void addEntry_Click(object sender, EventArgs e) {
+            string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+            string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage: Dictionary.FirstLanguage;
+
+            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(this.displayedSearchMode), phraseLanguage, translationLanguage).ShowDialog();
+            if (dr == System.Windows.Forms.DialogResult.OK)
+                UpdateResults();
+        }
 		#endregion
 
 		#region Tools Menu
@@ -951,7 +961,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			addTo.Visible = addTo.DropDownItems.Count > 0;
 
-            editMI.Enabled = grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0;
+            deleteMI.Enabled = editMI.Enabled = grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0;
 		}
 
 		private void AddToExistingList(long listID) {
@@ -1021,9 +1031,18 @@ namespace Szotar.WindowsForms.Forms {
             int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
             if (index < 0)
                 return;
-            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(searchMode), results[index].Entry).ShowDialog();
+
+            string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+            string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
+
+            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(displayedSearchMode), phraseLanguage, translationLanguage, results[index].Entry).ShowDialog();
             if (dr == DialogResult.OK)
                 UpdateResults();
+        }
+
+        private void deleteMI_Click(object sender, EventArgs e) {
+            var remove = this.GetSelectedResults().Select(sr => sr.Entry).ToArray();
+            GetSectionBySearchMode(displayedSearchMode).RemoveEntries(remove);
         }
 		#endregion
 		#endregion
@@ -1047,12 +1066,6 @@ namespace Szotar.WindowsForms.Forms {
 				Errors.CouldNotLoadDictionary(dict.Name, dict.Path, e);
 			}
 		}
-
-        private void addEntry_Click(object sender, EventArgs e) {
-            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(this.SearchMode)).ShowDialog();
-            if (dr == System.Windows.Forms.DialogResult.OK)
-                UpdateResults();
-        }
 	}
 
 	public enum SearchMode {

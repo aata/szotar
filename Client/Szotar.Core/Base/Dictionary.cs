@@ -72,6 +72,7 @@ namespace Szotar {
         void AddEntry(Entry entry);
 		void GetFullEntry(Entry entry);
         void EntryModified(Entry entry);
+        void RemoveEntries(IList<Entry> entries);
 	}
 
 	[Serializable]
