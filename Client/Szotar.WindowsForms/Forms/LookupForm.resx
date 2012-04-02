@@ -368,18 +368,17 @@
   <data name="editInformation.Text" xml:space="preserve">
     <value>Edit &amp;Information</value>
   </data>
-  <metadata name="editEntries.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="addEntry.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="editEntries.Enabled" type="System.Boolean, mscorlib">
-    <value>False</value>
+  <data name="addEntry.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+I</value>
   </data>
-  <data name="editEntries.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="addEntry.Size" type="System.Drawing.Size, System.Drawing">
     <value>194, 22</value>
   </data>
-  <data name="editEntries.Text" xml:space="preserve">
-    <value>Edit &amp;Entries</value>
+  <data name="addEntry.Text" xml:space="preserve">
+    <value>A&amp;dd Entry</value>
   </data>
   <metadata name="importDictionary.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
@@ -478,7 +477,7 @@
     <value>Top, Bottom, Left, Right</value>
   </data>
   <metadata name="contextMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>105, 5</value>
+    <value>102, 11</value>
   </metadata>
   <data name="addTo.Size" type="System.Drawing.Size, System.Drawing">
     <value>198, 22</value>
@@ -486,8 +485,30 @@
   <data name="addTo.Text" xml:space="preserve">
     <value>A&amp;dd to</value>
   </data>
+  <metadata name="contextMenuSeparator.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="contextMenuSeparator.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 6</value>
+  </data>
+  <data name="editMI.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="editMI.Text" xml:space="preserve">
+    <value>&amp;Edit</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="deleteMI.Enabled" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="deleteMI.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="deleteMI.Text" xml:space="preserve">
+    <value>&amp;Delete</value>
+  </data>
   <data name="contextMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>199, 114</value>
+    <value>199, 142</value>
   </data>
   <data name="&gt;&gt;contextMenu.Name" xml:space="preserve">
     <value>contextMenu</value>
@@ -502,7 +523,7 @@
     <value>Vertical</value>
   </data>
   <data name="grid.Size" type="System.Drawing.Size, System.Drawing">
-    <value>700, 415</value>
+    <value>600, 415</value>
   </data>
   <data name="grid.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -526,10 +547,10 @@
     <value>NoControl</value>
   </data>
   <data name="switchMode.Location" type="System.Drawing.Point, System.Drawing">
-    <value>278, 0</value>
+    <value>238, 0</value>
   </data>
   <data name="switchMode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>168, 22</value>
+    <value>144, 22</value>
   </data>
   <data name="switchMode.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -559,7 +580,7 @@
     <value>NoControl</value>
   </data>
   <data name="ignoreLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>81, 4</value>
+    <value>56, 4</value>
   </data>
   <data name="ignoreLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>54, 13</value>
@@ -592,13 +613,13 @@
     <value>Verdana, 8.25pt</value>
   </data>
   <data name="searchBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>453, 1</value>
+    <value>388, 1</value>
   </data>
   <data name="searchBox.PromptText" xml:space="preserve">
     <value>Search</value>
   </data>
   <data name="searchBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>241, 21</value>
+    <value>207, 21</value>
   </data>
   <data name="searchBox.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -607,7 +628,7 @@
     <value>searchBox</value>
   </data>
   <data name="&gt;&gt;searchBox.Type" xml:space="preserve">
-    <value>Szotar.WindowsForms.Controls.SearchBox, Szotar, Version=0.4.0.0, Culture=neutral, PublicKeyToken=null</value>
+    <value>Szotar.WindowsForms.Controls.SearchBox, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;searchBox.Parent" xml:space="preserve">
     <value>searchPanel</value>
@@ -625,10 +646,10 @@
     <value>NoControl</value>
   </data>
   <data name="ignoreCaseCheck.Location" type="System.Drawing.Point, System.Drawing">
-    <value>217, 3</value>
+    <value>183, 3</value>
   </data>
   <data name="ignoreCaseCheck.Size" type="System.Drawing.Size, System.Drawing">
-    <value>55, 17</value>
+    <value>50, 17</value>
   </data>
   <data name="ignoreCaseCheck.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -658,10 +679,10 @@
     <value>NoControl</value>
   </data>
   <data name="ignoreAccentsCheck.Location" type="System.Drawing.Point, System.Drawing">
-    <value>141, 3</value>
+    <value>116, 3</value>
   </data>
   <data name="ignoreAccentsCheck.Size" type="System.Drawing.Size, System.Drawing">
-    <value>70, 17</value>
+    <value>65, 17</value>
   </data>
   <data name="ignoreAccentsCheck.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -685,7 +706,7 @@
     <value>0, 27</value>
   </data>
   <data name="searchPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>700, 21</value>
+    <value>600, 21</value>
   </data>
   <data name="searchPanel.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -715,7 +736,7 @@
     <value>0, 0</value>
   </data>
   <data name="mainMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>700, 24</value>
+    <value>600, 24</value>
   </data>
   <data name="mainMenu.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -742,7 +763,7 @@
     <value>0, 0</value>
   </data>
   <data name="toolStripPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>700, 24</value>
+    <value>600, 24</value>
   </data>
   <data name="&gt;&gt;toolStripPanel.Name" xml:space="preserve">
     <value>toolStripPanel</value>
@@ -763,13 +784,13 @@
     <value>38</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>7, 13</value>
+    <value>6, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>700, 471</value>
+    <value>600, 471</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Verdana, 8.25pt</value>
+    <value>Segoe UI, 8.25pt</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Dictionary Lookup</value>
@@ -942,10 +963,10 @@
   <data name="&gt;&gt;editInformation.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;editEntries.Name" xml:space="preserve">
-    <value>editEntries</value>
+  <data name="&gt;&gt;addEntry.Name" xml:space="preserve">
+    <value>addEntry</value>
   </data>
-  <data name="&gt;&gt;editEntries.Type" xml:space="preserve">
+  <data name="&gt;&gt;addEntry.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;importDictionary.Name" xml:space="preserve">
@@ -1018,6 +1039,24 @@
     <value>addTo</value>
   </data>
   <data name="&gt;&gt;addTo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;contextMenuSeparator.Name" xml:space="preserve">
+    <value>contextMenuSeparator</value>
+  </data>
+  <data name="&gt;&gt;contextMenuSeparator.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;editMI.Name" xml:space="preserve">
+    <value>editMI</value>
+  </data>
+  <data name="&gt;&gt;editMI.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;deleteMI.Name" xml:space="preserve">
+    <value>deleteMI</value>
+  </data>
+  <data name="&gt;&gt;deleteMI.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

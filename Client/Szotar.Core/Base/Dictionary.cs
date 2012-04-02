@@ -69,7 +69,9 @@ namespace Szotar {
 	public interface IDictionarySection : ISearchDataSource {
 		int HeadWords { get; }
 
+        void AddEntry(Entry entry);
 		void GetFullEntry(Entry entry);
+        void EntryModified(Entry entry);
 	}
 
 	[Serializable]

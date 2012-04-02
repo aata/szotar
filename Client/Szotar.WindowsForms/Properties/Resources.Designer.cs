@@ -61,6 +61,24 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Add.
+        /// </summary>
+        internal static string Add {
+            get {
+                return ResourceManager.GetString("Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add dictionary entry.
+        /// </summary>
+        internal static string AddDictionaryItem {
+            get {
+                return ResourceManager.GetString("AddDictionaryItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Begin.
         /// </summary>
         internal static string BeginCommand {
@@ -190,6 +208,24 @@ namespace Szotar.WindowsForms.Properties {
         internal static string DictionarySectionSelectSecondHalf {
             get {
                 return ResourceManager.GetString("DictionarySectionSelectSecondHalf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Edit.
+        /// </summary>
+        internal static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit dictionary entry.
+        /// </summary>
+        internal static string EditDictionaryItem {
+            get {
+                return ResourceManager.GetString("EditDictionaryItem", resourceCulture);
             }
         }
         

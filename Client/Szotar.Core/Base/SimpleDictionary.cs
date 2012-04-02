@@ -93,6 +93,15 @@ namespace Szotar {
                     this.entries.Add(entry);
             }
 
+            public void AddEntry(Entry e) {
+                int insertionPoint = entries.FindIndex(x => x.Phrase.CompareTo(e.Phrase) > 0);
+                entries.Add(e);
+            }
+
+            public void EntryModified(Entry e) {
+                this.Dictionary.Save();
+            }
+
             public void Sort() {
                 entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
             }
