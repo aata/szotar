@@ -96,10 +96,16 @@ namespace Szotar {
             public void AddEntry(Entry e) {
                 int insertionPoint = entries.FindIndex(x => x.Phrase.CompareTo(e.Phrase) > 0);
                 entries.Add(e);
+                this.Dictionary.Save();
             }
 
             public void EntryModified(Entry e) {
                 this.Dictionary.Save();
+            }
+
+            public void RemoveEntries(IList<Entry> remove) {
+                if(entries.RemoveAll(e => remove.Contains(e)) > 0)
+                    this.Dictionary.Save();
             }
 
             public void Sort() {

@@ -54,8 +54,8 @@
             System.Windows.Forms.ToolStripMenuItem debugLog;
             System.Windows.Forms.ToolStripSeparator toolsSep;
             System.Windows.Forms.ToolStripMenuItem options;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.ToolStripSeparator contextMenuSeparator;
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.forwards = new System.Windows.Forms.ToolStripMenuItem();
             this.backwards = new System.Windows.Forms.ToolStripMenuItem();
             this.ignoreAccentsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,6 +70,9 @@
             this.grid = new System.Windows.Forms.DataGridView();
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addTo = new System.Windows.Forms.ToolStripMenuItem();
+            this.newItemCM = new System.Windows.Forms.ToolStripMenuItem();
+            this.editMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteMI = new System.Windows.Forms.ToolStripMenuItem();
             this.switchMode = new System.Windows.Forms.Button();
             this.ignoreLabel = new System.Windows.Forms.Label();
             this.searchPanel = new System.Windows.Forms.Panel();
@@ -78,8 +81,6 @@
             this.toolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
-            this.editMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteMI = new System.Windows.Forms.ToolStripMenuItem();
             addToList = new System.Windows.Forms.ToolStripMenuItem();
             reverseLookup = new System.Windows.Forms.ToolStripMenuItem();
             showStartPage = new System.Windows.Forms.ToolStripMenuItem();
@@ -360,6 +361,11 @@
             resources.ApplyResources(options, "options");
             options.Click += new System.EventHandler(this.options_Click);
             // 
+            // contextMenuSeparator
+            // 
+            contextMenuSeparator.Name = "contextMenuSeparator";
+            resources.ApplyResources(contextMenuSeparator, "contextMenuSeparator");
+            // 
             // copyCM
             // 
             this.copyCM.Name = "copyCM";
@@ -432,6 +438,7 @@
             this.copyCM,
             reverseLookup,
             contextMenuSeparator,
+            this.newItemCM,
             this.editMI,
             this.deleteMI});
             this.contextMenu.Name = "listBuilderMenu";
@@ -442,6 +449,24 @@
             // 
             this.addTo.Name = "addTo";
             resources.ApplyResources(this.addTo, "addTo");
+            // 
+            // newItemCM
+            // 
+            this.newItemCM.Name = "newItemCM";
+            resources.ApplyResources(this.newItemCM, "newItemCM");
+            this.newItemCM.Click += new System.EventHandler(this.addEntry_Click);
+            // 
+            // editMI
+            // 
+            this.editMI.Name = "editMI";
+            resources.ApplyResources(this.editMI, "editMI");
+            this.editMI.Click += new System.EventHandler(this.editMI_Click);
+            // 
+            // deleteMI
+            // 
+            this.deleteMI.Name = "deleteMI";
+            resources.ApplyResources(this.deleteMI, "deleteMI");
+            this.deleteMI.Click += new System.EventHandler(this.deleteMI_Click);
             // 
             // switchMode
             // 
@@ -506,22 +531,6 @@
             this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.searchBox.Name = "searchBox";
             // 
-            // contextMenuSeparator
-            // 
-            contextMenuSeparator.Name = "contextMenuSeparator";
-            resources.ApplyResources(contextMenuSeparator, "contextMenuSeparator");
-            // 
-            // editMI
-            // 
-            this.editMI.Name = "editMI";
-            resources.ApplyResources(this.editMI, "editMI");
-            this.editMI.Click += new System.EventHandler(this.editMI_Click);
-            // 
-            // deleteMI
-            // 
-            resources.ApplyResources(this.deleteMI, "deleteMI");
-            this.deleteMI.Name = "deleteMI";
-            // 
             // LookupForm
             // 
             resources.ApplyResources(this, "$this");
@@ -572,6 +581,7 @@
 		private System.Windows.Forms.ToolStripMenuItem copyCM;
         private System.Windows.Forms.ToolStripMenuItem editMI;
         private System.Windows.Forms.ToolStripMenuItem deleteMI;
+        private System.Windows.Forms.ToolStripMenuItem newItemCM;
 	}
 }
 

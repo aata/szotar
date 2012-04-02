@@ -25,16 +25,17 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripMenuItem deleteMI;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditDictionaryItem));
             this.phraseLabel = new System.Windows.Forms.Label();
             this.phrase = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.translationsLabel = new System.Windows.Forms.Label();
             this.complete = new System.Windows.Forms.Button();
             this.cancel = new System.Windows.Forms.Button();
             this.translation = new System.Windows.Forms.TextBox();
             this.addTranslation = new System.Windows.Forms.Button();
+            this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.translations = new Szotar.WindowsForms.Controls.ListViewNF();
             this.translationText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             deleteMI = new System.Windows.Forms.ToolStripMenuItem();
             this.listContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -44,7 +45,7 @@
             deleteMI.Name = "deleteMI";
             deleteMI.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             deleteMI.ShowShortcutKeys = false;
-            deleteMI.Size = new System.Drawing.Size(152, 22);
+            deleteMI.Size = new System.Drawing.Size(100, 22);
             deleteMI.Text = "&Delete";
             deleteMI.Click += new System.EventHandler(this.deleteMI_Click);
             // 
@@ -66,14 +67,14 @@
             this.phrase.Size = new System.Drawing.Size(379, 22);
             this.phrase.TabIndex = 1;
             // 
-            // label1
+            // translationsLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 37);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(72, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Translations:";
+            this.translationsLabel.AutoSize = true;
+            this.translationsLabel.Location = new System.Drawing.Point(13, 37);
+            this.translationsLabel.Name = "translationsLabel";
+            this.translationsLabel.Size = new System.Drawing.Size(72, 13);
+            this.translationsLabel.TabIndex = 2;
+            this.translationsLabel.Text = "Translations:";
             // 
             // complete
             // 
@@ -117,6 +118,14 @@
             this.addTranslation.UseVisualStyleBackColor = true;
             this.addTranslation.Click += new System.EventHandler(this.addTranslation_Click);
             // 
+            // listContextMenu
+            // 
+            this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            deleteMI});
+            this.listContextMenu.Name = "listContextMenu";
+            this.listContextMenu.Size = new System.Drawing.Size(101, 26);
+            this.listContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.listContextMenu_Opening);
+            // 
             // translations
             // 
             this.translations.AllowDrop = true;
@@ -143,14 +152,6 @@
             // 
             this.translationText.Text = "";
             // 
-            // listContextMenu
-            // 
-            this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            deleteMI});
-            this.listContextMenu.Name = "listContextMenu";
-            this.listContextMenu.Size = new System.Drawing.Size(153, 48);
-            this.listContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.listContextMenu_Opening);
-            // 
             // EditDictionaryItem
             // 
             this.AcceptButton = this.complete;
@@ -163,10 +164,11 @@
             this.Controls.Add(this.translations);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.complete);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.translationsLabel);
             this.Controls.Add(this.phrase);
             this.Controls.Add(this.phraseLabel);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(496, 281);
             this.Name = "EditDictionaryItem";
             this.listContextMenu.ResumeLayout(false);
@@ -179,7 +181,7 @@
 
         private System.Windows.Forms.Label phraseLabel;
         private System.Windows.Forms.TextBox phrase;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label translationsLabel;
         private System.Windows.Forms.Button complete;
         private System.Windows.Forms.Button cancel;
         private Controls.ListViewNF translations;

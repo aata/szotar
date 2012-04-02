@@ -12,11 +12,17 @@ namespace Szotar.WindowsForms.Dialogs {
         IDictionarySection dictionary;
         Entry entry;
 
-        public EditDictionaryItem(IDictionarySection dictionary, Entry entry = null) {
+        public EditDictionaryItem(IDictionarySection dictionary, string phraseLanguage, string translationLanguage, Entry entry = null) {
             InitializeComponent();
 
             this.dictionary = dictionary;
             this.entry = entry;
+
+            if (!string.IsNullOrEmpty(phraseLanguage))
+                phraseLabel.Text = phraseLanguage + ":";
+
+            if (!string.IsNullOrEmpty(translationLanguage))
+                translationsLabel.Text = translationLanguage + ":";
 
             if (Adding) {
                 this.Text = Properties.Resources.AddDictionaryItem;
@@ -36,8 +42,12 @@ namespace Szotar.WindowsForms.Dialogs {
             ThemeHelper.UseExplorerTheme(translations);
 
             translations.Resize += delegate {
-                translations.Columns[0].Width = translations.ClientSize.Width - 1;
+                AutoSizeColumns();
             };
+            AutoSizeColumns();
+        }
+
+        void AutoSizeColumns() {
             translations.Columns[0].Width = translations.ClientSize.Width - 1;
         }
 
@@ -55,14 +65,10 @@ namespace Szotar.WindowsForms.Dialogs {
             }
         }
 
-        private void UpdateList() {
-            translations.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-        }
-
         private void addTranslation_Click(object sender, EventArgs e) {
             translations.Items.Add(new ListViewItem(new string[] { translation.Text, translation.Text }));
+            AutoSizeColumns();
             translation.ResetText();
-            UpdateList();
         }
 
         private void deleteMI_Click(object sender, EventArgs e) {

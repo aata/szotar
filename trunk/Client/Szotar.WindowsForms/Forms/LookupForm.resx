@@ -324,7 +324,7 @@
     <value>False</value>
   </metadata>
   <data name="dummyItem1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="dummyItem1.Text" xml:space="preserve">
     <value>Dummy Item</value>
@@ -378,7 +378,7 @@
     <value>194, 22</value>
   </data>
   <data name="addEntry.Text" xml:space="preserve">
-    <value>A&amp;dd Entry</value>
+    <value>Add E&amp;ntry</value>
   </data>
   <metadata name="importDictionary.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
@@ -446,6 +446,12 @@
   <data name="toolsMenu.Text" xml:space="preserve">
     <value>&amp;Tools</value>
   </data>
+  <metadata name="contextMenuSeparator.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="contextMenuSeparator.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 6</value>
+  </data>
   <data name="copyCM.ShortcutKeyDisplayString" xml:space="preserve">
     <value>Ctrl+C</value>
   </data>
@@ -485,21 +491,17 @@
   <data name="addTo.Text" xml:space="preserve">
     <value>A&amp;dd to</value>
   </data>
-  <metadata name="contextMenuSeparator.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <data name="contextMenuSeparator.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 6</value>
+  <data name="newItemCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>198, 22</value>
+  </data>
+  <data name="newItemCM.Text" xml:space="preserve">
+    <value>Add e&amp;ntry</value>
   </data>
   <data name="editMI.Size" type="System.Drawing.Size, System.Drawing">
     <value>198, 22</value>
   </data>
   <data name="editMI.Text" xml:space="preserve">
     <value>&amp;Edit</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="deleteMI.Enabled" type="System.Boolean, mscorlib">
-    <value>False</value>
   </data>
   <data name="deleteMI.Size" type="System.Drawing.Size, System.Drawing">
     <value>198, 22</value>
@@ -508,7 +510,7 @@
     <value>&amp;Delete</value>
   </data>
   <data name="contextMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>199, 142</value>
+    <value>199, 186</value>
   </data>
   <data name="&gt;&gt;contextMenu.Name" xml:space="preserve">
     <value>contextMenu</value>
@@ -525,6 +527,7 @@
   <data name="grid.Size" type="System.Drawing.Size, System.Drawing">
     <value>600, 415</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="grid.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
@@ -1011,6 +1014,12 @@
   <data name="&gt;&gt;options.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;contextMenuSeparator.Name" xml:space="preserve">
+    <value>contextMenuSeparator</value>
+  </data>
+  <data name="&gt;&gt;contextMenuSeparator.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;copyCM.Name" xml:space="preserve">
     <value>copyCM</value>
   </data>
@@ -1041,11 +1050,11 @@
   <data name="&gt;&gt;addTo.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;contextMenuSeparator.Name" xml:space="preserve">
-    <value>contextMenuSeparator</value>
+  <data name="&gt;&gt;newItemCM.Name" xml:space="preserve">
+    <value>newItemCM</value>
   </data>
-  <data name="&gt;&gt;contextMenuSeparator.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;newItemCM.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;editMI.Name" xml:space="preserve">
     <value>editMI</value>
