@@ -577,52 +577,58 @@ namespace Szotar {
         Thread workerThread;
 
 		public void BackgroundSaveWorker() {
-            Metrics.Measure("Saving dictionary: " + System.IO.Path.GetFileName(Path), delegate {
-                if (Path != null) {
-                    try {
-                        string tempFile = P.GetTempFileName();
-                        string backupFile = P.GetTempFileName();
-
-                        // Write the new version to a temporary file, first. If that fails, the actual dictionary file
-                        // is not modified.
-                        Write(tempFile);
-
-                        // Try to make a backup of the file. If that isn't possible for some reason, just
-                        // delete it, since we've written the replacement file.
+            try {
+                Metrics.Measure("Saving dictionary: " + System.IO.Path.GetFileName(Path), delegate {
+                    if (Path != null) {
                         try {
-                            CloseFile();
-                            DestroyCache();
-                            File.Move(Path, backupFile);
-                        } catch (IOException) {
-                            File.Delete(Path);
-                        } catch (UnauthorizedAccessException) {
-                            File.Delete(Path);
+                            string tempFile = P.GetTempFileName();
+                            string backupFile = P.GetTempFileName();
+
+                            // Write the new version to a temporary file, first. If that fails, the actual dictionary file
+                            // is not modified.
+                            Write(tempFile);
+
+                            // Try to make a backup of the file. If that isn't possible for some reason, just
+                            // delete it, since we've written the replacement file.
+                            try {
+                                CloseFile();
+                                DestroyCache();
+                                File.Move(Path, backupFile);
+                            } catch (IOException) {
+                                File.Delete(Path);
+                            } catch (UnauthorizedAccessException) {
+                                File.Delete(Path);
+                            }
+
+                            // Overwrite the dictionary file with the new version.
+                            File.Move(tempFile, Path);
+
+                            // Try to open the file again, so that other people can't modify it.
+                            // If it fails, we can try again later.
+                            try {
+                                OpenFile(true);
+                            } catch (IOException) {
+                            } catch (UnauthorizedAccessException) { }
+
+                            File.Delete(backupFile);
+
+                            SaveCache();
+                        } catch (IOException ex) {
+                            throw new DictionarySaveException(ex.Message, ex);
+                        } catch (UnauthorizedAccessException ex) {
+                            throw new DictionarySaveException(ex.Message, ex);
+                        } catch (ArgumentException ex) {
+                            throw new DictionarySaveException(ex.Message, ex);
                         }
-
-                        // Overwrite the dictionary file with the new version.
-                        File.Move(tempFile, Path);
-
-                        // Try to open the file again, so that other people can't modify it.
-                        // If it fails, we can try again later.
-                        try {
-                            OpenFile(true);
-                        } catch (IOException) {
-                        } catch (UnauthorizedAccessException) { }
-
-                        File.Delete(backupFile);
-
-                        SaveCache();
-                    } catch (IOException ex) {
-                        throw new DictionarySaveException(ex.Message, ex);
-                    } catch (UnauthorizedAccessException ex) {
-                        throw new DictionarySaveException(ex.Message, ex);
-                    } catch (ArgumentException ex) {
-                        throw new DictionarySaveException(ex.Message, ex);
+                    } else {
+                        throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
                     }
-                } else {
-                    throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
-                }
-            });
+                });
+            } catch (DictionarySaveException e) {
+                ProgramLog.Default.AddMessage(LogType.Error, "{0}", e.Message);
+            } catch (InvalidOperationException e) {
+                ProgramLog.Default.AddMessage(LogType.Error, "{0}", e.Message);
+            }
 		}
 
         public void Save() {
