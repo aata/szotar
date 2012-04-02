@@ -950,6 +950,8 @@ namespace Szotar.WindowsForms.Forms {
 			}
 
 			addTo.Visible = addTo.DropDownItems.Count > 0;
+
+            editMI.Enabled = grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0;
 		}
 
 		private void AddToExistingList(long listID) {
@@ -1014,6 +1016,15 @@ namespace Szotar.WindowsForms.Forms {
 				searchBox.Text = results[index].Translation;
 			}
 		}
+
+        private void editMI_Click(object sender, EventArgs e) {
+            int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+            if (index < 0)
+                return;
+            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(searchMode), results[index].Entry).ShowDialog();
+            if (dr == DialogResult.OK)
+                UpdateResults();
+        }
 		#endregion
 		#endregion
 
@@ -1036,6 +1047,12 @@ namespace Szotar.WindowsForms.Forms {
 				Errors.CouldNotLoadDictionary(dict.Name, dict.Path, e);
 			}
 		}
+
+        private void addEntry_Click(object sender, EventArgs e) {
+            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(this.SearchMode)).ShowDialog();
+            if (dr == System.Windows.Forms.DialogResult.OK)
+                UpdateResults();
+        }
 	}
 
 	public enum SearchMode {

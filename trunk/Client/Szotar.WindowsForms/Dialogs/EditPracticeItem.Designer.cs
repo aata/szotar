@@ -55,14 +55,14 @@
             // 
             this.phrase.Location = new System.Drawing.Point(79, 9);
             this.phrase.Name = "phrase";
-            this.phrase.Size = new System.Drawing.Size(266, 20);
+            this.phrase.Size = new System.Drawing.Size(266, 22);
             this.phrase.TabIndex = 1;
             // 
             // translation
             // 
             this.translation.Location = new System.Drawing.Point(79, 35);
             this.translation.Name = "translation";
-            this.translation.Size = new System.Drawing.Size(266, 20);
+            this.translation.Size = new System.Drawing.Size(266, 22);
             this.translation.TabIndex = 3;
             // 
             // phraseLabel
@@ -70,7 +70,7 @@
             this.phraseLabel.AutoSize = true;
             this.phraseLabel.Location = new System.Drawing.Point(12, 9);
             this.phraseLabel.Name = "phraseLabel";
-            this.phraseLabel.Size = new System.Drawing.Size(40, 13);
+            this.phraseLabel.Size = new System.Drawing.Size(41, 13);
             this.phraseLabel.TabIndex = 0;
             this.phraseLabel.Text = "Phrase";
             // 
@@ -79,7 +79,7 @@
             this.translationLabel.AutoSize = true;
             this.translationLabel.Location = new System.Drawing.Point(12, 38);
             this.translationLabel.Name = "translationLabel";
-            this.translationLabel.Size = new System.Drawing.Size(59, 13);
+            this.translationLabel.Size = new System.Drawing.Size(64, 13);
             this.translationLabel.TabIndex = 2;
             this.translationLabel.Text = "Translation";
             // 
@@ -96,6 +96,7 @@
             this.Controls.Add(this.phrase);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.ok);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "EditPracticeItem";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

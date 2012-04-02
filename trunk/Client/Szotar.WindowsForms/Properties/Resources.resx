@@ -272,4 +272,16 @@
     <value>{0} entries</value>
     <comment>Used to show how many entries a dictionary contains</comment>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>&amp;Add</value>
+  </data>
+  <data name="AddDictionaryItem" xml:space="preserve">
+    <value>Add dictionary entry</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>&amp;Edit</value>
+  </data>
+  <data name="EditDictionaryItem" xml:space="preserve">
+    <value>Edit dictionary entry</value>
+  </data>
 </root>

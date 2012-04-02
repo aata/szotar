@@ -345,7 +345,7 @@ namespace Szotar {
                 }
             }
 
-            void AddEntry(Entry e) {
+            public void AddEntry(Entry e) {
                 long from = FindOrAddWord(e.Phrase, e.PhraseNoAccents);
 
                 foreach (var tr in e.Translations) {
@@ -379,6 +379,10 @@ namespace Szotar {
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
                 return this.GetEnumerator();
             }
+
+            void IDictionarySection.EntryModified(Entry entry) {
+                throw new NotImplementedException();
+            }
         }
 
         public IDictionarySection ForwardsSection {
@@ -410,6 +414,10 @@ namespace Szotar {
 
         public SqliteSection(SqliteDictionary dict, int section) : base(dict) {
             this.section = section;
+        }
+
+        void IDictionarySection.AddEntry(Entry e) {
+            throw new NotSupportedException();
         }
 
         public int HeadWords {
@@ -552,6 +560,10 @@ namespace Szotar {
             if (selectTranslations != null)
                 selectTranslations.Dispose();
             base.Dispose(disposing);
+        }
+
+        void IDictionarySection.EntryModified(Entry entry) {
+            throw new NotImplementedException();
         }
     }
 

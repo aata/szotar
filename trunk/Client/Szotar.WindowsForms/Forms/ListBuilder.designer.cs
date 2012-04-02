@@ -41,6 +41,8 @@
             this.author = new System.Windows.Forms.TextBox();
             this.urlPanel = new System.Windows.Forms.Panel();
             this.url = new System.Windows.Forms.TextBox();
+            this.entriesPanel = new System.Windows.Forms.Panel();
+            this.entriesLabel = new System.Windows.Forms.Label();
             this.showStartPage = new System.Windows.Forms.ToolStripMenuItem();
             this.save = new System.Windows.Forms.ToolStripMenuItem();
             this.close = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,8 +75,6 @@
             this.shadow = new System.Windows.Forms.PictureBox();
             this.icon = new System.Windows.Forms.PictureBox();
             this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
-            this.entriesPanel = new System.Windows.Forms.Panel();
-            this.entriesLabel = new System.Windows.Forms.Label();
             nameLabel = new System.Windows.Forms.Label();
             authorLabel = new System.Windows.Forms.Label();
             urlLabel = new System.Windows.Forms.Label();
@@ -89,12 +89,12 @@
             this.namePanel.SuspendLayout();
             this.authorPanel.SuspendLayout();
             this.urlPanel.SuspendLayout();
+            this.entriesPanel.SuspendLayout();
             this.mainMenu.SuspendLayout();
             this.itemContextMenu.SuspendLayout();
             this.meta.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.shadow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.icon)).BeginInit();
-            this.entriesPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // nameLabel
@@ -139,7 +139,7 @@
             metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             metaFlow.Location = new System.Drawing.Point(73, 7);
             metaFlow.Name = "metaFlow";
-            metaFlow.Size = new System.Drawing.Size(19057, 60);
+            metaFlow.Size = new System.Drawing.Size(20140, 60);
             metaFlow.TabIndex = 2;
             // 
             // namePanel
@@ -201,6 +201,25 @@
             this.url.Name = "url";
             this.url.Size = new System.Drawing.Size(161, 22);
             this.url.TabIndex = 1;
+            // 
+            // entriesPanel
+            // 
+            this.entriesPanel.AutoSize = true;
+            this.entriesPanel.Controls.Add(this.entriesLabel);
+            this.entriesPanel.Location = new System.Drawing.Point(218, 32);
+            this.entriesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.entriesPanel.Name = "entriesPanel";
+            this.entriesPanel.Size = new System.Drawing.Size(6, 17);
+            this.entriesPanel.TabIndex = 1;
+            // 
+            // entriesLabel
+            // 
+            this.entriesLabel.AutoSize = true;
+            this.entriesLabel.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.entriesLabel.Location = new System.Drawing.Point(3, 4);
+            this.entriesLabel.Name = "entriesLabel";
+            this.entriesLabel.Size = new System.Drawing.Size(0, 13);
+            this.entriesLabel.TabIndex = 0;
             // 
             // fileMenu
             // 
@@ -275,6 +294,7 @@
             this.learn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
             this.learn.Size = new System.Drawing.Size(171, 22);
             this.learn.Text = "&Learn";
+            this.learn.Click += new System.EventHandler(this.learn_Click);
             // 
             // editSep2
             // 
@@ -285,7 +305,7 @@
             // contextSep1
             // 
             contextSep1.Name = "contextSep1";
-            contextSep1.Size = new System.Drawing.Size(149, 6);
+            contextSep1.Size = new System.Drawing.Size(141, 6);
             // 
             // editMenu
             // 
@@ -421,40 +441,40 @@
             this.swap,
             this.deleteCM});
             this.itemContextMenu.Name = "itemContextMenu";
-            this.itemContextMenu.Size = new System.Drawing.Size(153, 142);
+            this.itemContextMenu.Size = new System.Drawing.Size(145, 120);
             // 
             // cutCM
             // 
             this.cutCM.Name = "cutCM";
             this.cutCM.ShortcutKeyDisplayString = "Ctrl+X";
-            this.cutCM.Size = new System.Drawing.Size(152, 22);
+            this.cutCM.Size = new System.Drawing.Size(144, 22);
             this.cutCM.Text = "C&ut";
             // 
             // copyCM
             // 
             this.copyCM.Name = "copyCM";
             this.copyCM.ShortcutKeyDisplayString = "Ctrl+C";
-            this.copyCM.Size = new System.Drawing.Size(152, 22);
+            this.copyCM.Size = new System.Drawing.Size(144, 22);
             this.copyCM.Text = "&Copy";
             // 
             // pasteCM
             // 
             this.pasteCM.Name = "pasteCM";
             this.pasteCM.ShortcutKeyDisplayString = "Ctrl+V";
-            this.pasteCM.Size = new System.Drawing.Size(152, 22);
+            this.pasteCM.Size = new System.Drawing.Size(144, 22);
             this.pasteCM.Text = "&Paste";
             // 
             // swap
             // 
             this.swap.Name = "swap";
-            this.swap.Size = new System.Drawing.Size(152, 22);
+            this.swap.Size = new System.Drawing.Size(144, 22);
             this.swap.Text = "&Swap";
             // 
             // deleteCM
             // 
             this.deleteCM.Name = "deleteCM";
             this.deleteCM.ShortcutKeyDisplayString = "Del";
-            this.deleteCM.Size = new System.Drawing.Size(152, 22);
+            this.deleteCM.Size = new System.Drawing.Size(144, 22);
             this.deleteCM.Text = "&Delete";
             // 
             // meta
@@ -509,25 +529,6 @@
             this.grid.Size = new System.Drawing.Size(361, 379);
             this.grid.TabIndex = 8;
             // 
-            // entriesPanel
-            // 
-            this.entriesPanel.AutoSize = true;
-            this.entriesPanel.Controls.Add(this.entriesLabel);
-            this.entriesPanel.Location = new System.Drawing.Point(218, 32);
-            this.entriesPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.entriesPanel.Name = "entriesPanel";
-            this.entriesPanel.Size = new System.Drawing.Size(6, 17);
-            this.entriesPanel.TabIndex = 1;
-            // 
-            // entriesLabel
-            // 
-            this.entriesLabel.AutoSize = true;
-            this.entriesLabel.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.entriesLabel.Location = new System.Drawing.Point(3, 4);
-            this.entriesLabel.Name = "entriesLabel";
-            this.entriesLabel.Size = new System.Drawing.Size(0, 13);
-            this.entriesLabel.TabIndex = 0;
-            // 
             // ListBuilder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -549,14 +550,14 @@
             this.authorPanel.PerformLayout();
             this.urlPanel.ResumeLayout(false);
             this.urlPanel.PerformLayout();
+            this.entriesPanel.ResumeLayout(false);
+            this.entriesPanel.PerformLayout();
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();
             this.itemContextMenu.ResumeLayout(false);
             this.meta.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.shadow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.icon)).EndInit();
-            this.entriesPanel.ResumeLayout(false);
-            this.entriesPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
