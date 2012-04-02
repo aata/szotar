@@ -106,6 +106,7 @@
             this.translation.Name = "translation";
             this.translation.Size = new System.Drawing.Size(298, 22);
             this.translation.TabIndex = 3;
+            this.translation.KeyUp += new System.Windows.Forms.KeyEventHandler(this.translation_KeyUp);
             // 
             // addTranslation
             // 

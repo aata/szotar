@@ -107,5 +107,10 @@ namespace Szotar.WindowsForms.Dialogs {
             if (e.Data.GetFormats().Contains("System.Windows.Forms.ListViewItem"))
                 e.Effect = DragDropEffects.Move;
         }
+
+        private void translation_KeyUp(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter)
+                addTranslation_Click(sender, e);
+        }
     }
 }

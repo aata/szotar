@@ -55,7 +55,7 @@ namespace Szotar.WindowsForms {
                     break;
 
                 case "Practice":
-                    new Forms.PracticeWindow().Show();
+                    new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(20), PracticeMode.Learn).Show();
                     break;
 
                 case "Dictionary":
