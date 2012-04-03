@@ -49,7 +49,13 @@ namespace Szotar.WindowsForms.Forms {
 				components.Add(new DisposableComponent(mode));
 		}
 
-		private void SetMode(IPracticeMode mode) {
+		public void SetMode(IPracticeMode mode) {
+            if (this.mode == mode)
+                return;
+
+            if (this.mode != null)
+                this.mode.Stop();
+
 			this.mode = mode;
 			mode.Start(this);
 		}
@@ -98,5 +104,13 @@ namespace Szotar.WindowsForms.Forms {
 		private void showStartPage_Click(object sender, EventArgs e) {
             ShowForm.Show<StartPage>();
 		}
+
+        private void flashcardsMI_Click(object sender, EventArgs e) {
+            SetMode(new FlashcardMode());
+        }
+
+        private void learnMI_Click(object sender, EventArgs e) {
+            SetMode(new LearnMode());
+        }
 	}
 }

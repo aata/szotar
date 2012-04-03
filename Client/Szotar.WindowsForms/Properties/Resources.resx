@@ -284,4 +284,10 @@
   <data name="EditDictionaryItem" xml:space="preserve">
     <value>Edit dictionary entry</value>
   </data>
+  <data name="ConfirmDeletePracticeItem" xml:space="preserve">
+    <value>Are you sure you want to delete this item? There is no undo button for this operation!</value>
+  </data>
+  <data name="ConfirmDeletePracticeItemTitle" xml:space="preserve">
+    <value>Delete this item?</value>
+  </data>
 </root>
