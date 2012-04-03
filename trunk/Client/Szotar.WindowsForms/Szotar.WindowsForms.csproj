@@ -239,6 +239,12 @@
     <Compile Include="Preferences\Display.Designer.cs">
       <DependentUpon>Display.cs</DependentUpon>
     </Compile>
+    <Compile Include="Preferences\Practice.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Preferences\Practice.Designer.cs">
+      <DependentUpon>Practice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Preferences\ResetSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -339,6 +345,9 @@
     <EmbeddedResource Include="Preferences\Display.resx">
       <DependentUpon>Display.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Practice.resx">
+      <DependentUpon>Practice.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Preferences\ResetSettings.resx">
       <DependentUpon>ResetSettings.cs</DependentUpon>

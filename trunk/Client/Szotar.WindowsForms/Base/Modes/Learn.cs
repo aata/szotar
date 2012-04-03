@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Linq;
 
 namespace Szotar.WindowsForms {
 	// Checks answers, ignoring case, extraneous spaces and punctuation, and parenthesised 
@@ -436,6 +437,8 @@ namespace Szotar.WindowsForms {
 		TextBox affirmation; // When the user gets an answer wrong, make them type it in so that they learn it.
 		Button overrideButton;
 		Button editButton;
+        Button viewButton;
+        Button deleteButton;
 		RoundOverview roundOverview;
 		GameOverview gameOverview;
 
@@ -488,9 +491,11 @@ namespace Szotar.WindowsForms {
 			answer = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
 			scoreLabel = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = scoreFont, Dock = DockStyle.Bottom, TextAlign = ContentAlignment.BottomRight };
 			translation = new TextBox() { Font = font };
-			affirmation = new TextBox() { Font = font };
-			overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = "&override" };
-			editButton = new Button() { Font = GameArea.FindForm().Font, Text = "&edit" };
+            affirmation = new TextBox() { Font = font };
+            overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = "&override" };
+            editButton = new Button() { Font = GameArea.FindForm().Font, Text = "&edit" };
+            viewButton = new Button() { Font = GameArea.FindForm().Font, Text = "&view in list" };
+            deleteButton = new Button() { Font = GameArea.FindForm().Font, Text = "&delete" };
 			roundOverview = new RoundOverview() { Dock = DockStyle.Fill };
 			gameOverview = new GameOverview(this) { Dock = DockStyle.Fill };
 
@@ -498,9 +503,11 @@ namespace Szotar.WindowsForms {
 			GameArea.Controls.Add(scoreLabel);
 			GameArea.Controls.Add(answer);
 			GameArea.Controls.Add(translation);
-			GameArea.Controls.Add(affirmation);
-			GameArea.Controls.Add(overrideButton);
-			GameArea.Controls.Add(editButton);
+            GameArea.Controls.Add(affirmation);
+            GameArea.Controls.Add(overrideButton);
+            GameArea.Controls.Add(editButton);
+            GameArea.Controls.Add(viewButton);
+            GameArea.Controls.Add(deleteButton);
 			GameArea.Controls.Add(roundOverview);
 			GameArea.Controls.Add(gameOverview);
 
@@ -509,6 +516,8 @@ namespace Szotar.WindowsForms {
 			affirmation.TextChanged += new EventHandler(affirmation_TextChanged);
 			overrideButton.Click += delegate { Override(items[index], lastGuess); };
 			editButton.Click += new EventHandler(editButton_Click);
+            viewButton.Click += new EventHandler(viewButton_Click);
+            deleteButton.Click += new EventHandler(deleteButton_Click);
 			roundOverview.KeyUp += new KeyEventHandler(roundOverview_KeyUp);
 
 			// Stop the beep sound being produced when Enter is pressed.
@@ -547,7 +556,37 @@ namespace Szotar.WindowsForms {
 				if (!existed)
 					ProgramLog.Default.AddMessage(LogType.Debug, "Attempting to update word list entry that no longer exists: {0}, {1}", items[index].Phrase, items[index].Translation);
 			}
-		}
+        }
+
+        void deleteButton_Click(object sender, EventArgs e) {
+            var dr = MessageBox.Show(
+                GameArea,
+                Properties.Resources.ConfirmDeletePracticeItem,
+                Properties.Resources.ConfirmDeletePracticeItemTitle,
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.None,
+                MessageBoxDefaultButton.Button2);
+
+            if (dr == DialogResult.OK) {
+                var list = DataStore.Database.GetWordList(items[index].SetID);
+                for (int i = 0; i < list.Count; i++) {
+                    var item = list[i];
+                    if (item.Phrase == items[index].Phrase && item.Translation == items[index].Translation)
+                        list.RemoveAt(i);
+                }
+            }
+        }
+
+        void viewButton_Click(object sender, EventArgs e) {
+            var form = Forms.ListBuilder.Open(items[index].SetID);
+            var list = form.WordList;
+            for (int i = 0; i < list.Count; i++) {
+                if (list[i].Phrase == items[index].Phrase && list[i].Translation == items[index].Translation) {
+                    form.ScrollToPosition(i);
+                    break;
+                }
+            }
+        }
 
 		public override void Stop() {
 			base.Stop();
@@ -793,6 +832,8 @@ namespace Szotar.WindowsForms {
 			phrase.Tag = phrase.Visible = state != State.RoundOverview && state != State.GameOverview;
 			answer.Tag = answer.Visible = state == State.ViewingAnswer;
 			overrideButton.Tag = overrideButton.Visible = state == State.ViewingAnswer;
+            viewButton.Tag = viewButton.Visible = state == State.ViewingAnswer;
+            deleteButton.Tag = deleteButton.Visible = state == State.ViewingAnswer;
 			editButton.Tag = editButton.Visible = state == State.ViewingAnswer || state == State.Guessing;
 			roundOverview.Tag = roundOverview.Visible = state == State.RoundOverview;
 			gameOverview.Tag = gameOverview.Visible = state == State.GameOverview;
@@ -885,7 +926,7 @@ namespace Szotar.WindowsForms {
 			}
 
 			int right = GameArea.ClientSize.Width;
-			foreach (var button in new[] { overrideButton, editButton }) {
+			foreach (var button in new[] { overrideButton, editButton, viewButton, deleteButton }) {
 				if ((bool?)button.Tag == true) {
 					button.Top = 0;
 					button.Left = right - button.Width;

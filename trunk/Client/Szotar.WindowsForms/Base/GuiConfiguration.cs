@@ -125,5 +125,10 @@ namespace Szotar.WindowsForms {
 			get { return Default.Get<bool>("PracticeFixCase", true); }
 			set { Default.Set("PracticeFixCase", value); }
 		}
+
+        public static int PracticeDefaultCount {
+            get { return Default.Get<int>("PracticeDefaultCount", 20); }
+            set { Default.Set("PracticeDefaultCount", value); }
+        }
 	}
 }

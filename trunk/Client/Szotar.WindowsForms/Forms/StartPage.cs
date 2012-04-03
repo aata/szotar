@@ -123,6 +123,10 @@ namespace Szotar.WindowsForms.Forms {
 		private void about_Click(object sender, EventArgs e) {
 			ShowForm.Show<About>();
 		}
+
+        private void practiceRandom_Click(object sender, EventArgs e) {
+            new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
+        }
 		#endregion
 	}
 }

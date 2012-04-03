@@ -601,7 +601,7 @@ namespace Szotar.Sqlite {
         public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
             // Join with VocabItems to avoid practicing items which have since been deleted or edited
             var reader = this.SelectReader(@"
-                SELECT Phrase, Translation, SetID, SUM(Result) AS ResultSum, COUNT(Result) as ResultCount, Created 
+                SELECT Phrase, Translation, SetID, SUM(Result) AS ResultSum, COUNT(Result) as ResultCount, MAX(Created) 
                 FROM (SELECT PracticeHistory.Phrase, PracticeHistory.Translation, PracticeHistory.SetID, PracticeHistory.Result, PracticeHistory.Created 
                       FROM PracticeHistory INNER JOIN VocabItems 
                       ON PracticeHistory.Phrase = VocabItems.Phrase AND PracticeHistory.Translation = VocabItems.Translation 

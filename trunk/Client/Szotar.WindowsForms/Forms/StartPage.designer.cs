@@ -38,10 +38,12 @@
             this.menu = new System.Windows.Forms.MenuStrip();
             this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.openListMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.newListMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.newListCM = new System.Windows.Forms.ToolStripMenuItem();
             this.listContextMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.flashcardsListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.learnListMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.newListMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.practiceRandom = new System.Windows.Forms.ToolStripMenuItem();
             this.recentItems = new Szotar.WindowsForms.Controls.ListSearch();
             file = new System.Windows.Forms.ToolStripMenuItem();
             close = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,6 +61,8 @@
             // file
             // 
             file.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newListMI,
+            this.practiceRandom,
             close,
             fileSep,
             this.exitProgram});
@@ -70,20 +74,20 @@
             // 
             close.Name = "close";
             close.ShortcutKeyDisplayString = "Alt+F4";
-            close.Size = new System.Drawing.Size(145, 22);
+            close.Size = new System.Drawing.Size(225, 22);
             close.Text = "&Close";
             close.Click += new System.EventHandler(this.close_Click);
             // 
             // fileSep
             // 
             fileSep.Name = "fileSep";
-            fileSep.Size = new System.Drawing.Size(142, 6);
+            fileSep.Size = new System.Drawing.Size(222, 6);
             // 
             // exitProgram
             // 
             this.exitProgram.Name = "exitProgram";
             this.exitProgram.ShortcutKeyDisplayString = "";
-            this.exitProgram.Size = new System.Drawing.Size(145, 22);
+            this.exitProgram.Size = new System.Drawing.Size(225, 22);
             this.exitProgram.Text = "E&xit {0}";
             this.exitProgram.Click += new System.EventHandler(this.exitProgram_Click);
             // 
@@ -147,47 +151,63 @@
             // 
             this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openListMI,
-            this.newListMI,
+            this.newListCM,
             this.listContextMenuSeparator,
             this.flashcardsListMI,
             this.learnListMI});
             this.listContextMenu.Name = "listContextMenu";
-            this.listContextMenu.Size = new System.Drawing.Size(153, 120);
+            this.listContextMenu.Size = new System.Drawing.Size(152, 98);
             this.listContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.listContextMenu_Opening);
             // 
             // openListMI
             // 
             this.openListMI.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.openListMI.Name = "openListMI";
-            this.openListMI.Size = new System.Drawing.Size(152, 22);
+            this.openListMI.Size = new System.Drawing.Size(151, 22);
             this.openListMI.Text = "&Open";
             this.openListMI.Click += new System.EventHandler(this.openListMI_Click);
             // 
-            // newListMI
+            // newListCM
             // 
-            this.newListMI.Name = "newListMI";
-            this.newListMI.Size = new System.Drawing.Size(152, 22);
-            this.newListMI.Text = "&New Word List";
-            this.newListMI.Click += new System.EventHandler(this.newListMI_Click);
+            this.newListCM.Name = "newListCM";
+            this.newListCM.Size = new System.Drawing.Size(151, 22);
+            this.newListCM.Text = "&New Word List";
+            this.newListCM.Click += new System.EventHandler(this.newListMI_Click);
             // 
             // listContextMenuSeparator
             // 
             this.listContextMenuSeparator.Name = "listContextMenuSeparator";
-            this.listContextMenuSeparator.Size = new System.Drawing.Size(149, 6);
+            this.listContextMenuSeparator.Size = new System.Drawing.Size(148, 6);
             // 
             // flashcardsListMI
             // 
             this.flashcardsListMI.Name = "flashcardsListMI";
-            this.flashcardsListMI.Size = new System.Drawing.Size(152, 22);
+            this.flashcardsListMI.Size = new System.Drawing.Size(151, 22);
             this.flashcardsListMI.Text = "&Familiarize";
             this.flashcardsListMI.Click += new System.EventHandler(this.flashcardsListMI_Click);
             // 
             // learnListMI
             // 
             this.learnListMI.Name = "learnListMI";
-            this.learnListMI.Size = new System.Drawing.Size(152, 22);
+            this.learnListMI.Size = new System.Drawing.Size(151, 22);
             this.learnListMI.Text = "&Learn";
             this.learnListMI.Click += new System.EventHandler(this.learnListMI_Click);
+            // 
+            // newListMI
+            // 
+            this.newListMI.Name = "newListMI";
+            this.newListMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.newListMI.Size = new System.Drawing.Size(225, 22);
+            this.newListMI.Text = "&New Word List";
+            this.newListMI.Click += new System.EventHandler(this.newListMI_Click);
+            // 
+            // practiceRandom
+            // 
+            this.practiceRandom.Name = "practiceRandom";
+            this.practiceRandom.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+            this.practiceRandom.Size = new System.Drawing.Size(225, 22);
+            this.practiceRandom.Text = "&Practice Weak Points";
+            this.practiceRandom.Click += new System.EventHandler(this.practiceRandom_Click);
             // 
             // recentItems
             // 
@@ -229,10 +249,12 @@
         private Controls.ListSearch recentItems;
         private System.Windows.Forms.ContextMenuStrip listContextMenu;
         private System.Windows.Forms.ToolStripMenuItem openListMI;
-        private System.Windows.Forms.ToolStripMenuItem newListMI;
+        private System.Windows.Forms.ToolStripMenuItem newListCM;
         private System.Windows.Forms.ToolStripSeparator listContextMenuSeparator;
         private System.Windows.Forms.ToolStripMenuItem flashcardsListMI;
         private System.Windows.Forms.ToolStripMenuItem learnListMI;
+        private System.Windows.Forms.ToolStripMenuItem newListMI;
+        private System.Windows.Forms.ToolStripMenuItem practiceRandom;
 
 	}
 }

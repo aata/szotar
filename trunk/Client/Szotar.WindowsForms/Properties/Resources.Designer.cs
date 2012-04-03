@@ -106,6 +106,24 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete this item? There is no undo button for this operation!.
+        /// </summary>
+        internal static string ConfirmDeletePracticeItem {
+            get {
+                return ResourceManager.GetString("ConfirmDeletePracticeItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this item?.
+        /// </summary>
+        internal static string ConfirmDeletePracticeItemTitle {
+            get {
+                return ResourceManager.GetString("ConfirmDeletePracticeItemTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to delete this word list? This operation cannot be undone..
         /// </summary>
         internal static string ConfirmDeleteWordList {
