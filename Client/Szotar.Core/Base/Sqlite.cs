@@ -435,16 +435,23 @@ namespace Szotar.Sqlite {
 		}
 
 		public bool UpdateWordListEntry(long setID, string oldPhrase, string oldTranslation, 
-			string newPhrase, string newTranslation) 
-		{
-			// TODO: LIMIT 1?
-			int rows = ExecuteSQL(@"
-				UPDATE VocabItems
-				SET Phrase = ?, Translation = ?
-				WHERE Phrase = ? AND Translation = ?", 
-				setID, newPhrase, newTranslation, oldPhrase, oldTranslation);
+			string newPhrase, string newTranslation) {
+		
+            // Modifying the database directly doesn't notify existing word lists of the change.
+            // This solution does so with less work.
+            var list = GetWordList(setID);
 
-			return rows > 0;
+            bool found = false;
+            foreach (var item in list) {
+                if (item.Phrase == oldPhrase && item.Translation == oldTranslation) {
+                    item.Phrase = newPhrase;
+                    item.Translation = newTranslation;
+                    found = true;
+                    // Don't stop yet; there may be more identical items.
+                }
+            }
+
+            return found;
 		}
 
         public void AddPracticeHistory(long setID, string phrase, string translation, bool correct) {
