@@ -534,28 +534,11 @@ namespace Szotar.WindowsForms {
 		}
 
 		void editButton_Click(object sender, EventArgs e) {
-			var dialog = new Dialogs.EditPracticeItem(items[index]);
-			if (dialog.ShowDialog() == DialogResult.OK) {
-				var existed = DataStore.Database.UpdateWordListEntry(
-					items[index].SetID,
-					items[index].Phrase,
-					items[index].Translation,
-					dialog.Phrase,
-					dialog.Translation);
-
-				items[index] = new PracticeItem(items[index].SetID, dialog.Phrase, dialog.Translation);
-				Update();
-				Layout();
-
-				// TODO: This should possibly be made into an actual message, since it would go against 
-				// the user's expectations. However, explaining the reason why it didn't work would 
-				// be equally confusing.
-				// A third (and perhaps best) option would be to modify the item based on its unique ID 
-				// (which word list entries do actually have, even though they are not currently 
-				// retrieved by SqliteWordList.)
-				if (!existed)
-					ProgramLog.Default.AddMessage(LogType.Debug, "Attempting to update word list entry that no longer exists: {0}, {1}", items[index].Phrase, items[index].Translation);
-			}
+            var newItem = Dialogs.EditPracticeItem.Show(items[index]);
+            if (newItem != null)
+                items[index] = newItem;
+            Update();
+            Layout();
         }
 
         void deleteButton_Click(object sender, EventArgs e) {

@@ -81,7 +81,14 @@ namespace Szotar.WindowsForms.Forms {
 			return queue.AllItems;
 		}
 
-		ToolStrip IPracticeWindow.Controls {
+        public void ReplaceItem(PracticeItem existing, PracticeItem replacement) {
+            var items = queue.AllItems;
+            for (int i = 0; i < items.Count; i++)
+                if (items[i] == existing)
+                    items[i] = replacement;
+        }
+
+        ToolStrip IPracticeWindow.Controls {
 			get { return mainMenu; }
 		}
 
@@ -110,6 +117,12 @@ namespace Szotar.WindowsForms.Forms {
         }
 
         private void learnMI_Click(object sender, EventArgs e) {
+            SetMode(new LearnMode());
+        }
+
+        private void practiceWeakPoints_Click(object sender, EventArgs e) {
+            mode.Stop();
+            queue = new PracticeQueue(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount));
             SetMode(new LearnMode());
         }
 	}

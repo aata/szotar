@@ -28,6 +28,7 @@ namespace Szotar.WindowsForms {
 
 		PracticeItem FetchNextItem();
 		IList<PracticeItem> GetAllItems();
+        void ReplaceItem(PracticeItem existing, PracticeItem replacement);
 
 		ToolStrip Controls { get; }
 		Panel GameArea { get; }
@@ -36,7 +37,7 @@ namespace Szotar.WindowsForms {
 
 		int ItemCount { get; }
 		int Position { get; }
-	}
+    }
 
 	public interface IPracticeMode : IDisposable {
 		void Start(IPracticeWindow owner);
@@ -117,7 +118,11 @@ namespace Szotar.WindowsForms {
 			fore = new Stack<PracticeItem>();
 
 		public IPracticeWindow Source { get; private set; }
-		public PracticeItem CurrentItem { get; private set; }
+        public PracticeItem CurrentItem { get; private set; }
+        public void UpdateCurrentItem(PracticeItem newItem) {
+            Source.ReplaceItem(CurrentItem, newItem);
+            CurrentItem = newItem;
+        }
 		public int Length { get { return Source.ItemCount; } }
 		public int Position { 
 			get {
@@ -222,7 +227,13 @@ namespace Szotar.WindowsForms {
 			navMenu.Back += delegate { GoBack(); };
 			navMenu.Forward += delegate { GoForward(); };
 			navMenu.End += delegate { GoToEnd(); };
-			navMenu.Edit += delegate { };
+			navMenu.Edit += delegate {
+                var newItem = Dialogs.EditPracticeItem.Show(nav.CurrentItem);
+                if (newItem != null)
+                    nav.UpdateCurrentItem(newItem);
+                Update();
+                Layout();
+            };
 			navMenu.Swap += delegate { SwapItems(); };
 
 			translationLabel.Visible = false;
