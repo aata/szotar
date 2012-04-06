@@ -538,7 +538,7 @@ namespace Szotar.WindowsForms {
 			currentRound = new List<Attempt>();
 
 			if (previousRound != null)
-				items = new List<PracticeItem>(from x in previousRound where x.Correct select x.Item);
+				items = new List<PracticeItem>(from x in previousRound where !x.Correct select x.Item);
 			else
 				items = Owner.GetAllItems();
 
