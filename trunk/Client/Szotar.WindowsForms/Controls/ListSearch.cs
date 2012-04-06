@@ -56,15 +56,22 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		void WireDBEvents() {
-			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
+            DataStore.Database.WordListAccessed += new EventHandler<Sqlite.WordListEventArgs>(Database_WordListAccessed);
+            DataStore.Database.WordListDeleted += new EventHandler<Sqlite.WordListEventArgs>(Database_WordListDeleted);
 		}
 
 		void UnwireDBEvents() {
-			DataStore.Database.WordListDeleted -= new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
+            DataStore.Database.WordListDeleted -= new EventHandler<Sqlite.WordListEventArgs>(Database_WordListDeleted);
+            DataStore.Database.WordListAccessed -= new EventHandler<Sqlite.WordListEventArgs>(Database_WordListAccessed);
 		}
 
+        // When a list is opened, move it to the front of the recent lists section.
+        void Database_WordListAccessed(object sender, Sqlite.WordListEventArgs e) {
+            UpdateResults();
+        }
+
 		// When a word list is deleted, remove it from the results view.
-		void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
+        void Database_WordListDeleted(object sender, Sqlite.WordListEventArgs e) {
 			for (int i = 0; i < results.Items.Count; ) {
 				var tag = results.Items[i].Tag;
 				if (tag is ListInfo && ((ListInfo)tag).ID == e.SetID)
@@ -81,6 +88,7 @@ namespace Szotar.WindowsForms.Controls {
 
             if (ShowDictionaries) {
                 ListViewGroup dictsGroup = new ListViewGroup(Properties.Resources.Dictionaries);
+                dictsGroup.Name = "Dictionaries";
                 results.Groups.Add(dictsGroup);
 
                 Action<DictionaryInfo> addItem = dict => {
@@ -114,6 +122,7 @@ namespace Szotar.WindowsForms.Controls {
 			foreach (IListStore store in listStores) {
 				string storeName = store == recentListStore ? Properties.Resources.RecentListStoreName : Properties.Resources.DefaultListStoreName;
 				ListViewGroup group = new ListViewGroup(storeName);
+                group.Name = storeName;
 				results.Groups.Add(group);
 				foreach (ListInfo list in store.GetLists()) {
                     if (!list.ID.HasValue || !DataStore.Database.WordListExists(list.ID.Value))
@@ -145,6 +154,7 @@ namespace Szotar.WindowsForms.Controls {
 
 			if (!string.IsNullOrEmpty(searchBox.Text)) {
 				var group = new ListViewGroup(Properties.Resources.SearchResults);
+                group.Name = Properties.Resources.SearchResults;
 				results.Groups.Add(group);
 				foreach (var wsr in DataStore.Database.SearchAllEntries(searchBox.Text)) {
 					if (results.Items.Count > maxCount)

@@ -221,9 +221,13 @@ namespace Szotar.Sqlite {
 		}
 	}
 
-	public class WordListDeletedEventArgs : EventArgs {
-		public long SetID { get; set; }
-	}
+    public class WordListEventArgs : EventArgs {
+        public long SetID { get; private set; }
+
+        public WordListEventArgs(long id) {
+            SetID = id;
+        }
+    };
 
 	public class SqliteDataStore : SqliteDatabase {
 		Dictionary<long, NullWeakReference<SqliteWordList>> wordLists = new Dictionary<long, NullWeakReference<SqliteWordList>>();
@@ -233,13 +237,14 @@ namespace Szotar.Sqlite {
 		}
 
 		protected override int ApplicationSchemaVersion() {
-			return 2;
+			return 3;
 		}
 
 		protected override void IncrementalUpgradeSchema(int toVersion) {
 			switch (toVersion) {
 				case 1: InitDatabase(); break;
 				case 2: UpgradePracticeSchema(); break;
+                case 3: AddAccessedColumn(); break;
 				default: throw new ArgumentOutOfRangeException("toVersion");
 			}
 		}
@@ -326,6 +331,12 @@ namespace Szotar.Sqlite {
 				CREATE INDEX PracticeHistory_IndexC ON PracticeHistory (Created);");
 		}
 
+        private void AddAccessedColumn() {
+            ExecuteSQL(@"
+                ALTER Table SETS
+                ADD COLUMN Accessed DATE");
+        }
+
 		/// <param name="setID">The SetID of the word list</param>
 		/// <returns>An existing SqliteWordList instance, if one exists, otherwise a newly-created SqliteWordList.</returns>
 		public SqliteWordList GetWordList(long setID) {
@@ -368,6 +379,20 @@ namespace Szotar.Sqlite {
 			return wl;
 		}
 
+        public IEnumerable<ListInfo> GetRecentSets(int limit) {
+            var reader = SelectReader(@"
+                TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+                SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
+                FROM Sets
+                WHERE Accessed NOT NULL
+                ORDER BY Accessed DESC
+                LIMIT " + limit.ToString());
+
+            while (reader.Read()) {
+                yield return ListInfoFromReader(reader);
+            }
+        }
+
 		private ListInfo ListInfoFromReader(DbDataReader reader) {
 			var list = new ListInfo();
 
@@ -381,14 +406,19 @@ namespace Szotar.Sqlite {
 				list.Url = reader.GetString(4);
 			if (!reader.IsDBNull(5))
 				list.Date = reader.GetDateTime(5);
-			if (!reader.IsDBNull(6))
-				list.TermCount = reader.GetInt64(6);
+            if (!reader.IsDBNull(6))
+                list.Accessed = reader.GetDateTime(6);
+            if (!reader.IsDBNull(7))
+                list.TermCount = reader.GetInt64(7);
 
 			return list;
 		}
 
 		public IEnumerable<ListInfo> GetAllSets() {
-			using (var reader = this.SelectReader("TYPES Integer, Text, Text, Text, Text, Date, Integer; SELECT id, Name, Author, Language, Url, Created, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id) FROM Sets ORDER BY id ASC")) {
+			using (var reader = this.SelectReader(@"
+                TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+                SELECT id, Name, Author, Language, Url, Created, Accessed,
+                    (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id) FROM Sets ORDER BY Name ASC")) {
 				while (reader.Read())
 					yield return ListInfoFromReader(reader);
 			}
@@ -468,6 +498,17 @@ namespace Szotar.Sqlite {
                          VALUES (?, ?, ?, ?, datetime('now'))", setID, phrase, translation, correct ? 1 : 0);
         }
 
+        public event EventHandler<WordListEventArgs> WordListAccessed;
+
+        public void RaiseWordListOpened(long? id) {
+            if (!id.HasValue)
+                return;
+
+            var handler = WordListAccessed;
+            if (handler != null)
+                handler(this, new WordListEventArgs(id.Value)); 
+        }
+
 		//This function also raised the ListDeleted event on the WordList, if one exists.
 		public void DeleteWordList(long setID) {
 			NullWeakReference<SqliteWordList> wlr;
@@ -486,7 +527,7 @@ namespace Szotar.Sqlite {
 
 			var handler = WordListDeleted;
 			if (handler != null)
-				handler(this, new WordListDeletedEventArgs { SetID = setID });
+				handler(this, new WordListEventArgs(setID));
 
 			if (wlr != null) {
 				var wl = wlr.Target;
@@ -496,7 +537,7 @@ namespace Szotar.Sqlite {
 		}
 
 		//Note: there's also a ListDeleted event on the WordList itself, which may be preferable.
-		public event EventHandler<WordListDeletedEventArgs> WordListDeleted;
+		public event EventHandler<WordListEventArgs> WordListDeleted;
 
 		public List<PracticeItem> GetItems(IList<ListSearchResult> items) {
 			if (items.Count == 0)

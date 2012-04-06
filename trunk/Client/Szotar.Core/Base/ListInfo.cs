@@ -11,6 +11,7 @@ namespace Szotar {
 		public string Url { get; set; }
 		public DateTime? Date { get; set; }
 		public long? TermCount { get; set; }
+        public DateTime? Accessed { get; set; }
 
 		public ListInfo() { }
 

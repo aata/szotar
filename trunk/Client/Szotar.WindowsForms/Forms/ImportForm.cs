@@ -78,7 +78,8 @@ namespace Szotar.WindowsForms.Forms {
 			System.Diagnostics.Debug.Assert(!InvokeRequired, "ImportCompleted called on a secondary thread");
 			this.importedWordList = result;
 			CurrentUI = null;
-			new ListBuilder(importedWordList).Show();
+            if(importedWordList.ID.HasValue)
+			    ListBuilder.Open(importedWordList.ID.Value);
 			Close();
 		}
 		#endregion

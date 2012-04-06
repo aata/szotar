@@ -134,25 +134,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void MakeRecent() {
-			var recent = Configuration.RecentLists ?? new List<ListInfo>();
-
-			recent.RemoveAll(e => e.ID == list.ID);
-
-			recent.Insert(0, new ListInfo() {
-				Name = list.Name,
-				Author = list.Author,
-				Url = list.Url,
-				Date = list.Date,
-				ID = list.ID,
-				Language = list.Language,
-				TermCount = list.Count
-			});
-
-			var max = Configuration.RecentListsSize;
-			if (recent.Count > max)
-				recent.RemoveRange(max, recent.Count - max);
-
-			Configuration.RecentLists = recent;
+            list.Accessed = DateTime.Now;
+            DataStore.Database.RaiseWordListOpened(list.ID);
 		}
 
 		void remove_Click(object sender, EventArgs e) {

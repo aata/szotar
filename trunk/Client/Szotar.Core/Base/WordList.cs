@@ -92,8 +92,9 @@ namespace Szotar {
 		public abstract string Name { get; set; }
 		public abstract string Author { get; set; }
 		public abstract string Language { get; set; }
-		public abstract string Url { get; set; }
-		public abstract DateTime? Date { get; set; }
+        public abstract string Url { get; set; }
+        public abstract DateTime? Date { get; set; }
+        public abstract DateTime? Accessed { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		protected void RaisePropertyChanged(string propertyName) {
