@@ -128,6 +128,12 @@ namespace Szotar {
 		/// The description of the last redo item, or null if no items can be redone.
 		/// </summary>
 		public abstract string RedoDescription { get; }
+
+        public abstract string[] Tags { get; }
+        public abstract void Tag(string tag);
+        public abstract void Untag(string tag);
+        public abstract bool HasTag(string tag);
+
 	}
 
 	public class WordListEntry : System.ComponentModel.INotifyPropertyChanged {
