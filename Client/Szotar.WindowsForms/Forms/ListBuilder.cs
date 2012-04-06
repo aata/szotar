@@ -28,7 +28,8 @@ namespace Szotar.WindowsForms.Forms {
 			MakeRecent();
 		}
 
-		public ListBuilder(WordList wordList) {
+        // Constructor is protected in order to make sure no other word lists are open for this list.
+		protected ListBuilder(WordList wordList) {
 			InitializeComponent();
 
 			this.list = wordList;
@@ -100,6 +101,9 @@ namespace Szotar.WindowsForms.Forms {
 			}
 
 			var list = DataStore.Database.GetWordList(setID);
+            if (list == null)
+                return null;
+
 			var form = new ListBuilder(list);
 			form.Show();
 			return form;
@@ -449,6 +453,16 @@ namespace Szotar.WindowsForms.Forms {
 		public void ScrollToPosition(int position) {
 			grid.ScrollToIndex(position);
 		}
+
+        public bool ScrollToItem(string phrase, string translation) {
+            for (int i = 0; i < list.Count; i++) {
+                if (list[i].Phrase == phrase && list[i].Translation == translation) {
+                    ScrollToPosition(i);
+                    return true;
+                }
+            }
+            return false;
+        }
 
 		void showStartPage_Click(object sender, EventArgs e) {
             ShowForm.Show<StartPage>();

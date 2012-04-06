@@ -937,6 +937,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			addTo.DropDownItems.Clear();
 
+            // Find out what word list editors are already open.
 			foreach (Form f in Application.OpenForms) {
 				var lb = f as ListBuilder;
 				if (lb != null) {
@@ -946,8 +947,7 @@ namespace Szotar.WindowsForms.Forms {
 				}
 			}
 
-			// Clone it, if it exists, or make a new one.
-			var recent = Configuration.RecentLists != null ? new List<ListInfo>(Configuration.RecentLists) : new List<ListInfo>();
+            var recent = new RecentListStore().GetLists().ToList();
 			recent.RemoveAll(r => open.Contains(r.ID.Value));
 
 			if (recent.Count > 0 && open.Count > 0)
@@ -965,7 +965,9 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void AddToExistingList(long listID) {
-			AddEntries(ListBuilder.Open(listID));
+            var form = ListBuilder.Open(listID);
+			if(form != null)
+                AddEntries(form);
 		}
 
 		IEnumerable<int> GetSelectedIndices() {
