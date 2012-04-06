@@ -96,7 +96,6 @@
             this.results.ShowItemToolTips = true;
             this.results.Size = new System.Drawing.Size(493, 314);
             this.results.SmallImageList = this.imageListSmall;
-            this.results.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.results.TabIndex = 2;
             this.results.UseCompatibleStateImageBehavior = false;
             this.results.View = System.Windows.Forms.View.Details;

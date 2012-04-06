@@ -93,11 +93,6 @@ namespace Szotar {
 			Default.Reset();
 		}
 
-		public static List<ListInfo> RecentLists {
-			get { return Default.Get<List<ListInfo>>("RecentLists", null); }
-			set { Default.Set("RecentLists", value); }
-		}
-
 		public static int RecentListsSize {
 			get { return Default.Get<int>("RecentListsSize", 10); }
 			set { Default.Set("RecentListsSize", value); }

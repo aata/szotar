@@ -130,15 +130,25 @@ namespace Szotar.Sqlite {
 		}
 
 		//Will probably want both a Created and Modified property in the future.
-		public override System.DateTime? Date {
-			get { return (DateTime?)worker.GetWordListProperty("Created"); }
-			set {
-				if (value == null)
-					throw new ArgumentNullException();
-				worker.SetWordListProperty("Created", value);
-				RaisePropertyChanged("Date");
-			}
-		}
+        public override System.DateTime? Date {
+            get { return (DateTime?)worker.GetWordListProperty("Created"); }
+            set {
+                if (value == null)
+                    throw new ArgumentNullException();
+                worker.SetWordListProperty("Created", value);
+                RaisePropertyChanged("Date");
+            }
+        }
+
+        public override System.DateTime? Accessed {
+            get { return (DateTime?)worker.GetWordListProperty("Accessed"); }
+            set {
+                if (value == null)
+                    throw new ArgumentNullException();
+                worker.SetWordListProperty("Accessed", value);
+                RaisePropertyChanged("Accessed");
+            }
+        }
 
 		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
 			int index = IndexOf(entry);

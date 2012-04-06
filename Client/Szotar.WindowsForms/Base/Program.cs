@@ -46,9 +46,6 @@ namespace Szotar.WindowsForms {
 				return;
 			}
 
-			DataStore.Database.WordListDeleted += new EventHandler<Szotar.Sqlite.WordListDeletedEventArgs>(Database_WordListDeleted);
-
-            
             switch (GuiConfiguration.StartupAction) {
                 case "StartPage":
                     new Forms.StartPage().Show();
@@ -86,14 +83,6 @@ namespace Szotar.WindowsForms {
 
 			RunUntilNoForms();
 			return;
-		}
-
-		static void Database_WordListDeleted(object sender, Szotar.Sqlite.WordListDeletedEventArgs e) {
-			var recent = Configuration.RecentLists;
-			if (recent != null) {
-				recent.RemoveAll(r => r.ID == e.SetID);
-				Configuration.RecentLists = recent;
-			}
 		}
 
 		private static void RunUntilNoForms() {
