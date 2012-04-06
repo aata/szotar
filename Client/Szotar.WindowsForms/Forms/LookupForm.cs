@@ -845,8 +845,7 @@ namespace Szotar.WindowsForms.Forms {
 		void recentLists_DropDownOpening(object sender, EventArgs e) {
 			recentLists.DropDownItems.Clear();
 
-			var recent = new RecentListStore();
-			foreach (ListInfo li in recent.GetLists()) {
+			foreach (ListInfo li in DataStore.Database.GetRecentSets(Configuration.RecentListsSize)) {
 				var handler = new EventHandler(this.OpenRecentFile);
 				var item = new ToolStripMenuItem(li.Name, null, handler);
 				item.Tag = li;
@@ -947,7 +946,7 @@ namespace Szotar.WindowsForms.Forms {
 				}
 			}
 
-            var recent = new RecentListStore().GetLists().ToList();
+            var recent = DataStore.Database.GetRecentSets(Configuration.RecentListsSize).ToList();
 			recent.RemoveAll(r => open.Contains(r.ID.Value));
 
 			if (recent.Count > 0 && open.Count > 0)

@@ -10,7 +10,6 @@ using WordSearchResult = Szotar.Sqlite.SqliteDataStore.WordSearchResult;
 
 namespace Szotar.WindowsForms.Controls {
 	public partial class ListSearch : UserControl {
-		private List<IListStore> listStores = new List<IListStore>();
         private List<DictionaryInfo> dictionaries;
 
 		bool ReallyDesignMode {
@@ -20,8 +19,6 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-
-        readonly IListStore recentListStore;
 		public ListSearch() {
 			InitializeComponent();
 
@@ -29,9 +26,6 @@ namespace Szotar.WindowsForms.Controls {
 
 			if (ReallyDesignMode)
 				return;
-
-			listStores.Add(recentListStore = new RecentListStore());
-			listStores.Add(new SqliteListStore(DataStore.Database));
 
 			search.Click += (s, e) => UpdateResults();
 			searchBox.TextChanged += (s, e) => UpdateResults();
@@ -117,42 +111,43 @@ namespace Szotar.WindowsForms.Controls {
                 }
             }
 
-            var recentLists = recentListStore.GetLists().ToList();
+            var recentLists = DataStore.Database.GetRecentSets(Configuration.RecentListsSize).ToList();
 
-			foreach (IListStore store in listStores) {
-				string storeName = store == recentListStore ? Properties.Resources.RecentListStoreName : Properties.Resources.DefaultListStoreName;
-				ListViewGroup group = new ListViewGroup(storeName);
-                group.Name = storeName;
-				results.Groups.Add(group);
-				foreach (ListInfo list in store.GetLists()) {
+            Action<string, IEnumerable<ListInfo>> addItems = delegate(string headerText, IEnumerable<ListInfo> lists) {
+                var group = new ListViewGroup(headerText);
+                results.Groups.Add(group);
+                foreach (ListInfo list in lists) {
                     if (!list.ID.HasValue || !DataStore.Database.WordListExists(list.ID.Value))
-                        continue; 
-                    
+                        continue;
+
                     if (string.IsNullOrEmpty(list.Name))
                         list.Name = Properties.Resources.DefaultListName;
 
-					if (searchBox.Text.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
-						continue;
-
-					if (results.Items.Count > maxCount)
-						return false;
-
-                    if (store != recentListStore && recentLists.Count(a => a.ID == list.ID) > 0)
+                    if (searchBox.Text.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
                         continue;
 
-					ListViewItem item = new ListViewItem(
-						new string[] { list.Name, 
+                    if (results.Items.Count > maxCount)
+                        break;
+
+                    if (lists != recentLists && recentLists.Count(a => a.ID == list.ID) > 0)
+                        continue;
+
+                    ListViewItem item = new ListViewItem(
+                        new string[] { list.Name, 
 						               list.Date.HasValue ? list.Date.Value.ToString() : string.Empty, 
 									   list.TermCount.HasValue ? string.Format(Properties.Resources.NTerms, list.TermCount.Value) : string.Empty },
 
                         "List");
-					item.Tag = list;
-					item.Group = group;
-					results.Items.Add(item);
-				}
-			}
+                    item.Tag = list;
+                    item.Group = group;
+                    results.Items.Add(item);
+                }
+            };
 
-			if (!string.IsNullOrEmpty(searchBox.Text)) {
+            addItems(Properties.Resources.RecentListStoreName, recentLists);
+            addItems(Properties.Resources.DefaultListStoreName, DataStore.Database.GetAllSets());
+            
+            if (!string.IsNullOrEmpty(searchBox.Text) && !(results.Items.Count > maxCount)) {
 				var group = new ListViewGroup(Properties.Resources.SearchResults);
                 group.Name = Properties.Resources.SearchResults;
 				results.Groups.Add(group);

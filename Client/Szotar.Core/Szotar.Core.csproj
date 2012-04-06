@@ -92,7 +92,6 @@
     <Compile Include="Base\LineWriter.cs" />
     <Compile Include="Base\ListInfo.cs" />
     <Compile Include="Base\ListSearchResult.cs" />
-    <Compile Include="Base\ListStore.cs" />
     <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\MruList.cs" />
