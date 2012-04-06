@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Data.Common;
-using CultureInfo = System.Globalization.CultureInfo;
-using System;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using CultureInfo = System.Globalization.CultureInfo;
 
 // SqliteWordList: an SQLite-backed word list. All changes made are immediately
 // synchronised with the database, and can be undone or re-done. It also has an
@@ -34,7 +35,7 @@ namespace Szotar.Sqlite {
 	public class SqliteWordList : WordList {
 		Worker worker;
 		BindingList<WordListEntry> list;
-		long? id;
+		long id;
 		bool raiseListEvents = true;
 		UndoList<Command> undoList;
 
@@ -162,6 +163,11 @@ namespace Szotar.Sqlite {
 			Debug.Assert(index >= 0);
 			worker.SetProperty(index, property.ToString(), value);
         }
+
+        public override string[] Tags { get { return DataStore.GetTags(id).ToArray(); } }
+        public override void Tag(string tag) { DataStore.Tag(tag, id); }
+        public override void Untag(string tag) { DataStore.Untag(tag, id); }
+        public override bool HasTag(string tag) { return DataStore.HasTag(tag, id); }
         #endregion
 
 		#region List implementation

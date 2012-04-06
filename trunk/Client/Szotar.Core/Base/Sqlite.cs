@@ -40,6 +40,8 @@ namespace Szotar.Sqlite {
 		}
 
 		private void Init() {
+            ExecuteSQL("PRAGMA foreign_keys = ON");
+
 			int appSchemaVer = this.ApplicationSchemaVersion();
 			Debug.Assert(appSchemaVer >= 1, "Desired SQLite database schema version should be greater than 0");
 
@@ -237,7 +239,7 @@ namespace Szotar.Sqlite {
 		}
 
 		protected override int ApplicationSchemaVersion() {
-			return 3;
+			return 4;
 		}
 
 		protected override void IncrementalUpgradeSchema(int toVersion) {
@@ -245,6 +247,7 @@ namespace Szotar.Sqlite {
 				case 1: InitDatabase(); break;
 				case 2: UpgradePracticeSchema(); break;
                 case 3: AddAccessedColumn(); break;
+                case 4: AddTagsTable(); break;
 				default: throw new ArgumentOutOfRangeException("toVersion");
 			}
 		}
@@ -337,7 +340,54 @@ namespace Szotar.Sqlite {
                 ADD COLUMN Accessed DATE");
         }
 
-		/// <param name="setID">The SetID of the word list</param>
+        private void AddTagsTable() {
+            ExecuteSQL(@"
+                CREATE TABLE Tags (
+                    tag TEXT NOT NULL PRIMARY KEY,
+                    SetID INTEGER NOT NULL,
+                    FOREIGN KEY(SetID) REFERENCES Sets(id)
+                );");
+        }
+
+        #region Tags
+        public IEnumerable<KeyValuePair<string, int>> GetTags(bool orderByName = true) {
+            var reader = SelectReader("SELECT tag AS t, count(SetID) AS n FROM Tags GROUP BY tag ORDER BY " + (orderByName ? "t ASC" : "n DESC, t ASC"));
+            while (reader.Read())
+                yield return new KeyValuePair<string, int>(reader.GetString(0), reader.GetInt32(1));
+        }
+
+        public IEnumerable<ListInfo> SearchByTag(string tag) {
+            var reader = SelectReader(@"
+                SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = id) 
+                FROM Tags INNER JOIN Sets ON Tags.SetID = Sets.id
+                WHERE tag = ?
+                ORDER BY Name ASC", tag);
+            while (reader.Read())
+                yield return ListInfoFromReader(reader);
+        }
+
+        public IEnumerable<string> GetTags(long setID) {
+            var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ?", setID);
+            while (reader.Read())
+                yield return reader.GetString(0);
+        }
+
+        public bool HasTag(string tag, long setID) {
+            return Convert.ToInt64(Select("SELECT count(*) FROM Tags WHERE tag = ? AND SetID = ?", tag, setID)) > 0;
+        }
+
+        public void Tag(string tag, long setID) {
+            // Need to check this here or we may violate the uniqueness constraint.
+            if(!HasTag(tag, setID))
+                ExecuteSQL("INSERT INTO Tags (tag, SetID) VALUES (?, ?)", tag, setID);
+        }
+
+        public void Untag(string tag, long setID) {
+            ExecuteSQL("DELETE FROM Tags WHERE tag = ? AND SetID = ?", tag, setID);
+        }
+        #endregion
+
+        /// <param name="setID">The SetID of the word list</param>
 		/// <returns>An existing SqliteWordList instance, if one exists, otherwise a newly-created SqliteWordList.</returns>
 		public SqliteWordList GetWordList(long setID) {
 			SqliteWordList wl = null;
