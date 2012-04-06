@@ -399,7 +399,7 @@ namespace Szotar.WindowsForms {
 		GameOverview gameOverview;
 
 		Font font, smallFont, extraSmallFont, scoreFont;
-		Random random;
+		Random rng;
 
 		AnswerChecker answerChecker = new AnswerChecker();
 
@@ -425,7 +425,7 @@ namespace Szotar.WindowsForms {
 		public LearnMode()
 			: base("Learn")
 		{
-			random = new Random();
+			rng = new Random();
 		}
 
 		public override void Start(IPracticeWindow owner) {
@@ -537,16 +537,12 @@ namespace Szotar.WindowsForms {
 				rounds.Add(currentRound);
 			currentRound = new List<Attempt>();
 
-			if (previousRound != null) {
-				items = new List<PracticeItem>();
-				foreach (var attempt in previousRound) {
-					if (!attempt.Correct)
-						items.Add(attempt.Item);
-					Shuffle(items);
-				}
-			} else {
+			if (previousRound != null)
+				items = new List<PracticeItem>(from x in previousRound where x.Correct select x.Item);
+			else
 				items = Owner.GetAllItems();
-			}
+
+            items.Shuffle(rng);
 
 			index = 0;
 			score = 0;
@@ -555,22 +551,6 @@ namespace Szotar.WindowsForms {
 				state = State.Guessing;
 			else
 				state = State.GameOverview;
-		}
-
-		void Shuffle<T>(IList<T> items) {
-			ShuffleRange(items, 0, items.Count);
-		}
-
-		void ShuffleRange<T>(IList<T> items, int start, int count) {
-			// Fisher-Yates shuffle
-			int n = count;
-			while (n > 1) {
-				n--;
-				int k = random.Next(n + 1);
-				var t = items[start + k];
-				items[start + k] = items[start + n];
-				items[start + n] = t;
-			}
 		}
 
 		public bool Swap {
@@ -582,7 +562,7 @@ namespace Szotar.WindowsForms {
 					// Shuffle the remaining items so you don't get the same one again (which would be too easy.)
 					// This could also be done by simply moving the current item to the back of the list and shifting
 					// the rest frontwards.
-					ShuffleRange(items, index, items.Count - index);
+					items.Shuffle(rng, index, items.Count - index);
 					Update();
 					Layout();
 				}

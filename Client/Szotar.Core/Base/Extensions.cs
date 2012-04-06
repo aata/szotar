@@ -7,16 +7,20 @@ namespace Szotar {
             Shuffle(items, new Random());
         }
 
-        public static void Shuffle<T>(this IList<T> items, Random random) {
+        public static void Shuffle<T>(this IList<T> items, Random random, int start, int count) {
             // Fisher-Yates shuffle
-            int n = items.Count;
+            int n = count;
             while (n > 1) {
                 n--;
                 int k = random.Next(n + 1);
-                var t = items[k];
-                items[k] = items[n];
-                items[n] = t;
+                var t = items[start + k];
+                items[start + k] = items[start + n];
+                items[start + n] = t;
             }
+        }
+
+        public static void Shuffle<T>(this IList<T> items, Random random) {
+            Shuffle(items, random, 0, items.Count);
         }
     }
 }
