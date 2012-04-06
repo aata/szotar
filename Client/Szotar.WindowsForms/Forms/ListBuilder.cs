@@ -542,6 +542,7 @@ namespace Szotar.WindowsForms.Forms {
                 item.CheckOnClick = true;
                 item.Checked = currentTags.Contains(tag.Key);
                 item.CheckedChanged += new EventHandler(tag_CheckedChanged);
+                tagsMI.DropDownItems.Insert(tagsMI.DropDownItems.Count - 1, item);
             }
         }
 
@@ -557,6 +558,8 @@ namespace Szotar.WindowsForms.Forms {
         private void createTagMI_KeyUp(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter && !string.IsNullOrEmpty(createTagMI.Text.Trim())) {
                 list.Tag(createTagMI.Text.Trim());
+                tagsMI.DropDown.Close();
+                createTagMI.Clear();
             }
         }
 	}
