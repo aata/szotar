@@ -85,6 +85,7 @@
     <Compile Include="Base\DictionaryImporting.cs" />
     <Compile Include="Base\DictionaryInfo.cs" />
     <Compile Include="Base\Entry.cs" />
+    <Compile Include="Base\Extensions.cs" />
     <Compile Include="Base\Importing.cs" />
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\LineReader.cs" />
