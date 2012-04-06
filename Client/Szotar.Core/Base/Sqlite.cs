@@ -605,7 +605,7 @@ namespace Szotar.Sqlite {
 			return answer;
 		}
 
-        public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
+        public List<PracticeItem> OldGetSuggestedPracticeItems(int limit) {
             // Join with VocabItems to avoid practicing items which have since been deleted or edited
             var reader = this.SelectReader(@"
                 SELECT Phrase, Translation, SetID, SUM(Result) AS ResultSum, COUNT(Result) as ResultCount, MAX(Created) 
@@ -622,5 +622,92 @@ namespace Szotar.Sqlite {
             }
             return results;
         }
+
+        public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
+            var reader = this.SelectReader(@"
+                SELECT VocabItems.Phrase, VocabItems.Translation, VocabItems.SetID, Result, Created
+                FROM VocabItems LEFT JOIN PracticeHistory
+                    ON PracticeHistory.SetID = VocabItems.SetID 
+                    AND PracticeHistory.Phrase = VocabItems.Phrase 
+                    AND PracticeHistory.Translation = VocabItems.Translation  
+                ORDER BY VocabItems.SetID, VocabItems.Phrase, VocabItems.Translation, Created");
+
+            var items = new List<PracticeItem>();
+            PracticeItem item = null;
+
+            while(reader.Read()) {
+                string phrase = reader.GetString(0);
+                string translation = reader.GetString(1);
+                long setID = reader.GetInt64(2);
+                bool? correct = reader.IsDBNull(3) ? (bool?)null : reader.GetBoolean(3);
+                DateTime? created = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4);
+
+                if(item == null || item.Phrase != phrase || item.Translation != translation) {
+                    item = new PracticeItem(setID, phrase, translation, new PracticeHistory());
+                    items.Add(item);
+                }
+
+                if (correct != null && created != null)
+                    item.History.Add(created.Value, correct.Value);
+            }
+
+            // Results in the items with the highest importance being placed first in the list.
+            items.Sort(new Comparison<PracticeItem>((a, b) => -a.History.Importance.CompareTo(b.History.Importance)));
+            
+            var chosen = new List<PracticeItem>();
+            var rng = new Random();
+            var distribution = new NormalDistribution(rng);
+            while (chosen.Count < limit && items.Count > 0) {
+                double x = Math.Abs(distribution.NextDouble(3) / 3);
+                // ~68% chance that x < 1/3
+                // ~95% chance that x < 2/3
+                int index = (int)Math.Floor(items.Count * x);
+                if (index >= items.Count)
+                    index--;
+                chosen.Add(items[index]);
+                items.RemoveAt(index);
+            }
+            chosen.Shuffle(rng);
+
+            return chosen;
+        }
 	}
+
+    // A normal distribution with a mean of 0 and standard deviation of 1.
+    class NormalDistribution {
+        Random random;
+        double? next;
+
+        public NormalDistribution(Random random) {
+            this.random = random;
+        }
+
+        // Uses the Box-Muller transform to generate two independent and normally distributed pseudorandom numbers.
+        // One is returned; the other is saved for the next call.
+        public double NextDouble() {
+            if (next.HasValue) {
+                double d = next.Value;
+                next = null;
+                return d;
+            }
+
+            double u1 = random.NextDouble(), u2 = random.NextDouble();
+            double r = Math.Sqrt(-2 * Math.Log(u1));
+            double theta = 2 * Math.PI * u2;
+
+            next = r * Math.Sin(theta);
+            return r * Math.Cos(theta);
+        }
+
+        // Only produces pseudorandom numbers with an absolute value less than or equal to the given amount.
+        // Theoretically, this could take an infinite amount of time to generate a number. Approximately 68%
+        // of numbers generated are less than 1, 95% less than 2, 99.7% less than 3, so it should not pose a problem.
+        public double NextDouble(double max) {
+            double d;
+            do {
+                d = NextDouble();
+            } while (Math.Abs(d) > max);
+            return d;
+        }
+    }
 }
