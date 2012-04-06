@@ -116,6 +116,12 @@ namespace Szotar.WindowsForms.Controls {
 				ListViewGroup group = new ListViewGroup(storeName);
 				results.Groups.Add(group);
 				foreach (ListInfo list in store.GetLists()) {
+                    if (!list.ID.HasValue || !DataStore.Database.WordListExists(list.ID.Value))
+                        continue; 
+                    
+                    if (string.IsNullOrEmpty(list.Name))
+                        list.Name = Properties.Resources.DefaultListName;
+
 					if (searchBox.Text.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
 						continue;
 

@@ -43,7 +43,7 @@ namespace Szotar.Sqlite {
 			get { return id; }
 		}
 
-		public SqliteWordList(SqliteDataStore store, long setID) {
+		protected SqliteWordList(SqliteDataStore store, long setID) {
 			DataStore = store;
 			id = setID;
 			worker = new Worker(store, this);
@@ -52,6 +52,16 @@ namespace Szotar.Sqlite {
 			list = new BindingList<WordListEntry>(worker.GetAllEntries());
 			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
 		}
+
+        public static SqliteWordList FromSetID(SqliteDataStore store, long setID) {
+            var list = new SqliteWordList(store, setID);
+            if (!list.worker.Exists()) {
+                list.Dispose();
+                return null;
+            }
+
+            return list;
+        }
 
 		//Re-raise the ListChanged event with the SqliteWordList as the originator.
 		//Using BindingList as the in-memory list makes this very easy.
@@ -256,13 +266,19 @@ namespace Szotar.Sqlite {
 			SqliteWordList list;
 
 			//These are called particularly often, any performance enhancements are useful.
-			DbCommand insertCommand, deleteCommand;
-			DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
-				insertCommandTranslation, deleteCommandSetID, deleteCommandListPosition;
+            DbCommand insertCommand, deleteCommand, existsCommand;
+            DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
+				insertCommandTranslation, deleteCommandSetID, deleteCommandListPosition, existsCommandID;
 
 			public Worker(SqliteDataStore store, SqliteWordList list)
 				: base(store) {
 				this.list = list;
+
+                existsCommand = Connection.CreateCommand();
+                existsCommand.CommandText = @"SELECT Count(*) FROM Sets WHERE Sets.id = ?";
+                existsCommandID = existsCommand.CreateParameter();
+                existsCommand.Parameters.Add(existsCommandID);
+                existsCommandID.Value = list.ID;
 
 				insertCommand = Connection.CreateCommand();
 				insertCommand.CommandText = @"
@@ -314,6 +330,10 @@ namespace Szotar.Sqlite {
 
 				base.Dispose(disposing);
 			}
+
+            public bool Exists() {
+                return Convert.ToInt64(existsCommand.ExecuteScalar()) > 0;
+            }
 
 			/// <summary>
 			/// Inserts a single item at the given index.

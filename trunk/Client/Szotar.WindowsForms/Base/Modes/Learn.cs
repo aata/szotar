@@ -237,145 +237,101 @@ namespace Szotar.WindowsForms {
 		}
 	};
 
-	class GameOverview : UserControl {
-		FlowLayoutPanel flow;
+    class GameOverview : UserControl {
+        ListView list;
+        List<ListViewGroup> groups;
 
-		Font headerFont, textFont;
+        public GameOverview(LearnMode mode) {
+            list = new ListView() { 
+                Dock = DockStyle.Fill, 
+                Margin = new Padding(3),
+                FullRowSelect = true,
+                View = View.Details,
+                HeaderStyle = ColumnHeaderStyle.None
+            };
+            groups = new List<ListViewGroup>();
 
-		public GameOverview(LearnMode mode) {
-			flow = new FlowLayoutPanel() { 
-				Dock = DockStyle.Fill, 
-				FlowDirection = FlowDirection.TopDown, 
-				WrapContents = false,
-				AutoScroll = true
-			};
+            Controls.Add(list);
+            ThemeHelper.UseExplorerTheme(list);
 
-			headerFont = new Font(mode.GameArea.Font.FontFamily, mode.GameArea.Font.Size * 1.8f, FontStyle.Bold);
-			textFont = new Font(mode.GameArea.Font.FontFamily, mode.GameArea.Font.Size, FontStyle.Regular);
+            InitializeContextMenu();
 
-			Controls.Add(flow);
-		}
+            list.Resize += delegate { DistributeColumns(); };
+            this.Load += delegate { DistributeColumns(); };
+        }
 
-		protected override void Dispose(bool disposing) {
-			base.Dispose(disposing);
+        void DistributeColumns() {
+            if (list.Columns.Count >= 3) {
+                list.Columns[0].Width = list.ClientSize.Width / 2;
+                list.Columns[1].Width = list.ClientSize.Width / 2;
+                list.Columns[2].Width = 0;
+            }
+        }
 
-			if (disposing) {
-				headerFont.Dispose();
-				textFont.Dispose();
-			}
-		}
+        public void UpdateOverview(IList<IList<Attempt>> rounds) {
+            list.BeginUpdate();
 
-		public void UpdateOverview(IList<IList<Attempt>> rounds) {
-			flow.Controls.Clear();
-			flow.WrapContents = false;
+            try {
+                list.Clear();
+                list.Groups.Clear();
+                groups.Clear();
 
-			int i = 1;
-			foreach (var round in rounds) {
-				var headerFlow = new FlowLayoutPanel {
-					FlowDirection = FlowDirection.LeftToRight,
-					WrapContents = false,
-					AutoSize = true
-				};
+                list.Columns.Add(new ColumnHeader());
+                list.Columns.Add(new ColumnHeader());
+                list.Columns.Add(new ColumnHeader());
 
-				var header = new Label() { Font = headerFont, AutoSize = true };
-				header.Text = string.Format("Round {0}", i++);
-				headerFlow.Controls.Add(header);
+                foreach (var round in rounds) {
+                    var group = new ListViewGroup();
+                    groups.Add(group);
+                    group.Header = string.Format("Round {0}", groups.Count);
+                    list.Groups.Add(group);
 
-				var score = new Label() { Font = headerFont, AutoSize = true, ForeColor = AnswerColors.Correct };
-				int correct = 0;
-				foreach (var attempt in round)
-					if (attempt.Correct)
-						correct++;
-				score.Text = string.Format("{0}/{1} — {2}%", 
-					correct, 
-					round.Count, 
-					round.Count > 0 ? correct * 100 / round.Count : 100);
+                    foreach (var attempt in round) {
+                        string phrase, translation;
+                        if (!attempt.Swapped) {
+                            phrase = attempt.Item.Phrase;
+                            translation = attempt.Item.Translation;
+                        } else {
+                            phrase = attempt.Item.Translation;
+                            translation = attempt.Item.Phrase;
+                        }
 
-				headerFlow.Controls.Add(score);
+                        var item = new ListViewItem(new string[] { phrase, translation, "" }, group);
+                        if(!attempt.Correct)
+                            item.ForeColor = SystemColors.GrayText;
+                        item.Tag = attempt;
+                        list.Items.Add(item);
+                    }
+                }
+            } finally {
+                list.EndUpdate();
+            }
 
-				flow.Controls.Add(headerFlow);
-				flow.Controls.Add(MakeTable(round));
-			}
+            DistributeColumns();
+        }
 
-			Layout();
-		}
+        #region Context Menu
+        ContextMenuStrip contextMenu;
+        void InitializeContextMenu() {
+            contextMenu = new ContextMenuStrip();
 
-		public TableLayoutPanel MakeTable(IList<Attempt> round) {
-			var table = new TableLayoutPanel {
-				RowCount = round.Count,
-				ColumnCount = 4
-			};
+            var viewInList = new ToolStripMenuItem("&View In List");
+            EventHandler viewInListClick = (s, e) => {                
+                foreach (ListViewItem item in list.SelectedItems) {
+                    var attempt = item.Tag as Attempt;
+                    var form = Forms.ListBuilder.Open(attempt.Item.SetID);
+                    if(form != null)
+                        form.ScrollToItem(attempt.Item.Phrase, attempt.Item.Translation);
+                }
+            };
+            viewInList.Click += viewInListClick;
+            list.ItemActivate += viewInListClick;
+            contextMenu.Items.Add(viewInList);
 
-			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-			table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-
-			int i = 0;
-			foreach (var attempt in round) {
-				table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
-				var ordinal = new Label {
-					Text = string.Format("{0}.", ++i),
-					TextAlign = ContentAlignment.MiddleRight
-				};
-
-				var word = new Label {
-					Text = attempt.Swapped ? attempt.Item.Translation : attempt.Item.Phrase,
-					ForeColor = attempt.Correct ? AnswerColors.Correct : AnswerColors.Incorrect,
-					TextAlign = ContentAlignment.MiddleLeft
-				};
-
-				var arrow = new Label {
-					Text = "→",
-					TextAlign = ContentAlignment.MiddleCenter
-				};
-
-				var translation = new Label {
-					Text = Text = attempt.Swapped ? attempt.Item.Phrase : attempt.Item.Translation,
-					TextAlign = ContentAlignment.MiddleLeft
-				};
-
-				int j = 0;
-				foreach (Label label in new[] { ordinal, word, arrow, translation }) {
-					label.AutoSize = true;
-					label.Font = textFont;
-					table.Controls.Add(label);
-					table.SetRow(label, i - 1);
-					table.SetColumn(label, j++);
-				}
-			}
-
-			table.AutoSize = true;
-			table.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-			table.Margin = new Padding(table.Margin.Left * 4, table.Margin.Top, table.Margin.Right, table.Margin.Bottom);
-			return table;
-		}
-
-		protected override void OnResize(EventArgs e) {
-			base.OnResize(e);
-
-			Layout();
-		}
-
-		// TODO: This is still pretty slow. Find a faster way.
-		new void Layout() {
-			flow.SuspendLayout();
-			foreach (var control in flow.Controls) {
-				var table = control as TableLayoutPanel;
-				if (table != null) {
-					table.SuspendLayout();
-					foreach(var tableControl in table.Controls) {
-						var label = tableControl as Label;
-						if (label != null)
-							label.MaximumSize = new Size(ClientSize.Width * 3 / 7, int.MaxValue);
-					}
-					table.ResumeLayout();
-				}
-			}
-			flow.ResumeLayout();
-		}
-	};
+            list.ContextMenuStrip = contextMenu;
+        }
+        #endregion
+    }
 
 	// TODO: Add items in the file menu that open the word lists currently being learnt.
 	class OptionsMenu : MenuStrip {
@@ -385,7 +341,7 @@ namespace Szotar.WindowsForms {
 		public OptionsMenu(LearnMode mode) {
 			this.mode = mode;
 
-			optionsItem = new ToolStripMenuItem("&Options");
+			optionsItem = new ToolStripMenuItem("O&ptions");
 			Items.Add(optionsItem);
 
 			swapItem = new ToolStripMenuItem("&Swap phrase/translation");
@@ -562,13 +518,8 @@ namespace Szotar.WindowsForms {
 
         void viewButton_Click(object sender, EventArgs e) {
             var form = Forms.ListBuilder.Open(items[index].SetID);
-            var list = form.WordList;
-            for (int i = 0; i < list.Count; i++) {
-                if (list[i].Phrase == items[index].Phrase && list[i].Translation == items[index].Translation) {
-                    form.ScrollToPosition(i);
-                    break;
-                }
-            }
+            if (form != null)
+                form.ScrollToItem(items[index].Phrase, items[index].Translation);
         }
 
 		public override void Stop() {

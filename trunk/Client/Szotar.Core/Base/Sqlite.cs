@@ -338,10 +338,17 @@ namespace Szotar.Sqlite {
 			if (wl != null)
 				return wl;
 
-			wl = new SqliteWordList(this, setID);
+			wl = SqliteWordList.FromSetID(this, setID);
+            if (wl == null)
+                return null;
+
 			wordLists[setID] = new NullWeakReference<SqliteWordList>(wl);
 			return wl;
 		}
+
+        public bool WordListExists(long id) {
+            return GetWordList(id) != null;
+        }
 
 		public SqliteWordList CreateSet(string name, string author, string language, string url, DateTime? date) {
 			long setID;
@@ -354,7 +361,9 @@ namespace Szotar.Sqlite {
 				txn.Commit();
 			}
 
-			var wl = new SqliteWordList(this, setID);
+			var wl = SqliteWordList.FromSetID(this, setID);
+            if (wl == null)
+                return null;
 			wordLists[setID] = new NullWeakReference<SqliteWordList>(wl);
 			return wl;
 		}
@@ -470,6 +479,7 @@ namespace Szotar.Sqlite {
 				ExecuteSQL("DELETE FROM VocabItems WHERE SetID = ?", setID);
 				ExecuteSQL("DELETE FROM SetProperties WHERE SetID = ?", setID);
 				ExecuteSQL("DELETE FROM SetMemberships WHERE ChildID = ? OR ParentID = ?", setID, setID);
+                ExecuteSQL("DELETE FROM PracticeHistory WHERE SetID = ?", setID);
 
 				txn.Commit();
 			}
@@ -671,7 +681,7 @@ namespace Szotar.Sqlite {
 
             return chosen;
         }
-	}
+    }
 
     // A normal distribution with a mean of 0 and standard deviation of 1.
     class NormalDistribution {
