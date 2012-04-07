@@ -343,7 +343,7 @@ namespace Szotar.Sqlite {
         private void AddTagsTable() {
             ExecuteSQL(@"
                 CREATE TABLE Tags (
-                    tag TEXT NOT NULL PRIMARY KEY,
+                    tag TEXT NOT NULL,
                     SetID INTEGER NOT NULL,
                     FOREIGN KEY(SetID) REFERENCES Sets(id)
                 );");
@@ -377,8 +377,8 @@ namespace Szotar.Sqlite {
         }
 
         public void Tag(string tag, long setID) {
-            // Need to check this here or we may violate the uniqueness constraint.
-            if(!HasTag(tag, setID))
+            // Need to check this here or we may violate the uniqueness/foreign key constraint.
+            if(!HasTag(tag, setID) && WordListExists(setID))
                 ExecuteSQL("INSERT INTO Tags (tag, SetID) VALUES (?, ?)", tag, setID);
         }
 
