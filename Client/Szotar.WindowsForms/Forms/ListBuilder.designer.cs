@@ -74,8 +74,6 @@
             this.meta = new System.Windows.Forms.Panel();
             this.shadow = new System.Windows.Forms.PictureBox();
             this.icon = new System.Windows.Forms.PictureBox();
-            this.tagsMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.createTagMI = new System.Windows.Forms.ToolStripTextBox();
             this.grid = new Szotar.WindowsForms.Controls.DictionaryGrid();
             nameLabel = new System.Windows.Forms.Label();
             authorLabel = new System.Windows.Forms.Label();
@@ -141,7 +139,7 @@
             metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             metaFlow.Location = new System.Drawing.Point(73, 7);
             metaFlow.Name = "metaFlow";
-            metaFlow.Size = new System.Drawing.Size(21223, 60);
+            metaFlow.Size = new System.Drawing.Size(21945, 60);
             metaFlow.TabIndex = 2;
             // 
             // namePanel
@@ -425,8 +423,7 @@
             this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             fileMenu,
             this.editMenu,
-            practiceMenu,
-            this.tagsMI});
+            practiceMenu});
             this.mainMenu.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
@@ -516,21 +513,6 @@
             this.icon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.icon.TabIndex = 0;
             this.icon.TabStop = false;
-            // 
-            // tagsMI
-            // 
-            this.tagsMI.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.createTagMI});
-            this.tagsMI.Name = "tagsMI";
-            this.tagsMI.Size = new System.Drawing.Size(44, 20);
-            this.tagsMI.Text = "&Tags";
-            this.tagsMI.DropDownOpening += new System.EventHandler(this.tagsMI_DropDownOpening);
-            // 
-            // createTagMI
-            // 
-            this.createTagMI.Name = "createTagMI";
-            this.createTagMI.Size = new System.Drawing.Size(100, 23);
-            this.createTagMI.KeyUp += new System.Windows.Forms.KeyEventHandler(this.createTagMI_KeyUp);
             // 
             // grid
             // 
@@ -623,7 +605,5 @@
 		private System.Windows.Forms.ToolStripMenuItem learn;
         private System.Windows.Forms.Panel entriesPanel;
         private System.Windows.Forms.Label entriesLabel;
-        private System.Windows.Forms.ToolStripMenuItem tagsMI;
-        private System.Windows.Forms.ToolStripTextBox createTagMI;
 	}
 }

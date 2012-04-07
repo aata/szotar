@@ -6,6 +6,8 @@ using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Forms {
 	public partial class StartPage : Form {
+        TagMenu tagMenu;
+
 		public StartPage() {
 			InitializeComponent();
 
@@ -16,12 +18,21 @@ namespace Szotar.WindowsForms.Forms {
 			exitProgram.Text = string.Format(exitProgram.Text, Application.ProductName);
 
 			recentItems.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(recentItems_ListsChosen);
+
+            tagMenu = new TagMenu();
+            listContextMenu.Items.Insert(listContextMenu.Items.IndexOf(newListCM), tagMenu);
 		}
 
         #region List Search
         private void listContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e) {
-            bool listsAreSelected = recentItems.AcceptLists().Count > 0;
-            listContextMenuSeparator.Visible = flashcardsListMI.Visible = learnListMI.Visible = listsAreSelected;
+            var selectedLists = recentItems.AcceptLists();
+
+            listContextMenuSeparator.Visible = flashcardsListMI.Visible = learnListMI.Visible = selectedLists.Count > 0;
+
+            if (selectedLists.Count == 1)
+                tagMenu.WordList = Sqlite.SqliteWordList.FromSetID(DataStore.Database, selectedLists[0].SetID);
+            else
+                tagMenu.WordList = null;
         }
 
 		private void newListMI_Click(object sender, EventArgs e) {

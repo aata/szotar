@@ -65,6 +65,7 @@ namespace Szotar.WindowsForms.Forms {
 			redo.Click += delegate { list.Redo(); };
 			editMenu.DropDownOpening += new EventHandler(editMenu_DropDownOpening);
 			itemContextMenu.Opening += new CancelEventHandler(itemContextMenu_Opening);
+            mainMenu.Items.Add(new TagMenu() { WordList = list });
 
 			grid.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(grid_ColumnHeaderMouseClick);
 
@@ -527,40 +528,5 @@ namespace Szotar.WindowsForms.Forms {
 		private void learn_Click(object sender, EventArgs e) {
 			Practice(PracticeMode.Learn);
 		}
-
-        private void tagsMI_DropDownOpening(object sender, EventArgs e) {
-            // Don't remove the text box.            
-            while(tagsMI.DropDownItems.Count > 1)
-                tagsMI.DropDownItems.RemoveAt(0);
-
-            var tags = DataStore.Database.GetTags(false);
-            var currentTags = list.Tags;
-
-            foreach (var tag in tags) {
-                var item = new ToolStripMenuItem(tag.Key);
-                item.Tag = tag.Key;
-                item.CheckOnClick = true;
-                item.Checked = currentTags.Contains(tag.Key);
-                item.CheckedChanged += new EventHandler(tag_CheckedChanged);
-                tagsMI.DropDownItems.Insert(tagsMI.DropDownItems.Count - 1, item);
-            }
-        }
-
-        void tag_CheckedChanged(object sender, EventArgs e) {
-            var item = (ToolStripMenuItem)sender;
-            string tag = (string)item.Tag;
-            if (item.Checked)
-                list.Tag(tag);
-            else
-                list.Untag(tag);
-        }
-
-        private void createTagMI_KeyUp(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter && !string.IsNullOrEmpty(createTagMI.Text.Trim())) {
-                list.Tag(createTagMI.Text.Trim());
-                tagsMI.DropDown.Close();
-                createTagMI.Clear();
-            }
-        }
 	}
 }
