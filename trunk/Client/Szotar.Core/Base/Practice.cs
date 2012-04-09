@@ -14,22 +14,13 @@ namespace Szotar {
 			Phrase = phrase;
 			Translation = translation;
 			SetID = setID;
-            History = history;
+            History = history ?? new PracticeHistory();
 		}
 	}
 
     [System.Diagnostics.DebuggerDisplay("{DebugText}")]
     public class PracticeHistory {
         public List<KeyValuePair<DateTime, bool>> History { get; protected set; }
-
-        double? weightedPercentage;
-        public double WeightedPercentage {
-            get {
-                if (weightedPercentage == null)
-                    weightedPercentage = CalculateWeightedPercentage();
-                return weightedPercentage.Value;
-            }
-        }
 
         double? importance;
         public double Importance {
@@ -45,24 +36,8 @@ namespace Szotar {
         }
 
         public void Add(DateTime created, bool correct) {
-            weightedPercentage = null;
+            importance = null;
             History.Add(new KeyValuePair<DateTime, bool>(created, correct));
-        }
-
-        // Recent results count more towards the total value.
-        double CalculateWeightedPercentage() {
-            double nom = 0, denom = 0;
-            for (int i = 0; i < History.Count; i++) {
-                double weight = (double)(i + 1) / ((double)History.Count + 1);
-                weight = Math.Pow(weight, 0.5);
-                denom += weight;
-                if (History[i].Value)
-                    nom += weight;
-            }
-
-            if (denom == 0)
-                return 0;
-            return nom / denom;
         }
 
         int DaysAgo(DateTime d) {
@@ -71,7 +46,7 @@ namespace Szotar {
 
         // Value between 0 and 1 indicating the need to practice this item.
         double Need() {
-            double need = 0.5;
+            double need = 0.9; // Starts very high.
             int manyDays = 28;
 
             foreach (var kvp in History) {

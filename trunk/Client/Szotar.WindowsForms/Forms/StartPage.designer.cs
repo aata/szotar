@@ -45,6 +45,7 @@
             this.flashcardsListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.learnListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.recentItems = new Szotar.WindowsForms.Controls.ListSearch();
+            this.findDuplicates = new System.Windows.Forms.ToolStripMenuItem();
             file = new System.Windows.Forms.ToolStripMenuItem();
             close = new System.Windows.Forms.ToolStripMenuItem();
             fileSep = new System.Windows.Forms.ToolStripSeparator();
@@ -111,6 +112,7 @@
             // 
             tools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             debugLog,
+            this.findDuplicates,
             toolsSep,
             options});
             tools.Name = "tools";
@@ -120,19 +122,19 @@
             // debugLog
             // 
             debugLog.Name = "debugLog";
-            debugLog.Size = new System.Drawing.Size(132, 22);
+            debugLog.Size = new System.Drawing.Size(186, 22);
             debugLog.Text = "&Debug Log";
             debugLog.Click += new System.EventHandler(this.debugLog_Click);
             // 
             // toolsSep
             // 
             toolsSep.Name = "toolsSep";
-            toolsSep.Size = new System.Drawing.Size(129, 6);
+            toolsSep.Size = new System.Drawing.Size(183, 6);
             // 
             // options
             // 
             options.Name = "options";
-            options.Size = new System.Drawing.Size(132, 22);
+            options.Size = new System.Drawing.Size(186, 22);
             options.Text = "&Options";
             options.Click += new System.EventHandler(this.options_Click);
             // 
@@ -217,11 +219,19 @@
             this.recentItems.MaxItems = 100;
             this.recentItems.Name = "recentItems";
             this.recentItems.Padding = new System.Windows.Forms.Padding(3);
+            this.recentItems.SearchTerm = "";
             this.recentItems.ShowDictionaries = true;
             this.recentItems.ShowListItems = true;
             this.recentItems.ShowTags = true;
             this.recentItems.Size = new System.Drawing.Size(569, 395);
             this.recentItems.TabIndex = 2;
+            // 
+            // findDuplicates
+            // 
+            this.findDuplicates.Name = "findDuplicates";
+            this.findDuplicates.Size = new System.Drawing.Size(186, 22);
+            this.findDuplicates.Text = "Find D&uplicate Terms";
+            this.findDuplicates.Click += new System.EventHandler(this.findDuplicates_Click);
             // 
             // StartPage
             // 
@@ -257,6 +267,7 @@
         private System.Windows.Forms.ToolStripMenuItem learnListMI;
         private System.Windows.Forms.ToolStripMenuItem newListMI;
         private System.Windows.Forms.ToolStripMenuItem practiceRandom;
+        private System.Windows.Forms.ToolStripMenuItem findDuplicates;
 
 	}
 }

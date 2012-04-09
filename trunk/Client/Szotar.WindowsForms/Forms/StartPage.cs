@@ -145,5 +145,9 @@ namespace Szotar.WindowsForms.Forms {
             new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
         }
 		#endregion
+
+        private void findDuplicates_Click(object sender, EventArgs e) {
+            ShowForm.Show<FindDuplicates>();
+        }
 	}
 }
