@@ -34,6 +34,8 @@
             System.Windows.Forms.ToolStripMenuItem help;
             System.Windows.Forms.ToolStripMenuItem about;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartPage));
+            this.newListMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.practiceRandom = new System.Windows.Forms.ToolStripMenuItem();
             this.exitProgram = new System.Windows.Forms.ToolStripMenuItem();
             this.menu = new System.Windows.Forms.MenuStrip();
             this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -42,8 +44,6 @@
             this.listContextMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.flashcardsListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.learnListMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.newListMI = new System.Windows.Forms.ToolStripMenuItem();
-            this.practiceRandom = new System.Windows.Forms.ToolStripMenuItem();
             this.recentItems = new Szotar.WindowsForms.Controls.ListSearch();
             file = new System.Windows.Forms.ToolStripMenuItem();
             close = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,6 +69,22 @@
             file.Name = "file";
             file.Size = new System.Drawing.Size(37, 20);
             file.Text = "&File";
+            // 
+            // newListMI
+            // 
+            this.newListMI.Name = "newListMI";
+            this.newListMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.newListMI.Size = new System.Drawing.Size(225, 22);
+            this.newListMI.Text = "&New Word List";
+            this.newListMI.Click += new System.EventHandler(this.newListMI_Click);
+            // 
+            // practiceRandom
+            // 
+            this.practiceRandom.Name = "practiceRandom";
+            this.practiceRandom.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+            this.practiceRandom.Size = new System.Drawing.Size(225, 22);
+            this.practiceRandom.Text = "&Practice Weak Points";
+            this.practiceRandom.Click += new System.EventHandler(this.practiceRandom_Click);
             // 
             // close
             // 
@@ -193,22 +209,6 @@
             this.learnListMI.Text = "&Learn";
             this.learnListMI.Click += new System.EventHandler(this.learnListMI_Click);
             // 
-            // newListMI
-            // 
-            this.newListMI.Name = "newListMI";
-            this.newListMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newListMI.Size = new System.Drawing.Size(225, 22);
-            this.newListMI.Text = "&New Word List";
-            this.newListMI.Click += new System.EventHandler(this.newListMI_Click);
-            // 
-            // practiceRandom
-            // 
-            this.practiceRandom.Name = "practiceRandom";
-            this.practiceRandom.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.practiceRandom.Size = new System.Drawing.Size(225, 22);
-            this.practiceRandom.Text = "&Practice Weak Points";
-            this.practiceRandom.Click += new System.EventHandler(this.practiceRandom_Click);
-            // 
             // recentItems
             // 
             this.recentItems.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -218,6 +218,8 @@
             this.recentItems.Name = "recentItems";
             this.recentItems.Padding = new System.Windows.Forms.Padding(3);
             this.recentItems.ShowDictionaries = true;
+            this.recentItems.ShowListItems = true;
+            this.recentItems.ShowTags = true;
             this.recentItems.Size = new System.Drawing.Size(569, 395);
             this.recentItems.TabIndex = 2;
             // 

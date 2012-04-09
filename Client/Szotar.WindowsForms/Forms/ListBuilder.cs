@@ -81,8 +81,6 @@ namespace Szotar.WindowsForms.Forms {
 			deleteMI.Click += new EventHandler(remove_Click);
 			deleteCM.Click += new EventHandler(remove_Click);
 
-
-
 			WireListEvents();
 			MakeRecent();
 

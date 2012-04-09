@@ -53,6 +53,7 @@
             this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList.Images.SetKeyName(0, "Dictionary");
             this.imageList.Images.SetKeyName(1, "List");
+            this.imageList.Images.SetKeyName(2, "Tag");
             // 
             // imageListSmall
             // 
@@ -60,6 +61,7 @@
             this.imageListSmall.TransparentColor = System.Drawing.Color.Transparent;
             this.imageListSmall.Images.SetKeyName(0, "Dictionary");
             this.imageListSmall.Images.SetKeyName(1, "List");
+            this.imageListSmall.Images.SetKeyName(2, "Tag");
             // 
             // fileSystemWatcher
             // 
