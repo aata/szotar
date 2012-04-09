@@ -139,7 +139,7 @@
             metaFlow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             metaFlow.Location = new System.Drawing.Point(73, 7);
             metaFlow.Name = "metaFlow";
-            metaFlow.Size = new System.Drawing.Size(21945, 60);
+            metaFlow.Size = new System.Drawing.Size(22306, 60);
             metaFlow.TabIndex = 2;
             // 
             // namePanel

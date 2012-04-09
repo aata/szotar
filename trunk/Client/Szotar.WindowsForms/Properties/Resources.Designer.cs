@@ -357,6 +357,15 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} lists.
+        /// </summary>
+        internal static string NLists {
+            get {
+                return ResourceManager.GetString("NLists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} terms.
         /// </summary>
         internal static string NTerms {
@@ -461,6 +470,15 @@ namespace Szotar.WindowsForms.Properties {
         internal static string SwappedNRows {
             get {
                 return ResourceManager.GetString("SwappedNRows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tags.
+        /// </summary>
+        internal static string Tags {
+            get {
+                return ResourceManager.GetString("Tags", resourceCulture);
             }
         }
         

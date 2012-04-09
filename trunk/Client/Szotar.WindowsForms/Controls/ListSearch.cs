@@ -80,6 +80,20 @@ namespace Szotar.WindowsForms.Controls {
 		private bool PopulateResults(int? maxCount) {
             results.Groups.Clear();
 
+            if (ShowTags && !string.IsNullOrEmpty(searchBox.Text)) {
+                var tagsGroup = new ListViewGroup(Properties.Resources.Tags);
+                tagsGroup.Header = Properties.Resources.Tags;
+                results.Groups.Add(tagsGroup);
+
+                foreach(var tag in DataStore.Database.GetTags()) {
+                    if (tag.Key.Contains(searchBox.Text.Trim())) {
+                        var item = new ListViewItem(new string[] { tag.Key, string.Format(Properties.Resources.NLists, tag.Value, string.Empty) }, "Tag");
+                        item.Tag = tag;
+                        results.Items.Add(item);
+                    }
+                }
+            }
+
             if (ShowDictionaries) {
                 ListViewGroup dictsGroup = new ListViewGroup(Properties.Resources.Dictionaries);
                 dictsGroup.Name = "Dictionaries";
@@ -293,7 +307,10 @@ namespace Szotar.WindowsForms.Controls {
 
 			foreach (ListViewItem item in results.SelectedItems) {
 				object tag = item.Tag;
-				if (tag is ListInfo) {
+                if (tag is KeyValuePair<string, int>) {
+                    foreach (var list in DataStore.Database.SearchByTag(((KeyValuePair<string, int>)tag).Key))
+                        lists.Add(new ListSearchResult(list.ID.Value));
+                } if (tag is ListInfo) {
 					var list = (ListInfo)tag;
 					lists.Add(new ListSearchResult(list.ID.Value));
 				} else if (tag is Szotar.Sqlite.SqliteDataStore.WordSearchResult) {
@@ -308,6 +325,9 @@ namespace Szotar.WindowsForms.Controls {
 					}
 				}
 			}
+
+            // Now that tags can be selected it means the same list can be "selected" twice...
+            lists = lists.Distinct().ToList();
 
 			return lists;
 		}
@@ -326,7 +346,18 @@ namespace Szotar.WindowsForms.Controls {
 
         [Browsable(true)]
         [Description("Whether or not dictionaries are shown in the results view.")]
+        [DefaultValue(false)]
         public bool ShowDictionaries { get; set; }
+
+        [Browsable(true)]
+        [Description("Whether or not list items are shown in the results view.")]
+        [DefaultValue(false)]
+        public bool ShowListItems { get; set; }
+
+        [Browsable(true)]
+        [Description("Whether or not tags are shown in the results view.")]
+        [DefaultValue(false)]
+        public bool ShowTags { get; set; }
 	}
 
 	public class ListsChosenEventArgs : EventArgs {
