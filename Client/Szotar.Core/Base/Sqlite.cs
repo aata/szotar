@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using IO = System.IO;
 
@@ -279,11 +280,8 @@ namespace Szotar.Sqlite {
 
 				CREATE INDEX Sets_Index ON Sets (id);
 
-				CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT);
-				CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property);
-
-				CREATE TABLE SetMemberships (ChildID INTEGER NOT NULL, ParentID INTEGER NOT NULL);
-				CREATE INDEX SetMemberships_Index ON SetMemberships (ChildID, ParentID);");
+				CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT, FOREIGN KEY (SetID) REFERENCES Sets(id));
+				CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property);");
 		}
 
 		// Upgrade the schema for the new practice functionality.
@@ -306,7 +304,8 @@ namespace Szotar.Sqlite {
 					Phrase TEXT NOT NULL COLLATE NOCASE,
 					Translation TEXT NOT NULL COLLATE NOCASE,
 					SetID INTEGER NOT NULL,
-					ListPosition INTEGER NOT NULL);
+					ListPosition INTEGER NOT NULL,
+                    FOREIGN KEY (SetID) REFERENCES Sets(id));
 				
 				CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase);
 				CREATE INDEX VocabItems_IndexT ON VocabItems (Translation);
@@ -324,7 +323,8 @@ namespace Szotar.Sqlite {
 					Translation TEXT NOT NULL COLLATE NOCASE,
 					SetID INTEGER NOT NULL,
 					Created DATE NOT NULL,
-					Result INTEGER NOT NULL -- 1 for success, 0 for failure
+					Result INTEGER NOT NULL, -- 1 for success, 0 for failure
+                    FOREIGN KEY(SetID) REFERENCES Sets(id)
 					);
 
 				-- Are these necessary?
@@ -566,11 +566,11 @@ namespace Szotar.Sqlite {
 				wordLists.Remove(setID);
 
 			using (var txn = Connection.BeginTransaction()) {
-				ExecuteSQL("DELETE FROM Sets WHERE id = ?", setID);
 				ExecuteSQL("DELETE FROM VocabItems WHERE SetID = ?", setID);
 				ExecuteSQL("DELETE FROM SetProperties WHERE SetID = ?", setID);
-				ExecuteSQL("DELETE FROM SetMemberships WHERE ChildID = ? OR ParentID = ?", setID, setID);
                 ExecuteSQL("DELETE FROM PracticeHistory WHERE SetID = ?", setID);
+                ExecuteSQL("DELETE FROM Tags WHERE SetID = ?", setID);
+                ExecuteSQL("DELETE FROM Sets WHERE id = ?", setID);
 
 				txn.Commit();
 			}
@@ -676,19 +676,20 @@ namespace Szotar.Sqlite {
 		// Using yield return here would probably be a bad idea, since the connection
 		// would only be closed if the consumer consumes the whole list.
 		/// <summary>Returns the ListInfo instances for those items which were lists and not single vocab items.</summary>
-		public List<ListInfo> GetListInformation(List<ListSearchResult> lists) {
+		public List<ListInfo> GetListInformation(IEnumerable<ListSearchResult> lists) {
 			var answer = new List<ListInfo>();
 
 			using (var txn = Connection.BeginTransaction()) {
 				using (var command = Connection.CreateCommand()) {
 					command.CommandText =
-						@"TYPES Integer, Text, Text, Text, Text, Date, Integer; 
-						 SELECT id, Name, Author, Language, Url, Created, 
+						@"TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+						 SELECT id, Name, Author, Language, Url, Created, Accessed, 
 						     (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
 						 FROM Sets
 						 WHERE id = ?";
 
 					var param = command.CreateParameter();
+                    command.Parameters.Add(param);
 
 					foreach (var list in lists) {
 						if (list.Position.HasValue)
@@ -706,25 +707,7 @@ namespace Szotar.Sqlite {
 			return answer;
 		}
 
-        public List<PracticeItem> OldGetSuggestedPracticeItems(int limit) {
-            // Join with VocabItems to avoid practicing items which have since been deleted or edited
-            var reader = this.SelectReader(@"
-                SELECT Phrase, Translation, SetID, SUM(Result) AS ResultSum, COUNT(Result) as ResultCount, MAX(Created) 
-                FROM (SELECT PracticeHistory.Phrase, PracticeHistory.Translation, PracticeHistory.SetID, PracticeHistory.Result, PracticeHistory.Created 
-                      FROM PracticeHistory INNER JOIN VocabItems 
-                      ON PracticeHistory.Phrase = VocabItems.Phrase AND PracticeHistory.Translation = VocabItems.Translation 
-                      ORDER BY Created DESC)
-                GROUP BY Phrase, Translation 
-                ORDER BY ResultSum*1000/ResultCount ASC 
-                LIMIT " + limit.ToString());
-            var results = new List<PracticeItem>();
-            while (reader.Read()) {
-                results.Add(new PracticeItem(reader.GetInt64(2), reader.GetString(0), reader.GetString(1)));
-            }
-            return results;
-        }
-
-        public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
+        private List<PracticeItem> GetPracticeItems() {
             var reader = this.SelectReader(@"
                 SELECT VocabItems.Phrase, VocabItems.Translation, VocabItems.SetID, Result, Created
                 FROM VocabItems LEFT JOIN PracticeHistory
@@ -736,14 +719,14 @@ namespace Szotar.Sqlite {
             var items = new List<PracticeItem>();
             PracticeItem item = null;
 
-            while(reader.Read()) {
+            while (reader.Read()) {
                 string phrase = reader.GetString(0);
                 string translation = reader.GetString(1);
                 long setID = reader.GetInt64(2);
                 bool? correct = reader.IsDBNull(3) ? (bool?)null : reader.GetBoolean(3);
                 DateTime? created = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4);
 
-                if(item == null || item.Phrase != phrase || item.Translation != translation) {
+                if (item == null || item.Phrase != phrase || item.Translation != translation) {
                     item = new PracticeItem(setID, phrase, translation, new PracticeHistory());
                     items.Add(item);
                 }
@@ -752,9 +735,57 @@ namespace Szotar.Sqlite {
                     item.History.Add(created.Value, correct.Value);
             }
 
+            return items;
+        }
+
+        public List<ListInfo> GetSetsByPracticeHistory() {
+            var items = from g in (from x in GetPracticeItems()
+                                   group x by x.SetID into set
+                                   select new { Set = set, Score = set.Average(x => Math.Pow(x.History.Importance, 2)) })
+                        orderby g.Score descending
+                        select g.Set.Key;
+
+            return GetListInformation(from x in items select new ListSearchResult(x));
+        }
+
+        public class Duplicate {
+            public long SetID { get; set; }
+            public string Phrase { get; set; }
+            public string Translation { get; set; }
+            public string ListName { get; set; }
+            public int PracticeCount { get; set; }
+        }
+
+        public IEnumerable<KeyValuePair<Duplicate, Duplicate>> FindDuplicateListItems() {
+            var reader = SelectReader(@"
+                CREATE TEMP VIEW IF NOT EXISTS DupL AS Select V.SetID, V.Phrase, V.Translation, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;
+                CREATE TEMP VIEW IF NOT EXISTS DupR AS Select V.SetID, V.Phrase, V.Translation, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;                
+                SELECT L.SetID, L.Phrase, L.Translation, L.Name, L.PracticeCount, R.SetID, R.Phrase, R.Translation, R.Name, R.PracticeCount FROM DupL AS L JOIN DupR AS R ON (L.Phrase = R.Phrase OR L.Translation = R.Translation) AND L.SetID < R.SetID");
+            while (reader.Read()) {
+                var left = new Duplicate {
+                    SetID = reader.GetInt64(0),
+                    Phrase = reader.GetString(1),
+                    Translation = reader.GetString(2),
+                    ListName = reader.GetString(3),
+                    PracticeCount = reader.GetInt32(4),
+                };
+                var right = new Duplicate {
+                    SetID = reader.GetInt64(5),
+                    Phrase = reader.GetString(6),
+                    Translation = reader.GetString(7),
+                    ListName = reader.GetString(8),
+                    PracticeCount = reader.GetInt32(9),
+                };
+                yield return new KeyValuePair<Duplicate, Duplicate>(left, right);
+            }
+        }
+
+        public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
+            var items = GetPracticeItems();
+
             // Results in the items with the highest importance being placed first in the list.
             items.Sort(new Comparison<PracticeItem>((a, b) => -a.History.Importance.CompareTo(b.History.Importance)));
-            
+
             var chosen = new List<PracticeItem>();
             var rng = new Random();
             var distribution = new NormalDistribution(rng);

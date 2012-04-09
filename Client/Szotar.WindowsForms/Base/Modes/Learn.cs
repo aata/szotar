@@ -388,7 +388,7 @@ namespace Szotar.WindowsForms {
 
 	// TODO: Actually log the results
 	public class LearnMode : Mode {
-		Label phrase, scoreLabel, answer;
+		Label phrase, scoreLabel, answer, history;
 		TextBox translation; // The user enters their guess into this.
 		TextBox affirmation; // When the user gets an answer wrong, make them type it in so that they learn it.
 		Button overrideButton;
@@ -446,6 +446,7 @@ namespace Szotar.WindowsForms {
 			phrase = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
 			answer = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
 			scoreLabel = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = scoreFont, Dock = DockStyle.Bottom, TextAlign = ContentAlignment.BottomRight };
+            history = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = extraSmallFont, Dock = DockStyle.Top, TextAlign = ContentAlignment.MiddleLeft };
 			translation = new TextBox() { Font = font };
             affirmation = new TextBox() { Font = font };
             overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = "&override" };
@@ -458,6 +459,7 @@ namespace Szotar.WindowsForms {
 			GameArea.Controls.Add(phrase);
 			GameArea.Controls.Add(scoreLabel);
 			GameArea.Controls.Add(answer);
+            GameArea.Controls.Add(history);
 			GameArea.Controls.Add(translation);
             GameArea.Controls.Add(affirmation);
             GameArea.Controls.Add(overrideButton);
@@ -573,6 +575,7 @@ namespace Szotar.WindowsForms {
 		string CurrentTranslation { get { return swap ? items[index].Phrase : items[index].Translation; } }
 
 		void ReportGuess(PracticeItem item, bool correct) {
+            item.History.Add(DateTime.Now, correct);
             DataStore.Database.AddPracticeHistory(item.SetID, item.Phrase, item.Translation, correct);
 		}
 
@@ -738,12 +741,14 @@ namespace Szotar.WindowsForms {
 				if (state == State.ViewingAnswer)
 					affirmation.Clear();
 				scoreLabel.Text = string.Format("score: {0}/{1}, {2} remaining", score, currentRound.Count, items.Count - currentRound.Count);
+                history.Text = string.Format("history: {0}/{1}, importance {2:P1}", items[index].History.History.Count(x => x.Value), items[index].History.History.Count, items[index].History.Importance);
 			}
 
 			affirmation.Tag = affirmation.Visible = state == State.ViewingAnswer;
 			translation.Tag = translation.Visible = state == State.Guessing;
 			scoreLabel.Tag = scoreLabel.Visible = state != State.RoundOverview && state != State.GameOverview;
 			phrase.Tag = phrase.Visible = state != State.RoundOverview && state != State.GameOverview;
+            history.Tag = history.Visible = state == State.Guessing || state == State.ViewingAnswer;
 			answer.Tag = answer.Visible = state == State.ViewingAnswer;
 			overrideButton.Tag = overrideButton.Visible = state == State.ViewingAnswer;
             viewButton.Tag = viewButton.Visible = state == State.ViewingAnswer;
