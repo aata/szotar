@@ -17,7 +17,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			exitProgram.Text = string.Format(exitProgram.Text, Application.ProductName);
 
-			recentItems.ListsChosen += new EventHandler<Controls.ListsChosenEventArgs>(recentItems_ListsChosen);
+			recentItems.ListsChosen += new EventHandler(recentItems_ListsChosen);
 
             tagMenu = new TagMenu();
             listContextMenu.Items.Insert(listContextMenu.Items.IndexOf(newListCM), tagMenu);
@@ -25,7 +25,7 @@ namespace Szotar.WindowsForms.Forms {
 
         #region List Search
         private void listContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e) {
-            var selectedLists = recentItems.AcceptLists();
+            var selectedLists = recentItems.SelectedLists();
 
             listContextMenuSeparator.Visible = flashcardsListMI.Visible = learnListMI.Visible = selectedLists.Count > 0;
 
@@ -40,21 +40,23 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void openListMI_Click(object sender, EventArgs e) {
-			OpenLists(recentItems.AcceptLists());
-            OpenDictionaries(recentItems.AcceptDictionaries());
+            OpenTags(recentItems.SelectedTags());
+			OpenLists(recentItems.SelectedLists());
+            OpenDictionaries(recentItems.SelectedDictionaries());
 		}
 
-		private void recentItems_ListsChosen(object sender, Controls.ListsChosenEventArgs e) {
-			OpenLists(e.Chosen);
-            OpenDictionaries(e.ChosenDictionaries);
+		private void recentItems_ListsChosen(object sender, EventArgs e) {
+            OpenTags(recentItems.SelectedTags());
+            OpenLists(recentItems.SelectedLists());
+            OpenDictionaries(recentItems.SelectedDictionaries());
 		}
 
         private void flashcardsListMI_Click(object sender, EventArgs e) {
-            PracticeLists(PracticeMode.Flashcards, recentItems.AcceptLists());
+            PracticeLists(PracticeMode.Flashcards, recentItems.SelectedLists());
         }
 
         private void learnListMI_Click(object sender, EventArgs e) {
-            PracticeLists(PracticeMode.Learn, recentItems.AcceptLists());
+            PracticeLists(PracticeMode.Learn, recentItems.SelectedLists());
         }
 
 		T? NullableMin<T>(T? x, T? y)
@@ -87,6 +89,10 @@ namespace Szotar.WindowsForms.Forms {
 
 			return opened;
 		}
+        private void OpenTags(IList<string> tags) {
+            if (tags.Count > 0)
+                recentItems.SearchTerm = "tag:" + tags[0];
+        }
 
         private void OpenDictionaries(IList<DictionaryInfo> dicts) {
             foreach(var di in dicts)
