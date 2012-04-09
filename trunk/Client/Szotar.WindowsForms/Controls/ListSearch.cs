@@ -77,24 +77,35 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
+        public string SearchTerm {
+            get { return searchBox.Text; }
+            set { searchBox.Text = value; }
+        }
+
 		private bool PopulateResults(int? maxCount) {
             results.Groups.Clear();
 
-            if (ShowTags && !string.IsNullOrEmpty(searchBox.Text)) {
+            string searchTerm = searchBox.Text.Trim();
+            bool noSearch = string.IsNullOrEmpty(searchTerm);
+            string tagSearch = searchTerm.StartsWith("tag:") ? searchTerm.Substring(4) : null;
+            searchTerm = searchTerm.ToLower();
+
+            if (ShowTags && !noSearch) {
                 var tagsGroup = new ListViewGroup(Properties.Resources.Tags);
                 tagsGroup.Header = Properties.Resources.Tags;
                 results.Groups.Add(tagsGroup);
 
                 foreach(var tag in DataStore.Database.GetTags()) {
-                    if (tag.Key.Contains(searchBox.Text.Trim())) {
+                    if (tag.Key.Contains(searchTerm)) {
                         var item = new ListViewItem(new string[] { tag.Key, string.Format(Properties.Resources.NLists, tag.Value, string.Empty) }, "Tag");
                         item.Tag = tag;
+                        item.Group = tagsGroup;
                         results.Items.Add(item);
                     }
                 }
             }
 
-            if (ShowDictionaries) {
+            if (ShowDictionaries && tagSearch == null) {
                 ListViewGroup dictsGroup = new ListViewGroup(Properties.Resources.Dictionaries);
                 dictsGroup.Name = "Dictionaries";
                 results.Groups.Add(dictsGroup);
@@ -112,15 +123,14 @@ namespace Szotar.WindowsForms.Controls {
                     results.Items.Add(item);
                 };
 
-                string term = searchBox.Text.Trim().ToLower();
-                if (term.Length == 0) {
+                if (searchTerm.Length == 0) {
                     dictsGroup.Header = Properties.Resources.RecentDictionaries;
                     foreach(var dict in GuiConfiguration.RecentDictionaries.Entries)
                         if (System.IO.File.Exists(dict.Path))
                             addItem(dict);
                 } else { 
                     foreach(var dict in dictionaries)
-                        if (dict.Name.ToLower().Contains(term))
+                        if (dict.Name.ToLower().Contains(searchTerm))
                             addItem(dict);
                 }
             }
@@ -137,13 +147,11 @@ namespace Szotar.WindowsForms.Controls {
                     if (string.IsNullOrEmpty(list.Name))
                         list.Name = Properties.Resources.DefaultListName;
 
-                    if (searchBox.Text.Length > 0 && list.Name.IndexOf(searchBox.Text, StringComparison.CurrentCultureIgnoreCase) == -1)
+                    // If it's a tag search, the items have already been filtered - no need to do so now.
+                    if (tagSearch == null && !noSearch && list.Name.IndexOf(searchTerm, StringComparison.CurrentCultureIgnoreCase) == -1)
                         continue;
 
-                    if (results.Items.Count > maxCount)
-                        break;
-
-                    if (lists != recentLists && recentLists.Count(a => a.ID == list.ID) > 0)
+                    if (tagSearch == null && lists != recentLists && recentLists.Count(a => a.ID == list.ID) > 0)
                         continue;
 
                     ListViewItem item = new ListViewItem(
@@ -158,10 +166,14 @@ namespace Szotar.WindowsForms.Controls {
                 }
             };
 
-            addItems(Properties.Resources.RecentListStoreName, recentLists);
-            addItems(Properties.Resources.DefaultListStoreName, DataStore.Database.GetAllSets());
-            
-            if (!string.IsNullOrEmpty(searchBox.Text) && !(results.Items.Count > maxCount)) {
+            if (tagSearch != null) {
+                addItems(tagSearch, DataStore.Database.SearchByTag(tagSearch));
+            } else {
+                addItems(Properties.Resources.RecentListStoreName, recentLists);
+                addItems(Properties.Resources.DefaultListStoreName, DataStore.Database.GetAllSets());
+            }
+
+            if (ShowListItems && tagSearch == null && !string.IsNullOrEmpty(searchBox.Text) && !(results.Items.Count > maxCount)) {
 				var group = new ListViewGroup(Properties.Resources.SearchResults);
                 group.Name = Properties.Resources.SearchResults;
 				results.Groups.Add(group);
@@ -279,15 +291,12 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void results_ItemActivate(object sender, EventArgs e) {
-			var lists = AcceptLists();
-            var dicts = AcceptDictionaries();
-
 			var h = ListsChosen;
 			if (h != null)
-				h(this, new ListsChosenEventArgs(lists, dicts));
+				h(this, new EventArgs());
 		}
 
-        public List<DictionaryInfo> AcceptDictionaries() {
+        public List<DictionaryInfo> SelectedDictionaries() {
             var dicts = new List<DictionaryInfo>();
 
             foreach (ListViewItem item in results.SelectedItems) {
@@ -299,11 +308,21 @@ namespace Szotar.WindowsForms.Controls {
             return dicts;
         }
 
-		public List<ListSearchResult> AcceptLists() {
+        public List<string> SelectedTags() {
+            var tags = new List<string>();
+
+			foreach (ListViewItem item in results.SelectedItems)
+                if(item.Tag is KeyValuePair<string, int>)
+                    tags.Add(((KeyValuePair<string, int>)item.Tag).Key);
+
+            return tags;
+        }
+
+		public List<ListSearchResult> SelectedLists() {
 			var lists = new List<ListSearchResult>();
 
-			if (results.SelectedItems.Count == 0)
-				return new List<ListSearchResult>();
+            if (results.SelectedItems.Count == 0)
+                return lists;
 
 			foreach (ListViewItem item in results.SelectedItems) {
 				object tag = item.Tag;
@@ -332,7 +351,7 @@ namespace Szotar.WindowsForms.Controls {
 			return lists;
 		}
 
-		public event EventHandler<ListsChosenEventArgs> ListsChosen;
+		public event EventHandler ListsChosen;
 
 		/// <summary>The context menu shown for the results list.</summary>
 		public ContextMenuStrip ListContextMenuStrip {
@@ -358,15 +377,5 @@ namespace Szotar.WindowsForms.Controls {
         [Description("Whether or not tags are shown in the results view.")]
         [DefaultValue(false)]
         public bool ShowTags { get; set; }
-	}
-
-	public class ListsChosenEventArgs : EventArgs {
-        public IList<DictionaryInfo> ChosenDictionaries { get; set; }
-		public IList<ListSearchResult> Chosen { get; set; }
-
-		public ListsChosenEventArgs(IList<ListSearchResult> ids, IList<DictionaryInfo> dicts) {
-			Chosen = ids;
-            ChosenDictionaries = dicts;
-		}
 	}
 }
