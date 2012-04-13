@@ -132,6 +132,8 @@ namespace Szotar.Sqlite {
 		protected DbConnection conn;
         bool ownsConnection;
 
+        List<DbCommand> commands = new List<DbCommand>();
+
 		public SqliteObject(SqliteObject other) {
 			this.conn = other.conn;
             ownsConnection = false;
@@ -211,6 +213,12 @@ namespace Szotar.Sqlite {
 			command.Parameters.Add(param);
 		}
 
+        protected DbCommand CreateCommand() {
+            var command = Connection.CreateCommand();
+            commands.Add(command);
+            return command;
+        }
+
 		protected DbConnection Connection { get { return conn; } }
 
 		public void Dispose() {
@@ -219,6 +227,9 @@ namespace Szotar.Sqlite {
 		}
 
 		protected virtual void Dispose(bool disposing) {
+            foreach (var command in commands)
+                command.Dispose();
+
             if(ownsConnection)
                 conn.Dispose();
 		}
@@ -351,25 +362,29 @@ namespace Szotar.Sqlite {
 
         #region Tags
         public IEnumerable<KeyValuePair<string, int>> GetTags(bool orderByName = true) {
-            var reader = SelectReader("SELECT tag AS t, count(SetID) AS n FROM Tags GROUP BY tag ORDER BY " + (orderByName ? "t ASC" : "n DESC, t ASC"));
-            while (reader.Read())
-                yield return new KeyValuePair<string, int>(reader.GetString(0), reader.GetInt32(1));
+            using (var reader = SelectReader("SELECT tag AS t, count(SetID) AS n FROM Tags GROUP BY tag ORDER BY " + (orderByName ? "t ASC" : "n DESC, t ASC"))) {
+                while (reader.Read())
+                    yield return new KeyValuePair<string, int>(reader.GetString(0), reader.GetInt32(1));
+            }
         }
 
         public IEnumerable<ListInfo> SearchByTag(string tag) {
-            var reader = SelectReader(@"
+            using (var reader = SelectReader(@"
                 SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = id) 
                 FROM Tags INNER JOIN Sets ON Tags.SetID = Sets.id
                 WHERE tag = ?
-                ORDER BY Name ASC", tag);
-            while (reader.Read())
-                yield return ListInfoFromReader(reader);
+                ORDER BY Name ASC", tag)) {
+                
+                while (reader.Read())
+                    yield return ListInfoFromReader(reader);
+            }
         }
 
         public IEnumerable<string> GetTags(long setID) {
-            var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ?", setID);
-            while (reader.Read())
-                yield return reader.GetString(0);
+            using (var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ?", setID)) {
+                while (reader.Read())
+                    yield return reader.GetString(0);
+            }
         }
 
         public bool HasTag(string tag, long setID) {
@@ -430,16 +445,17 @@ namespace Szotar.Sqlite {
 		}
 
         public IEnumerable<ListInfo> GetRecentSets(int limit) {
-            var reader = SelectReader(@"
+            using (var reader = SelectReader(@"
                 TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
                 SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
                 FROM Sets
                 WHERE Accessed NOT NULL
                 ORDER BY Accessed DESC
-                LIMIT " + limit.ToString());
+                LIMIT " + limit.ToString())) {
 
-            while (reader.Read()) {
-                yield return ListInfoFromReader(reader);
+                while (reader.Read()) {
+                    yield return ListInfoFromReader(reader);
+                }
             }
         }
 
@@ -667,11 +683,33 @@ namespace Szotar.Sqlite {
 						reader.GetString(1),
 						reader.GetString(2));
 
+                    GetItemPracticeHistory(item);
+
 					output.Add(item);
 				}
 
 			}
 		}
+
+        DbCommand getHistory;
+        DbParameter getHistory_SetID, getHistory_Phrase, getHistory_Translation;
+        void GetItemPracticeHistory(PracticeItem item) {
+            if (getHistory == null) {
+                getHistory = CreateCommand()
+                    .AddParam(ref getHistory_SetID)
+                    .AddParam(ref getHistory_Phrase)
+                    .AddParam(ref getHistory_Translation);
+                getHistory.CommandText = "SELECT Created, Result FROM PracticeHistory WHERE SetID = ? AND Phrase = ? AND Translation = ? ORDER BY Created ASC";
+            }
+
+            getHistory_SetID.Value = item.SetID;
+            getHistory_Phrase.Value = item.Phrase;
+            getHistory_Translation.Value = item.Translation;
+
+            using (var reader = getHistory.ExecuteReader())
+                while (reader.Read())
+                    item.History.Add(reader.GetDateTime(0), reader.GetBoolean(1));
+        }
 
 		// Using yield return here would probably be a bad idea, since the connection
 		// would only be closed if the consumer consumes the whole list.
@@ -708,34 +746,35 @@ namespace Szotar.Sqlite {
 		}
 
         private List<PracticeItem> GetPracticeItems() {
-            var reader = this.SelectReader(@"
+            using (var reader = this.SelectReader(@"
                 SELECT VocabItems.Phrase, VocabItems.Translation, VocabItems.SetID, Result, Created
                 FROM VocabItems LEFT JOIN PracticeHistory
                     ON PracticeHistory.SetID = VocabItems.SetID 
                     AND PracticeHistory.Phrase = VocabItems.Phrase 
                     AND PracticeHistory.Translation = VocabItems.Translation  
-                ORDER BY VocabItems.SetID, VocabItems.Phrase, VocabItems.Translation, Created");
+                ORDER BY VocabItems.SetID, VocabItems.Phrase, VocabItems.Translation, Created")) {
 
-            var items = new List<PracticeItem>();
-            PracticeItem item = null;
+                var items = new List<PracticeItem>();
+                PracticeItem item = null;
 
-            while (reader.Read()) {
-                string phrase = reader.GetString(0);
-                string translation = reader.GetString(1);
-                long setID = reader.GetInt64(2);
-                bool? correct = reader.IsDBNull(3) ? (bool?)null : reader.GetBoolean(3);
-                DateTime? created = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4);
+                while (reader.Read()) {
+                    string phrase = reader.GetString(0);
+                    string translation = reader.GetString(1);
+                    long setID = reader.GetInt64(2);
+                    bool? correct = reader.IsDBNull(3) ? (bool?)null : reader.GetBoolean(3);
+                    DateTime? created = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4);
 
-                if (item == null || item.Phrase != phrase || item.Translation != translation) {
-                    item = new PracticeItem(setID, phrase, translation, new PracticeHistory());
-                    items.Add(item);
+                    if (item == null || item.Phrase != phrase || item.Translation != translation) {
+                        item = new PracticeItem(setID, phrase, translation, new PracticeHistory());
+                        items.Add(item);
+                    }
+
+                    if (correct != null && created != null)
+                        item.History.Add(created.Value, correct.Value);
                 }
 
-                if (correct != null && created != null)
-                    item.History.Add(created.Value, correct.Value);
+                return items;
             }
-
-            return items;
         }
 
         public List<ListInfo> GetSetsByPracticeHistory() {
@@ -757,26 +796,28 @@ namespace Szotar.Sqlite {
         }
 
         public IEnumerable<KeyValuePair<Duplicate, Duplicate>> FindDuplicateListItems() {
-            var reader = SelectReader(@"
+            using (var reader = SelectReader(@"
                 CREATE TEMP VIEW IF NOT EXISTS DupL AS Select V.SetID, V.Phrase, V.Translation, V.ListPosition, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;
                 CREATE TEMP VIEW IF NOT EXISTS DupR AS Select V.SetID, V.Phrase, V.Translation, V.ListPosition, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;                
-                SELECT L.SetID, L.Phrase, L.Translation, L.Name, L.PracticeCount, R.SetID, R.Phrase, R.Translation, R.Name, R.PracticeCount FROM DupL AS L JOIN DupR AS R ON (L.Phrase = R.Phrase OR L.Translation = R.Translation) AND (L.SetID < R.SetID OR (L.SetID = R.SetID AND L.ListPosition < R.ListPosition))");
-            while (reader.Read()) {
-                var left = new Duplicate {
-                    SetID = reader.GetInt64(0),
-                    Phrase = reader.GetString(1),
-                    Translation = reader.GetString(2),
-                    ListName = reader.GetString(3),
-                    PracticeCount = reader.GetInt32(4),
-                };
-                var right = new Duplicate {
-                    SetID = reader.GetInt64(5),
-                    Phrase = reader.GetString(6),
-                    Translation = reader.GetString(7),
-                    ListName = reader.GetString(8),
-                    PracticeCount = reader.GetInt32(9),
-                };
-                yield return new KeyValuePair<Duplicate, Duplicate>(left, right);
+                SELECT L.SetID, L.Phrase, L.Translation, L.Name, L.PracticeCount, R.SetID, R.Phrase, R.Translation, R.Name, R.PracticeCount FROM DupL AS L JOIN DupR AS R ON (L.Phrase = R.Phrase OR L.Translation = R.Translation) AND (L.SetID < R.SetID OR (L.SetID = R.SetID AND L.ListPosition < R.ListPosition))")) {
+                
+                while (reader.Read()) {
+                    var left = new Duplicate {
+                        SetID = reader.GetInt64(0),
+                        Phrase = reader.GetString(1),
+                        Translation = reader.GetString(2),
+                        ListName = reader.GetString(3),
+                        PracticeCount = reader.GetInt32(4),
+                    };
+                    var right = new Duplicate {
+                        SetID = reader.GetInt64(5),
+                        Phrase = reader.GetString(6),
+                        Translation = reader.GetString(7),
+                        ListName = reader.GetString(8),
+                        PracticeCount = reader.GetInt32(9),
+                    };
+                    yield return new KeyValuePair<Duplicate, Duplicate>(left, right);
+                }
             }
         }
 
