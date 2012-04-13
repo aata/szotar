@@ -506,14 +506,15 @@ namespace Szotar.Sqlite {
 			}
 
 			public IList<WordListEntry> GetAllEntries() {
-				var reader = SelectReader(@"
+                using (var reader = SelectReader(@"
 					TYPES Text, Text;
 					SELECT Phrase, Translation
 						FROM VocabItems 
 						WHERE SetID = ? 
-						ORDER BY ListPosition ASC", list.ID);
+						ORDER BY ListPosition ASC", list.ID)) {
 
-				return GetEntries(reader);
+                    return GetEntries(reader);
+                }
 			}
 
 			protected IList<WordListEntry> GetEntries(DbDataReader reader) {
