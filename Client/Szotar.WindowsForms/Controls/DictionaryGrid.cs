@@ -194,6 +194,10 @@ namespace Szotar.WindowsForms.Controls {
 
 		public void SelectRow(int row, int activeColumn) {
 			ClearSelection();
+
+            if (row >= RowCount)
+                return;
+
 			SetCurrentCellAddressCore(activeColumn, row, true, true, true);
 			SetSelectedRowCore(row, true);
 
@@ -960,6 +964,10 @@ namespace Szotar.WindowsForms.Controls {
 				return count;
 			}
 		}
+
+        public void SelectRow(int row) {
+            grid.SelectRow(row);
+        }
 		#endregion
 
 		#region Properties

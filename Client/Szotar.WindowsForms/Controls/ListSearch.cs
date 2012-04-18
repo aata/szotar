@@ -334,7 +334,7 @@ namespace Szotar.WindowsForms.Controls {
 					lists.Add(new ListSearchResult(list.ID.Value));
 				} else if (tag is Szotar.Sqlite.SqliteDataStore.WordSearchResult) {
 					var wsr = (Szotar.Sqlite.SqliteDataStore.WordSearchResult)tag;
-					lists.Add(new ListSearchResult(wsr.SetID, wsr.ListPosition));
+					lists.Add(new ListSearchResult(wsr.SetID, wsr.Phrase, wsr.Translation, wsr.ListPosition));
 				} else if (tag.Equals("Truncated")) {
 					// Taking this path when many items are selected would probably be annoying.
 					if (results.SelectedItems.Count == 1) {
