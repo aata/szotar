@@ -620,7 +620,7 @@ namespace Szotar.Sqlite {
 				bool hasListItems = false;
 
 				foreach (var r in items) {
-					if (r.Position == null) {
+					if (!r.HasItem) {
 						query.Append(r.SetID).Append(", ");
 						hasListItems = true;
 					}
@@ -638,28 +638,13 @@ namespace Szotar.Sqlite {
 					}
 				}
 
-				using (var cmd = Connection.CreateCommand()) {
-					cmd.CommandText =
-						@"SELECT SetID, Phrase, Translation
-					      FROM VocabItems
-					      WHERE SetID = ? AND ListPosition = ?";
+				foreach (var r in items) {
+					if (!r.HasItem)
+						continue;
 
-					var setID = cmd.CreateParameter();
-					var pos = cmd.CreateParameter();
-
-					cmd.Parameters.Add(setID);
-					cmd.Parameters.Add(pos);
-
-					foreach (var r in items) {
-						if (r.Position == null)
-							continue;
-						else
-							pos.Value = r.Position.Value;
-
-						setID.Value = r.SetID;
-
-						GetResults(cmd, results);
-					}
+                    var item = new PracticeItem(r.SetID, r.Phrase, r.Translation);
+                    GetItemPracticeHistory(item);
+                    results.Add(item);
 				}
 			}
 
@@ -730,7 +715,7 @@ namespace Szotar.Sqlite {
                     command.Parameters.Add(param);
 
 					foreach (var list in lists) {
-						if (list.Position.HasValue)
+						if (list.HasItem)
 							continue;
 
 						param.Value = list.SetID;

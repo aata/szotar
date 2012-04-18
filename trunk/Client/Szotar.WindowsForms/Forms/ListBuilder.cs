@@ -433,8 +433,31 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		public void ScrollToPosition(int position) {
+        public void ScrollToResult(ListSearchResult result) {
+            if (result.PositionHint.HasValue) {
+                var hint = result.PositionHint.Value;
+                if (hint >= 0 && hint < list.Count && list[hint].Phrase == result.Phrase && list[hint].Translation == result.Translation) {
+                    ScrollToPosition(hint);
+                    return;
+                }
+            }
+
+            for (int i = 0; i < list.Count; i++) {
+                var item = list[i];
+                if (item.Phrase == result.Phrase && item.Translation == result.Translation) {
+                    ScrollToPosition(i);
+                    return;
+                }
+            }
+
+            // Couldn't find the item... just scroll to where it was last
+            if(result.PositionHint.HasValue)
+                ScrollToPosition(result.PositionHint.Value);
+        }
+
+        public void ScrollToPosition(int position) {
 			grid.ScrollToIndex(position);
+            grid.SelectRow(position);
 		}
 
         public bool ScrollToItem(string phrase, string translation) {

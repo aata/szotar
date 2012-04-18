@@ -79,12 +79,12 @@ namespace Szotar.WindowsForms.Forms {
 
 			foreach (var current in chosen) {
 				var i = opened.FindIndex(x => x.SetID == current.SetID);
-				if (i != -1)
-					opened[i] = new ListSearchResult(
-						current.SetID,
-						NullableMin(opened[i].Position, current.Position));
-				else
-					opened.Add(current);
+                if (i != -1) {
+                    if (!opened[i].PositionHint.HasValue || opened[i].PositionHint.Value > (current.PositionHint ?? int.MaxValue)) 
+                        opened[i] = current;
+                } else {
+                    opened.Add(current);
+                }
 			}
 
 			return opened;
@@ -101,7 +101,7 @@ namespace Szotar.WindowsForms.Forms {
 
 		private void OpenLists(IList<ListSearchResult> chosen) {
 			foreach (var open in UniqueLists(chosen))
-				ListBuilder.Open(open.SetID).ScrollToPosition(open.Position ?? 0);
+				ListBuilder.Open(open.SetID).ScrollToResult(open);
 		}
 
 		private void PracticeLists(PracticeMode mode, IList<ListSearchResult> chosen) {
@@ -111,8 +111,8 @@ namespace Szotar.WindowsForms.Forms {
 				return;
 
 			foreach (var item in chosen) {
-				if (item.Position.HasValue
-					|| items.FindIndex(x => x.SetID == item.SetID && x.Position == null) < 0)
+				if (item.HasItem
+					|| items.FindIndex(x => x.SetID == item.SetID && !x.HasItem) < 0)
 					items.Add(item);
 			}
 
