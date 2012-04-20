@@ -529,6 +529,11 @@ namespace Szotar.WindowsForms.Controls {
 				if (grid.IsCurrentRowDirty) {
 					Debug.WriteLine(string.Format("  Row was dirty.", e.RowIndex, e.ColumnIndex));
 
+                    if (pairInEdit.Phrase == null)
+                        pairInEdit.Phrase = string.Empty;
+                    if (pairInEdit.Translation == null)
+                        pairInEdit.Translation = string.Empty;
+
 					ignoreNextListChangedEvent = true;
 					pairInEdit.Owner = source;
 					source[e.RowIndex] = pairInEdit;
