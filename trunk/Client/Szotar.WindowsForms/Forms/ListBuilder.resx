@@ -129,30 +129,24 @@
   <data name="&gt;&gt;learn.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="deleteList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>159, 22</value>
-  </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="nameLabel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
-  <data name="deleteCM.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 22</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="learn.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+L</value>
   </data>
   <data name="&gt;&gt;pasteCSV.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;icon.Type" xml:space="preserve">
-    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="author.Size" type="System.Drawing.Size, System.Drawing">
     <value>161, 22</value>
   </data>
   <data name="showStartPage.Size" type="System.Drawing.Size, System.Drawing">
     <value>159, 22</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="copyAsCsv.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
     <value>Ctrl+Shift+C</value>
   </data>
@@ -189,8 +183,11 @@
   <data name="showStartPage.Text" xml:space="preserve">
     <value>S&amp;how Start Page</value>
   </data>
-  <data name="&gt;&gt;editSep3.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;swap.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;urlPanel.Parent" xml:space="preserve">
     <value>metaFlow</value>
@@ -213,17 +210,20 @@
   <data name="editSep2.Size" type="System.Drawing.Size, System.Drawing">
     <value>211, 6</value>
   </data>
+  <data name="swap.Text" xml:space="preserve">
+    <value>&amp;Swap</value>
+  </data>
   <data name="&gt;&gt;meta.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
   <data name="learn.Size" type="System.Drawing.Size, System.Drawing">
     <value>171, 22</value>
   </data>
-  <data name="save.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+S</value>
-  </data>
   <data name="&gt;&gt;toolStripMenuItem1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="authorPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>209, 26</value>
   </data>
   <data name="&gt;&gt;showStartPage.Name" xml:space="preserve">
     <value>showStartPage</value>
@@ -246,6 +246,9 @@
   <data name="cutCM.Size" type="System.Drawing.Size, System.Drawing">
     <value>144, 22</value>
   </data>
+  <data name="&gt;&gt;editSep3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Segoe UI, 8.25pt</value>
   </data>
@@ -260,9 +263,6 @@
   </data>
   <data name="&gt;&gt;saveFileDialog.Type" xml:space="preserve">
     <value>System.Windows.Forms.SaveFileDialog, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;authorLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mainMenu.Parent" xml:space="preserve">
     <value>$this</value>
@@ -327,6 +327,9 @@
   <data name="deleteCM.ShortcutKeyDisplayString" xml:space="preserve">
     <value>Del</value>
   </data>
+  <data name="redo.ShortcutKeyDisplayString" xml:space="preserve">
+    <value>Ctrl+Y</value>
+  </data>
   <data name="&gt;&gt;save.Name" xml:space="preserve">
     <value>save</value>
   </data>
@@ -352,13 +355,16 @@
     <value>Top, Bottom, Left</value>
   </data>
   <data name="&gt;&gt;grid.Type" xml:space="preserve">
-    <value>Szotar.WindowsForms.Controls.DictionaryGrid, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
+    <value>Szotar.WindowsForms.Controls.DictionaryGrid, Szotar, Version=0.6.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="deleteCM.Text" xml:space="preserve">
     <value>&amp;Delete</value>
   </data>
   <data name="nameLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 4</value>
+  </data>
+  <data name="&gt;&gt;save.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="icon.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -398,6 +404,9 @@
   </data>
   <data name="namePanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 3, 3, 0</value>
+  </data>
+  <data name="&gt;&gt;pasteMI.Name" xml:space="preserve">
+    <value>pasteMI</value>
   </data>
   <data name="&gt;&gt;url.ZOrder" xml:space="preserve">
     <value>0</value>
@@ -444,8 +453,8 @@
   <data name="authorPanel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="&gt;&gt;save.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;entriesPanel.Name" xml:space="preserve">
+    <value>entriesPanel</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>ListBuilder</value>
@@ -474,9 +483,6 @@
   <data name="flashcards.Size" type="System.Drawing.Size, System.Drawing">
     <value>171, 22</value>
   </data>
-  <data name="authorLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 4</value>
-  </data>
   <data name="entriesLabel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
@@ -500,9 +506,6 @@
   </data>
   <data name="&gt;&gt;contextSep1.Name" xml:space="preserve">
     <value>contextSep1</value>
-  </data>
-  <data name="&gt;&gt;swap.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;meta.Name" xml:space="preserve">
     <value>meta</value>
@@ -531,6 +534,9 @@
   <data name="entriesPanel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="&gt;&gt;entriesLabel.Name" xml:space="preserve">
+    <value>entriesLabel</value>
+  </data>
   <data name="entriesLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 4</value>
   </data>
@@ -543,17 +549,14 @@
   <data name="&gt;&gt;urlPanel.Name" xml:space="preserve">
     <value>urlPanel</value>
   </data>
-  <data name="learn.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+L</value>
+  <data name="&gt;&gt;name.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="metaFlow.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="&gt;&gt;practiceMenu.Name" xml:space="preserve">
     <value>practiceMenu</value>
-  </data>
-  <data name="&gt;&gt;nameLabel.Name" xml:space="preserve">
-    <value>nameLabel</value>
   </data>
   <data name="copyMI.ShortcutKeyDisplayString" xml:space="preserve">
     <value>Ctrl+C</value>
@@ -591,8 +594,8 @@
   <data name="urlLabel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
-  <data name="&gt;&gt;pasteMI.Name" xml:space="preserve">
-    <value>pasteMI</value>
+  <data name="&gt;&gt;authorPanel.Parent" xml:space="preserve">
+    <value>metaFlow</value>
   </data>
   <data name="nameLabel.Text" xml:space="preserve">
     <value>Name:</value>
@@ -603,8 +606,8 @@
   <data name="authorPanel.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 32</value>
   </data>
-  <data name="&gt;&gt;grid.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="save.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+S</value>
   </data>
   <data name="metaFlow.Size" type="System.Drawing.Size, System.Drawing">
     <value>22667, 60</value>
@@ -636,9 +639,6 @@
   <data name="mainMenu.Text" xml:space="preserve">
     <value>Main Menu</value>
   </data>
-  <data name="pasteCSV.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+Shift+V</value>
-  </data>
   <data name="&gt;&gt;pasteCM.Name" xml:space="preserve">
     <value>pasteCM</value>
   </data>
@@ -647,6 +647,9 @@
   </data>
   <data name="&gt;&gt;editSep1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;flashcards.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="contextSep1.Size" type="System.Drawing.Size, System.Drawing">
     <value>141, 6</value>
@@ -666,8 +669,8 @@
   <data name="&gt;&gt;author.Type" xml:space="preserve">
     <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;mainMenu.Name" xml:space="preserve">
-    <value>mainMenu</value>
+  <data name="&gt;&gt;authorLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="meta.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -690,11 +693,8 @@
   <data name="pasteCM.Size" type="System.Drawing.Size, System.Drawing">
     <value>144, 22</value>
   </data>
-  <data name="redo.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Ctrl+Y</value>
-  </data>
-  <data name="&gt;&gt;name.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="deleteCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>144, 22</value>
   </data>
   <data name="&gt;&gt;itemContextMenu.Name" xml:space="preserve">
     <value>itemContextMenu</value>
@@ -711,17 +711,17 @@
   <data name="&gt;&gt;author.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="&gt;&gt;flashcards.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="url.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
   </data>
   <data name="namePanel.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 3</value>
   </data>
-  <data name="&gt;&gt;metaFlow.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="&gt;&gt;nameLabel.Name" xml:space="preserve">
+    <value>nameLabel</value>
   </data>
-  <data name="&gt;&gt;namePanel.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="authorLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 4</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -1499,8 +1499,8 @@
   <data name="urlLabel.Text" xml:space="preserve">
     <value>URL:</value>
   </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="deleteList.Text" xml:space="preserve">
+    <value>&amp;Delete this List</value>
   </data>
   <data name="pasteMI.ShortcutKeyDisplayString" xml:space="preserve">
     <value>Ctrl+V</value>
@@ -1516,9 +1516,6 @@
   </data>
   <data name="editMetadata.Text" xml:space="preserve">
     <value>&amp;Edit metadata</value>
-  </data>
-  <data name="&gt;&gt;entriesPanel.Name" xml:space="preserve">
-    <value>entriesPanel</value>
   </data>
   <data name="&gt;&gt;swapAll.Name" xml:space="preserve">
     <value>swapAll</value>
@@ -1544,8 +1541,8 @@
   <data name="&gt;&gt;entriesLabel.Parent" xml:space="preserve">
     <value>entriesPanel</value>
   </data>
-  <data name="&gt;&gt;entriesLabel.Name" xml:space="preserve">
-    <value>entriesLabel</value>
+  <data name="deleteList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>159, 22</value>
   </data>
   <data name="&gt;&gt;metaFlow.Parent" xml:space="preserve">
     <value>meta</value>
@@ -1589,6 +1586,9 @@
   <data name="&gt;&gt;editSep2.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;entriesPanel.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
   <data name="entriesLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -1616,8 +1616,8 @@
   <data name="shadow.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
-  <data name="authorPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>209, 26</value>
+  <data name="&gt;&gt;namePanel.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="mainMenu.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
@@ -1676,14 +1676,14 @@
   <data name="&gt;&gt;shadow.Name" xml:space="preserve">
     <value>shadow</value>
   </data>
-  <data name="pasteMI.Text" xml:space="preserve">
-    <value>&amp;Paste</value>
+  <data name="&gt;&gt;mainMenu.Name" xml:space="preserve">
+    <value>mainMenu</value>
   </data>
   <data name="&gt;&gt;metaFlow.Name" xml:space="preserve">
     <value>metaFlow</value>
   </data>
-  <data name="url.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
+  <data name="&gt;&gt;metaFlow.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="&gt;&gt;shadow.ZOrder" xml:space="preserve">
     <value>1</value>
@@ -1709,8 +1709,8 @@
   <data name="meta.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 420</value>
   </data>
-  <data name="deleteList.Text" xml:space="preserve">
-    <value>&amp;Delete this List</value>
+  <data name="&gt;&gt;icon.Type" xml:space="preserve">
+    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="entriesPanel.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1718,8 +1718,8 @@
   <data name="&gt;&gt;shadow.Type" xml:space="preserve">
     <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;entriesPanel.ZOrder" xml:space="preserve">
-    <value>3</value>
+  <data name="&gt;&gt;grid.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
   <data name="cutMI.Size" type="System.Drawing.Size, System.Drawing">
     <value>214, 22</value>
@@ -1736,8 +1736,8 @@
   <data name="redo.Size" type="System.Drawing.Size, System.Drawing">
     <value>214, 22</value>
   </data>
-  <data name="swap.Text" xml:space="preserve">
-    <value>&amp;Swap</value>
+  <data name="pasteCSV.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+Shift+V</value>
   </data>
   <data name="learn.Text" xml:space="preserve">
     <value>&amp;Learn</value>
@@ -1748,8 +1748,8 @@
   <data name="&gt;&gt;pasteMI.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;authorPanel.Parent" xml:space="preserve">
-    <value>metaFlow</value>
+  <data name="pasteMI.Text" xml:space="preserve">
+    <value>&amp;Paste</value>
   </data>
   <data name="copyAsCsv.Text" xml:space="preserve">
     <value>Cop&amp;y as CSV</value>
