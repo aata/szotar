@@ -117,40 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CannotOpenDatabase" xml:space="preserve">
-    <value>The program database cannot be opened. The message given was: {1}{0}</value>
-    <comment>{1} = \n\n</comment>
+  <data name="Correct" xml:space="preserve">
+    <value>Correct</value>
   </data>
-  <data name="CannotUpgradeDatabaseToVersion" xml:space="preserve">
-    <value>Cannot upgrade the database to version {0}</value>
+  <data name="DeleteButton" xml:space="preserve">
+    <value>&amp;delete</value>
   </data>
-  <data name="CouldNotLoadDictionary" xml:space="preserve">
-    <value>The dictionary \"{0}\" could not be loaded: perhaps the file has been moved or deleted?</value>
-    <comment>{0} = Dictionary name or path</comment>
+  <data name="EditButton" xml:space="preserve">
+    <value>&amp;edit</value>
   </data>
-  <data name="CouldNotLoadDictionaryCaption" xml:space="preserve">
-    <value>Error opening dictionary</value>
+  <data name="EndOfRound" xml:space="preserve">
+    <value>End of round {0}</value>
   </data>
-  <data name="DllNotFound" xml:space="preserve">
-    <value>A file required for this program to run, {0}, was not found. To run this program from a zip file, please extract the entire zip file.</value>
-    <comment>Dll file name</comment>
+  <data name="History" xml:space="preserve">
+    <value>history: {0}/{1}, importance {2:P1}</value>
   </data>
-  <data name="FileNotFound" xml:space="preserve">
-    <value>The file "{0}" was not found. Perhaps it was deleted or moved elsewhere?{2}{1}</value>
-    <comment>{0} = File name, {1} = Reason, {2} = \n\n</comment>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>Ignore &amp;case in answer</value>
   </data>
-  <data name="ImportFailedWithMessage" xml:space="preserve">
-    <value>The import failed with the message: {1}{0}</value>
-    <comment>{1} = \n\n</comment>
+  <data name="IgnoreParenthesized" xml:space="preserve">
+    <value>Ignore pa&amp;renthesized text in answer</value>
   </data>
-  <data name="ImportHadNotBegun" xml:space="preserve">
-    <value>The import had not begun.</value>
+  <data name="IgnorePunctuation" xml:space="preserve">
+    <value>Ignore &amp;punctuation in answer</value>
   </data>
-  <data name="NewerDatabaseVersion" xml:space="preserve">
-    <value>The program data was created by a newer version of this program. Please upgrade {0} to the latest version to use the program.</value>
-    <comment>{0} = Product name</comment>
+  <data name="IgnoreSpaces" xml:space="preserve">
+    <value>Ignore sp&amp;aces in answer</value>
   </data>
-  <data name="TheOperationWasCancelled" xml:space="preserve">
-    <value>The operation was cancelled.</value>
+  <data name="Incorrect" xml:space="preserve">
+    <value>Incorrect</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>O&amp;ptions</value>
+  </data>
+  <data name="OverrideButton" xml:space="preserve">
+    <value>&amp;override</value>
+  </data>
+  <data name="PressAnyKey" xml:space="preserve">
+    <value>Press any key to continue</value>
+  </data>
+  <data name="RoundN" xml:space="preserve">
+    <value>Round {0}</value>
+  </data>
+  <data name="Score" xml:space="preserve">
+    <value>score: {0}/{1}, {2} remaining</value>
+  </data>
+  <data name="Swap" xml:space="preserve">
+    <value>&amp;Swap Phrase/Translation</value>
+  </data>
+  <data name="ViewInList" xml:space="preserve">
+    <value>&amp;View In List</value>
+  </data>
+  <data name="ViewInListButton" xml:space="preserve">
+    <value>&amp;view in list</value>
   </data>
 </root>

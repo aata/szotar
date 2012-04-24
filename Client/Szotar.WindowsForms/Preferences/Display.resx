@@ -117,78 +117,214 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="&gt;&gt;hungarian.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;englishUS.Name" xml:space="preserve">
+    <value>englishUS</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>499, 309</value>
+  <data name="hungarian.Size" type="System.Drawing.Size, System.Drawing">
+    <value>74, 17</value>
   </data>
-  <data name="&gt;&gt;listFontLabel.ZOrder" xml:space="preserve">
-    <value>1</value>
+  <data name="hungarian.Text" xml:space="preserve">
+    <value>&amp;Hungarian</value>
   </data>
-  <data name="listFontButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>111, 23</value>
-  </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>Szotar.WindowsForms.Preferences.PreferencePage, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="listFontLabel.Text" xml:space="preserve">
-    <value>List font</value>
-  </data>
-  <data name="listFontButton.Text" xml:space="preserve">
-    <value>Font</value>
-  </data>
-  <data name="listFontLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 13</value>
-  </data>
-  <data name="&gt;&gt;listFontButton.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="listFontButton.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="listFontButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 21</value>
-  </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
-  </data>
-  <data name="&gt;&gt;listFontLabel.Name" xml:space="preserve">
-    <value>listFontLabel</value>
-  </data>
-  <data name="&gt;&gt;listFontButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="englishUS.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 17</value>
   </data>
   <data name="&gt;&gt;listFontLabel.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="listFontButton.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
+  <data name="&gt;&gt;listFontLabel.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="englishGB.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="hungarian.Location" type="System.Drawing.Point, System.Drawing">
+    <value>28, 114</value>
+  </data>
+  <data name="&gt;&gt;languageLabel.ZOrder" xml:space="preserve">
+    <value>4</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Display</value>
   </data>
-  <data name="listFontLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="englishUS.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="&gt;&gt;languageLabel.Name" xml:space="preserve">
+    <value>languageLabel</value>
+  </data>
+  <data name="englishGB.Location" type="System.Drawing.Point, System.Drawing">
+    <value>28, 91</value>
+  </data>
+  <data name="listFontButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>28, 20</value>
+  </data>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
   </data>
   <data name="listFontLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="listFontLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 4</value>
+  <data name="languageLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 51</value>
+  </data>
+  <data name="&gt;&gt;hungarian.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;hungarian.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;englishGB.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;listFontButton.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;englishUS.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
+    <value>499, 309</value>
+  </data>
+  <data name="englishUS.Location" type="System.Drawing.Point, System.Drawing">
+    <value>28, 68</value>
+  </data>
+  <data name="englishGB.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
   </data>
   <data name="&gt;&gt;listFontLabel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;listFontButton.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="information.Text" xml:space="preserve">
+    <value>Language changes only take effect after the program is restarted.</value>
+  </data>
+  <data name="&gt;&gt;listFontLabel.Name" xml:space="preserve">
+    <value>listFontLabel</value>
+  </data>
+  <data name="listFontButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>111, 23</value>
+  </data>
+  <data name="englishGB.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 17</value>
   </data>
   <data name="&gt;&gt;listFontButton.Name" xml:space="preserve">
     <value>listFontButton</value>
   </data>
+  <data name="&gt;&gt;englishUS.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="languageLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="listFontLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>44, 13</value>
+  </data>
+  <data name="hungarian.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="listFontButton.Text" xml:space="preserve">
+    <value>Font</value>
+  </data>
+  <data name="information.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 134</value>
+  </data>
+  <data name="information.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;information.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;hungarian.Name" xml:space="preserve">
+    <value>hungarian</value>
+  </data>
+  <data name="&gt;&gt;information.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="hungarian.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="listFontLabel.Text" xml:space="preserve">
+    <value>List &amp;font</value>
+  </data>
+  <data name="&gt;&gt;listFontButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;englishGB.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;listFontButton.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="information.Size" type="System.Drawing.Size, System.Drawing">
+    <value>489, 175</value>
+  </data>
+  <data name="languageLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>120, 13</value>
+  </data>
+  <data name="&gt;&gt;information.Name" xml:space="preserve">
+    <value>information</value>
+  </data>
+  <data name="englishUS.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="information.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="englishGB.Text" xml:space="preserve">
+    <value>&amp;English (GB)</value>
+  </data>
+  <data name="listFontButton.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="&gt;&gt;languageLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;englishGB.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;information.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="englishGB.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="&gt;&gt;languageLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="listFontLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 4</value>
+  </data>
+  <data name="languageLabel.Text" xml:space="preserve">
+    <value>User interface language</value>
+  </data>
+  <data name="listFontLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;englishUS.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="languageLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="&gt;&gt;englishGB.Name" xml:space="preserve">
+    <value>englishGB</value>
+  </data>
+  <data name="listFontButton.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="englishUS.Text" xml:space="preserve">
+    <value>&amp;English (US)</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>Szotar.WindowsForms.Preferences.PreferencePage, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
-  </metadata>
-  <metadata name="$this.Language" type="System.Globalization.CultureInfo, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>hu</value>
   </metadata>
 </root>

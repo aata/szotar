@@ -131,7 +131,7 @@
     <value>Szerző:</value>
   </data>
   <data name="metaFlow.Size" type="System.Drawing.Size, System.Drawing">
-    <value>23750, 60</value>
+    <value>24472, 60</value>
   </data>
   <data name="showStartPage.Size" type="System.Drawing.Size, System.Drawing">
     <value>168, 22</value>
@@ -180,6 +180,9 @@
   </data>
   <data name="editSep2.Size" type="System.Drawing.Size, System.Drawing">
     <value>279, 6</value>
+  </data>
+  <data name="contextSep1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>165, 6</value>
   </data>
   <data name="undo.Size" type="System.Drawing.Size, System.Drawing">
     <value>282, 22</value>
@@ -258,6 +261,39 @@
   </data>
   <data name="editMenu.Text" xml:space="preserve">
     <value>&amp;Szerkesztés</value>
+  </data>
+  <data name="cutCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>168, 22</value>
+  </data>
+  <data name="cutCM.Text" xml:space="preserve">
+    <value>Ki&amp;vágás</value>
+  </data>
+  <data name="copyCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>168, 22</value>
+  </data>
+  <data name="copyCM.Text" xml:space="preserve">
+    <value>&amp;Másolás</value>
+  </data>
+  <data name="pasteCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>168, 22</value>
+  </data>
+  <data name="pasteCM.Text" xml:space="preserve">
+    <value>&amp;Beillesztés</value>
+  </data>
+  <data name="swap.Size" type="System.Drawing.Size, System.Drawing">
+    <value>168, 22</value>
+  </data>
+  <data name="swap.Text" xml:space="preserve">
+    <value>&amp;Felcserelés</value>
+  </data>
+  <data name="deleteCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>168, 22</value>
+  </data>
+  <data name="deleteCM.Text" xml:space="preserve">
+    <value>&amp;Törlés</value>
+  </data>
+  <data name="itemContextMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>169, 142</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

@@ -117,34 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SimpleDictionary$Author$Description" xml:space="preserve">
-    <value>Whoever originally wrote or compiled the dictionary.</value>
+  <data name="Correct" xml:space="preserve">
+    <value>Helyes</value>
   </data>
-  <data name="SimpleDictionary$Author$Name" xml:space="preserve">
-    <value>Author</value>
+  <data name="DeleteButton" xml:space="preserve">
+    <value>&amp;törlés</value>
   </data>
-  <data name="SimpleDictionary$FirstLanguage$Description" xml:space="preserve">
-    <value>The human readable name of the language of the “left” half of the dictionary.</value>
+  <data name="EditButton" xml:space="preserve">
+    <value>&amp;szerkesztése</value>
   </data>
-  <data name="SimpleDictionary$FirstLanguage$Name" xml:space="preserve">
-    <value>First Language</value>
+  <data name="EndOfRound" xml:space="preserve">
+    <value>{0}. játszma végett</value>
   </data>
-  <data name="SimpleDictionary$Name$Description" xml:space="preserve">
-    <value>Name of the dictionary.</value>
+  <data name="History" xml:space="preserve">
+    <value>előzmények: {0}/{1}, fontosság {2:P1}</value>
   </data>
-  <data name="SimpleDictionary$Name$Name" xml:space="preserve">
-    <value>Name</value>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>A válasz nem &amp;nagybetűérzékeny</value>
   </data>
-  <data name="SimpleDictionary$SecondLanguage$Description" xml:space="preserve">
-    <value>The human readable name of the language of the “left” half of the dictionary.</value>
+  <data name="IgnoreParenthesized" xml:space="preserve">
+    <value>&amp;Zárójeles szöveg mellőzése a válaszban</value>
   </data>
-  <data name="SimpleDictionary$SecondLanguage$Name" xml:space="preserve">
-    <value>Second Language</value>
+  <data name="IgnorePunctuation" xml:space="preserve">
+    <value>Köz&amp;pontás mellőzése a válaszban</value>
   </data>
-  <data name="SimpleDictionary$Url$Description" xml:space="preserve">
-    <value>A URL where the dictionary can be downloaded.</value>
+  <data name="IgnoreSpaces" xml:space="preserve">
+    <value>&amp;Szóköz mellőzése a válaszban</value>
   </data>
-  <data name="SimpleDictionary$Url$Name" xml:space="preserve">
-    <value>URL</value>
+  <data name="Incorrect" xml:space="preserve">
+    <value>Helytelen</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>&amp;Beállítások</value>
+  </data>
+  <data name="OverrideButton" xml:space="preserve">
+    <value>&amp;felülbírálás</value>
+  </data>
+  <data name="PressAnyKey" xml:space="preserve">
+    <value>Üssön le egy billentyűt a folytatáshoz</value>
+  </data>
+  <data name="RoundN" xml:space="preserve">
+    <value>{0}. játszma</value>
+  </data>
+  <data name="Score" xml:space="preserve">
+    <value>pontszám: {0}/{1}, {2} maradnak</value>
+  </data>
+  <data name="Swap" xml:space="preserve">
+    <value>&amp;Kifejezés és fordítás felcserelése</value>
+  </data>
+  <data name="ViewInList" xml:space="preserve">
+    <value>&amp;Listában nézés</value>
+  </data>
+  <data name="ViewInListButton" xml:space="preserve">
+    <value>&amp;listában nézés</value>
   </data>
 </root>

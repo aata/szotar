@@ -129,16 +129,16 @@ namespace Szotar.WindowsForms {
 		public RoundOverview() : this(0, 0, 0) { }
 
 		public void UpdateScore(int round, int count, int correct) {
-			roundNo.Text = string.Format("End of round {0}", round);
+			roundNo.Text = string.Format(Resources.LearnMode.EndOfRound, round);
 
 			int incorrect = count - correct;
-			correctLabel.Text = "Correct";
-			incorrectLabel.Text = "Incorrect";
+			correctLabel.Text = Resources.LearnMode.Correct;
+			incorrectLabel.Text = Resources.LearnMode.Incorrect;
 			correctCount.Text = correct.ToString();
 			incorrectCount.Text = incorrect.ToString();
 			correctRatio.Text = RatioToPercentage(correct, count);
 			incorrectRatio.Text = RatioToPercentage(incorrect, count);
-			prompt.Text = "Press any key to continue";
+			prompt.Text = Resources.LearnMode.PressAnyKey;
 
 			Layout();
 		}
@@ -283,7 +283,7 @@ namespace Szotar.WindowsForms {
                 foreach (var round in rounds) {
                     var group = new ListViewGroup();
                     groups.Add(group);
-                    group.Header = string.Format("Round {0}", groups.Count);
+                    group.Header = string.Format(Resources.LearnMode.RoundN, groups.Count);
                     list.Groups.Add(group);
 
                     foreach (var attempt in round) {
@@ -315,7 +315,7 @@ namespace Szotar.WindowsForms {
         void InitializeContextMenu() {
             contextMenu = new ContextMenuStrip();
 
-            var viewInList = new ToolStripMenuItem("&View In List");
+            var viewInList = new ToolStripMenuItem(Resources.LearnMode.ViewInList);
             EventHandler viewInListClick = (s, e) => {                
                 foreach (ListViewItem item in list.SelectedItems) {
                     var attempt = item.Tag as Attempt;
@@ -341,10 +341,10 @@ namespace Szotar.WindowsForms {
 		public OptionsMenu(LearnMode mode) {
 			this.mode = mode;
 
-			optionsItem = new ToolStripMenuItem("O&ptions");
+			optionsItem = new ToolStripMenuItem(Resources.LearnMode.Options);
 			Items.Add(optionsItem);
 
-			swapItem = new ToolStripMenuItem("&Swap phrase/translation");
+			swapItem = new ToolStripMenuItem(Resources.LearnMode.Swap);
 			swapItem.Click += delegate {
 				mode.Swap = !mode.Swap;
 			};
@@ -354,10 +354,10 @@ namespace Szotar.WindowsForms {
 			optionsItem.DropDownItems.Add(swapItem);
 			optionsItem.DropDownItems.Add(new ToolStripSeparator());
 			
-			AddFixupItem("Ignore sp&aces in answer", "PracticeFixSpaces", optionsItem);
-			AddFixupItem("Ignore &punctuation in answer", "PracticeFixPunctuation", optionsItem);
-			AddFixupItem("Ignore pa&renthesized text in answer", "PracticeFixParentheses", optionsItem);
-			AddFixupItem("Ignore &case in answer", "PracticeFixCase", optionsItem);
+			AddFixupItem(Resources.LearnMode.IgnoreSpaces, "PracticeFixSpaces", optionsItem);
+            AddFixupItem(Resources.LearnMode.IgnorePunctuation, "PracticeFixPunctuation", optionsItem);
+            AddFixupItem(Resources.LearnMode.IgnoreParenthesized, "PracticeFixParentheses", optionsItem);
+			AddFixupItem(Resources.LearnMode.IgnoreCase, "PracticeFixCase", optionsItem);
 		}
 
 		void optionsItem_DropDownOpening(object sender, EventArgs e) {
@@ -449,10 +449,10 @@ namespace Szotar.WindowsForms {
             history = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = extraSmallFont, Dock = DockStyle.Top, TextAlign = ContentAlignment.MiddleLeft };
 			translation = new TextBox() { Font = font };
             affirmation = new TextBox() { Font = font };
-            overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = "&override" };
-            editButton = new Button() { Font = GameArea.FindForm().Font, Text = "&edit" };
-            viewButton = new Button() { Font = GameArea.FindForm().Font, Text = "&view in list" };
-            deleteButton = new Button() { Font = GameArea.FindForm().Font, Text = "&delete" };
+            overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.OverrideButton };
+            editButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.EditButton };
+            viewButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.ViewInListButton };
+            deleteButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.DeleteButton };
 			roundOverview = new RoundOverview() { Dock = DockStyle.Fill };
 			gameOverview = new GameOverview(this) { Dock = DockStyle.Fill };
 
@@ -740,8 +740,8 @@ namespace Szotar.WindowsForms {
 					translation.Clear();
 				if (state == State.ViewingAnswer)
 					affirmation.Clear();
-				scoreLabel.Text = string.Format("score: {0}/{1}, {2} remaining", score, currentRound.Count, items.Count - currentRound.Count);
-                history.Text = string.Format("history: {0}/{1}, importance {2:P1}", items[index].History.History.Count(x => x.Value), items[index].History.History.Count, items[index].History.Importance);
+				scoreLabel.Text = string.Format(Resources.LearnMode.Score, score, currentRound.Count, items.Count - currentRound.Count);
+                history.Text = string.Format(Resources.LearnMode.History, items[index].History.History.Count(x => x.Value), items[index].History.History.Count, items[index].History.Importance);
 			}
 
 			affirmation.Tag = affirmation.Visible = state == State.ViewingAnswer;
