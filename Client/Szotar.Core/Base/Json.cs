@@ -3,6 +3,7 @@ using System.Text;
 using System.IO;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Szotar.Json {
 	[Serializable]
@@ -305,11 +306,11 @@ namespace Szotar.Json {
 			long integral;
 			double floating;
 
-			if(long.TryParse(sb.ToString(), out integral)) {
+			if(long.TryParse(sb.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out integral)) {
 				LongValue = integral;
 				DoubleValue = integral;
 				IsIntegral = true;
-			} else if (double.TryParse(sb.ToString(), out floating)) {
+			} else if (double.TryParse(sb.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out floating)) {
 				DoubleValue = floating;
 				LongValue = (long)floating; // This could result in garbage. What to do in that case?
 				IsIntegral = false;
@@ -320,9 +321,9 @@ namespace Szotar.Json {
 
 		protected override void Write(TextWriter tw, int indentation) {
 			if(IsIntegral)
-				tw.Write(LongValue);
+				tw.Write(LongValue.ToString(CultureInfo.InvariantCulture));
 			else
-				tw.Write(DoubleValue);
+                tw.Write(DoubleValue.ToString(CultureInfo.InvariantCulture));
 		}
 	}
 
