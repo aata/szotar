@@ -24,6 +24,7 @@
 		/// </summary>
 		private void InitializeComponent() {
             System.Windows.Forms.Label prompt;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DictionaryImport));
             this.select = new System.Windows.Forms.ComboBox();
             this.content = new System.Windows.Forms.Panel();
             prompt = new System.Windows.Forms.Label();
@@ -31,46 +32,29 @@
             // 
             // prompt
             // 
-            prompt.AutoSize = true;
-            prompt.Location = new System.Drawing.Point(11, 11);
+            resources.ApplyResources(prompt, "prompt");
             prompt.Name = "prompt";
-            prompt.Size = new System.Drawing.Size(103, 13);
-            prompt.TabIndex = 0;
-            prompt.Text = "Select an Importer:";
             // 
             // select
             // 
-            this.select.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.select, "select");
             this.select.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.select.FormattingEnabled = true;
-            this.select.Location = new System.Drawing.Point(107, 9);
             this.select.Name = "select";
-            this.select.Size = new System.Drawing.Size(356, 21);
-            this.select.TabIndex = 0;
             // 
             // content
             // 
-            this.content.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.content.Location = new System.Drawing.Point(0, 35);
+            resources.ApplyResources(this.content, "content");
             this.content.Name = "content";
-            this.content.Size = new System.Drawing.Size(473, 285);
-            this.content.TabIndex = 2;
             // 
             // DictionaryImport
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(473, 319);
             this.Controls.Add(this.content);
             this.Controls.Add(this.select);
             this.Controls.Add(prompt);
-            this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.MinimumSize = new System.Drawing.Size(345, 239);
             this.Name = "DictionaryImport";
-            this.Text = "DictionaryImport";
             this.ResumeLayout(false);
             this.PerformLayout();
 

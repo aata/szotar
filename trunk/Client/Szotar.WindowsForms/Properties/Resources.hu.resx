@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="RecentListStoreName" xml:space="preserve">
+    <value>Legfrissabbi listák</value>
+  </data>
+  <data name="PhraseDefaultHeader" xml:space="preserve">
+    <value>Kifejezés</value>
+    <comment>Used as a list header.</comment>
+  </data>
+  <data name="DefaultListName" xml:space="preserve">
+    <value>Névtelen</value>
+  </data>
+  <data name="TranslationDefaultHeader" xml:space="preserve">
+    <value>Fordítás</value>
+    <comment>Used as a list header.</comment>
+  </data>
+  <data name="DefaultListStoreName" xml:space="preserve">
+    <value>Listák</value>
+  </data>
+  <data name="FinishCommand" xml:space="preserve">
+    <value>&amp;Befejezés</value>
+    <comment>Used as a button label in dialogs.</comment>
+  </data>
+  <data name="NextCommand" xml:space="preserve">
+    <value>&amp;Következő</value>
+    <comment>Used as a button label in dialogs.</comment>
+  </data>
+  <data name="BeginCommand" xml:space="preserve">
+    <value>&amp;Indítás</value>
+    <comment>Used as a button label in dialogs.</comment>
+  </data>
+  <data name="DefaultDictionaryName" xml:space="preserve">
+    <value>Névtelen</value>
+  </data>
+  <data name="ImportFinished" xml:space="preserve">
+    <value>Importálás végett</value>
+    <comment>Used by dictionary importer as a progress message.</comment>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="DictionaryIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\dictionary.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Floppy48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\floppy.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GenericDocument16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\genericdocument16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GenericDocument96" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\genericdocument.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="List48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\list.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TopInwardShadow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Images\TopInwardShadow.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ChangedXToY" xml:space="preserve">
+    <value> '{0}'-tól '{1}'-hoz választása</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="DeletedNItems" xml:space="preserve">
+    <value>{0} elem törölése</value>
+    <comment>Undo stuff (NB: there is no "Deleted 1 Item" yet. Localising pluralisation isn't easy, anyway.)</comment>
+  </data>
+  <data name="Inserted1Item" xml:space="preserve">
+    <value>1 elem beszúrása</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="InsertedNItems" xml:space="preserve">
+    <value>{0} elem beszúrása</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="InternalOperation" xml:space="preserve">
+    <value>(Belső működés)</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="SearchResults" xml:space="preserve">
+    <value>Keresési eredmények</value>
+    <comment>Shown when searching for lists.</comment>
+  </data>
+  <data name="SwappedNRows" xml:space="preserve">
+    <value>{0} sor felcserélése</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="NTerms" xml:space="preserve">
+    <value>{0} elem</value>
+    <comment>Used to denote how many items a word list contains.</comment>
+  </data>
+  <data name="OnlyNResultsShown" xml:space="preserve">
+    <value>Csak {0} eredmények latható. Kattintson ide duplán többért.</value>
+  </data>
+  <data name="ShowMore" xml:space="preserve">
+    <value>Több</value>
+  </data>
+  <data name="SortedList" xml:space="preserve">
+    <value>Rendezés</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="ConfirmDeleteWordList" xml:space="preserve">
+    <value>Biztosan törölni akarja ezt a listát? Ez a művelet visszafordíthatatlan.</value>
+  </data>
+  <data name="ConfirmDeleteWordListCaption" xml:space="preserve">
+    <value>Törölje ezt a listát?</value>
+  </data>
+  <data name="ConfirmKeepNewWordList" xml:space="preserve">
+    <value>Ennek a listának nincs eleme. Akarja menteni egyáltalán? (A "Nem" gomb töröl a listát.)</value>
+  </data>
+  <data name="ConfirmKeepNewWordListCaption" xml:space="preserve">
+    <value>Tart meg ezt a listát?</value>
+  </data>
+  <data name="Redo" xml:space="preserve">
+    <value>Újra</value>
+  </data>
+  <data name="RedoSpecific" xml:space="preserve">
+    <value>Újra "{0}"</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Visszavonás</value>
+  </data>
+  <data name="UndoSpecific" xml:space="preserve">
+    <value>"{0}" visszavonása</value>
+  </data>
+  <data name="ChangedItemToXandY" xml:space="preserve">
+    <value>Elem '{0}' és '{1}'-hoz választása</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="Moved1Row" xml:space="preserve">
+    <value>Sor áthelyezése</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="MovedNRows" xml:space="preserve">
+    <value>{0} sor áthelyezése</value>
+    <comment>Undo item description</comment>
+  </data>
+  <data name="RecentDictionaries" xml:space="preserve">
+    <value>Legfrissabbi szótárok</value>
+  </data>
+  <data name="RecentWordLists" xml:space="preserve">
+    <value>Legfrissabbi listák</value>
+    <comment>A slightly less ambiguous version of RecentLists (used on the start page for example)</comment>
+  </data>
+  <data name="Dictionaries" xml:space="preserve">
+    <value>Szótárok</value>
+  </data>
+  <data name="NEntries" xml:space="preserve">
+    <value>{0} címszavak</value>
+    <comment>Used to show how many entries a dictionary contains</comment>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>&amp;Hozzáadás</value>
+  </data>
+  <data name="AddDictionaryItem" xml:space="preserve">
+    <value>Szótár címszó összeadása</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>&amp;Szerkesztés</value>
+  </data>
+  <data name="EditDictionaryItem" xml:space="preserve">
+    <value>Címszó szerkesztés</value>
+  </data>
+  <data name="ConfirmDeletePracticeItem" xml:space="preserve">
+    <value>Biztosan törölni akarja ezt a terméket? Ez a művelet visszafordíthatatlan.</value>
+  </data>
+  <data name="ConfirmDeletePracticeItemTitle" xml:space="preserve">
+    <value>Törölje ezt a elemet?</value>
+  </data>
+  <data name="NLists" xml:space="preserve">
+    <value>{0} lista</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Címkékek</value>
+  </data>
+  <data name="AllFiles" xml:space="preserve">
+    <value>Minden fájlok (*.*)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>M&amp;entés</value>
+  </data>
+</root>

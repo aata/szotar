@@ -84,7 +84,15 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		ListViewItem MakeItem(LogMessage m) {
-			var item = new ListViewItem(new[] { m.Type.ToString(), m.Time.ToShortTimeString(), m.Text });
+            string type = m.Type.ToString();
+            switch (m.Type) {
+                case LogType.Debug: type = debug.Text; break;
+                case LogType.Error: type = error.Text; break;
+                case LogType.Metrics: type = metrics.Text; break;
+                case LogType.Warning: type = warning.Text; break;
+            }
+
+			var item = new ListViewItem(new[] { type, m.Time.ToString("t", System.Threading.Thread.CurrentThread.CurrentUICulture), m.Text });
 			item.Tag = m;
 			return item;
 		}

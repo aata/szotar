@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,4 +117,29 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="infoLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>151, 13</value>
+  </data>
+  <data name="infoLabel.Text" xml:space="preserve">
+    <value>Mit mutat meg {0} amikor indít:</value>
+  </data>
+  <data name="startPage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>78, 17</value>
+  </data>
+  <data name="startPage.Text" xml:space="preserve">
+    <value>Kezdőlapot</value>
+  </data>
+  <data name="dictionary.Size" type="System.Drawing.Size, System.Drawing">
+    <value>83, 17</value>
+  </data>
+  <data name="dictionary.Text" xml:space="preserve">
+    <value>Ezt a szótárt</value>
+  </data>
+  <data name="practice.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 17</value>
+  </data>
+  <data name="practice.Text" xml:space="preserve">
+    <value>Gyakorlást</value>
+  </data>
 </root>

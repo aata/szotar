@@ -39,12 +39,8 @@
             // 
             // search
             // 
-            this.search.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.search.Location = new System.Drawing.Point(393, 0);
+            resources.ApplyResources(this.search, "search");
             this.search.Name = "search";
-            this.search.Size = new System.Drawing.Size(100, 23);
-            this.search.TabIndex = 1;
-            this.search.Text = "&Search";
             this.search.UseVisualStyleBackColor = true;
             // 
             // imageList
@@ -71,21 +67,13 @@
             // 
             // searchBox
             // 
-            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.searchBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            resources.ApplyResources(this.searchBox, "searchBox");
             this.searchBox.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.searchBox.Location = new System.Drawing.Point(0, 0);
             this.searchBox.Name = "searchBox";
-            this.searchBox.PromptText = "Search";
-            this.searchBox.Size = new System.Drawing.Size(387, 20);
-            this.searchBox.TabIndex = 0;
             // 
             // results
             // 
-            this.results.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this.results, "results");
             this.results.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.firstColumn,
             this.secondColumn,
@@ -93,41 +81,34 @@
             this.results.FullRowSelect = true;
             this.results.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.results.LargeImageList = this.imageList;
-            this.results.Location = new System.Drawing.Point(0, 26);
             this.results.Name = "results";
             this.results.ShowItemToolTips = true;
-            this.results.Size = new System.Drawing.Size(493, 314);
             this.results.SmallImageList = this.imageListSmall;
-            this.results.TabIndex = 2;
             this.results.UseCompatibleStateImageBehavior = false;
             this.results.View = System.Windows.Forms.View.Details;
             this.results.ItemActivate += new System.EventHandler(this.results_ItemActivate);
             // 
             // firstColumn
             // 
-            this.firstColumn.Text = "";
-            this.firstColumn.Width = 177;
+            resources.ApplyResources(this.firstColumn, "firstColumn");
             // 
             // secondColumn
             // 
-            this.secondColumn.Text = "";
-            this.secondColumn.Width = 183;
+            resources.ApplyResources(this.secondColumn, "secondColumn");
             // 
             // thirdColumn
             // 
-            this.thirdColumn.Text = "";
-            this.thirdColumn.Width = 121;
+            resources.ApplyResources(this.thirdColumn, "thirdColumn");
             // 
             // ListSearch
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.searchBox);
             this.Controls.Add(this.results);
             this.Controls.Add(this.search);
             this.DoubleBuffered = true;
             this.Name = "ListSearch";
-            this.Size = new System.Drawing.Size(493, 340);
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher)).EndInit();
             this.ResumeLayout(false);
 

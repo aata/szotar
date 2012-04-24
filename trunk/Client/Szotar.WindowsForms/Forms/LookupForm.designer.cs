@@ -120,29 +120,30 @@
             // 
             // addToList
             // 
-            addToList.Name = "addToList";
             resources.ApplyResources(addToList, "addToList");
+            addToList.Name = "addToList";
             addToList.Click += new System.EventHandler(this.addToList_Click);
             // 
             // reverseLookup
             // 
-            reverseLookup.Name = "reverseLookup";
             resources.ApplyResources(reverseLookup, "reverseLookup");
+            reverseLookup.Name = "reverseLookup";
             reverseLookup.Click += new System.EventHandler(this.reverseLookupToolStripMenuItem_Click);
             // 
             // showStartPage
             // 
-            showStartPage.Name = "showStartPage";
             resources.ApplyResources(showStartPage, "showStartPage");
+            showStartPage.Name = "showStartPage";
             showStartPage.Click += new System.EventHandler(this.showStartPage_Click);
             // 
             // fileSep
             // 
-            fileSep.Name = "fileSep";
             resources.ApplyResources(fileSep, "fileSep");
+            fileSep.Name = "fileSep";
             // 
             // searchMenu
             // 
+            resources.ApplyResources(searchMenu, "searchMenu");
             searchMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.forwards,
             this.backwards,
@@ -157,83 +158,83 @@
             nextPerfectMatch,
             previousPerfectMatch});
             searchMenu.Name = "searchMenu";
-            resources.ApplyResources(searchMenu, "searchMenu");
             // 
             // forwards
             // 
-            this.forwards.Name = "forwards";
             resources.ApplyResources(this.forwards, "forwards");
+            this.forwards.Name = "forwards";
             this.forwards.Click += new System.EventHandler(this.forwards_Click);
             // 
             // backwards
             // 
-            this.backwards.Name = "backwards";
             resources.ApplyResources(this.backwards, "backwards");
+            this.backwards.Name = "backwards";
             this.backwards.Click += new System.EventHandler(this.backwards_Click);
             // 
             // switchModeMenuItem
             // 
-            switchModeMenuItem.Name = "switchModeMenuItem";
             resources.ApplyResources(switchModeMenuItem, "switchModeMenuItem");
+            switchModeMenuItem.Name = "switchModeMenuItem";
             switchModeMenuItem.Click += new System.EventHandler(this.switchModeMenuItem_Click);
             // 
             // searchSep1
             // 
-            searchSep1.Name = "searchSep1";
             resources.ApplyResources(searchSep1, "searchSep1");
+            searchSep1.Name = "searchSep1";
             // 
             // focusSearchFieldMenuItem
             // 
-            focusSearchFieldMenuItem.Name = "focusSearchFieldMenuItem";
             resources.ApplyResources(focusSearchFieldMenuItem, "focusSearchFieldMenuItem");
+            focusSearchFieldMenuItem.Name = "focusSearchFieldMenuItem";
             focusSearchFieldMenuItem.Click += new System.EventHandler(this.focusSearchField_Click);
             // 
             // clearSearch
             // 
-            clearSearch.Name = "clearSearch";
             resources.ApplyResources(clearSearch, "clearSearch");
+            clearSearch.Name = "clearSearch";
             clearSearch.Click += new System.EventHandler(this.clearSearch_Click);
             // 
             // toolStripMenuItem3
             // 
-            toolStripMenuItem3.Name = "toolStripMenuItem3";
             resources.ApplyResources(toolStripMenuItem3, "toolStripMenuItem3");
+            toolStripMenuItem3.Name = "toolStripMenuItem3";
             // 
             // ignoreAccentsMenuItem
             // 
+            resources.ApplyResources(this.ignoreAccentsMenuItem, "ignoreAccentsMenuItem");
             this.ignoreAccentsMenuItem.CheckOnClick = true;
             this.ignoreAccentsMenuItem.Name = "ignoreAccentsMenuItem";
-            resources.ApplyResources(this.ignoreAccentsMenuItem, "ignoreAccentsMenuItem");
             this.ignoreAccentsMenuItem.Click += new System.EventHandler(this.ignoreAccentsMenuItem_Click);
             // 
             // ignoreCaseMenuItem
             // 
+            resources.ApplyResources(this.ignoreCaseMenuItem, "ignoreCaseMenuItem");
             this.ignoreCaseMenuItem.Checked = true;
             this.ignoreCaseMenuItem.CheckOnClick = true;
             this.ignoreCaseMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ignoreCaseMenuItem.Name = "ignoreCaseMenuItem";
-            resources.ApplyResources(this.ignoreCaseMenuItem, "ignoreCaseMenuItem");
             this.ignoreCaseMenuItem.Click += new System.EventHandler(this.ignoreCaseMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
             resources.ApplyResources(toolStripSeparator1, "toolStripSeparator1");
+            toolStripSeparator1.Name = "toolStripSeparator1";
             // 
             // nextPerfectMatch
             // 
-            nextPerfectMatch.Name = "nextPerfectMatch";
             resources.ApplyResources(nextPerfectMatch, "nextPerfectMatch");
+            nextPerfectMatch.Name = "nextPerfectMatch";
             nextPerfectMatch.Click += new System.EventHandler(this.nextPerfectMatch_Click);
             // 
             // previousPerfectMatch
             // 
-            previousPerfectMatch.Name = "previousPerfectMatch";
             resources.ApplyResources(previousPerfectMatch, "previousPerfectMatch");
+            previousPerfectMatch.Name = "previousPerfectMatch";
             previousPerfectMatch.Click += new System.EventHandler(this.previousPerfectMatch_Click);
             // 
             // listMenu
             // 
+            resources.ApplyResources(listMenu, "listMenu");
             listMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             newList,
             openList,
@@ -241,47 +242,47 @@
             listsSep,
             this.recentLists});
             listMenu.Name = "listMenu";
-            resources.ApplyResources(listMenu, "listMenu");
             // 
             // newList
             // 
+            resources.ApplyResources(newList, "newList");
             newList.Image = global::Szotar.WindowsForms.Properties.Resources.GenericDocument16;
             newList.Name = "newList";
-            resources.ApplyResources(newList, "newList");
             newList.Click += new System.EventHandler(this.newList_Click);
             // 
             // openList
             // 
-            openList.Name = "openList";
             resources.ApplyResources(openList, "openList");
+            openList.Name = "openList";
             openList.Click += new System.EventHandler(this.openList_Click);
             // 
             // importList
             // 
-            importList.Name = "importList";
             resources.ApplyResources(importList, "importList");
+            importList.Name = "importList";
             importList.Click += new System.EventHandler(this.importList_Click);
             // 
             // listsSep
             // 
-            listsSep.Name = "listsSep";
             resources.ApplyResources(listsSep, "listsSep");
+            listsSep.Name = "listsSep";
             // 
             // recentLists
             // 
+            resources.ApplyResources(this.recentLists, "recentLists");
             this.recentLists.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             dummyItem1});
             this.recentLists.Name = "recentLists";
-            resources.ApplyResources(this.recentLists, "recentLists");
             this.recentLists.DropDownOpening += new System.EventHandler(this.recentLists_DropDownOpening);
             // 
             // dummyItem1
             // 
-            dummyItem1.Name = "dummyItem1";
             resources.ApplyResources(dummyItem1, "dummyItem1");
+            dummyItem1.Name = "dummyItem1";
             // 
             // dictionaryMenu
             // 
+            resources.ApplyResources(dictionaryMenu, "dictionaryMenu");
             dictionaryMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.copyMI,
             this.dictSep1,
@@ -289,40 +290,40 @@
             addEntry,
             importDictionary});
             dictionaryMenu.Name = "dictionaryMenu";
-            resources.ApplyResources(dictionaryMenu, "dictionaryMenu");
             dictionaryMenu.DropDownOpening += new System.EventHandler(this.dictionaryMenu_DropDownOpening);
             // 
             // copyMI
             // 
-            this.copyMI.Name = "copyMI";
             resources.ApplyResources(this.copyMI, "copyMI");
+            this.copyMI.Name = "copyMI";
             this.copyMI.Click += new System.EventHandler(this.copyMI_Click);
             // 
             // dictSep1
             // 
-            this.dictSep1.Name = "dictSep1";
             resources.ApplyResources(this.dictSep1, "dictSep1");
+            this.dictSep1.Name = "dictSep1";
             // 
             // editInformation
             // 
-            editInformation.Name = "editInformation";
             resources.ApplyResources(editInformation, "editInformation");
+            editInformation.Name = "editInformation";
             editInformation.Click += new System.EventHandler(this.editInformation_Click);
             // 
             // addEntry
             // 
-            addEntry.Name = "addEntry";
             resources.ApplyResources(addEntry, "addEntry");
+            addEntry.Name = "addEntry";
             addEntry.Click += new System.EventHandler(this.addEntry_Click);
             // 
             // importDictionary
             // 
-            importDictionary.Name = "importDictionary";
             resources.ApplyResources(importDictionary, "importDictionary");
+            importDictionary.Name = "importDictionary";
             importDictionary.Click += new System.EventHandler(this.importDictionary_Click);
             // 
             // toolsMenu
             // 
+            resources.ApplyResources(toolsMenu, "toolsMenu");
             toolsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             dictsFolder,
             charMap,
@@ -330,76 +331,75 @@
             toolsSep,
             options});
             toolsMenu.Name = "toolsMenu";
-            resources.ApplyResources(toolsMenu, "toolsMenu");
             // 
             // dictsFolder
             // 
-            dictsFolder.Name = "dictsFolder";
             resources.ApplyResources(dictsFolder, "dictsFolder");
+            dictsFolder.Name = "dictsFolder";
             dictsFolder.Click += new System.EventHandler(this.dictsFolder_Click);
             // 
             // charMap
             // 
-            charMap.Name = "charMap";
             resources.ApplyResources(charMap, "charMap");
+            charMap.Name = "charMap";
             charMap.Click += new System.EventHandler(this.charMap_Click);
             // 
             // debugLog
             // 
-            debugLog.Name = "debugLog";
             resources.ApplyResources(debugLog, "debugLog");
+            debugLog.Name = "debugLog";
             debugLog.Click += new System.EventHandler(this.debugLog_Click);
             // 
             // toolsSep
             // 
-            toolsSep.Name = "toolsSep";
             resources.ApplyResources(toolsSep, "toolsSep");
+            toolsSep.Name = "toolsSep";
             // 
             // options
             // 
-            options.Name = "options";
             resources.ApplyResources(options, "options");
+            options.Name = "options";
             options.Click += new System.EventHandler(this.options_Click);
             // 
             // contextMenuSeparator
             // 
-            contextMenuSeparator.Name = "contextMenuSeparator";
             resources.ApplyResources(contextMenuSeparator, "contextMenuSeparator");
+            contextMenuSeparator.Name = "contextMenuSeparator";
             // 
             // copyCM
             // 
-            this.copyCM.Name = "copyCM";
             resources.ApplyResources(this.copyCM, "copyCM");
+            this.copyCM.Name = "copyCM";
             this.copyCM.Click += new System.EventHandler(this.copyCM_Click);
             // 
             // exitMenuItem
             // 
-            this.exitMenuItem.Name = "exitMenuItem";
             resources.ApplyResources(this.exitMenuItem, "exitMenuItem");
+            this.exitMenuItem.Name = "exitMenuItem";
             this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
             // 
             // fileMenu
             // 
+            resources.ApplyResources(this.fileMenu, "fileMenu");
             this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             showStartPage,
             this.closeWindow,
             fileSep,
             this.exitMenuItem});
             this.fileMenu.Name = "fileMenu";
-            resources.ApplyResources(this.fileMenu, "fileMenu");
             // 
             // closeWindow
             // 
-            this.closeWindow.Name = "closeWindow";
             resources.ApplyResources(this.closeWindow, "closeWindow");
+            this.closeWindow.Name = "closeWindow";
             this.closeWindow.Click += new System.EventHandler(this.closeWindow_Click);
             // 
             // grid
             // 
+            resources.ApplyResources(this.grid, "grid");
             this.grid.AllowUserToAddRows = false;
             this.grid.AllowUserToDeleteRows = false;
             this.grid.AllowUserToResizeRows = false;
-            resources.ApplyResources(this.grid, "grid");
             this.grid.BackgroundColor = System.Drawing.SystemColors.Control;
             this.grid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.grid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
@@ -432,6 +432,7 @@
             // 
             // contextMenu
             // 
+            resources.ApplyResources(this.contextMenu, "contextMenu");
             this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             addToList,
             this.addTo,
@@ -442,30 +443,29 @@
             this.editMI,
             this.deleteMI});
             this.contextMenu.Name = "listBuilderMenu";
-            resources.ApplyResources(this.contextMenu, "contextMenu");
             this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
             // 
             // addTo
             // 
-            this.addTo.Name = "addTo";
             resources.ApplyResources(this.addTo, "addTo");
+            this.addTo.Name = "addTo";
             // 
             // newItemCM
             // 
-            this.newItemCM.Name = "newItemCM";
             resources.ApplyResources(this.newItemCM, "newItemCM");
+            this.newItemCM.Name = "newItemCM";
             this.newItemCM.Click += new System.EventHandler(this.addEntry_Click);
             // 
             // editMI
             // 
-            this.editMI.Name = "editMI";
             resources.ApplyResources(this.editMI, "editMI");
+            this.editMI.Name = "editMI";
             this.editMI.Click += new System.EventHandler(this.editMI_Click);
             // 
             // deleteMI
             // 
-            this.deleteMI.Name = "deleteMI";
             resources.ApplyResources(this.deleteMI, "deleteMI");
+            this.deleteMI.Name = "deleteMI";
             this.deleteMI.Click += new System.EventHandler(this.deleteMI_Click);
             // 
             // switchMode
@@ -507,8 +507,8 @@
             // 
             // toolStripPanel
             // 
-            this.toolStripPanel.Controls.Add(this.mainMenu);
             resources.ApplyResources(this.toolStripPanel, "toolStripPanel");
+            this.toolStripPanel.Controls.Add(this.mainMenu);
             this.toolStripPanel.Name = "toolStripPanel";
             this.toolStripPanel.Orientation = System.Windows.Forms.Orientation.Horizontal;
             this.toolStripPanel.RowMargin = new System.Windows.Forms.Padding(3, 0, 0, 0);

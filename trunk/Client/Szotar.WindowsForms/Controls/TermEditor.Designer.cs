@@ -26,6 +26,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TermEditor));
             this.table = new System.Windows.Forms.TableLayoutPanel();
             this.phraseLabel = new System.Windows.Forms.Label();
             this.phrase = new System.Windows.Forms.TextBox();
@@ -36,74 +37,39 @@
             // 
             // table
             // 
-            this.table.ColumnCount = 2;
-            this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.table.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            resources.ApplyResources(this.table, "table");
             this.table.Controls.Add(this.phraseLabel, 0, 0);
             this.table.Controls.Add(this.phrase, 1, 0);
             this.table.Controls.Add(this.translationLabel, 0, 1);
             this.table.Controls.Add(this.translation, 1, 1);
-            this.table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.table.Location = new System.Drawing.Point(0, 0);
             this.table.Name = "table";
-            this.table.RowCount = 3;
-            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.table.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.table.Size = new System.Drawing.Size(226, 169);
-            this.table.TabIndex = 0;
             // 
             // phraseLabel
             // 
-            this.phraseLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.phraseLabel.AutoSize = true;
-            this.phraseLabel.Location = new System.Drawing.Point(3, 0);
+            resources.ApplyResources(this.phraseLabel, "phraseLabel");
             this.phraseLabel.Name = "phraseLabel";
-            this.phraseLabel.Size = new System.Drawing.Size(59, 26);
-            this.phraseLabel.TabIndex = 0;
-            this.phraseLabel.Text = "Phrase";
-            this.phraseLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // phrase
             // 
-            this.phrase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.phrase.Location = new System.Drawing.Point(68, 3);
+            resources.ApplyResources(this.phrase, "phrase");
             this.phrase.Name = "phrase";
-            this.phrase.Size = new System.Drawing.Size(155, 20);
-            this.phrase.TabIndex = 1;
             // 
             // translationLabel
             // 
-            this.translationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.translationLabel.AutoSize = true;
-            this.translationLabel.Location = new System.Drawing.Point(3, 26);
+            resources.ApplyResources(this.translationLabel, "translationLabel");
             this.translationLabel.Name = "translationLabel";
-            this.translationLabel.Size = new System.Drawing.Size(59, 26);
-            this.translationLabel.TabIndex = 2;
-            this.translationLabel.Text = "Translation";
-            this.translationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // translation
             // 
-            this.translation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.translation.Location = new System.Drawing.Point(68, 29);
+            resources.ApplyResources(this.translation, "translation");
             this.translation.Name = "translation";
-            this.translation.Size = new System.Drawing.Size(155, 20);
-            this.translation.TabIndex = 3;
             // 
             // TermEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.table);
             this.Name = "TermEditor";
-            this.Size = new System.Drawing.Size(226, 169);
             this.table.ResumeLayout(false);
             this.table.PerformLayout();
             this.ResumeLayout(false);
