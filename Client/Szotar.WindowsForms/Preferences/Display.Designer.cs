@@ -23,39 +23,31 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.listFontLabel = new System.Windows.Forms.Label();
-			this.listFontButton = new System.Windows.Forms.Button();
-			this.SuspendLayout();
-			// 
-			// listFontLabel
-			// 
-			this.listFontLabel.AutoSize = true;
-			this.listFontLabel.Location = new System.Drawing.Point(4, 4);
-			this.listFontLabel.Name = "listFontLabel";
-			this.listFontLabel.Size = new System.Drawing.Size(44, 13);
-			this.listFontLabel.TabIndex = 0;
-			this.listFontLabel.Text = "List font";
-			// 
-			// listFontButton
-			// 
-			this.listFontButton.AutoSize = true;
-			this.listFontButton.Location = new System.Drawing.Point(7, 21);
-			this.listFontButton.Name = "listFontButton";
-			this.listFontButton.Size = new System.Drawing.Size(111, 23);
-			this.listFontButton.TabIndex = 1;
-			this.listFontButton.Text = "Font";
-			this.listFontButton.UseVisualStyleBackColor = true;
-			// 
-			// Display
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.listFontButton);
-			this.Controls.Add(this.listFontLabel);
-			this.Name = "Display";
-			this.Size = new System.Drawing.Size(499, 309);
-			this.ResumeLayout(false);
-			this.PerformLayout();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Display));
+            this.listFontLabel = new System.Windows.Forms.Label();
+            this.listFontButton = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // listFontLabel
+            // 
+            resources.ApplyResources(this.listFontLabel, "listFontLabel");
+            this.listFontLabel.Name = "listFontLabel";
+            // 
+            // listFontButton
+            // 
+            resources.ApplyResources(this.listFontButton, "listFontButton");
+            this.listFontButton.Name = "listFontButton";
+            this.listFontButton.UseVisualStyleBackColor = true;
+            // 
+            // Display
+            // 
+            resources.ApplyResources(this, "$this");
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.listFontButton);
+            this.Controls.Add(this.listFontLabel);
+            this.Name = "Display";
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 

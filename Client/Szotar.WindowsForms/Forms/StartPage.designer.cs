@@ -25,6 +25,7 @@
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripMenuItem file;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartPage));
             System.Windows.Forms.ToolStripMenuItem close;
             System.Windows.Forms.ToolStripSeparator fileSep;
             System.Windows.Forms.ToolStripMenuItem tools;
@@ -33,10 +34,10 @@
             System.Windows.Forms.ToolStripMenuItem options;
             System.Windows.Forms.ToolStripMenuItem help;
             System.Windows.Forms.ToolStripMenuItem about;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartPage));
             this.newListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.practiceRandom = new System.Windows.Forms.ToolStripMenuItem();
             this.exitProgram = new System.Windows.Forms.ToolStripMenuItem();
+            this.findDuplicates = new System.Windows.Forms.ToolStripMenuItem();
             this.menu = new System.Windows.Forms.MenuStrip();
             this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.openListMI = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,7 +46,6 @@
             this.flashcardsListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.learnListMI = new System.Windows.Forms.ToolStripMenuItem();
             this.recentItems = new Szotar.WindowsForms.Controls.ListSearch();
-            this.findDuplicates = new System.Windows.Forms.ToolStripMenuItem();
             file = new System.Windows.Forms.ToolStripMenuItem();
             close = new System.Windows.Forms.ToolStripMenuItem();
             fileSep = new System.Windows.Forms.ToolStripSeparator();
@@ -61,6 +61,7 @@
             // 
             // file
             // 
+            resources.ApplyResources(file, "file");
             file.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newListMI,
             this.practiceRandom,
@@ -68,105 +69,94 @@
             fileSep,
             this.exitProgram});
             file.Name = "file";
-            file.Size = new System.Drawing.Size(37, 20);
-            file.Text = "&File";
             // 
             // newListMI
             // 
+            resources.ApplyResources(this.newListMI, "newListMI");
             this.newListMI.Name = "newListMI";
-            this.newListMI.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newListMI.Size = new System.Drawing.Size(225, 22);
-            this.newListMI.Text = "&New Word List";
             this.newListMI.Click += new System.EventHandler(this.newListMI_Click);
             // 
             // practiceRandom
             // 
+            resources.ApplyResources(this.practiceRandom, "practiceRandom");
             this.practiceRandom.Name = "practiceRandom";
-            this.practiceRandom.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.practiceRandom.Size = new System.Drawing.Size(225, 22);
-            this.practiceRandom.Text = "&Practice Weak Points";
             this.practiceRandom.Click += new System.EventHandler(this.practiceRandom_Click);
             // 
             // close
             // 
+            resources.ApplyResources(close, "close");
             close.Name = "close";
-            close.ShortcutKeyDisplayString = "Alt+F4";
-            close.Size = new System.Drawing.Size(225, 22);
-            close.Text = "&Close";
             close.Click += new System.EventHandler(this.close_Click);
             // 
             // fileSep
             // 
+            resources.ApplyResources(fileSep, "fileSep");
             fileSep.Name = "fileSep";
-            fileSep.Size = new System.Drawing.Size(222, 6);
             // 
             // exitProgram
             // 
+            resources.ApplyResources(this.exitProgram, "exitProgram");
             this.exitProgram.Name = "exitProgram";
-            this.exitProgram.ShortcutKeyDisplayString = "";
-            this.exitProgram.Size = new System.Drawing.Size(225, 22);
-            this.exitProgram.Text = "E&xit {0}";
             this.exitProgram.Click += new System.EventHandler(this.exitProgram_Click);
             // 
             // tools
             // 
+            resources.ApplyResources(tools, "tools");
             tools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             debugLog,
             this.findDuplicates,
             toolsSep,
             options});
             tools.Name = "tools";
-            tools.Size = new System.Drawing.Size(48, 20);
-            tools.Text = "&Tools";
             // 
             // debugLog
             // 
+            resources.ApplyResources(debugLog, "debugLog");
             debugLog.Name = "debugLog";
-            debugLog.Size = new System.Drawing.Size(186, 22);
-            debugLog.Text = "&Debug Log";
             debugLog.Click += new System.EventHandler(this.debugLog_Click);
+            // 
+            // findDuplicates
+            // 
+            resources.ApplyResources(this.findDuplicates, "findDuplicates");
+            this.findDuplicates.Name = "findDuplicates";
+            this.findDuplicates.Click += new System.EventHandler(this.findDuplicates_Click);
             // 
             // toolsSep
             // 
+            resources.ApplyResources(toolsSep, "toolsSep");
             toolsSep.Name = "toolsSep";
-            toolsSep.Size = new System.Drawing.Size(183, 6);
             // 
             // options
             // 
+            resources.ApplyResources(options, "options");
             options.Name = "options";
-            options.Size = new System.Drawing.Size(186, 22);
-            options.Text = "&Options";
             options.Click += new System.EventHandler(this.options_Click);
             // 
             // help
             // 
+            resources.ApplyResources(help, "help");
             help.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             about});
             help.Name = "help";
-            help.Size = new System.Drawing.Size(44, 20);
-            help.Text = "&Help";
             // 
             // about
             // 
+            resources.ApplyResources(about, "about");
             about.Name = "about";
-            about.Size = new System.Drawing.Size(107, 22);
-            about.Text = "&About";
             about.Click += new System.EventHandler(this.about_Click);
             // 
             // menu
             // 
+            resources.ApplyResources(this.menu, "menu");
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             file,
             tools,
             help});
-            this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(569, 24);
-            this.menu.TabIndex = 1;
-            this.menu.Text = "menu";
             // 
             // listContextMenu
             // 
+            resources.ApplyResources(this.listContextMenu, "listContextMenu");
             this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openListMI,
             this.newListCM,
@@ -174,78 +164,56 @@
             this.flashcardsListMI,
             this.learnListMI});
             this.listContextMenu.Name = "listContextMenu";
-            this.listContextMenu.Size = new System.Drawing.Size(152, 98);
             this.listContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.listContextMenu_Opening);
             // 
             // openListMI
             // 
-            this.openListMI.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            resources.ApplyResources(this.openListMI, "openListMI");
             this.openListMI.Name = "openListMI";
-            this.openListMI.Size = new System.Drawing.Size(151, 22);
-            this.openListMI.Text = "&Open";
             this.openListMI.Click += new System.EventHandler(this.openListMI_Click);
             // 
             // newListCM
             // 
+            resources.ApplyResources(this.newListCM, "newListCM");
             this.newListCM.Name = "newListCM";
-            this.newListCM.Size = new System.Drawing.Size(151, 22);
-            this.newListCM.Text = "&New Word List";
             this.newListCM.Click += new System.EventHandler(this.newListMI_Click);
             // 
             // listContextMenuSeparator
             // 
+            resources.ApplyResources(this.listContextMenuSeparator, "listContextMenuSeparator");
             this.listContextMenuSeparator.Name = "listContextMenuSeparator";
-            this.listContextMenuSeparator.Size = new System.Drawing.Size(148, 6);
             // 
             // flashcardsListMI
             // 
+            resources.ApplyResources(this.flashcardsListMI, "flashcardsListMI");
             this.flashcardsListMI.Name = "flashcardsListMI";
-            this.flashcardsListMI.Size = new System.Drawing.Size(151, 22);
-            this.flashcardsListMI.Text = "&Familiarize";
             this.flashcardsListMI.Click += new System.EventHandler(this.flashcardsListMI_Click);
             // 
             // learnListMI
             // 
+            resources.ApplyResources(this.learnListMI, "learnListMI");
             this.learnListMI.Name = "learnListMI";
-            this.learnListMI.Size = new System.Drawing.Size(151, 22);
-            this.learnListMI.Text = "&Learn";
             this.learnListMI.Click += new System.EventHandler(this.learnListMI_Click);
             // 
             // recentItems
             // 
-            this.recentItems.Dock = System.Windows.Forms.DockStyle.Fill;
+            resources.ApplyResources(this.recentItems, "recentItems");
             this.recentItems.ListContextMenuStrip = this.listContextMenu;
-            this.recentItems.Location = new System.Drawing.Point(0, 24);
             this.recentItems.MaxItems = 100;
             this.recentItems.Name = "recentItems";
-            this.recentItems.Padding = new System.Windows.Forms.Padding(3);
             this.recentItems.SearchTerm = "";
             this.recentItems.ShowDictionaries = true;
             this.recentItems.ShowListItems = true;
             this.recentItems.ShowTags = true;
-            this.recentItems.Size = new System.Drawing.Size(569, 395);
-            this.recentItems.TabIndex = 2;
-            // 
-            // findDuplicates
-            // 
-            this.findDuplicates.Name = "findDuplicates";
-            this.findDuplicates.Size = new System.Drawing.Size(186, 22);
-            this.findDuplicates.Text = "Find D&uplicate Terms";
-            this.findDuplicates.Click += new System.EventHandler(this.findDuplicates_Click);
             // 
             // StartPage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 419);
             this.Controls.Add(this.recentItems);
             this.Controls.Add(this.menu);
-            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu;
-            this.MinimumSize = new System.Drawing.Size(300, 200);
             this.Name = "StartPage";
-            this.Text = "Szótár";
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
             this.listContextMenu.ResumeLayout(false);

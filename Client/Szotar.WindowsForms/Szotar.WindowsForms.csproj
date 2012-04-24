@@ -279,9 +279,8 @@
       <DependentUpon>UserInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Controls\DictionaryGrid.resx">
-      <DependentUpon>DictionaryGrid.cs</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="Controls\DictionarySectionUI.hu.resx">
+      <DependentUpon>DictionarySectionUI.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\DictionarySectionUI.resx">
       <DependentUpon>DictionarySectionUI.cs</DependentUpon>
@@ -290,13 +289,22 @@
       <DependentUpon>ErrorUI.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ListSearch.hu.resx">
+      <DependentUpon>ListSearch.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ListSearch.resx">
       <DependentUpon>ListSearch.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\LogViewer.hu.resx">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\LogViewer.resx">
       <DependentUpon>LogViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ProgressUI.hu.resx">
+      <DependentUpon>ProgressUI.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ProgressUI.resx">
       <DependentUpon>ProgressUI.cs</DependentUpon>
@@ -310,27 +318,48 @@
       <DependentUpon>SearchBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TermEditor.hu.resx">
+      <DependentUpon>TermEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\TermEditor.resx">
       <DependentUpon>TermEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\EditDictionaryItem.hu.resx">
+      <DependentUpon>EditDictionaryItem.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\EditDictionaryItem.resx">
       <DependentUpon>EditDictionaryItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\EditPracticeItem.hu.resx">
+      <DependentUpon>EditPracticeItem.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\EditPracticeItem.resx">
       <DependentUpon>EditPracticeItem.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\About.hu.resx">
+      <DependentUpon>About.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\About.resx">
       <DependentUpon>About.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DictionaryImport.hu.resx">
+      <DependentUpon>DictionaryImport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DictionaryImport.resx">
       <DependentUpon>DictionaryImport.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DictionaryInfoEditor.hu.resx">
+      <DependentUpon>DictionaryInfoEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DictionaryInfoEditor.resx">
       <DependentUpon>DictionaryInfoEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FindDuplicates.hu.resx">
+      <DependentUpon>FindDuplicates.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FindDuplicates.resx">
       <DependentUpon>FindDuplicates.cs</DependentUpon>
@@ -339,47 +368,85 @@
       <DependentUpon>ImportForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ListBuilder.hu.resx">
+      <DependentUpon>ListBuilder.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ListBuilder.resx">
       <DependentUpon>ListBuilder.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LogViewerForm.hu.resx">
+      <DependentUpon>LogViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\LogViewerForm.resx">
       <DependentUpon>LogViewerForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LookupForm.hu.resx">
+      <DependentUpon>LookupForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\LookupForm.resx">
       <DependentUpon>LookupForm.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PracticeWindow.hu.resx">
+      <DependentUpon>PracticeWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PracticeWindow.resx">
       <DependentUpon>PracticeWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Preferences.hu.resx">
+      <DependentUpon>Preferences.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Preferences.resx">
       <DependentUpon>Preferences.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\StartPage.hu.resx">
+      <DependentUpon>StartPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\StartPage.resx">
       <DependentUpon>StartPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Display.hu.resx">
+      <DependentUpon>Display.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Preferences\Display.resx">
       <DependentUpon>Display.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Practice.hu.resx">
+      <DependentUpon>Practice.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Preferences\Practice.resx">
       <DependentUpon>Practice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\ResetSettings.hu.resx">
+      <DependentUpon>ResetSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Preferences\ResetSettings.resx">
       <DependentUpon>ResetSettings.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Startup.hu.resx">
+      <DependentUpon>Startup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Preferences\Startup.resx">
       <DependentUpon>Startup.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\UserInfo.hu.resx">
+      <DependentUpon>UserInfo.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Preferences\UserInfo.resx">
       <DependentUpon>UserInfo.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.hu.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.hu.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -387,12 +454,17 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\Errors.hu.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Strings\Errors.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\ImporterDescriptions.hu.resx" />
     <EmbeddedResource Include="Resources\Strings\ImporterDescriptions.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Strings\LookupForm.hu.resx" />
     <EmbeddedResource Include="Resources\Strings\TypeDescriptions.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -403,6 +475,11 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Base\RtlAwareMessageBox.cs" />
+    <Compile Include="Properties\Resources.hu.Designer.cs">
+      <DependentUpon>Resources.hu.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

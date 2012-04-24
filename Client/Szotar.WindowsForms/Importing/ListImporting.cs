@@ -130,11 +130,13 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 		}
 
 		private void GotResponse(IAsyncResult result) {
-			try {
-				OnCompleted(GetResult(result), null, false, null);
-			} catch (WebException e) {
-				OnCompleted(null, e, true, null);
-			}
+            try {
+                OnCompleted(GetResult(result), null, false, null);
+            } catch (WebException e) {
+                OnCompleted(null, e, true, null);
+            } catch (ImportException e) {
+                OnCompleted(null, e, true, null);
+            }
 			request = null;
 		}
 

@@ -142,14 +142,6 @@
     <value>&amp;Next</value>
     <comment>Used as a button label in dialogs.</comment>
   </data>
-  <data name="DictionarySectionSelectFirstHalf" xml:space="preserve">
-    <value>Please select the file for the first half of the dictionary.</value>
-    <comment>Label</comment>
-  </data>
-  <data name="DictionarySectionSelectSecondHalf" xml:space="preserve">
-    <value>Please select the file for the second half of the dictionary.</value>
-    <comment>Label</comment>
-  </data>
   <data name="BeginCommand" xml:space="preserve">
     <value>&amp;Begin</value>
     <comment>Used as a button label in dialogs.</comment>
@@ -295,5 +287,11 @@
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
+  </data>
+  <data name="AllFiles" xml:space="preserve">
+    <value>All files (*.*)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>&amp;Save</value>
   </data>
 </root>

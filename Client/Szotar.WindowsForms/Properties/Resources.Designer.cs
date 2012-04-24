@@ -79,6 +79,15 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All files (*.*).
+        /// </summary>
+        internal static string AllFiles {
+            get {
+                return ResourceManager.GetString("AllFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Begin.
         /// </summary>
         internal static string BeginCommand {
@@ -208,24 +217,6 @@ namespace Szotar.WindowsForms.Properties {
             get {
                 object obj = ResourceManager.GetObject("DictionaryIcon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please select the file for the first half of the dictionary..
-        /// </summary>
-        internal static string DictionarySectionSelectFirstHalf {
-            get {
-                return ResourceManager.GetString("DictionarySectionSelectFirstHalf", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please select the file for the second half of the dictionary..
-        /// </summary>
-        internal static string DictionarySectionSelectSecondHalf {
-            get {
-                return ResourceManager.GetString("DictionarySectionSelectSecondHalf", resourceCulture);
             }
         }
         
@@ -434,6 +425,15 @@ namespace Szotar.WindowsForms.Properties {
         internal static string RedoSpecific {
             get {
                 return ResourceManager.GetString("RedoSpecific", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Save.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
             }
         }
         

@@ -125,9 +125,11 @@ namespace Szotar.WindowsForms.Controls {
 
                 if (searchTerm.Length == 0) {
                     dictsGroup.Header = Properties.Resources.RecentDictionaries;
-                    foreach(var dict in GuiConfiguration.RecentDictionaries.Entries)
-                        if (System.IO.File.Exists(dict.Path))
-                            addItem(dict);
+                    if (GuiConfiguration.RecentDictionaries != null) {
+                        foreach (var dict in GuiConfiguration.RecentDictionaries.Entries)
+                            if (System.IO.File.Exists(dict.Path))
+                                addItem(dict);
+                    }
                 } else { 
                     foreach(var dict in dictionaries)
                         if (dict.Name.ToLower().Contains(searchTerm))

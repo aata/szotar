@@ -22,7 +22,7 @@ namespace Szotar.WindowsForms.Controls {
 
         private void browse_Click(object sender, EventArgs e) {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "All files (*.*)|*.*";
+            ofd.Filter = Properties.Resources.AllFiles + "|*.*";
             ofd.Multiselect = false;
 
             if (ofd.ShowDialog() == DialogResult.OK) {

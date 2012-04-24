@@ -117,4 +117,157 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="&gt;&gt;practice.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="dictionary.Size" type="System.Drawing.Size, System.Drawing">
+    <value>108, 17</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="dictionary.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="list.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="&gt;&gt;list.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="dictionary.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="practice.Text" xml:space="preserve">
+    <value>Open practice window</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>Szotar.WindowsForms.Preferences.PreferencePage, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="dictionary.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 44</value>
+  </data>
+  <data name="&gt;&gt;startPage.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="infoLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 4</value>
+  </data>
+  <data name="practice.Size" type="System.Drawing.Size, System.Drawing">
+    <value>131, 17</value>
+  </data>
+  <data name="&gt;&gt;practice.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;infoLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="startPage.Text" xml:space="preserve">
+    <value>Show the Start Page</value>
+  </data>
+  <data name="&gt;&gt;startPage.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="infoLabel.Text" xml:space="preserve">
+    <value>When {0} starts:</value>
+  </data>
+  <data name="infoLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>84, 13</value>
+  </data>
+  <data name="&gt;&gt;startPage.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;dictionary.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="startPage.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="practice.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="&gt;&gt;practice.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dictionary.Name" xml:space="preserve">
+    <value>dictionary</value>
+  </data>
+  <data name="startPage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>123, 17</value>
+  </data>
+  <data name="&gt;&gt;practice.Name" xml:space="preserve">
+    <value>practice</value>
+  </data>
+  <data name="list.Size" type="System.Drawing.Size, System.Drawing">
+    <value>264, 21</value>
+  </data>
+  <data name="startPage.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 21</value>
+  </data>
+  <data name="&gt;&gt;list.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;list.Name" xml:space="preserve">
+    <value>list</value>
+  </data>
+  <data name="list.Location" type="System.Drawing.Point, System.Drawing">
+    <value>25, 67</value>
+  </data>
+  <data name="&gt;&gt;dictionary.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="practice.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;dictionary.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="list.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="infoLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="&gt;&gt;infoLabel.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="dictionary.Text" xml:space="preserve">
+    <value>Open a dictionary</value>
+  </data>
+  <data name="startPage.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;list.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>Startup</value>
+  </data>
+  <data name="&gt;&gt;infoLabel.Name" xml:space="preserve">
+    <value>infoLabel</value>
+  </data>
+  <data name="practice.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 94</value>
+  </data>
+  <data name="&gt;&gt;startPage.Name" xml:space="preserve">
+    <value>startPage</value>
+  </data>
+  <data name="&gt;&gt;infoLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
+    <value>292, 201</value>
+  </data>
+  <data name="infoLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="$this.Language" type="System.Globalization.CultureInfo, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>hu</value>
+  </metadata>
 </root>

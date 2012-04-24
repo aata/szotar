@@ -1,0 +1,392 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="addToList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="addToList.Text" xml:space="preserve">
+    <value>&amp;Új listához hozzáadás</value>
+  </data>
+  <data name="reverseLookup.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="reverseLookup.Text" xml:space="preserve">
+    <value>&amp;Fordított keresés</value>
+  </data>
+  <data name="showStartPage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="showStartPage.Text" xml:space="preserve">
+    <value>&amp;Kezdőlap mutatása</value>
+  </data>
+  <data name="fileSep.Size" type="System.Drawing.Size, System.Drawing">
+    <value>171, 6</value>
+  </data>
+  <data name="forwards.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="forwards.Text" xml:space="preserve">
+    <value>&amp;Angol ⇔ Magyar</value>
+  </data>
+  <data name="backwards.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="backwards.Text" xml:space="preserve">
+    <value>&amp;Magyar ⇔ Angol</value>
+  </data>
+  <data name="switchModeMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="switchModeMenuItem.Text" xml:space="preserve">
+    <value>Mód &amp;váltása</value>
+  </data>
+  <data name="searchSep1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 6</value>
+  </data>
+  <data name="focusSearchFieldMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="focusSearchFieldMenuItem.Text" xml:space="preserve">
+    <value>&amp;Keresési mező aktiválása</value>
+  </data>
+  <data name="clearSearch.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="clearSearch.Text" xml:space="preserve">
+    <value>Keresés &amp;törlése</value>
+  </data>
+  <data name="toolStripMenuItem3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 6</value>
+  </data>
+  <data name="ignoreAccentsMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="ignoreAccentsMenuItem.Text" xml:space="preserve">
+    <value>M&amp;ellékjel nem számít</value>
+  </data>
+  <data name="ignoreCaseMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="ignoreCaseMenuItem.Text" xml:space="preserve">
+    <value>Nem &amp;nagybetűérzékeny</value>
+  </data>
+  <data name="toolStripSeparator1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>240, 6</value>
+  </data>
+  <data name="nextPerfectMatch.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="nextPerfectMatch.Text" xml:space="preserve">
+    <value>Következő pontos találat</value>
+  </data>
+  <data name="previousPerfectMatch.Size" type="System.Drawing.Size, System.Drawing">
+    <value>243, 22</value>
+  </data>
+  <data name="previousPerfectMatch.Text" xml:space="preserve">
+    <value>Előző pontos találat</value>
+  </data>
+  <data name="searchMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>58, 20</value>
+  </data>
+  <data name="searchMenu.Text" xml:space="preserve">
+    <value>&amp;Keresés</value>
+  </data>
+  <data name="newList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>172, 22</value>
+  </data>
+  <data name="newList.Text" xml:space="preserve">
+    <value>&amp;Új</value>
+  </data>
+  <data name="openList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>172, 22</value>
+  </data>
+  <data name="openList.Text" xml:space="preserve">
+    <value>&amp;Megnyitás</value>
+  </data>
+  <data name="importList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>172, 22</value>
+  </data>
+  <data name="importList.Text" xml:space="preserve">
+    <value>&amp;Importálás</value>
+  </data>
+  <data name="listsSep.Size" type="System.Drawing.Size, System.Drawing">
+    <value>169, 6</value>
+  </data>
+  <data name="recentLists.Size" type="System.Drawing.Size, System.Drawing">
+    <value>172, 22</value>
+  </data>
+  <data name="recentLists.Text" xml:space="preserve">
+    <value>&amp;Legfrissabbi listák</value>
+  </data>
+  <data name="listMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>43, 20</value>
+  </data>
+  <data name="listMenu.Text" xml:space="preserve">
+    <value>&amp;Lista</value>
+  </data>
+  <data name="copyMI.Size" type="System.Drawing.Size, System.Drawing">
+    <value>212, 22</value>
+  </data>
+  <data name="copyMI.Text" xml:space="preserve">
+    <value>Kijelölés &amp;másolása</value>
+  </data>
+  <data name="dictSep1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>209, 6</value>
+  </data>
+  <data name="editInformation.Size" type="System.Drawing.Size, System.Drawing">
+    <value>212, 22</value>
+  </data>
+  <data name="editInformation.Text" xml:space="preserve">
+    <value>&amp;Adatok szerkesztése...</value>
+  </data>
+  <data name="addEntry.Size" type="System.Drawing.Size, System.Drawing">
+    <value>212, 22</value>
+  </data>
+  <data name="addEntry.Text" xml:space="preserve">
+    <value>Címszó &amp;beszúlása...</value>
+  </data>
+  <data name="importDictionary.Size" type="System.Drawing.Size, System.Drawing">
+    <value>212, 22</value>
+  </data>
+  <data name="importDictionary.Text" xml:space="preserve">
+    <value>&amp;Importálás...</value>
+  </data>
+  <data name="dictionaryMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>51, 20</value>
+  </data>
+  <data name="dictionaryMenu.Text" xml:space="preserve">
+    <value>&amp;Szótár</value>
+  </data>
+  <data name="dictsFolder.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="dictsFolder.Text" xml:space="preserve">
+    <value>&amp;Szótárok mappa megnyitása</value>
+  </data>
+  <data name="charMap.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="charMap.Text" xml:space="preserve">
+    <value>&amp;Karaktertábla</value>
+  </data>
+  <data name="debugLog.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="debugLog.Text" xml:space="preserve">
+    <value>&amp;Hibakövetés napló</value>
+  </data>
+  <data name="toolsSep.Size" type="System.Drawing.Size, System.Drawing">
+    <value>220, 6</value>
+  </data>
+  <data name="options.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 22</value>
+  </data>
+  <data name="options.Text" xml:space="preserve">
+    <value>&amp;Beállítások</value>
+  </data>
+  <data name="toolsMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>66, 20</value>
+  </data>
+  <data name="toolsMenu.Text" xml:space="preserve">
+    <value>&amp;Eszközök</value>
+  </data>
+  <data name="contextMenuSeparator.Size" type="System.Drawing.Size, System.Drawing">
+    <value>199, 6</value>
+  </data>
+  <data name="copyCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="copyCM.Text" xml:space="preserve">
+    <value>&amp;Másolás</value>
+  </data>
+  <data name="exitMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="exitMenuItem.Text" xml:space="preserve">
+    <value>{0} kijarása</value>
+  </data>
+  <data name="closeWindow.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="closeWindow.Text" xml:space="preserve">
+    <value>&amp;Bezarás...</value>
+  </data>
+  <data name="fileMenu.Text" xml:space="preserve">
+    <value>&amp;Fájl</value>
+  </data>
+  <data name="addTo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="addTo.Text" xml:space="preserve">
+    <value>&amp;Hozzáadás listához</value>
+  </data>
+  <data name="newItemCM.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="newItemCM.Text" xml:space="preserve">
+    <value>&amp;Elem hozzáadása...</value>
+  </data>
+  <data name="editMI.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="editMI.Text" xml:space="preserve">
+    <value>&amp;Szerkesztés</value>
+  </data>
+  <data name="deleteMI.Size" type="System.Drawing.Size, System.Drawing">
+    <value>202, 22</value>
+  </data>
+  <data name="deleteMI.Text" xml:space="preserve">
+    <value>&amp;Törlés</value>
+  </data>
+  <data name="contextMenu.Size" type="System.Drawing.Size, System.Drawing">
+    <value>203, 164</value>
+  </data>
+  <data name="ignoreLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>-7, 6</value>
+  </data>
+  <data name="ignoreLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>79, 13</value>
+  </data>
+  <data name="ignoreLabel.Text" xml:space="preserve">
+    <value>Nem számít:</value>
+  </data>
+  <data name="ignoreCaseCheck.Location" type="System.Drawing.Point, System.Drawing">
+    <value>156, 4</value>
+  </data>
+  <data name="ignoreCaseCheck.Size" type="System.Drawing.Size, System.Drawing">
+    <value>76, 17</value>
+  </data>
+  <data name="ignoreCaseCheck.Text" xml:space="preserve">
+    <value>Nagybetű</value>
+  </data>
+  <data name="ignoreAccentsCheck.Location" type="System.Drawing.Point, System.Drawing">
+    <value>78, 5</value>
+  </data>
+  <data name="ignoreAccentsCheck.Size" type="System.Drawing.Size, System.Drawing">
+    <value>72, 17</value>
+  </data>
+  <data name="ignoreAccentsCheck.Text" xml:space="preserve">
+    <value>Mellékjel</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+</root>

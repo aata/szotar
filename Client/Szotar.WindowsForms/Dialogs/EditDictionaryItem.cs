@@ -29,7 +29,7 @@ namespace Szotar.WindowsForms.Dialogs {
                 complete.Text = Properties.Resources.Add;
             } else {
                 this.Text = Properties.Resources.EditDictionaryItem;
-                complete.Text = Properties.Resources.Edit;
+                complete.Text = Properties.Resources.Save;
             }
 
             if (entry != null) {
