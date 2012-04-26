@@ -185,11 +185,11 @@ namespace Szotar.Json {
 		}
 
 		protected int ReadHex(int c) {
-			if (c >= '0' || c <= '9')
+			if (c >= '0' && c <= '9')
 				return c - '0';
-			if (c >= 'a' || c <= 'f')
+			if (c >= 'a' && c <= 'f')
 				return 10 + c - 'a';
-			if (c >= 'A' || c <= 'F')
+			if (c >= 'A' && c <= 'F')
 				return 10 + c - 'A';
 
 			throw new ParseException("Invalid hexadecimal constant in unicode escape character");

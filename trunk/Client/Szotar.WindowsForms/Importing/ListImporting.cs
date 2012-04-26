@@ -12,7 +12,7 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 
 	[ImporterAttribute("Quizlet", typeof(WordList))]
 	public class QuizletImporter : IImporter<WordList> {
-		int? setID;
+		long? setID;
 		Uri uri;
 		System.Net.WebRequest request;
 		IAsyncResult requestAsyncResult;
@@ -23,11 +23,11 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 			: this(null) {
 		}
 
-		public QuizletImporter(int? setID) {
+		public QuizletImporter(long? setID) {
 			this.setID = setID;
 		}
 
-		public int? Set {
+		public long? Set {
 			get { return setID; }
 			set { setID = value; }
 		}
@@ -39,7 +39,10 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
 		public void BeginImport() {
 			if (disposed)
 				throw new ObjectDisposedException("quizletImporter");
-			if (setID == null) {
+			
+            if (setID == null) {
+                OnCompleted(null, new InvalidOperationException("Cannot begin quizlet import when Set is null"), false, null);
+                return;
 			}
 
 			operation = AsyncOperationManager.CreateOperation(null);
