@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.IO;
-
-using Szotar.Json;
-using System.Threading;
 using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Threading;
+using Szotar.Json;
 
 namespace Szotar {
     public class QuizletAPI {
@@ -102,6 +100,7 @@ namespace Szotar {
             var op = System.ComponentModel.AsyncOperationManager.CreateOperation(null);
             try {
                 var wr = WebRequest.Create(uri);
+                wr.Proxy = GlobalProxySelection.GetEmptyWebProxy();
                 token.Register(delegate { wr.Abort(); });
 
                 wr.BeginGetResponse(new AsyncCallback(delegate(IAsyncResult result) {
