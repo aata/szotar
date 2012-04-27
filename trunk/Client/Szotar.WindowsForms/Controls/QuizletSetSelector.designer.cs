@@ -28,6 +28,7 @@
             this.searchTab = new System.Windows.Forms.TabPage();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.searchButton = new System.Windows.Forms.Button();
+            this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
             this.searchResults = new System.Windows.Forms.ListView();
             this.nameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.creatorColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -39,10 +40,9 @@
             this.manualInput = new System.Windows.Forms.TextBox();
             this.manualInputLabel = new System.Windows.Forms.Label();
             this.dialogButtonsPanel = new System.Windows.Forms.Panel();
+            this.attribution = new System.Windows.Forms.LinkLabel();
             this.importButton = new System.Windows.Forms.Button();
             this.errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            this.attribution = new System.Windows.Forms.LinkLabel();
-            this.searchBox = new Szotar.WindowsForms.Controls.SearchBox();
             this.tabControl.SuspendLayout();
             this.searchTab.SuspendLayout();
             this.manualTab.SuspendLayout();
@@ -85,7 +85,7 @@
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(71, 21);
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.progressBar.TabIndex = 3;
+            this.progressBar.TabIndex = 1;
             this.progressBar.Visible = false;
             // 
             // searchButton
@@ -98,6 +98,18 @@
             this.searchButton.Text = "&Search";
             this.searchButton.UseVisualStyleBackColor = true;
             this.searchButton.Click += new System.EventHandler(this.searchButton_Click);
+            // 
+            // searchBox
+            // 
+            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.searchBox.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.searchBox.Location = new System.Drawing.Point(6, 7);
+            this.searchBox.Name = "searchBox";
+            this.searchBox.PromptText = "Search";
+            this.searchBox.Size = new System.Drawing.Size(387, 21);
+            this.searchBox.TabIndex = 0;
+            this.searchBox.Search += new System.EventHandler(this.searchBox_Search);
             // 
             // searchResults
             // 
@@ -116,9 +128,10 @@
             this.searchResults.MultiSelect = false;
             this.searchResults.Name = "searchResults";
             this.searchResults.Size = new System.Drawing.Size(571, 292);
-            this.searchResults.TabIndex = 0;
+            this.searchResults.TabIndex = 3;
             this.searchResults.UseCompatibleStateImageBehavior = false;
             this.searchResults.View = System.Windows.Forms.View.Details;
+            this.searchResults.ItemActivate += new System.EventHandler(this.searchResults_ItemActivate);
             // 
             // nameColumn
             // 
@@ -172,7 +185,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.manualInput.Location = new System.Drawing.Point(9, 23);
             this.manualInput.Name = "manualInput";
-            this.manualInput.Size = new System.Drawing.Size(571, 20);
+            this.manualInput.Size = new System.Drawing.Size(540, 20);
             this.manualInput.TabIndex = 1;
             this.manualInput.TextChanged += new System.EventHandler(this.manualInput_TextChanged);
             this.manualInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.manualInput_KeyPress);
@@ -196,6 +209,17 @@
             this.dialogButtonsPanel.Size = new System.Drawing.Size(591, 29);
             this.dialogButtonsPanel.TabIndex = 1;
             // 
+            // attribution
+            // 
+            this.attribution.AutoSize = true;
+            this.attribution.Location = new System.Drawing.Point(3, 4);
+            this.attribution.Name = "attribution";
+            this.attribution.Size = new System.Drawing.Size(121, 13);
+            this.attribution.TabIndex = 1;
+            this.attribution.TabStop = true;
+            this.attribution.Text = "Powered by Quizlet.com";
+            this.attribution.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.attribution_LinkClicked);
+            // 
             // importButton
             // 
             this.importButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -211,29 +235,6 @@
             // errorProvider
             // 
             this.errorProvider.ContainerControl = this;
-            // 
-            // attribution
-            // 
-            this.attribution.AutoSize = true;
-            this.attribution.Location = new System.Drawing.Point(3, 4);
-            this.attribution.Name = "attribution";
-            this.attribution.Size = new System.Drawing.Size(121, 13);
-            this.attribution.TabIndex = 1;
-            this.attribution.TabStop = true;
-            this.attribution.Text = "Powered by Quizlet.com";
-            this.attribution.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.attribution_LinkClicked);
-            // 
-            // searchBox
-            // 
-            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.searchBox.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.searchBox.Location = new System.Drawing.Point(6, 7);
-            this.searchBox.Name = "searchBox";
-            this.searchBox.PromptText = "Search";
-            this.searchBox.Size = new System.Drawing.Size(387, 21);
-            this.searchBox.TabIndex = 1;
-            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
             // 
             // QuizletSetSelector
             // 

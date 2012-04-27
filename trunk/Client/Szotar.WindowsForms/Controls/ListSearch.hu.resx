@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="search.Text" xml:space="preserve">
     <value>&amp;Keresés</value>
@@ -125,7 +125,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAAD0
-        IQAAAk1TRnQBSQFMAgEBAwEAAeQBAQHkAQEBIAEAASABAAT/ARkBAAj/AUIBTQE2BwABNgMAASgDAAGA
+        IQAAAk1TRnQBSQFMAgEBAwEAAewBAQHsAQEBIAEAASABAAT/ARkBAAj/AUIBTQE2BwABNgMAASgDAAGA
         AwABIAMAAQEBAAEYBgABMGMAAdEB0gHVAZkBmgGfAaYBoAGeA98D/xgAMP4D//8AJAABygHNAdEBQQGV
         AcgBbwGkAcgBtwGqAbIBmwGMAYoD+Q8AA/8D/AP6A9UqxAPDA+wD+wP9A///ABgAAckBzQHRAUEBmAHL
         AaYB9QH/AaoB5gH5AVsBlwHEAZgBkgGbA/QPAAP+A+YD0gHzAvQM/wb+Bv0D/AP7BvoD+QP4A/cBsQKy
@@ -277,7 +277,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAACk
-        CQAAAk1TRnQBSQFMAgEBAwEAAeQBAQHkAQEBEAEAARABAAT/ARkBAAj/AUIBTQE2BwABNgMAASgDAAFA
+        CQAAAk1TRnQBSQFMAgEBAwEAAewBAQHsAQEBEAEAARABAAT/ARkBAAj/AUIBTQE2BwABNgMAASgDAAFA
         AwABEAMAAQEBAAEYBgABDDkAAa8BwAHMAawBswG8AeUC5AYAA/8D/gP2FfUD/gP/igABngG0AcMBigHU
         AfABZQG3AeQBzAHTAdsGAAP8AcMB1AHMAf0C/gP/A/4D/QP8A/oD+QP2AcIB0gHKA/whAAP+YwABnwG5
         AckBiwHWAfIBbQHHAfMBNgGLAcUB8AHyAfMGAAP7AaQB2gHABv4D/QP7A/oD+AP2A/MBngHSAboD+x4A

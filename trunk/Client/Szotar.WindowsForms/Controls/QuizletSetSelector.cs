@@ -15,7 +15,6 @@ namespace Szotar.WindowsForms.Controls {
 	public partial class QuizletSetSelector : UserControl, IImporterUI<WordList> {
 		private Nullable<long> selectedSet;
 		QuizletImporter importer;
-		Exception exception;
         CancellationTokenSource cts;
         DisposableComponent disposableComponent;
         bool searching;
@@ -153,6 +152,13 @@ namespace Szotar.WindowsForms.Controls {
 			OnFinished();
 		}
 
+        private void searchResults_ItemActivate(object sender, EventArgs e) {
+            if (searchResults.SelectedIndices.Count == 0)
+                return;
+
+            importButton_Click(sender, e);
+        }
+
 		private void searchButton_Click(object sender, EventArgs e) {
             if (searching)
 				AbortRequest();
@@ -160,12 +166,11 @@ namespace Szotar.WindowsForms.Controls {
     			StartSearch();
 		}
 
-		private void searchBox_KeyPress(object sender, KeyPressEventArgs e) {
-			if (e.KeyChar == '\r') {
-				e.Handled = true;
-				StartSearch();
-			}
-		}
+        private void searchBox_Search(object sender, EventArgs e) {
+            if (searching)
+                AbortRequest();
+            StartSearch();
+        }
 
 		void searchResults_SelectedIndexChanged(object sender, EventArgs e) {
 			UpdateImportButton();

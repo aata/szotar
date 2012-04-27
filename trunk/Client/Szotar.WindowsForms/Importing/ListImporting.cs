@@ -54,7 +54,7 @@ namespace Szotar.WindowsForms.Importing.WordListImporting {
                         return;
                     }
 
-                    var list = DataStore.Database.CreateSet(set.Title, set.Author, null, set.Uri.ToString(), null);
+                    var list = DataStore.Database.CreateSet(set.Title, set.Author, null, set.Uri.ToString(), DateTime.Now);
                     foreach (var pair in set.Terms)
                         list.Add(new WordListEntry(list, pair.Phrase, pair.Translation));
                     OnCompleted(list, null, false, null);
