@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace Szotar.Json {
 	[Serializable]
-	public class ParseException : Exception {
+	public class ParseException : FormatException {
 		public ParseException() { }
 	  
 		public ParseException(string message) 
