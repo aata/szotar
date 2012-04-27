@@ -149,5 +149,13 @@ namespace Szotar.WindowsForms.Forms {
         private void findDuplicates_Click(object sender, EventArgs e) {
             ShowForm.Show<FindDuplicates>();
         }
+
+        private void importDictionaryMI_Click(object sender, EventArgs e) {
+            ShowForm.Show<DictionaryImport>();
+        }
+
+        private void importListMI_Click(object sender, EventArgs e) {
+            ShowForm.Show<ImportForm>();
+        }
 	}
 }

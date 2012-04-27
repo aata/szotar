@@ -29,6 +29,7 @@ namespace Szotar.WindowsForms.Controls {
 
 			search.Click += (s, e) => UpdateResults();
 			searchBox.TextChanged += (s, e) => UpdateResults();
+            searchBox.Search += (s, e) => UpdateResults();
 			results.Resize += (s, e) => ResizeColumns();
 			Disposed += (s, e) => UnwireDBEvents();
 
