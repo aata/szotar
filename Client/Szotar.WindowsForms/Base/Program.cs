@@ -46,53 +46,53 @@ namespace Szotar.WindowsForms {
 				return;
 			}
 
-            if (!string.IsNullOrEmpty(GuiConfiguration.UiLanguage)) {
-                try {
-                    // According to MSDN, we should set both CurrentCulture and CurrentUICulture.
-                    // http://msdn.microsoft.com/en-us/library/w7x1y988.aspx
-                    var culture = new System.Globalization.CultureInfo(GuiConfiguration.UiLanguage);
+			if (!string.IsNullOrEmpty(GuiConfiguration.UiLanguage)) {
+				try {
+					// According to MSDN, we should set both CurrentCulture and CurrentUICulture.
+					// http://msdn.microsoft.com/en-us/library/w7x1y988.aspx
+					var culture = new System.Globalization.CultureInfo(GuiConfiguration.UiLanguage);
 
-                    System.Threading.Thread.CurrentThread.CurrentCulture = culture;
-                    System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
-                } catch (ArgumentException) {
-                    ProgramLog.Default.AddMessage(LogType.Error, "The UI language \"{0}\" is invalid.", GuiConfiguration.UiLanguage);
-                }
-            }
+					System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+					System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+				} catch (ArgumentException) {
+					ProgramLog.Default.AddMessage(LogType.Error, "The UI language \"{0}\" is invalid.", GuiConfiguration.UiLanguage);
+				}
+			}
 
-            switch (GuiConfiguration.StartupAction) {
-                case "StartPage":
-                    new Forms.StartPage().Show();
-                    break;
+			switch (GuiConfiguration.StartupAction) {
+				case "StartPage":
+					new Forms.StartPage().Show();
+					break;
 
-                case "Practice":
-                    new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
-                    break;
+				case "Practice":
+					new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
+					break;
 
-                case "Dictionary":
-                default:
-                    string dict = GuiConfiguration.StartupDictionary;
-                    if (string.IsNullOrEmpty(dict))
-                        goto case "StartPage";
+				case "Dictionary":
+				default:
+					string dict = GuiConfiguration.StartupDictionary;
+					if (string.IsNullOrEmpty(dict))
+						goto case "StartPage";
 
-                    Exception error = null;
+					Exception error = null;
 
-                    try {
-                        DictionaryInfo info = new SimpleDictionary.Info(dict);
-                        new Forms.LookupForm(info).Show();
-                    } catch (System.IO.IOException e) { // TODO: Access/permission exceptions?
-                        error = e;
-                        goto case "StartPage";
-                    } catch (DictionaryLoadException e) {
-                        error = e;
-                        // Maybe there should be some UI for this (it's there, but not loadable?)...
-                        goto case "StartPage";
-                    }
+					try {
+						DictionaryInfo info = new SimpleDictionary.Info(dict);
+						new Forms.LookupForm(info).Show();
+					} catch (System.IO.IOException e) { // TODO: Access/permission exceptions?
+						error = e;
+						goto case "StartPage";
+					} catch (DictionaryLoadException e) {
+						error = e;
+						// Maybe there should be some UI for this (it's there, but not loadable?)...
+						goto case "StartPage";
+					}
 
-                    if (error != null)
-                        ProgramLog.Default.AddMessage(LogType.Error, "Could not load dictionary {0}: {1}", dict, error.Message);
+					if (error != null)
+						ProgramLog.Default.AddMessage(LogType.Error, "Could not load dictionary {0}: {1}", dict, error.Message);
 
-                    break;
-            }
+					break;
+			}
 
 			RunUntilNoForms();
 			return;

@@ -126,14 +126,14 @@ namespace Szotar.WindowsForms {
 			set { Default.Set("PracticeFixCase", value); }
 		}
 
-        public static int PracticeDefaultCount {
-            get { return Default.Get<int>("PracticeDefaultCount", 20); }
-            set { Default.Set("PracticeDefaultCount", value); }
-        }
+		public static int PracticeDefaultCount {
+			get { return Default.Get<int>("PracticeDefaultCount", 20); }
+			set { Default.Set("PracticeDefaultCount", value); }
+		}
 
-        public static string UiLanguage {
-            get { return Default.Get<string>("UiLanguage", ""); }
-            set { Default.Set("UiLanguage", value); }
-        }
+		public static string UiLanguage {
+			get { return Default.Get<string>("UiLanguage", ""); }
+			set { Default.Set("UiLanguage", value); }
+		}
 	}
 }

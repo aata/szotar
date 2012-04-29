@@ -23,39 +23,39 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProgressUI));
-            this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.progressLabel = new System.Windows.Forms.Label();
-            this.cancel = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-            // 
-            // progressBar
-            // 
-            resources.ApplyResources(this.progressBar, "progressBar");
-            this.progressBar.Name = "progressBar";
-            // 
-            // progressLabel
-            // 
-            resources.ApplyResources(this.progressLabel, "progressLabel");
-            this.progressLabel.Name = "progressLabel";
-            // 
-            // cancel
-            // 
-            resources.ApplyResources(this.cancel, "cancel");
-            this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancel.Name = "cancel";
-            this.cancel.UseVisualStyleBackColor = true;
-            this.cancel.Click += new System.EventHandler(this.cancel_Click);
-            // 
-            // ProgressUI
-            // 
-            resources.ApplyResources(this, "$this");
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.cancel);
-            this.Controls.Add(this.progressLabel);
-            this.Controls.Add(this.progressBar);
-            this.Name = "ProgressUI";
-            this.ResumeLayout(false);
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProgressUI));
+			this.progressBar = new System.Windows.Forms.ProgressBar();
+			this.progressLabel = new System.Windows.Forms.Label();
+			this.cancel = new System.Windows.Forms.Button();
+			this.SuspendLayout();
+			// 
+			// progressBar
+			// 
+			resources.ApplyResources(this.progressBar, "progressBar");
+			this.progressBar.Name = "progressBar";
+			// 
+			// progressLabel
+			// 
+			resources.ApplyResources(this.progressLabel, "progressLabel");
+			this.progressLabel.Name = "progressLabel";
+			// 
+			// cancel
+			// 
+			resources.ApplyResources(this.cancel, "cancel");
+			this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.cancel.Name = "cancel";
+			this.cancel.UseVisualStyleBackColor = true;
+			this.cancel.Click += new System.EventHandler(this.cancel_Click);
+			// 
+			// ProgressUI
+			// 
+			resources.ApplyResources(this, "$this");
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.cancel);
+			this.Controls.Add(this.progressLabel);
+			this.Controls.Add(this.progressBar);
+			this.Name = "ProgressUI";
+			this.ResumeLayout(false);
 
 		}
 

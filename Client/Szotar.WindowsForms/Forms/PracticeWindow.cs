@@ -14,8 +14,8 @@ namespace Szotar.WindowsForms.Forms {
 		PracticeQueue queue;
 		IPracticeMode mode;
 
-        public PracticeWindow(IList<ListSearchResult> items, PracticeMode whichMode)
-            : this(DataStore.Database.GetItems(items), whichMode) { }
+		public PracticeWindow(IList<ListSearchResult> items, PracticeMode whichMode)
+			: this(DataStore.Database.GetItems(items), whichMode) { }
 
 		public PracticeWindow(List<PracticeItem> terms, PracticeMode whichMode) {
 			InitializeComponent();
@@ -50,11 +50,11 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		public void SetMode(IPracticeMode mode) {
-            if (this.mode == mode)
-                return;
+			if (this.mode == mode)
+				return;
 
-            if (this.mode != null)
-                this.mode.Stop();
+			if (this.mode != null)
+				this.mode.Stop();
 
 			this.mode = mode;
 			mode.Start(this);
@@ -81,14 +81,14 @@ namespace Szotar.WindowsForms.Forms {
 			return queue.AllItems;
 		}
 
-        public void ReplaceItem(PracticeItem existing, PracticeItem replacement) {
-            var items = queue.AllItems;
-            for (int i = 0; i < items.Count; i++)
-                if (items[i] == existing)
-                    items[i] = replacement;
-        }
+		public void ReplaceItem(PracticeItem existing, PracticeItem replacement) {
+			var items = queue.AllItems;
+			for (int i = 0; i < items.Count; i++)
+				if (items[i] == existing)
+					items[i] = replacement;
+		}
 
-        ToolStrip IPracticeWindow.Controls {
+		ToolStrip IPracticeWindow.Controls {
 			get { return mainMenu; }
 		}
 
@@ -109,21 +109,21 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void showStartPage_Click(object sender, EventArgs e) {
-            ShowForm.Show<StartPage>();
+			ShowForm.Show<StartPage>();
 		}
 
-        private void flashcardsMI_Click(object sender, EventArgs e) {
-            SetMode(new FlashcardMode());
-        }
+		private void flashcardsMI_Click(object sender, EventArgs e) {
+			SetMode(new FlashcardMode());
+		}
 
-        private void learnMI_Click(object sender, EventArgs e) {
-            SetMode(new LearnMode());
-        }
+		private void learnMI_Click(object sender, EventArgs e) {
+			SetMode(new LearnMode());
+		}
 
-        private void practiceWeakPoints_Click(object sender, EventArgs e) {
-            mode.Stop();
-            queue = new PracticeQueue(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount));
-            SetMode(new LearnMode());
-        }
+		private void practiceWeakPoints_Click(object sender, EventArgs e) {
+			mode.Stop();
+			queue = new PracticeQueue(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount));
+			SetMode(new LearnMode());
+		}
 	}
 }

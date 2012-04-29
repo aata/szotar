@@ -88,29 +88,29 @@ namespace Szotar {
 				}
 			}
 
-            public void AddEntries(IList<Entry> entries, Action<int, int> notify) {
-                foreach (var entry in entries)
-                    this.entries.Add(entry);
-            }
+			public void AddEntries(IList<Entry> entries, Action<int, int> notify) {
+				foreach (var entry in entries)
+					this.entries.Add(entry);
+			}
 
-            public void AddEntry(Entry e) {
-                int insertionPoint = entries.FindIndex(x => x.Phrase.CompareTo(e.Phrase) > 0);
-                entries.Add(e);
-                this.Dictionary.Save();
-            }
+			public void AddEntry(Entry e) {
+				int insertionPoint = entries.FindIndex(x => x.Phrase.CompareTo(e.Phrase) > 0);
+				entries.Add(e);
+				this.Dictionary.Save();
+			}
 
-            public void EntryModified(Entry e) {
-                this.Dictionary.Save();
-            }
+			public void EntryModified(Entry e) {
+				this.Dictionary.Save();
+			}
 
-            public void RemoveEntries(IList<Entry> remove) {
-                if(entries.RemoveAll(e => remove.Contains(e)) > 0)
-                    this.Dictionary.Save();
-            }
+			public void RemoveEntries(IList<Entry> remove) {
+				if(entries.RemoveAll(e => remove.Contains(e)) > 0)
+					this.Dictionary.Save();
+			}
 
-            public void Sort() {
-                entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
-            }
+			public void Sort() {
+				entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
+			}
 		}
 
 		public class Info : DictionaryInfo {
@@ -118,7 +118,7 @@ namespace Szotar {
 				using (SimpleDictionary dict = new SimpleDictionary(path, false, false))
 					Load(dict);
 
-                
+				
 				GetFullInstance = () => new SimpleDictionary(Path);
 			}
 
@@ -334,7 +334,7 @@ namespace Szotar {
 				});
 
 				if (!alreadySorted)
-                    Sort();
+					Sort();
 			} catch (IOException ex) {
 				throw new DictionaryLoadException(ex.Message, ex);
 			} catch (ArgumentException ex) {
@@ -344,10 +344,10 @@ namespace Szotar {
 			}
 		}
 
-        public void Sort() {
-            forwards.Sort();
-            backwards.Sort();
-        }
+		public void Sort() {
+			forwards.Sort();
+			backwards.Sort();
+		}
 
 		void LoadEntriesWith(bool loadTranslations, Action<char, Entry> action) {
 			try {
@@ -458,15 +458,15 @@ namespace Szotar {
 			}
 		}
 
-        public void AddEntries(IList<Entry> forwards, IList<Entry> backwards, Action<int, int> notify = null) {
-            if (notify == null) {
-                this.forwards.AddEntries(forwards, null);
-                this.backwards.AddEntries(backwards, null);
-            } else {
-                this.forwards.AddEntries(forwards, (i, n) => notify(i, n + backwards.Count));
-                this.backwards.AddEntries(backwards, (i, n) => notify(i + forwards.Count, n + forwards.Count));
-            }
-        }
+		public void AddEntries(IList<Entry> forwards, IList<Entry> backwards, Action<int, int> notify = null) {
+			if (notify == null) {
+				this.forwards.AddEntries(forwards, null);
+				this.backwards.AddEntries(backwards, null);
+			} else {
+				this.forwards.AddEntries(forwards, (i, n) => notify(i, n + backwards.Count));
+				this.backwards.AddEntries(backwards, (i, n) => notify(i + forwards.Count, n + forwards.Count));
+			}
+		}
 
 
 		/// <summary>Escapes characters \0, %, space, \n and \r. Used to avoid wasting 
@@ -579,83 +579,83 @@ namespace Szotar {
 			}
 		}
 
-        #region Background Save
-        Thread workerThread;
+		#region Background Save
+		Thread workerThread;
 
 		public void BackgroundSaveWorker() {
-            try {
-                Metrics.Measure("Saving dictionary: " + System.IO.Path.GetFileName(Path), delegate {
-                    if (Path != null) {
-                        try {
-                            string tempFile = P.GetTempFileName();
-                            string backupFile = P.GetTempFileName();
+			try {
+				Metrics.Measure("Saving dictionary: " + System.IO.Path.GetFileName(Path), delegate {
+					if (Path != null) {
+						try {
+							string tempFile = P.GetTempFileName();
+							string backupFile = P.GetTempFileName();
 
-                            // Write the new version to a temporary file, first. If that fails, the actual dictionary file
-                            // is not modified.
-                            Write(tempFile);
+							// Write the new version to a temporary file, first. If that fails, the actual dictionary file
+							// is not modified.
+							Write(tempFile);
 
-                            // Try to make a backup of the file. If that isn't possible for some reason, just
-                            // delete it, since we've written the replacement file.
-                            try {
-                                CloseFile();
-                                DestroyCache();
-                                File.Move(Path, backupFile);
-                            } catch (IOException) {
-                                File.Delete(Path);
-                            } catch (UnauthorizedAccessException) {
-                                File.Delete(Path);
-                            }
+							// Try to make a backup of the file. If that isn't possible for some reason, just
+							// delete it, since we've written the replacement file.
+							try {
+								CloseFile();
+								DestroyCache();
+								File.Move(Path, backupFile);
+							} catch (IOException) {
+								File.Delete(Path);
+							} catch (UnauthorizedAccessException) {
+								File.Delete(Path);
+							}
 
-                            // Overwrite the dictionary file with the new version.
-                            File.Move(tempFile, Path);
+							// Overwrite the dictionary file with the new version.
+							File.Move(tempFile, Path);
 
-                            // Try to open the file again, so that other people can't modify it.
-                            // If it fails, we can try again later.
-                            try {
-                                OpenFile(true);
-                            } catch (IOException) {
-                            } catch (UnauthorizedAccessException) { }
+							// Try to open the file again, so that other people can't modify it.
+							// If it fails, we can try again later.
+							try {
+								OpenFile(true);
+							} catch (IOException) {
+							} catch (UnauthorizedAccessException) { }
 
-                            File.Delete(backupFile);
+							File.Delete(backupFile);
 
-                            SaveCache();
-                        } catch (IOException ex) {
-                            throw new DictionarySaveException(ex.Message, ex);
-                        } catch (UnauthorizedAccessException ex) {
-                            throw new DictionarySaveException(ex.Message, ex);
-                        } catch (ArgumentException ex) {
-                            throw new DictionarySaveException(ex.Message, ex);
-                        }
-                    } else {
-                        throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
-                    }
-                });
-            } catch (DictionarySaveException e) {
-                ProgramLog.Default.AddMessage(LogType.Error, "{0}", e.Message);
-            } catch (InvalidOperationException e) {
-                ProgramLog.Default.AddMessage(LogType.Error, "{0}", e.Message);
-            }
+							SaveCache();
+						} catch (IOException ex) {
+							throw new DictionarySaveException(ex.Message, ex);
+						} catch (UnauthorizedAccessException ex) {
+							throw new DictionarySaveException(ex.Message, ex);
+						} catch (ArgumentException ex) {
+							throw new DictionarySaveException(ex.Message, ex);
+						}
+					} else {
+						throw new InvalidOperationException("Can't save a dictionary that doesn't have a Path");
+					}
+				});
+			} catch (DictionarySaveException e) {
+				ProgramLog.Default.AddMessage(LogType.Error, "{0}", e.Message);
+			} catch (InvalidOperationException e) {
+				ProgramLog.Default.AddMessage(LogType.Error, "{0}", e.Message);
+			}
 		}
 
-        public void Save() {
-            CancelBackgroundSave();
+		public void Save() {
+			CancelBackgroundSave();
 
-            workerThread = new Thread(new ThreadStart(this.BackgroundSaveWorker));
-            workerThread.Start();
-        }
+			workerThread = new Thread(new ThreadStart(this.BackgroundSaveWorker));
+			workerThread.Start();
+		}
 
-        void CancelBackgroundSave() {
-            if (workerThread == null)
-                return;
+		void CancelBackgroundSave() {
+			if (workerThread == null)
+				return;
 
-            workerThread.Abort();
-            workerThread.Join();
-            workerThread = null;
-        }
-        #endregion
+			workerThread.Abort();
+			workerThread.Join();
+			workerThread = null;
+		}
+		#endregion
 
-        #region Caching
-        static readonly int CacheFormatVersion = 2;
+		#region Caching
+		static readonly int CacheFormatVersion = 2;
 
 		string CachePath() {
 			return P.ChangeExtension(Path, ".dict.cache");
@@ -680,23 +680,23 @@ namespace Szotar {
 
 			// We have to save a copy of the list of entries in case it gets modified while the thread is running.
 			var forwardsEntries = new List<Entry>(forwards.HeadWords);
-            bool haveTags = true;
-            foreach (var entry in forwards) {
-                forwardsEntries.Add(entry.Clone());
-                if (entry.Tag.Data == null)
-                    haveTags = false;
-            }
+			bool haveTags = true;
+			foreach (var entry in forwards) {
+				forwardsEntries.Add(entry.Clone());
+				if (entry.Tag.Data == null)
+					haveTags = false;
+			}
 			var backwardsEntries = new List<Entry>(backwards.HeadWords);
-            foreach (var entry in backwards) {
-                backwardsEntries.Add(entry.Clone());
-                if (entry.Tag.Data == null)
-                    haveTags = false;
-            }
+			foreach (var entry in backwards) {
+				backwardsEntries.Add(entry.Clone());
+				if (entry.Tag.Data == null)
+					haveTags = false;
+			}
 
-            if (!haveTags) {
-                // Can't write the dictionary cache because there aren't any entry tags.
-                return;
-            }
+			if (!haveTags) {
+				// Can't write the dictionary cache because there aren't any entry tags.
+				return;
+			}
 
 			new Thread(new ThreadStart(delegate {
 				Metrics.Measure(string.Format("Saving dictionary cache for {0}", this.Name), delegate {

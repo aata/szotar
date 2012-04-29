@@ -832,7 +832,7 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void openList_Click(object sender, EventArgs e) {
-            ShowForm.Show<StartPage>();
+			ShowForm.Show<StartPage>();
 		}
 
 		void importList_Click(object sender, EventArgs e) {
@@ -898,14 +898,14 @@ namespace Szotar.WindowsForms.Forms {
 			ShowForm.Show<DictionaryImport>();
 		}
 
-        private void addEntry_Click(object sender, EventArgs e) {
-            string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
-            string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage: Dictionary.FirstLanguage;
+		private void addEntry_Click(object sender, EventArgs e) {
+			string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+			string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage: Dictionary.FirstLanguage;
 
-            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(this.displayedSearchMode), phraseLanguage, translationLanguage).ShowDialog();
-            if (dr == System.Windows.Forms.DialogResult.OK)
-                UpdateResults();
-        }
+			var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(this.displayedSearchMode), phraseLanguage, translationLanguage).ShowDialog();
+			if (dr == System.Windows.Forms.DialogResult.OK)
+				UpdateResults();
+		}
 		#endregion
 
 		#region Tools Menu
@@ -936,7 +936,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			addTo.DropDownItems.Clear();
 
-            // Find out what word list editors are already open.
+			// Find out what word list editors are already open.
 			foreach (Form f in Application.OpenForms) {
 				var lb = f as ListBuilder;
 				if (lb != null) {
@@ -946,7 +946,7 @@ namespace Szotar.WindowsForms.Forms {
 				}
 			}
 
-            var recent = DataStore.Database.GetRecentSets(Configuration.RecentListsSize).ToList();
+			var recent = DataStore.Database.GetRecentSets(Configuration.RecentListsSize).ToList();
 			recent.RemoveAll(r => open.Contains(r.ID.Value));
 
 			if (recent.Count > 0 && open.Count > 0)
@@ -960,13 +960,13 @@ namespace Szotar.WindowsForms.Forms {
 
 			addTo.Visible = addTo.DropDownItems.Count > 0;
 
-            deleteMI.Enabled = editMI.Enabled = grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0;
+			deleteMI.Enabled = editMI.Enabled = grid.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0;
 		}
 
 		private void AddToExistingList(long listID) {
-            var form = ListBuilder.Open(listID);
+			var form = ListBuilder.Open(listID);
 			if(form != null)
-                AddEntries(form);
+				AddEntries(form);
 		}
 
 		IEnumerable<int> GetSelectedIndices() {
@@ -1028,23 +1028,23 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-        private void editMI_Click(object sender, EventArgs e) {
-            int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
-            if (index < 0)
-                return;
+		private void editMI_Click(object sender, EventArgs e) {
+			int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
+			if (index < 0)
+				return;
 
-            string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
-            string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
+			string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+			string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
 
-            var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(displayedSearchMode), phraseLanguage, translationLanguage, results[index].Entry).ShowDialog();
-            if (dr == DialogResult.OK)
-                UpdateResults();
-        }
+			var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(displayedSearchMode), phraseLanguage, translationLanguage, results[index].Entry).ShowDialog();
+			if (dr == DialogResult.OK)
+				UpdateResults();
+		}
 
-        private void deleteMI_Click(object sender, EventArgs e) {
-            var remove = this.GetSelectedResults().Select(sr => sr.Entry).ToArray();
-            GetSectionBySearchMode(displayedSearchMode).RemoveEntries(remove);
-        }
+		private void deleteMI_Click(object sender, EventArgs e) {
+			var remove = this.GetSelectedResults().Select(sr => sr.Entry).ToArray();
+			GetSectionBySearchMode(displayedSearchMode).RemoveEntries(remove);
+		}
 		#endregion
 		#endregion
 

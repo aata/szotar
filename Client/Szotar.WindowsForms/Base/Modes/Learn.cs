@@ -237,101 +237,101 @@ namespace Szotar.WindowsForms {
 		}
 	};
 
-    class GameOverview : UserControl {
-        ListView list;
-        List<ListViewGroup> groups;
+	class GameOverview : UserControl {
+		ListView list;
+		List<ListViewGroup> groups;
 
-        public GameOverview(LearnMode mode) {
-            list = new ListView() { 
-                Dock = DockStyle.Fill, 
-                Margin = new Padding(3),
-                FullRowSelect = true,
-                View = View.Details,
-                HeaderStyle = ColumnHeaderStyle.None
-            };
-            groups = new List<ListViewGroup>();
+		public GameOverview(LearnMode mode) {
+			list = new ListView() { 
+				Dock = DockStyle.Fill, 
+				Margin = new Padding(3),
+				FullRowSelect = true,
+				View = View.Details,
+				HeaderStyle = ColumnHeaderStyle.None
+			};
+			groups = new List<ListViewGroup>();
 
-            Controls.Add(list);
-            ThemeHelper.UseExplorerTheme(list);
+			Controls.Add(list);
+			ThemeHelper.UseExplorerTheme(list);
 
-            InitializeContextMenu();
+			InitializeContextMenu();
 
-            list.Resize += delegate { DistributeColumns(); };
-            this.Load += delegate { DistributeColumns(); };
-        }
+			list.Resize += delegate { DistributeColumns(); };
+			this.Load += delegate { DistributeColumns(); };
+		}
 
-        void DistributeColumns() {
-            if (list.Columns.Count >= 3) {
-                list.Columns[0].Width = list.ClientSize.Width / 2;
-                list.Columns[1].Width = list.ClientSize.Width / 2;
-                list.Columns[2].Width = 0;
-            }
-        }
+		void DistributeColumns() {
+			if (list.Columns.Count >= 3) {
+				list.Columns[0].Width = list.ClientSize.Width / 2;
+				list.Columns[1].Width = list.ClientSize.Width / 2;
+				list.Columns[2].Width = 0;
+			}
+		}
 
-        public void UpdateOverview(IList<IList<Attempt>> rounds) {
-            list.BeginUpdate();
+		public void UpdateOverview(IList<IList<Attempt>> rounds) {
+			list.BeginUpdate();
 
-            try {
-                list.Clear();
-                list.Groups.Clear();
-                groups.Clear();
+			try {
+				list.Clear();
+				list.Groups.Clear();
+				groups.Clear();
 
-                list.Columns.Add(new ColumnHeader());
-                list.Columns.Add(new ColumnHeader());
-                list.Columns.Add(new ColumnHeader());
+				list.Columns.Add(new ColumnHeader());
+				list.Columns.Add(new ColumnHeader());
+				list.Columns.Add(new ColumnHeader());
 
-                foreach (var round in rounds) {
-                    var group = new ListViewGroup();
-                    groups.Add(group);
-                    group.Header = string.Format(Resources.LearnMode.RoundN, groups.Count);
-                    list.Groups.Add(group);
+				foreach (var round in rounds) {
+					var group = new ListViewGroup();
+					groups.Add(group);
+					group.Header = string.Format(Resources.LearnMode.RoundN, groups.Count);
+					list.Groups.Add(group);
 
-                    foreach (var attempt in round) {
-                        string phrase, translation;
-                        if (!attempt.Swapped) {
-                            phrase = attempt.Item.Phrase;
-                            translation = attempt.Item.Translation;
-                        } else {
-                            phrase = attempt.Item.Translation;
-                            translation = attempt.Item.Phrase;
-                        }
+					foreach (var attempt in round) {
+						string phrase, translation;
+						if (!attempt.Swapped) {
+							phrase = attempt.Item.Phrase;
+							translation = attempt.Item.Translation;
+						} else {
+							phrase = attempt.Item.Translation;
+							translation = attempt.Item.Phrase;
+						}
 
-                        var item = new ListViewItem(new string[] { phrase, translation, "" }, group);
-                        if(!attempt.Correct)
-                            item.ForeColor = SystemColors.GrayText;
-                        item.Tag = attempt;
-                        list.Items.Add(item);
-                    }
-                }
-            } finally {
-                list.EndUpdate();
-            }
+						var item = new ListViewItem(new string[] { phrase, translation, "" }, group);
+						if(!attempt.Correct)
+							item.ForeColor = SystemColors.GrayText;
+						item.Tag = attempt;
+						list.Items.Add(item);
+					}
+				}
+			} finally {
+				list.EndUpdate();
+			}
 
-            DistributeColumns();
-        }
+			DistributeColumns();
+		}
 
-        #region Context Menu
-        ContextMenuStrip contextMenu;
-        void InitializeContextMenu() {
-            contextMenu = new ContextMenuStrip();
+		#region Context Menu
+		ContextMenuStrip contextMenu;
+		void InitializeContextMenu() {
+			contextMenu = new ContextMenuStrip();
 
-            var viewInList = new ToolStripMenuItem(Resources.LearnMode.ViewInList);
-            EventHandler viewInListClick = (s, e) => {                
-                foreach (ListViewItem item in list.SelectedItems) {
-                    var attempt = item.Tag as Attempt;
-                    var form = Forms.ListBuilder.Open(attempt.Item.SetID);
-                    if(form != null)
-                        form.ScrollToItem(attempt.Item.Phrase, attempt.Item.Translation);
-                }
-            };
-            viewInList.Click += viewInListClick;
-            list.ItemActivate += viewInListClick;
-            contextMenu.Items.Add(viewInList);
+			var viewInList = new ToolStripMenuItem(Resources.LearnMode.ViewInList);
+			EventHandler viewInListClick = (s, e) => {                
+				foreach (ListViewItem item in list.SelectedItems) {
+					var attempt = item.Tag as Attempt;
+					var form = Forms.ListBuilder.Open(attempt.Item.SetID);
+					if(form != null)
+						form.ScrollToItem(attempt.Item.Phrase, attempt.Item.Translation);
+				}
+			};
+			viewInList.Click += viewInListClick;
+			list.ItemActivate += viewInListClick;
+			contextMenu.Items.Add(viewInList);
 
-            list.ContextMenuStrip = contextMenu;
-        }
-        #endregion
-    }
+			list.ContextMenuStrip = contextMenu;
+		}
+		#endregion
+	}
 
 	// TODO: Add items in the file menu that open the word lists currently being learnt.
 	class OptionsMenu : MenuStrip {
@@ -355,8 +355,8 @@ namespace Szotar.WindowsForms {
 			optionsItem.DropDownItems.Add(new ToolStripSeparator());
 			
 			AddFixupItem(Resources.LearnMode.IgnoreSpaces, "PracticeFixSpaces", optionsItem);
-            AddFixupItem(Resources.LearnMode.IgnorePunctuation, "PracticeFixPunctuation", optionsItem);
-            AddFixupItem(Resources.LearnMode.IgnoreParenthesized, "PracticeFixParentheses", optionsItem);
+			AddFixupItem(Resources.LearnMode.IgnorePunctuation, "PracticeFixPunctuation", optionsItem);
+			AddFixupItem(Resources.LearnMode.IgnoreParenthesized, "PracticeFixParentheses", optionsItem);
 			AddFixupItem(Resources.LearnMode.IgnoreCase, "PracticeFixCase", optionsItem);
 		}
 
@@ -393,8 +393,8 @@ namespace Szotar.WindowsForms {
 		TextBox affirmation; // When the user gets an answer wrong, make them type it in so that they learn it.
 		Button overrideButton;
 		Button editButton;
-        Button viewButton;
-        Button deleteButton;
+		Button viewButton;
+		Button deleteButton;
 		RoundOverview roundOverview;
 		GameOverview gameOverview;
 
@@ -446,26 +446,26 @@ namespace Szotar.WindowsForms {
 			phrase = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
 			answer = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
 			scoreLabel = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = scoreFont, Dock = DockStyle.Bottom, TextAlign = ContentAlignment.BottomRight };
-            history = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = extraSmallFont, Dock = DockStyle.Top, TextAlign = ContentAlignment.MiddleLeft };
+			history = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = extraSmallFont, Dock = DockStyle.Top, TextAlign = ContentAlignment.MiddleLeft };
 			translation = new TextBox() { Font = font };
-            affirmation = new TextBox() { Font = font };
-            overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.OverrideButton };
-            editButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.EditButton };
-            viewButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.ViewInListButton };
-            deleteButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.DeleteButton };
+			affirmation = new TextBox() { Font = font };
+			overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.OverrideButton };
+			editButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.EditButton };
+			viewButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.ViewInListButton };
+			deleteButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.DeleteButton };
 			roundOverview = new RoundOverview() { Dock = DockStyle.Fill };
 			gameOverview = new GameOverview(this) { Dock = DockStyle.Fill };
 
 			GameArea.Controls.Add(phrase);
 			GameArea.Controls.Add(scoreLabel);
 			GameArea.Controls.Add(answer);
-            GameArea.Controls.Add(history);
+			GameArea.Controls.Add(history);
 			GameArea.Controls.Add(translation);
-            GameArea.Controls.Add(affirmation);
-            GameArea.Controls.Add(overrideButton);
-            GameArea.Controls.Add(editButton);
-            GameArea.Controls.Add(viewButton);
-            GameArea.Controls.Add(deleteButton);
+			GameArea.Controls.Add(affirmation);
+			GameArea.Controls.Add(overrideButton);
+			GameArea.Controls.Add(editButton);
+			GameArea.Controls.Add(viewButton);
+			GameArea.Controls.Add(deleteButton);
 			GameArea.Controls.Add(roundOverview);
 			GameArea.Controls.Add(gameOverview);
 
@@ -474,8 +474,8 @@ namespace Szotar.WindowsForms {
 			affirmation.TextChanged += new EventHandler(affirmation_TextChanged);
 			overrideButton.Click += delegate { Override(items[index], lastGuess); };
 			editButton.Click += new EventHandler(editButton_Click);
-            viewButton.Click += new EventHandler(viewButton_Click);
-            deleteButton.Click += new EventHandler(deleteButton_Click);
+			viewButton.Click += new EventHandler(viewButton_Click);
+			deleteButton.Click += new EventHandler(deleteButton_Click);
 			roundOverview.KeyUp += new KeyEventHandler(roundOverview_KeyUp);
 
 			// Stop the beep sound being produced when Enter is pressed.
@@ -492,37 +492,37 @@ namespace Szotar.WindowsForms {
 		}
 
 		void editButton_Click(object sender, EventArgs e) {
-            var newItem = Dialogs.EditPracticeItem.Show(items[index]);
-            if (newItem != null)
-                items[index] = newItem;
-            Update();
-            Layout();
-        }
+			var newItem = Dialogs.EditPracticeItem.Show(items[index]);
+			if (newItem != null)
+				items[index] = newItem;
+			Update();
+			Layout();
+		}
 
-        void deleteButton_Click(object sender, EventArgs e) {
-            var dr = MessageBox.Show(
-                GameArea,
-                Properties.Resources.ConfirmDeletePracticeItem,
-                Properties.Resources.ConfirmDeletePracticeItemTitle,
-                MessageBoxButtons.OKCancel,
-                MessageBoxIcon.None,
-                MessageBoxDefaultButton.Button2);
+		void deleteButton_Click(object sender, EventArgs e) {
+			var dr = MessageBox.Show(
+				GameArea,
+				Properties.Resources.ConfirmDeletePracticeItem,
+				Properties.Resources.ConfirmDeletePracticeItemTitle,
+				MessageBoxButtons.OKCancel,
+				MessageBoxIcon.None,
+				MessageBoxDefaultButton.Button2);
 
-            if (dr == DialogResult.OK) {
-                var list = DataStore.Database.GetWordList(items[index].SetID);
-                for (int i = 0; i < list.Count; i++) {
-                    var item = list[i];
-                    if (item.Phrase == items[index].Phrase && item.Translation == items[index].Translation)
-                        list.RemoveAt(i);
-                }
-            }
-        }
+			if (dr == DialogResult.OK) {
+				var list = DataStore.Database.GetWordList(items[index].SetID);
+				for (int i = 0; i < list.Count; i++) {
+					var item = list[i];
+					if (item.Phrase == items[index].Phrase && item.Translation == items[index].Translation)
+						list.RemoveAt(i);
+				}
+			}
+		}
 
-        void viewButton_Click(object sender, EventArgs e) {
-            var form = Forms.ListBuilder.Open(items[index].SetID);
-            if (form != null)
-                form.ScrollToItem(items[index].Phrase, items[index].Translation);
-        }
+		void viewButton_Click(object sender, EventArgs e) {
+			var form = Forms.ListBuilder.Open(items[index].SetID);
+			if (form != null)
+				form.ScrollToItem(items[index].Phrase, items[index].Translation);
+		}
 
 		public override void Stop() {
 			base.Stop();
@@ -544,7 +544,7 @@ namespace Szotar.WindowsForms {
 			else
 				items = Owner.GetAllItems();
 
-            items.Shuffle(rng);
+			items.Shuffle(rng);
 
 			index = 0;
 			score = 0;
@@ -575,8 +575,8 @@ namespace Szotar.WindowsForms {
 		string CurrentTranslation { get { return swap ? items[index].Phrase : items[index].Translation; } }
 
 		void ReportGuess(PracticeItem item, bool correct) {
-            item.History.Add(DateTime.Now, correct);
-            DataStore.Database.AddPracticeHistory(item.SetID, item.Phrase, item.Translation, correct);
+			item.History.Add(DateTime.Now, correct);
+			DataStore.Database.AddPracticeHistory(item.SetID, item.Phrase, item.Translation, correct);
 		}
 
 		void NextPhrase() {
@@ -741,18 +741,18 @@ namespace Szotar.WindowsForms {
 				if (state == State.ViewingAnswer)
 					affirmation.Clear();
 				scoreLabel.Text = string.Format(Resources.LearnMode.Score, score, currentRound.Count, items.Count - currentRound.Count);
-                history.Text = string.Format(Resources.LearnMode.History, items[index].History.History.Count(x => x.Value), items[index].History.History.Count, items[index].History.Importance);
+				history.Text = string.Format(Resources.LearnMode.History, items[index].History.History.Count(x => x.Value), items[index].History.History.Count, items[index].History.Importance);
 			}
 
 			affirmation.Tag = affirmation.Visible = state == State.ViewingAnswer;
 			translation.Tag = translation.Visible = state == State.Guessing;
 			scoreLabel.Tag = scoreLabel.Visible = state != State.RoundOverview && state != State.GameOverview;
 			phrase.Tag = phrase.Visible = state != State.RoundOverview && state != State.GameOverview;
-            history.Tag = history.Visible = state == State.Guessing || state == State.ViewingAnswer;
+			history.Tag = history.Visible = state == State.Guessing || state == State.ViewingAnswer;
 			answer.Tag = answer.Visible = state == State.ViewingAnswer;
 			overrideButton.Tag = overrideButton.Visible = state == State.ViewingAnswer;
-            viewButton.Tag = viewButton.Visible = state == State.ViewingAnswer;
-            deleteButton.Tag = deleteButton.Visible = state == State.ViewingAnswer;
+			viewButton.Tag = viewButton.Visible = state == State.ViewingAnswer;
+			deleteButton.Tag = deleteButton.Visible = state == State.ViewingAnswer;
 			editButton.Tag = editButton.Visible = state == State.ViewingAnswer || state == State.Guessing;
 			roundOverview.Tag = roundOverview.Visible = state == State.RoundOverview;
 			gameOverview.Tag = gameOverview.Visible = state == State.GameOverview;

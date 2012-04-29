@@ -13,7 +13,7 @@ namespace Szotar {
 		public abstract IStringTable Strings { get; }
 		public abstract IStringTable GetTypeDescriptionStringTable(Type type);
 
-        public abstract IStringTable GetStringTable(string tableName);
+		public abstract IStringTable GetStringTable(string tableName);
 
 		public static LocalizationProvider Default { get; set; }
 	}

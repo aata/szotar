@@ -8,85 +8,85 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
-    public partial class TermEditor : UserControl {
-        WordListEntry item;
+	public partial class TermEditor : UserControl {
+		WordListEntry item;
 
-        public TermEditor() {
-            InitializeComponent();
-        }
+		public TermEditor() {
+			InitializeComponent();
+		}
 
-        protected override void OnControlRemoved(ControlEventArgs e) {
-            Item = null;
+		protected override void OnControlRemoved(ControlEventArgs e) {
+			Item = null;
 
-            base.OnControlRemoved(e);
-        }
+			base.OnControlRemoved(e);
+		}
 
-        public WordList List {
-            get { return item == null ? null : item.Owner; }
-        }
+		public WordList List {
+			get { return item == null ? null : item.Owner; }
+		}
 
-        public WordListEntry Item {
-            get { return item; }
-            set {
-                if (item == value)
-                    return;
-                if (item != null)
-                    UnwireEventHandlers();
-                item = value;
-                if (item != null)
-                    WireEventHandlers();
-                Update();
-            }
-        }
+		public WordListEntry Item {
+			get { return item; }
+			set {
+				if (item == value)
+					return;
+				if (item != null)
+					UnwireEventHandlers();
+				item = value;
+				if (item != null)
+					WireEventHandlers();
+				Update();
+			}
+		}
 
-        private void WireEventHandlers() {
-            List.ListChanged += new ListChangedEventHandler(list_ListChanged);
-            List.ListDeleted += new EventHandler(list_ListDeleted);
-        }
+		private void WireEventHandlers() {
+			List.ListChanged += new ListChangedEventHandler(list_ListChanged);
+			List.ListDeleted += new EventHandler(list_ListDeleted);
+		}
 
-        void list_ListDeleted(object sender, EventArgs e) {
-            Item = null;
-            RaiseItemDeleted();
-        }
+		void list_ListDeleted(object sender, EventArgs e) {
+			Item = null;
+			RaiseItemDeleted();
+		}
 
-        void list_ListChanged(object sender, ListChangedEventArgs e) {
-            if (e.ListChangedType == ListChangedType.ItemDeleted) {
-                if (!List.Contains(item)) {
-                    Item = null;
-                    RaiseItemDeleted();
-                }
-            }
-        }
+		void list_ListChanged(object sender, ListChangedEventArgs e) {
+			if (e.ListChangedType == ListChangedType.ItemDeleted) {
+				if (!List.Contains(item)) {
+					Item = null;
+					RaiseItemDeleted();
+				}
+			}
+		}
 
-        public event EventHandler ItemDeleted;
-        void RaiseItemDeleted() {
-            var h = ItemDeleted;
-            if (h != null)
-                h(this, new EventArgs());
-        }
+		public event EventHandler ItemDeleted;
+		void RaiseItemDeleted() {
+			var h = ItemDeleted;
+			if (h != null)
+				h(this, new EventArgs());
+		}
 
-        private void UnwireEventHandlers() {
-            List.ListChanged -= new ListChangedEventHandler(list_ListChanged);
-            List.ListDeleted -= new EventHandler(list_ListDeleted);
-        }
+		private void UnwireEventHandlers() {
+			List.ListChanged -= new ListChangedEventHandler(list_ListChanged);
+			List.ListDeleted -= new EventHandler(list_ListDeleted);
+		}
 
-        new void Update() {
-            if (item != null) {
-                phrase.Text = item.Phrase;
-                translation.Text = item.Translation;
-                phrase.Enabled = translation.Enabled = true;
-            } else {
-                phrase.Clear();
-                translation.Clear();
-                phrase.Enabled = translation.Enabled = false;
-            }
-        }
+		new void Update() {
+			if (item != null) {
+				phrase.Text = item.Phrase;
+				translation.Text = item.Translation;
+				phrase.Enabled = translation.Enabled = true;
+			} else {
+				phrase.Clear();
+				translation.Clear();
+				phrase.Enabled = translation.Enabled = false;
+			}
+		}
 
-        public void Save() {
-            if (item != null) {
-                item.Phrase = phrase.Text;
-                item.Translation = translation.Text;
-            }
-        }
-    }
+		public void Save() {
+			if (item != null) {
+				item.Phrase = phrase.Text;
+				item.Translation = translation.Text;
+			}
+		}
+	}
 }

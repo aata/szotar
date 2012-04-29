@@ -323,7 +323,7 @@ namespace Szotar.Json {
 			if(IsIntegral)
 				tw.Write(LongValue.ToString(CultureInfo.InvariantCulture));
 			else
-                tw.Write(DoubleValue.ToString(CultureInfo.InvariantCulture));
+				tw.Write(DoubleValue.ToString(CultureInfo.InvariantCulture));
 		}
 	}
 
