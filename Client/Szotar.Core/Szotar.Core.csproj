@@ -106,6 +106,7 @@
     <Compile Include="Base\WordList.cs" />
     <Compile Include="Base\Undo.cs" />
     <Compile Include="Quizlet\Quizlet.cs" />
+    <Compile Include="Quizlet\QuizletImporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

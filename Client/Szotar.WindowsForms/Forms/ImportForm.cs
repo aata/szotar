@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
-
-using Szotar.WindowsForms.Importing;
 
 namespace Szotar.WindowsForms.Forms {
 	public partial class ImportForm : Form, INotifyProgress {
@@ -29,18 +23,25 @@ namespace Szotar.WindowsForms.Forms {
 				string description = type.Name;
 
 				Attribute[] attributes = Attribute.GetCustomAttributes(type);
-                foreach (Attribute attribute in attributes) {
-                    if (attribute is ImporterAttribute && ((ImporterAttribute)attribute).Type == typeof(WordList))
-                        name = ((ImporterAttribute)attribute).Name;
-                    else if (attribute is ImporterDescriptionAttribute)
-                        description = Resources.ImporterDescriptions.ResourceManager.GetString(
-                            ((ImporterDescriptionAttribute)attribute).ResourceIdentifier, System.Globalization.CultureInfo.CurrentUICulture)
-                            ?? description;
-                }
+                foreach (var attribute in attributes.OfType<ImporterUIAttribute>()) {
+                    if(!attribute.ImporterType.GetInterfaces().Contains(typeof(IImporter<WordList>)))
+                        continue;
 
-				if (name != null) {
-					importerSelection.Items.Add(new ImporterItem(type, name, description));
-				}
+                    var importerAttribute = (ImporterAttribute)Attribute.GetCustomAttribute(attribute.ImporterType, typeof(ImporterAttribute));
+                    if (importerAttribute == null)
+                        continue;
+
+                    var descAttribute = (ImporterDescriptionAttribute)Attribute.GetCustomAttribute(attribute.ImporterType, typeof(ImporterDescriptionAttribute));
+                    name = importerAttribute.Name;
+
+                    if (descAttribute != null)
+                        description = Resources.ImporterDescriptions.ResourceManager.GetString(
+                            descAttribute.ResourceIdentifier, System.Globalization.CultureInfo.CurrentUICulture)
+                            ?? descAttribute.Description ?? description;
+
+                    if (name != null)
+                        importerSelection.Items.Add(new ImporterItem(type, name, description));
+                }
 			}
 			importerSelection.EndUpdate();
 
@@ -92,15 +93,17 @@ namespace Szotar.WindowsForms.Forms {
 					importer.Dispose();
 				}
 
-				importer = (IImporter<WordList>)item.Type.GetConstructor(new Type[] { }).Invoke(new object[] { });
-				WireImporterEvents();
+                var newUI = (IImporterUI<WordList>)Activator.CreateInstance(item.Type);
+                importer = newUI.Importer;
+                WireImporterEvents();
 
-				IImporterUI<WordList> newUI = importer.CreateUI();
-				newUI.Finished += new EventHandler(this.ImporterUIFinished);
-				CurrentUI = (Control)newUI;
+                if (newUI != null) {
+                    newUI.Finished += new EventHandler(this.ImporterUIFinished);
+                    CurrentUI = (Control)newUI;
+                }
 			}
 		}
-
+           
 		private Control CurrentUI {
 			get {
 				if (content.HasChildren)
@@ -189,24 +192,5 @@ namespace Szotar.WindowsForms.Forms {
 			SetProgressMessage(e.Message, e.Percentage);
 		}
 		#endregion
-	}
-
-	public class ImporterItem {
-		private string name, description;
-		private Type type;
-
-		public ImporterItem(Type type, string name, string description) {
-			this.type = type;
-			this.name = name;
-			this.description = description;
-		}
-
-		public Type Type { get { return type; } }
-		public string Name { get { return name; } }
-		public string Description { get { return description; } }
-
-		public override string ToString() {
-			return name + " - " + description;
-		}
 	}
 }
