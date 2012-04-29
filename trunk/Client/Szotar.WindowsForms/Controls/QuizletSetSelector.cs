@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
 	using System.Globalization;
-	using System.IO;
-	using System.Text.RegularExpressions;
-	using Szotar.WindowsForms.Importing;
-	using Szotar.WindowsForms.Importing.WordListImporting;
+    using System.Text.RegularExpressions;
     using System.Threading;
 
+    [ImporterUI(typeof(QuizletImporter))]
 	public partial class QuizletSetSelector : UserControl, IImporterUI<WordList> {
-		private Nullable<long> selectedSet;
+		long? selectedSet;
 		QuizletImporter importer;
         CancellationTokenSource cts;
         DisposableComponent disposableComponent;
@@ -23,12 +19,10 @@ namespace Szotar.WindowsForms.Controls {
 			get { return importer; }
 		}
 
-		public QuizletSetSelector(IImporter<WordList> importer) {
-			if (!(importer is QuizletImporter))
-				throw new ArgumentException("QuizletSetSelector cannot Apply to a " + importer == null ? "NullReference" : importer.GetType().Name);
-
-			this.importer = (QuizletImporter)importer;
+		public QuizletSetSelector() {
 			InitializeComponent();
+
+            importer = new QuizletImporter();
 
             if (this.components == null)
                 this.components = new System.ComponentModel.Container();

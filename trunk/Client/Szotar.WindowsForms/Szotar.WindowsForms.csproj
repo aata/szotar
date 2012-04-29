@@ -99,6 +99,7 @@
     <Compile Include="Base\DisposableComponent.cs" />
     <Compile Include="Base\Errors.cs" />
     <Compile Include="Base\GuiConfiguration.cs" />
+    <Compile Include="Base\ImporterItem.cs" />
     <Compile Include="Base\Localization.cs" />
     <Compile Include="Base\Modes\Learn.cs">
       <SubType>UserControl</SubType>
@@ -253,7 +254,6 @@
       <DependentUpon>StartPage.cs</DependentUpon>
     </Compile>
     <Compile Include="Importing\DualSection.cs" />
-    <Compile Include="Importing\ListImporting.cs" />
     <Compile Include="Preferences\Display.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -496,6 +496,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LookupForm.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Quizlet.hu.resx" />
     <EmbeddedResource Include="Resources\Quizlet.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>

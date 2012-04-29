@@ -115,8 +115,6 @@ namespace Szotar {
 	}
 
 	public interface IImporter<T> : IDisposable {
-		IImporterUI<T> CreateUI();
-
 		void BeginImport();
 		void Cancel();
 

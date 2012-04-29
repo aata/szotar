@@ -17,6 +17,10 @@ namespace Szotar.WindowsForms {
 		public override IStringTable Strings {
 			get { return new StringTable(Properties.Resources.ResourceManager); }
 		}
+
+        public override IStringTable GetStringTable(string tableName) {
+            return new StringTable(tableName);
+        }
 	}
 
 	public class TypeStringTable : StringTable {
@@ -42,7 +46,7 @@ namespace Szotar.WindowsForms {
 		}
 
 		public StringTable(string name) {
-			resourceManager = new ResourceManager("Szotar.WindowsForms.Resources.Strings." + name, System.Reflection.Assembly.GetExecutingAssembly());
+			resourceManager = new ResourceManager("Szotar.WindowsForms.Resources." + name, System.Reflection.Assembly.GetExecutingAssembly());
 		}
 
 		public virtual string this[string stringName] {
