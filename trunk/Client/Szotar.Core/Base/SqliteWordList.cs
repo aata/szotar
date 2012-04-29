@@ -54,15 +54,15 @@ namespace Szotar.Sqlite {
 			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
 		}
 
-        public static SqliteWordList FromSetID(SqliteDataStore store, long setID) {
-            var list = new SqliteWordList(store, setID);
-            if (!list.worker.Exists()) {
-                list.Dispose();
-                return null;
-            }
+		public static SqliteWordList FromSetID(SqliteDataStore store, long setID) {
+			var list = new SqliteWordList(store, setID);
+			if (!list.worker.Exists()) {
+				list.Dispose();
+				return null;
+			}
 
-            return list;
-        }
+			return list;
+		}
 
 		//Re-raise the ListChanged event with the SqliteWordList as the originator.
 		//Using BindingList as the in-memory list makes this very easy.
@@ -131,25 +131,25 @@ namespace Szotar.Sqlite {
 		}
 
 		//Will probably want both a Created and Modified property in the future.
-        public override System.DateTime? Date {
-            get { return (DateTime?)worker.GetWordListProperty("Created"); }
-            set {
-                if (value == null)
-                    throw new ArgumentNullException();
-                worker.SetWordListProperty("Created", value);
-                RaisePropertyChanged("Date");
-            }
-        }
+		public override System.DateTime? Date {
+			get { return (DateTime?)worker.GetWordListProperty("Created"); }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+				worker.SetWordListProperty("Created", value);
+				RaisePropertyChanged("Date");
+			}
+		}
 
-        public override System.DateTime? Accessed {
-            get { return (DateTime?)worker.GetWordListProperty("Accessed"); }
-            set {
-                if (value == null)
-                    throw new ArgumentNullException();
-                worker.SetWordListProperty("Accessed", value);
-                RaisePropertyChanged("Accessed");
-            }
-        }
+		public override System.DateTime? Accessed {
+			get { return (DateTime?)worker.GetWordListProperty("Accessed"); }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+				worker.SetWordListProperty("Accessed", value);
+				RaisePropertyChanged("Accessed");
+			}
+		}
 
 		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
 			int index = IndexOf(entry);
@@ -162,13 +162,13 @@ namespace Szotar.Sqlite {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
 			worker.SetProperty(index, property.ToString(), value);
-        }
+		}
 
-        public override string[] Tags { get { return DataStore.GetTags(id).ToArray(); } }
-        public override void Tag(string tag) { DataStore.Tag(tag, id); }
-        public override void Untag(string tag) { DataStore.Untag(tag, id); }
-        public override bool HasTag(string tag) { return DataStore.HasTag(tag, id); }
-        #endregion
+		public override string[] Tags { get { return DataStore.GetTags(id).ToArray(); } }
+		public override void Tag(string tag) { DataStore.Tag(tag, id); }
+		public override void Untag(string tag) { DataStore.Untag(tag, id); }
+		public override bool HasTag(string tag) { return DataStore.HasTag(tag, id); }
+		#endregion
 
 		#region List implementation
 		public override void Add(WordListEntry item) {
@@ -282,19 +282,19 @@ namespace Szotar.Sqlite {
 			SqliteWordList list;
 
 			//These are called particularly often, any performance enhancements are useful.
-            DbCommand insertCommand, deleteCommand, existsCommand;
-            DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
+			DbCommand insertCommand, deleteCommand, existsCommand;
+			DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
 				insertCommandTranslation, deleteCommandSetID, deleteCommandListPosition, existsCommandID;
 
 			public Worker(SqliteDataStore store, SqliteWordList list)
 				: base(store) {
 				this.list = list;
 
-                existsCommand = Connection.CreateCommand();
-                existsCommand.CommandText = @"SELECT Count(*) FROM Sets WHERE Sets.id = ?";
-                existsCommandID = existsCommand.CreateParameter();
-                existsCommand.Parameters.Add(existsCommandID);
-                existsCommandID.Value = list.ID;
+				existsCommand = Connection.CreateCommand();
+				existsCommand.CommandText = @"SELECT Count(*) FROM Sets WHERE Sets.id = ?";
+				existsCommandID = existsCommand.CreateParameter();
+				existsCommand.Parameters.Add(existsCommandID);
+				existsCommandID.Value = list.ID;
 
 				insertCommand = Connection.CreateCommand();
 				insertCommand.CommandText = @"
@@ -347,9 +347,9 @@ namespace Szotar.Sqlite {
 				base.Dispose(disposing);
 			}
 
-            public bool Exists() {
-                return Convert.ToInt64(existsCommand.ExecuteScalar()) > 0;
-            }
+			public bool Exists() {
+				return Convert.ToInt64(existsCommand.ExecuteScalar()) > 0;
+			}
 
 			/// <summary>
 			/// Inserts a single item at the given index.
@@ -506,15 +506,15 @@ namespace Szotar.Sqlite {
 			}
 
 			public IList<WordListEntry> GetAllEntries() {
-                using (var reader = SelectReader(@"
+				using (var reader = SelectReader(@"
 					TYPES Text, Text;
 					SELECT Phrase, Translation
 						FROM VocabItems 
 						WHERE SetID = ? 
 						ORDER BY ListPosition ASC", list.ID)) {
 
-                    return GetEntries(reader);
-                }
+					return GetEntries(reader);
+				}
 			}
 
 			protected IList<WordListEntry> GetEntries(DbDataReader reader) {

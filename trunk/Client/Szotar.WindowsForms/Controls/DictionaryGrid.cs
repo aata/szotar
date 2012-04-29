@@ -195,8 +195,8 @@ namespace Szotar.WindowsForms.Controls {
 		public void SelectRow(int row, int activeColumn) {
 			ClearSelection();
 
-            if (row >= RowCount)
-                return;
+			if (row >= RowCount)
+				return;
 
 			SetCurrentCellAddressCore(activeColumn, row, true, true, true);
 			SetSelectedRowCore(row, true);
@@ -529,10 +529,10 @@ namespace Szotar.WindowsForms.Controls {
 				if (grid.IsCurrentRowDirty) {
 					Debug.WriteLine(string.Format("  Row was dirty.", e.RowIndex, e.ColumnIndex));
 
-                    if (pairInEdit.Phrase == null)
-                        pairInEdit.Phrase = string.Empty;
-                    if (pairInEdit.Translation == null)
-                        pairInEdit.Translation = string.Empty;
+					if (pairInEdit.Phrase == null)
+						pairInEdit.Phrase = string.Empty;
+					if (pairInEdit.Translation == null)
+						pairInEdit.Translation = string.Empty;
 
 					ignoreNextListChangedEvent = true;
 					pairInEdit.Owner = source;
@@ -970,9 +970,9 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-        public void SelectRow(int row) {
-            grid.SelectRow(row);
-        }
+		public void SelectRow(int row) {
+			grid.SelectRow(row);
+		}
 		#endregion
 
 		#region Properties

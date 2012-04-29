@@ -8,16 +8,16 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Preferences {
-    [PreferencePage("Practice", Parent = typeof(Categories.General), Importance = 5)]
-    public partial class Practice : PreferencePage {
-        public Practice() {
-            InitializeComponent();
+	[PreferencePage("Practice", Parent = typeof(Categories.General), Importance = 5)]
+	public partial class Practice : PreferencePage {
+		public Practice() {
+			InitializeComponent();
 
-            itemCount.Value = GuiConfiguration.PracticeDefaultCount;
-        }
+			itemCount.Value = GuiConfiguration.PracticeDefaultCount;
+		}
 
-        public override void Commit() {
-            GuiConfiguration.PracticeDefaultCount = (int)itemCount.Value;
-        }
-    }
+		public override void Commit() {
+			GuiConfiguration.PracticeDefaultCount = (int)itemCount.Value;
+		}
+	}
 }

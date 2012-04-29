@@ -7,10 +7,10 @@ namespace Szotar.WindowsForms {
 		public event EventHandler Disposed;
 		public ISite Site { get; set; }
 
-        public IDisposable Thing { 
-            get { return thing; } 
-            set { thing = value; } 
-        }
+		public IDisposable Thing { 
+			get { return thing; } 
+			set { thing = value; } 
+		}
 
 		public DisposableComponent(IDisposable thing) {
 			this.thing = thing;

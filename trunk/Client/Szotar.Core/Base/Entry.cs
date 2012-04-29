@@ -157,8 +157,8 @@ namespace Szotar {
 		}
 
 		public void FullyLoad() {
-            if(Tag != null)
-			    Tag.DictionarySection.GetFullEntry(this);
+			if(Tag != null)
+				Tag.DictionarySection.GetFullEntry(this);
 		}
 
 		public IList<Translation> Translations {

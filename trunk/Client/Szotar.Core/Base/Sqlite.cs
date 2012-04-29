@@ -31,17 +31,17 @@ namespace Szotar.Sqlite {
 
 		protected string Path {
 			get { return path; }
-            set {
-                conn.Close();
-                System.IO.File.Move(path, value);
-                path = value;
-                conn.ConnectionString = "Data Source=" + path;
-                conn.Open();
-            }
+			set {
+				conn.Close();
+				System.IO.File.Move(path, value);
+				path = value;
+				conn.ConnectionString = "Data Source=" + path;
+				conn.Open();
+			}
 		}
 
 		private void Init() {
-            ExecuteSQL("PRAGMA foreign_keys = ON");
+			ExecuteSQL("PRAGMA foreign_keys = ON");
 
 			int appSchemaVer = this.ApplicationSchemaVersion();
 			Debug.Assert(appSchemaVer >= 1, "Desired SQLite database schema version should be greater than 0");
@@ -97,29 +97,29 @@ namespace Szotar.Sqlite {
 		}
 
 		protected void UpgradeSchemaInIncrements(int fromVersion, int toVersion) {
-            using (var txn = conn.BeginTransaction()) {
-                if (fromVersion >= toVersion)
-                    throw new ArgumentException("Can't downgrade the application database. What happen?", "fromVersion");
+			using (var txn = conn.BeginTransaction()) {
+				if (fromVersion >= toVersion)
+					throw new ArgumentException("Can't downgrade the application database. What happen?", "fromVersion");
 
-                for (; fromVersion < toVersion; ++fromVersion)
-                    IncrementalUpgradeSchema(fromVersion + 1);
+				for (; fromVersion < toVersion; ++fromVersion)
+					IncrementalUpgradeSchema(fromVersion + 1);
 
 
-                txn.Commit();
-            }
+				txn.Commit();
+			}
 		}
 
-        protected object GetMetadata(string name, object defaultValue) {
-            return Select(@"SELECT Value FROM Info WHERE Name = ?", name) ?? defaultValue;
-        }
+		protected object GetMetadata(string name, object defaultValue) {
+			return Select(@"SELECT Value FROM Info WHERE Name = ?", name) ?? defaultValue;
+		}
 
-        protected void SetMetadata(string name, object value) {
-            if (Select(@"SELECT Value FROM Info WHERE Name = ?", name) == null)
-                ExecuteSQL(@"INSERT INTO Info (Name, Value) VALUES (?, ?)", name, value.ToString());
-            else
-                ExecuteSQL(@"UPDATE Info SET Value = ? WHERE Name = ?", value.ToString(), name);
-        }
-        
+		protected void SetMetadata(string name, object value) {
+			if (Select(@"SELECT Value FROM Info WHERE Name = ?", name) == null)
+				ExecuteSQL(@"INSERT INTO Info (Name, Value) VALUES (?, ?)", name, value.ToString());
+			else
+				ExecuteSQL(@"UPDATE Info SET Value = ? WHERE Name = ?", value.ToString(), name);
+		}
+		
 		protected override void Dispose(bool disposing) {
 			if (disposing)
 				conn.Dispose();
@@ -130,30 +130,30 @@ namespace Szotar.Sqlite {
 
 	public abstract class SqliteObject : IDisposable {
 		protected DbConnection conn;
-        bool ownsConnection;
+		bool ownsConnection;
 
-        List<DbCommand> commands = new List<DbCommand>();
+		List<DbCommand> commands = new List<DbCommand>();
 
 		public SqliteObject(SqliteObject other) {
 			this.conn = other.conn;
-            ownsConnection = false;
+			ownsConnection = false;
 		}
 
 		protected SqliteObject(DbConnection connection) {
 			this.conn = connection;
-            ownsConnection = true;
+			ownsConnection = true;
 		}
 
-        protected static DbConnection OpenDatabase(string path) {
-            string dir = IO.Path.GetDirectoryName(path);
-            if (!IO.Directory.Exists(dir))
-                IO.Directory.CreateDirectory(dir);
+		protected static DbConnection OpenDatabase(string path) {
+			string dir = IO.Path.GetDirectoryName(path);
+			if (!IO.Directory.Exists(dir))
+				IO.Directory.CreateDirectory(dir);
 #if !MONO
-            return new System.Data.SQLite.SQLiteConnection("Data Source=" + path);
+			return new System.Data.SQLite.SQLiteConnection("Data Source=" + path);
 #else
 			return new Mono.Data.Sqlite.SqliteConnection("Data Source=" + path);
 #endif
-        }
+		}
 
 		/// <summary>
 		/// Get the ID of the last inserted row. This is equal to the primary key of that row, if one exists.
@@ -213,11 +213,11 @@ namespace Szotar.Sqlite {
 			command.Parameters.Add(param);
 		}
 
-        protected DbCommand CreateCommand() {
-            var command = Connection.CreateCommand();
-            commands.Add(command);
-            return command;
-        }
+		protected DbCommand CreateCommand() {
+			var command = Connection.CreateCommand();
+			commands.Add(command);
+			return command;
+		}
 
 		protected DbConnection Connection { get { return conn; } }
 
@@ -227,21 +227,21 @@ namespace Szotar.Sqlite {
 		}
 
 		protected virtual void Dispose(bool disposing) {
-            foreach (var command in commands)
-                command.Dispose();
+			foreach (var command in commands)
+				command.Dispose();
 
-            if(ownsConnection)
-                conn.Dispose();
+			if(ownsConnection)
+				conn.Dispose();
 		}
 	}
 
-    public class WordListEventArgs : EventArgs {
-        public long SetID { get; private set; }
+	public class WordListEventArgs : EventArgs {
+		public long SetID { get; private set; }
 
-        public WordListEventArgs(long id) {
-            SetID = id;
-        }
-    };
+		public WordListEventArgs(long id) {
+			SetID = id;
+		}
+	};
 
 	public class SqliteDataStore : SqliteDatabase {
 		Dictionary<long, NullWeakReference<SqliteWordList>> wordLists = new Dictionary<long, NullWeakReference<SqliteWordList>>();
@@ -258,8 +258,8 @@ namespace Szotar.Sqlite {
 			switch (toVersion) {
 				case 1: InitDatabase(); break;
 				case 2: UpgradePracticeSchema(); break;
-                case 3: AddAccessedColumn(); break;
-                case 4: AddTagsTable(); break;
+				case 3: AddAccessedColumn(); break;
+				case 4: AddTagsTable(); break;
 				default: throw new ArgumentOutOfRangeException("toVersion");
 			}
 		}
@@ -316,7 +316,7 @@ namespace Szotar.Sqlite {
 					Translation TEXT NOT NULL COLLATE NOCASE,
 					SetID INTEGER NOT NULL,
 					ListPosition INTEGER NOT NULL,
-                    FOREIGN KEY (SetID) REFERENCES Sets(id));
+					FOREIGN KEY (SetID) REFERENCES Sets(id));
 				
 				CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase);
 				CREATE INDEX VocabItems_IndexT ON VocabItems (Translation);
@@ -335,7 +335,7 @@ namespace Szotar.Sqlite {
 					SetID INTEGER NOT NULL,
 					Created DATE NOT NULL,
 					Result INTEGER NOT NULL, -- 1 for success, 0 for failure
-                    FOREIGN KEY(SetID) REFERENCES Sets(id)
+					FOREIGN KEY(SetID) REFERENCES Sets(id)
 					);
 
 				-- Are these necessary?
@@ -345,64 +345,64 @@ namespace Szotar.Sqlite {
 				CREATE INDEX PracticeHistory_IndexC ON PracticeHistory (Created);");
 		}
 
-        private void AddAccessedColumn() {
-            ExecuteSQL(@"
-                ALTER Table SETS
-                ADD COLUMN Accessed DATE");
-        }
+		private void AddAccessedColumn() {
+			ExecuteSQL(@"
+				ALTER Table SETS
+				ADD COLUMN Accessed DATE");
+		}
 
-        private void AddTagsTable() {
-            ExecuteSQL(@"
-                CREATE TABLE Tags (
-                    tag TEXT NOT NULL,
-                    SetID INTEGER NOT NULL,
-                    FOREIGN KEY(SetID) REFERENCES Sets(id)
-                );");
-        }
+		private void AddTagsTable() {
+			ExecuteSQL(@"
+				CREATE TABLE Tags (
+					tag TEXT NOT NULL,
+					SetID INTEGER NOT NULL,
+					FOREIGN KEY(SetID) REFERENCES Sets(id)
+				);");
+		}
 
-        #region Tags
-        public IEnumerable<KeyValuePair<string, int>> GetTags(bool orderByName = true) {
-            using (var reader = SelectReader("SELECT tag AS t, count(SetID) AS n FROM Tags GROUP BY tag ORDER BY " + (orderByName ? "t ASC" : "n DESC, t ASC"))) {
-                while (reader.Read())
-                    yield return new KeyValuePair<string, int>(reader.GetString(0), reader.GetInt32(1));
-            }
-        }
+		#region Tags
+		public IEnumerable<KeyValuePair<string, int>> GetTags(bool orderByName = true) {
+			using (var reader = SelectReader("SELECT tag AS t, count(SetID) AS n FROM Tags GROUP BY tag ORDER BY " + (orderByName ? "t ASC" : "n DESC, t ASC"))) {
+				while (reader.Read())
+					yield return new KeyValuePair<string, int>(reader.GetString(0), reader.GetInt32(1));
+			}
+		}
 
-        public IEnumerable<ListInfo> SearchByTag(string tag) {
-            using (var reader = SelectReader(@"
-                SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = id) 
-                FROM Tags INNER JOIN Sets ON Tags.SetID = Sets.id
-                WHERE tag = ?
-                ORDER BY Name ASC", tag)) {
-                
-                while (reader.Read())
-                    yield return ListInfoFromReader(reader);
-            }
-        }
+		public IEnumerable<ListInfo> SearchByTag(string tag) {
+			using (var reader = SelectReader(@"
+				SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = id) 
+				FROM Tags INNER JOIN Sets ON Tags.SetID = Sets.id
+				WHERE tag = ?
+				ORDER BY Name ASC", tag)) {
+				
+				while (reader.Read())
+					yield return ListInfoFromReader(reader);
+			}
+		}
 
-        public IEnumerable<string> GetTags(long setID) {
-            using (var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ?", setID)) {
-                while (reader.Read())
-                    yield return reader.GetString(0);
-            }
-        }
+		public IEnumerable<string> GetTags(long setID) {
+			using (var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ?", setID)) {
+				while (reader.Read())
+					yield return reader.GetString(0);
+			}
+		}
 
-        public bool HasTag(string tag, long setID) {
-            return Convert.ToInt64(Select("SELECT count(*) FROM Tags WHERE tag = ? AND SetID = ?", tag, setID)) > 0;
-        }
+		public bool HasTag(string tag, long setID) {
+			return Convert.ToInt64(Select("SELECT count(*) FROM Tags WHERE tag = ? AND SetID = ?", tag, setID)) > 0;
+		}
 
-        public void Tag(string tag, long setID) {
-            // Need to check this here or we may violate the uniqueness/foreign key constraint.
-            if(!HasTag(tag, setID) && WordListExists(setID))
-                ExecuteSQL("INSERT INTO Tags (tag, SetID) VALUES (?, ?)", tag, setID);
-        }
+		public void Tag(string tag, long setID) {
+			// Need to check this here or we may violate the uniqueness/foreign key constraint.
+			if(!HasTag(tag, setID) && WordListExists(setID))
+				ExecuteSQL("INSERT INTO Tags (tag, SetID) VALUES (?, ?)", tag, setID);
+		}
 
-        public void Untag(string tag, long setID) {
-            ExecuteSQL("DELETE FROM Tags WHERE tag = ? AND SetID = ?", tag, setID);
-        }
-        #endregion
+		public void Untag(string tag, long setID) {
+			ExecuteSQL("DELETE FROM Tags WHERE tag = ? AND SetID = ?", tag, setID);
+		}
+		#endregion
 
-        /// <param name="setID">The SetID of the word list</param>
+		/// <param name="setID">The SetID of the word list</param>
 		/// <returns>An existing SqliteWordList instance, if one exists, otherwise a newly-created SqliteWordList.</returns>
 		public SqliteWordList GetWordList(long setID) {
 			SqliteWordList wl = null;
@@ -415,16 +415,16 @@ namespace Szotar.Sqlite {
 				return wl;
 
 			wl = SqliteWordList.FromSetID(this, setID);
-            if (wl == null)
-                return null;
+			if (wl == null)
+				return null;
 
 			wordLists[setID] = new NullWeakReference<SqliteWordList>(wl);
 			return wl;
 		}
 
-        public bool WordListExists(long id) {
-            return GetWordList(id) != null;
-        }
+		public bool WordListExists(long id) {
+			return GetWordList(id) != null;
+		}
 
 		public SqliteWordList CreateSet(string name, string author, string language, string url, DateTime? date) {
 			long setID;
@@ -438,26 +438,26 @@ namespace Szotar.Sqlite {
 			}
 
 			var wl = SqliteWordList.FromSetID(this, setID);
-            if (wl == null)
-                return null;
+			if (wl == null)
+				return null;
 			wordLists[setID] = new NullWeakReference<SqliteWordList>(wl);
 			return wl;
 		}
 
-        public IEnumerable<ListInfo> GetRecentSets(int limit) {
-            using (var reader = SelectReader(@"
-                TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
-                SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
-                FROM Sets
-                WHERE Accessed NOT NULL
-                ORDER BY Accessed DESC
-                LIMIT " + limit.ToString())) {
+		public IEnumerable<ListInfo> GetRecentSets(int limit) {
+			using (var reader = SelectReader(@"
+				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+				SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
+				FROM Sets
+				WHERE Accessed NOT NULL
+				ORDER BY Accessed DESC
+				LIMIT " + limit.ToString())) {
 
-                while (reader.Read()) {
-                    yield return ListInfoFromReader(reader);
-                }
-            }
-        }
+				while (reader.Read()) {
+					yield return ListInfoFromReader(reader);
+				}
+			}
+		}
 
 		private ListInfo ListInfoFromReader(DbDataReader reader) {
 			var list = new ListInfo();
@@ -472,19 +472,19 @@ namespace Szotar.Sqlite {
 				list.Url = reader.GetString(4);
 			if (!reader.IsDBNull(5))
 				list.Date = reader.GetDateTime(5);
-            if (!reader.IsDBNull(6))
-                list.Accessed = reader.GetDateTime(6);
-            if (!reader.IsDBNull(7))
-                list.TermCount = reader.GetInt64(7);
+			if (!reader.IsDBNull(6))
+				list.Accessed = reader.GetDateTime(6);
+			if (!reader.IsDBNull(7))
+				list.TermCount = reader.GetInt64(7);
 
 			return list;
 		}
 
 		public IEnumerable<ListInfo> GetAllSets() {
 			using (var reader = this.SelectReader(@"
-                TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
-                SELECT id, Name, Author, Language, Url, Created, Accessed,
-                    (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id) FROM Sets ORDER BY Name ASC")) {
+				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+				SELECT id, Name, Author, Language, Url, Created, Accessed,
+					(SELECT count(*) FROM VocabItems WHERE SetID = Sets.id) FROM Sets ORDER BY Name ASC")) {
 				while (reader.Read())
 					yield return ListInfoFromReader(reader);
 			}
@@ -542,38 +542,38 @@ namespace Szotar.Sqlite {
 		public bool UpdateWordListEntry(long setID, string oldPhrase, string oldTranslation, 
 			string newPhrase, string newTranslation) {
 		
-            // Modifying the database directly doesn't notify existing word lists of the change.
-            // This solution does so with less work.
-            var list = GetWordList(setID);
+			// Modifying the database directly doesn't notify existing word lists of the change.
+			// This solution does so with less work.
+			var list = GetWordList(setID);
 
-            bool found = false;
-            foreach (var item in list) {
-                if (item.Phrase == oldPhrase && item.Translation == oldTranslation) {
-                    item.Phrase = newPhrase;
-                    item.Translation = newTranslation;
-                    found = true;
-                    // Don't stop yet; there may be more identical items.
-                }
-            }
+			bool found = false;
+			foreach (var item in list) {
+				if (item.Phrase == oldPhrase && item.Translation == oldTranslation) {
+					item.Phrase = newPhrase;
+					item.Translation = newTranslation;
+					found = true;
+					// Don't stop yet; there may be more identical items.
+				}
+			}
 
-            return found;
+			return found;
 		}
 
-        public void AddPracticeHistory(long setID, string phrase, string translation, bool correct) {
-            ExecuteSQL(@"INSERT INTO PracticeHistory (SetID, Phrase, Translation, Result, Created)
-                         VALUES (?, ?, ?, ?, datetime('now'))", setID, phrase, translation, correct ? 1 : 0);
-        }
+		public void AddPracticeHistory(long setID, string phrase, string translation, bool correct) {
+			ExecuteSQL(@"INSERT INTO PracticeHistory (SetID, Phrase, Translation, Result, Created)
+						 VALUES (?, ?, ?, ?, datetime('now'))", setID, phrase, translation, correct ? 1 : 0);
+		}
 
-        public event EventHandler<WordListEventArgs> WordListAccessed;
+		public event EventHandler<WordListEventArgs> WordListAccessed;
 
-        public void RaiseWordListOpened(long? id) {
-            if (!id.HasValue)
-                return;
+		public void RaiseWordListOpened(long? id) {
+			if (!id.HasValue)
+				return;
 
-            var handler = WordListAccessed;
-            if (handler != null)
-                handler(this, new WordListEventArgs(id.Value)); 
-        }
+			var handler = WordListAccessed;
+			if (handler != null)
+				handler(this, new WordListEventArgs(id.Value)); 
+		}
 
 		//This function also raised the ListDeleted event on the WordList, if one exists.
 		public void DeleteWordList(long setID) {
@@ -584,9 +584,9 @@ namespace Szotar.Sqlite {
 			using (var txn = Connection.BeginTransaction()) {
 				ExecuteSQL("DELETE FROM VocabItems WHERE SetID = ?", setID);
 				ExecuteSQL("DELETE FROM SetProperties WHERE SetID = ?", setID);
-                ExecuteSQL("DELETE FROM PracticeHistory WHERE SetID = ?", setID);
-                ExecuteSQL("DELETE FROM Tags WHERE SetID = ?", setID);
-                ExecuteSQL("DELETE FROM Sets WHERE id = ?", setID);
+				ExecuteSQL("DELETE FROM PracticeHistory WHERE SetID = ?", setID);
+				ExecuteSQL("DELETE FROM Tags WHERE SetID = ?", setID);
+				ExecuteSQL("DELETE FROM Sets WHERE id = ?", setID);
 
 				txn.Commit();
 			}
@@ -614,8 +614,8 @@ namespace Szotar.Sqlite {
 			using (var txn = Connection.BeginTransaction()) {
 				var query = new StringBuilder(
 					@"SELECT SetID, Phrase, Translation
-				      FROM VocabItems
-				      WHERE SetID IN (");
+					  FROM VocabItems
+					  WHERE SetID IN (");
 
 				bool hasListItems = false;
 
@@ -642,9 +642,9 @@ namespace Szotar.Sqlite {
 					if (!r.HasItem)
 						continue;
 
-                    var item = new PracticeItem(r.SetID, r.Phrase, r.Translation);
-                    GetItemPracticeHistory(item);
-                    results.Add(item);
+					var item = new PracticeItem(r.SetID, r.Phrase, r.Translation);
+					GetItemPracticeHistory(item);
+					results.Add(item);
 				}
 			}
 
@@ -668,7 +668,7 @@ namespace Szotar.Sqlite {
 						reader.GetString(1),
 						reader.GetString(2));
 
-                    GetItemPracticeHistory(item);
+					GetItemPracticeHistory(item);
 
 					output.Add(item);
 				}
@@ -676,25 +676,25 @@ namespace Szotar.Sqlite {
 			}
 		}
 
-        DbCommand getHistory;
-        DbParameter getHistory_SetID, getHistory_Phrase, getHistory_Translation;
-        void GetItemPracticeHistory(PracticeItem item) {
-            if (getHistory == null) {
-                getHistory = CreateCommand()
-                    .AddParam(ref getHistory_SetID)
-                    .AddParam(ref getHistory_Phrase)
-                    .AddParam(ref getHistory_Translation);
-                getHistory.CommandText = "SELECT Created, Result FROM PracticeHistory WHERE SetID = ? AND Phrase = ? AND Translation = ? ORDER BY Created ASC";
-            }
+		DbCommand getHistory;
+		DbParameter getHistory_SetID, getHistory_Phrase, getHistory_Translation;
+		void GetItemPracticeHistory(PracticeItem item) {
+			if (getHistory == null) {
+				getHistory = CreateCommand()
+					.AddParam(ref getHistory_SetID)
+					.AddParam(ref getHistory_Phrase)
+					.AddParam(ref getHistory_Translation);
+				getHistory.CommandText = "SELECT Created, Result FROM PracticeHistory WHERE SetID = ? AND Phrase = ? AND Translation = ? ORDER BY Created ASC";
+			}
 
-            getHistory_SetID.Value = item.SetID;
-            getHistory_Phrase.Value = item.Phrase;
-            getHistory_Translation.Value = item.Translation;
+			getHistory_SetID.Value = item.SetID;
+			getHistory_Phrase.Value = item.Phrase;
+			getHistory_Translation.Value = item.Translation;
 
-            using (var reader = getHistory.ExecuteReader())
-                while (reader.Read())
-                    item.History.Add(reader.GetDateTime(0), reader.GetBoolean(1));
-        }
+			using (var reader = getHistory.ExecuteReader())
+				while (reader.Read())
+					item.History.Add(reader.GetDateTime(0), reader.GetBoolean(1));
+		}
 
 		// Using yield return here would probably be a bad idea, since the connection
 		// would only be closed if the consumer consumes the whole list.
@@ -707,12 +707,12 @@ namespace Szotar.Sqlite {
 					command.CommandText =
 						@"TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
 						 SELECT id, Name, Author, Language, Url, Created, Accessed, 
-						     (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
+							 (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
 						 FROM Sets
 						 WHERE id = ?";
 
 					var param = command.CreateParameter();
-                    command.Parameters.Add(param);
+					command.Parameters.Add(param);
 
 					foreach (var list in lists) {
 						if (list.HasItem)
@@ -730,142 +730,142 @@ namespace Szotar.Sqlite {
 			return answer;
 		}
 
-        private List<PracticeItem> GetPracticeItems() {
-            using (var reader = this.SelectReader(@"
-                SELECT VocabItems.Phrase, VocabItems.Translation, VocabItems.SetID, Result, Created
-                FROM VocabItems LEFT JOIN PracticeHistory
-                    ON PracticeHistory.SetID = VocabItems.SetID 
-                    AND PracticeHistory.Phrase = VocabItems.Phrase 
-                    AND PracticeHistory.Translation = VocabItems.Translation  
-                ORDER BY VocabItems.SetID, VocabItems.Phrase, VocabItems.Translation, Created")) {
+		private List<PracticeItem> GetPracticeItems() {
+			using (var reader = this.SelectReader(@"
+				SELECT VocabItems.Phrase, VocabItems.Translation, VocabItems.SetID, Result, Created
+				FROM VocabItems LEFT JOIN PracticeHistory
+					ON PracticeHistory.SetID = VocabItems.SetID 
+					AND PracticeHistory.Phrase = VocabItems.Phrase 
+					AND PracticeHistory.Translation = VocabItems.Translation  
+				ORDER BY VocabItems.SetID, VocabItems.Phrase, VocabItems.Translation, Created")) {
 
-                var items = new List<PracticeItem>();
-                PracticeItem item = null;
+				var items = new List<PracticeItem>();
+				PracticeItem item = null;
 
-                while (reader.Read()) {
-                    string phrase = reader.GetString(0);
-                    string translation = reader.GetString(1);
-                    long setID = reader.GetInt64(2);
-                    bool? correct = reader.IsDBNull(3) ? (bool?)null : reader.GetBoolean(3);
-                    DateTime? created = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4);
+				while (reader.Read()) {
+					string phrase = reader.GetString(0);
+					string translation = reader.GetString(1);
+					long setID = reader.GetInt64(2);
+					bool? correct = reader.IsDBNull(3) ? (bool?)null : reader.GetBoolean(3);
+					DateTime? created = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4);
 
-                    if (item == null || item.Phrase != phrase || item.Translation != translation) {
-                        item = new PracticeItem(setID, phrase, translation, new PracticeHistory());
-                        items.Add(item);
-                    }
+					if (item == null || item.Phrase != phrase || item.Translation != translation) {
+						item = new PracticeItem(setID, phrase, translation, new PracticeHistory());
+						items.Add(item);
+					}
 
-                    if (correct != null && created != null)
-                        item.History.Add(created.Value, correct.Value);
-                }
+					if (correct != null && created != null)
+						item.History.Add(created.Value, correct.Value);
+				}
 
-                return items;
-            }
-        }
+				return items;
+			}
+		}
 
-        public List<ListInfo> GetSetsByPracticeHistory() {
-            var items = from g in (from x in GetPracticeItems()
-                                   group x by x.SetID into set
-                                   select new { Set = set, Score = set.Average(x => Math.Pow(x.History.Importance, 2)) })
-                        orderby g.Score descending
-                        select g.Set.Key;
+		public List<ListInfo> GetSetsByPracticeHistory() {
+			var items = from g in (from x in GetPracticeItems()
+								   group x by x.SetID into set
+								   select new { Set = set, Score = set.Average(x => Math.Pow(x.History.Importance, 2)) })
+						orderby g.Score descending
+						select g.Set.Key;
 
-            return GetListInformation(from x in items select new ListSearchResult(x));
-        }
+			return GetListInformation(from x in items select new ListSearchResult(x));
+		}
 
-        public class Duplicate {
-            public long SetID { get; set; }
-            public string Phrase { get; set; }
-            public string Translation { get; set; }
-            public string ListName { get; set; }
-            public int PracticeCount { get; set; }
-        }
+		public class Duplicate {
+			public long SetID { get; set; }
+			public string Phrase { get; set; }
+			public string Translation { get; set; }
+			public string ListName { get; set; }
+			public int PracticeCount { get; set; }
+		}
 
-        public IEnumerable<KeyValuePair<Duplicate, Duplicate>> FindDuplicateListItems() {
-            using (var reader = SelectReader(@"
-                CREATE TEMP VIEW IF NOT EXISTS DupL AS Select V.SetID, V.Phrase, V.Translation, V.ListPosition, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;
-                CREATE TEMP VIEW IF NOT EXISTS DupR AS Select V.SetID, V.Phrase, V.Translation, V.ListPosition, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;                
-                SELECT L.SetID, L.Phrase, L.Translation, L.Name, L.PracticeCount, R.SetID, R.Phrase, R.Translation, R.Name, R.PracticeCount FROM DupL AS L JOIN DupR AS R ON (L.Phrase = R.Phrase OR L.Translation = R.Translation) AND (L.SetID < R.SetID OR (L.SetID = R.SetID AND L.ListPosition < R.ListPosition))")) {
-                
-                while (reader.Read()) {
-                    var left = new Duplicate {
-                        SetID = reader.GetInt64(0),
-                        Phrase = reader.GetString(1),
-                        Translation = reader.GetString(2),
-                        ListName = reader.GetString(3),
-                        PracticeCount = reader.GetInt32(4),
-                    };
-                    var right = new Duplicate {
-                        SetID = reader.GetInt64(5),
-                        Phrase = reader.GetString(6),
-                        Translation = reader.GetString(7),
-                        ListName = reader.GetString(8),
-                        PracticeCount = reader.GetInt32(9),
-                    };
-                    yield return new KeyValuePair<Duplicate, Duplicate>(left, right);
-                }
-            }
-        }
+		public IEnumerable<KeyValuePair<Duplicate, Duplicate>> FindDuplicateListItems() {
+			using (var reader = SelectReader(@"
+				CREATE TEMP VIEW IF NOT EXISTS DupL AS Select V.SetID, V.Phrase, V.Translation, V.ListPosition, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;
+				CREATE TEMP VIEW IF NOT EXISTS DupR AS Select V.SetID, V.Phrase, V.Translation, V.ListPosition, S.Name, (SELECT count(*) FROM PracticeHistory AS P WHERE P.SetID = V.SetID AND P.Phrase = V.Phrase AND P.Translation = V.Translation) as PracticeCount FROM VocabItems AS V JOIN Sets AS S ON V.SetID = S.ID;                
+				SELECT L.SetID, L.Phrase, L.Translation, L.Name, L.PracticeCount, R.SetID, R.Phrase, R.Translation, R.Name, R.PracticeCount FROM DupL AS L JOIN DupR AS R ON (L.Phrase = R.Phrase OR L.Translation = R.Translation) AND (L.SetID < R.SetID OR (L.SetID = R.SetID AND L.ListPosition < R.ListPosition))")) {
+				
+				while (reader.Read()) {
+					var left = new Duplicate {
+						SetID = reader.GetInt64(0),
+						Phrase = reader.GetString(1),
+						Translation = reader.GetString(2),
+						ListName = reader.GetString(3),
+						PracticeCount = reader.GetInt32(4),
+					};
+					var right = new Duplicate {
+						SetID = reader.GetInt64(5),
+						Phrase = reader.GetString(6),
+						Translation = reader.GetString(7),
+						ListName = reader.GetString(8),
+						PracticeCount = reader.GetInt32(9),
+					};
+					yield return new KeyValuePair<Duplicate, Duplicate>(left, right);
+				}
+			}
+		}
 
-        public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
-            var items = GetPracticeItems();
+		public List<PracticeItem> GetSuggestedPracticeItems(int limit) {
+			var items = GetPracticeItems();
 
-            // Results in the items with the highest importance being placed first in the list.
-            items.Sort(new Comparison<PracticeItem>((a, b) => -a.History.Importance.CompareTo(b.History.Importance)));
+			// Results in the items with the highest importance being placed first in the list.
+			items.Sort(new Comparison<PracticeItem>((a, b) => -a.History.Importance.CompareTo(b.History.Importance)));
 
-            var chosen = new List<PracticeItem>();
-            var rng = new Random();
-            var distribution = new NormalDistribution(rng);
-            while (chosen.Count < limit && items.Count > 0) {
-                double x = Math.Abs(distribution.NextDouble(3) / 3);
-                // ~68% chance that x < 1/3
-                // ~95% chance that x < 2/3
-                int index = (int)Math.Floor(items.Count * x);
-                if (index >= items.Count)
-                    index--;
-                chosen.Add(items[index]);
-                items.RemoveAt(index);
-            }
-            chosen.Shuffle(rng);
+			var chosen = new List<PracticeItem>();
+			var rng = new Random();
+			var distribution = new NormalDistribution(rng);
+			while (chosen.Count < limit && items.Count > 0) {
+				double x = Math.Abs(distribution.NextDouble(3) / 3);
+				// ~68% chance that x < 1/3
+				// ~95% chance that x < 2/3
+				int index = (int)Math.Floor(items.Count * x);
+				if (index >= items.Count)
+					index--;
+				chosen.Add(items[index]);
+				items.RemoveAt(index);
+			}
+			chosen.Shuffle(rng);
 
-            return chosen;
-        }
-    }
+			return chosen;
+		}
+	}
 
-    // A normal distribution with a mean of 0 and standard deviation of 1.
-    class NormalDistribution {
-        Random random;
-        double? next;
+	// A normal distribution with a mean of 0 and standard deviation of 1.
+	class NormalDistribution {
+		Random random;
+		double? next;
 
-        public NormalDistribution(Random random) {
-            this.random = random;
-        }
+		public NormalDistribution(Random random) {
+			this.random = random;
+		}
 
-        // Uses the Box-Muller transform to generate two independent and normally distributed pseudorandom numbers.
-        // One is returned; the other is saved for the next call.
-        public double NextDouble() {
-            if (next.HasValue) {
-                double d = next.Value;
-                next = null;
-                return d;
-            }
+		// Uses the Box-Muller transform to generate two independent and normally distributed pseudorandom numbers.
+		// One is returned; the other is saved for the next call.
+		public double NextDouble() {
+			if (next.HasValue) {
+				double d = next.Value;
+				next = null;
+				return d;
+			}
 
-            double u1 = random.NextDouble(), u2 = random.NextDouble();
-            double r = Math.Sqrt(-2 * Math.Log(u1));
-            double theta = 2 * Math.PI * u2;
+			double u1 = random.NextDouble(), u2 = random.NextDouble();
+			double r = Math.Sqrt(-2 * Math.Log(u1));
+			double theta = 2 * Math.PI * u2;
 
-            next = r * Math.Sin(theta);
-            return r * Math.Cos(theta);
-        }
+			next = r * Math.Sin(theta);
+			return r * Math.Cos(theta);
+		}
 
-        // Only produces pseudorandom numbers with an absolute value less than or equal to the given amount.
-        // Theoretically, this could take an infinite amount of time to generate a number. Approximately 68%
-        // of numbers generated are less than 1, 95% less than 2, 99.7% less than 3, so it should not pose a problem.
-        public double NextDouble(double max) {
-            double d;
-            do {
-                d = NextDouble();
-            } while (Math.Abs(d) > max);
-            return d;
-        }
-    }
+		// Only produces pseudorandom numbers with an absolute value less than or equal to the given amount.
+		// Theoretically, this could take an infinite amount of time to generate a number. Approximately 68%
+		// of numbers generated are less than 1, 95% less than 2, 99.7% less than 3, so it should not pose a problem.
+		public double NextDouble(double max) {
+			double d;
+			do {
+				d = NextDouble();
+			} while (Math.Abs(d) > max);
+			return d;
+		}
+	}
 }

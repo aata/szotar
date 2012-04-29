@@ -6,12 +6,12 @@
 	public class ListSearchResult {
 		public long SetID { get; set; }
 
-        public string Phrase { get; set; }
-        public string Translation { get; set; }
+		public string Phrase { get; set; }
+		public string Translation { get; set; }
 
 		public int? PositionHint { get; set; }
 
-        public bool HasItem { get { return Phrase != null; } } 
+		public bool HasItem { get { return Phrase != null; } } 
 
 		public ListSearchResult(long setID) {
 			SetID = setID;
@@ -19,8 +19,8 @@
 
 		public ListSearchResult(long setID, string phrase, string translation, int? positionHint = null) {
 			SetID = setID;
-            Phrase = phrase;
-            Translation = translation;
+			Phrase = phrase;
+			Translation = translation;
 			PositionHint = positionHint;
 		}
 	}

@@ -28,16 +28,16 @@ namespace Szotar.WindowsForms {
 
 		PracticeItem FetchNextItem();
 		IList<PracticeItem> GetAllItems();
-        void ReplaceItem(PracticeItem existing, PracticeItem replacement);
+		void ReplaceItem(PracticeItem existing, PracticeItem replacement);
 
 		ToolStrip Controls { get; }
 		Panel GameArea { get; }
 
-        void SetMode(IPracticeMode mode);
+		void SetMode(IPracticeMode mode);
 
 		int ItemCount { get; }
 		int Position { get; }
-    }
+	}
 
 	public interface IPracticeMode : IDisposable {
 		void Start(IPracticeWindow owner);
@@ -118,11 +118,11 @@ namespace Szotar.WindowsForms {
 			fore = new Stack<PracticeItem>();
 
 		public IPracticeWindow Source { get; private set; }
-        public PracticeItem CurrentItem { get; private set; }
-        public void UpdateCurrentItem(PracticeItem newItem) {
-            Source.ReplaceItem(CurrentItem, newItem);
-            CurrentItem = newItem;
-        }
+		public PracticeItem CurrentItem { get; private set; }
+		public void UpdateCurrentItem(PracticeItem newItem) {
+			Source.ReplaceItem(CurrentItem, newItem);
+			CurrentItem = newItem;
+		}
 		public int Length { get { return Source.ItemCount; } }
 		public int Position { 
 			get {
@@ -217,8 +217,8 @@ namespace Szotar.WindowsForms {
 				GameArea.Controls.Add(l);
 			}
 
-            GameArea.Resize += new EventHandler(GameArea_Resize);
-            GameArea.PreviewKeyDown += new PreviewKeyDownEventHandler(GameArea_PreviewKeyDown);
+			GameArea.Resize += new EventHandler(GameArea_Resize);
+			GameArea.PreviewKeyDown += new PreviewKeyDownEventHandler(GameArea_PreviewKeyDown);
 
 			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea }) {
 				c.MouseUp += new MouseEventHandler(GameArea_MouseUp);
@@ -228,12 +228,12 @@ namespace Szotar.WindowsForms {
 			navMenu.Forward += delegate { GoForward(); };
 			navMenu.End += delegate { GoToEnd(); };
 			navMenu.Edit += delegate {
-                var newItem = Dialogs.EditPracticeItem.Show(nav.CurrentItem);
-                if (newItem != null)
-                    nav.UpdateCurrentItem(newItem);
-                Update();
-                Layout();
-            };
+				var newItem = Dialogs.EditPracticeItem.Show(nav.CurrentItem);
+				if (newItem != null)
+					nav.UpdateCurrentItem(newItem);
+				Update();
+				Layout();
+			};
 			navMenu.Swap += delegate { SwapItems(); };
 
 			translationLabel.Visible = false;
@@ -241,19 +241,19 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
-        void GameArea_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) {
-            if (e.Modifiers != Keys.None) {
-                // Do nothing.
-            } else if (e.KeyCode == Keys.Left) {
-                GoBack();
-            } else if (e.KeyCode == Keys.End) {
-                GoToEnd();
-            } else if (e.KeyCode == Keys.Home) {
-                GoToStart();
-            } else {
-                GoForward();
-            }
-        }
+		void GameArea_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) {
+			if (e.Modifiers != Keys.None) {
+				// Do nothing.
+			} else if (e.KeyCode == Keys.Left) {
+				GoBack();
+			} else if (e.KeyCode == Keys.End) {
+				GoToEnd();
+			} else if (e.KeyCode == Keys.Home) {
+				GoToStart();
+			} else {
+				GoForward();
+			}
+		}
 
 		private void SwapItems() {
 			swap = !swap;
@@ -266,7 +266,7 @@ namespace Szotar.WindowsForms {
 			base.Stop();
 
 			GameArea.Resize -= new EventHandler(GameArea_Resize);
-            GameArea.PreviewKeyDown -= new PreviewKeyDownEventHandler(GameArea_PreviewKeyDown);
+			GameArea.PreviewKeyDown -= new PreviewKeyDownEventHandler(GameArea_PreviewKeyDown);
 
 			foreach (Control c in new Control[] { phraseLabel, translationLabel, GameArea })
 				c.MouseUp -= new MouseEventHandler(GameArea_MouseUp);
@@ -284,22 +284,22 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
-        private void GoToStart() {
-            while(nav.Position > 0)
-                nav.Retreat();
-            translationLabel.Visible = false;
+		private void GoToStart() {
+			while(nav.Position > 0)
+				nav.Retreat();
+			translationLabel.Visible = false;
 
-            Update();
-            Layout();
-        }
+			Update();
+			Layout();
+		}
 
-        private void GoToEnd() {
-            nav.AdvanceToEnd();
-            translationLabel.Visible = false;
+		private void GoToEnd() {
+			nav.AdvanceToEnd();
+			translationLabel.Visible = false;
 
-            Update();
-            Layout();
-        }
+			Update();
+			Layout();
+		}
 
 		void GoBack() {
 			if (translationLabel.Visible) {

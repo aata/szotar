@@ -44,105 +44,105 @@ namespace Szotar {
 		void Cancel();
 	}
 
-    namespace Dbf {
-        using System.Data.Common;
+	namespace Dbf {
+		using System.Data.Common;
 
-        [Importer("DBF", typeof(IDictionarySection))]
-        [ImporterDescription("DBF Importer",  "Dbf")]
-        public class Importer : IDictionarySectionImporter {
-            long shouldCancel = 0L;
+		[Importer("DBF", typeof(IDictionarySection))]
+		[ImporterDescription("DBF Importer",  "Dbf")]
+		public class Importer : IDictionarySectionImporter {
+			long shouldCancel = 0L;
 
-            public SimpleDictionary.Section Import(string path, out SectionInfo info) {
-                var entries = new SortedDictionary<string, List<Translation>>();
-                string fromName, toName;
+			public SimpleDictionary.Section Import(string path, out SectionInfo info) {
+				var entries = new SortedDictionary<string, List<Translation>>();
+				string fromName, toName;
 
-                using (var conn = Connect(path)) {
-                    int rows = 0;
-                    using (var getRowCount = conn.CreateCommand()) {
-                        getRowCount.CommandText = "SELECT COUNT(*) FROM SZOTAR;";
-                        rows = Convert.ToInt32(getRowCount.ExecuteScalar());
-                    }
+				using (var conn = Connect(path)) {
+					int rows = 0;
+					using (var getRowCount = conn.CreateCommand()) {
+						getRowCount.CommandText = "SELECT COUNT(*) FROM SZOTAR;";
+						rows = Convert.ToInt32(getRowCount.ExecuteScalar());
+					}
 
-                    int row = 0, lastPercent = -1;
-                    using (var cmd = conn.CreateCommand()) {
-                        cmd.CommandText = "SELECT * FROM " + System.IO.Path.GetFileNameWithoutExtension(path) + ";";
-                        using (var reader = cmd.ExecuteReader()) {
-                            fromName = reader.GetName(0);
-                            toName = reader.GetName(1);
+					int row = 0, lastPercent = -1;
+					using (var cmd = conn.CreateCommand()) {
+						cmd.CommandText = "SELECT * FROM " + System.IO.Path.GetFileNameWithoutExtension(path) + ";";
+						using (var reader = cmd.ExecuteReader()) {
+							fromName = reader.GetName(0);
+							toName = reader.GetName(1);
 
-                            while (reader.Read()) {
-                                row++;
+							while (reader.Read()) {
+								row++;
 
-                                if (Interlocked.Read(ref shouldCancel) > 0)
-                                    throw new OperationCanceledException();
-                                var key = reader.GetString(0);
-                                var data = reader.GetString(1);
+								if (Interlocked.Read(ref shouldCancel) > 0)
+									throw new OperationCanceledException();
+								var key = reader.GetString(0);
+								var data = reader.GetString(1);
 
-                                int percent = row * 100 / (rows != 0 ? rows : 1);
-                                if (percent > lastPercent) {
-                                    OnProgressChanged(string.Format("Row {0} of {1}", row, rows), percent);
-                                    lastPercent = percent;
-                                }
+								int percent = row * 100 / (rows != 0 ? rows : 1);
+								if (percent > lastPercent) {
+									OnProgressChanged(string.Format("Row {0} of {1}", row, rows), percent);
+									lastPercent = percent;
+								}
 
-                                List<Translation> translations;
-                                if (entries.TryGetValue(key, out translations)) {
-                                    translations.Add(new Translation(data));
-                                } else {
-                                    entries.Add(key, new List<Translation>(new Translation[] { new Translation(data) }));
-                                }
-                            }
-                        }
-                    }
-                }
+								List<Translation> translations;
+								if (entries.TryGetValue(key, out translations)) {
+									translations.Add(new Translation(data));
+								} else {
+									entries.Add(key, new List<Translation>(new Translation[] { new Translation(data) }));
+								}
+							}
+						}
+					}
+				}
 
-                var actualEntries = new List<Entry>();
-                foreach(var kv in entries)
-                    actualEntries.Add(new Entry(kv.Key, kv.Value));
-                var section = new SimpleDictionary.Section(actualEntries, true, null);
-                foreach(var e in actualEntries)
-                    e.Tag = new EntryTag(section, null);
+				var actualEntries = new List<Entry>();
+				foreach(var kv in entries)
+					actualEntries.Add(new Entry(kv.Key, kv.Value));
+				var section = new SimpleDictionary.Section(actualEntries, true, null);
+				foreach(var e in actualEntries)
+					e.Tag = new EntryTag(section, null);
 
-                info = new SectionInfo {
-                    Date = DateTime.Now,
-                    ItemCount = actualEntries.Count,
-                    Size = 0, 
-                    Name = fromName + "-" + toName
-                };
+				info = new SectionInfo {
+					Date = DateTime.Now,
+					ItemCount = actualEntries.Count,
+					Size = 0, 
+					Name = fromName + "-" + toName
+				};
 
-                return section;
-            }
+				return section;
+			}
 
-            public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
-            private void OnProgressChanged(string message, int? percent) {
-                EventHandler<ProgressMessageEventArgs> temp = ProgressChanged;
-                if (temp != null)
-                    temp(this, new ProgressMessageEventArgs(message, percent));
-            }
+			public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
+			private void OnProgressChanged(string message, int? percent) {
+				EventHandler<ProgressMessageEventArgs> temp = ProgressChanged;
+				if (temp != null)
+					temp(this, new ProgressMessageEventArgs(message, percent));
+			}
 
-            DbConnection Connect(string path) {
-                var builder = new DbConnectionStringBuilder();
-                builder.Add("Provider", "Microsoft.Jet.OLEDB.4.0");
-                path = System.IO.Path.GetDirectoryName(path);
-                builder.Add("Data Source", path);
-                builder.Add("Extended Properties", "dBASE III");
-                var conn = new System.Data.OleDb.OleDbConnection(builder.ConnectionString);
-                conn.Open();
-                return conn;
-            }
+			DbConnection Connect(string path) {
+				var builder = new DbConnectionStringBuilder();
+				builder.Add("Provider", "Microsoft.Jet.OLEDB.4.0");
+				path = System.IO.Path.GetDirectoryName(path);
+				builder.Add("Data Source", path);
+				builder.Add("Extended Properties", "dBASE III");
+				var conn = new System.Data.OleDb.OleDbConnection(builder.ConnectionString);
+				conn.Open();
+				return conn;
+			}
 
-            public void Cancel() {
-                Interlocked.Increment(ref shouldCancel);
-            }
+			public void Cancel() {
+				Interlocked.Increment(ref shouldCancel);
+			}
 
-            public void Dispose() {
-            }
-        }
-    }
+			public void Dispose() {
+			}
+		}
+	}
 
 	namespace Zbedic {
-        using System.IO;
-        using System.Threading;
-        using GZipStream = System.IO.Compression.GZipStream;
+		using System.IO;
+		using System.Threading;
+		using GZipStream = System.IO.Compression.GZipStream;
 
 		[Importer("Zbedic", typeof(IDictionarySection))]
 		[ImporterDescription("Zbedic Importer", "Zbedic")]
@@ -221,9 +221,9 @@ namespace Szotar {
 				// This sort is needed because of the {hw} tag which can change the entry's headword.
 				entries.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
 				var section = new SimpleDictionary.Section(entries, true, null);
-                foreach (var e in entries)
-                    e.Tag = new EntryTag(section, null);
-                return section;
+				foreach (var e in entries)
+					e.Tag = new EntryTag(section, null);
+				return section;
 			}
 
 			public event EventHandler<ProgressMessageEventArgs> ProgressChanged;

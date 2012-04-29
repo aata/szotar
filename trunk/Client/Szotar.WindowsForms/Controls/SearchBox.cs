@@ -26,7 +26,7 @@ namespace Szotar.WindowsForms.Controls {
 			textBox.TextChanged += new EventHandler(SearchBox_TextChanged);
 			Controls.Add(textBox);
 
-            textBox.KeyUp += new KeyEventHandler(textBox_KeyUp);
+			textBox.KeyUp += new KeyEventHandler(textBox_KeyUp);
 
 			foreColor = SystemColors.ControlText;
 			promptForeColor = SystemColors.GrayText;
@@ -41,17 +41,17 @@ namespace Szotar.WindowsForms.Controls {
 			UpdatePrompt();
 		}
 
-        [Browsable(true)]
-        public event EventHandler Search;
+		[Browsable(true)]
+		public event EventHandler Search;
 
-        void textBox_KeyUp(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return) {
-                e.Handled = true;
-                var h = Search;
-                if (h != null)
-                    h(this, new EventArgs());
-            }
-        }
+		void textBox_KeyUp(object sender, KeyEventArgs e) {
+			if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return) {
+				e.Handled = true;
+				var h = Search;
+				if (h != null)
+					h(this, new EventArgs());
+			}
+		}
 
 		void SearchBox_TextChanged(object sender, EventArgs e) {
 			if (!canPrompt && textBox.Text != text) {

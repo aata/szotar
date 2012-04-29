@@ -9,50 +9,50 @@ using System.Windows.Forms;
 using Szotar.WindowsForms.Importing;
 
 namespace Szotar.WindowsForms.Controls {
-    public partial class DictionarySectionUI : UserControl, IImporterUI<IBilingualDictionary> {
-        IDictionarySectionImporter importer;
-        DualSectionImporter dualSection;
+	public partial class DictionarySectionUI : UserControl, IImporterUI<IBilingualDictionary> {
+		IDictionarySectionImporter importer;
+		DualSectionImporter dualSection;
 
-        public DictionarySectionUI(DualSectionImporter dualSection, IDictionarySectionImporter importer) {
-            InitializeComponent();
+		public DictionarySectionUI(DualSectionImporter dualSection, IDictionarySectionImporter importer) {
+			InitializeComponent();
 
-            this.dualSection = dualSection;
-            this.importer = importer;
-        }
+			this.dualSection = dualSection;
+			this.importer = importer;
+		}
 
-        private void browse_Click(object sender, EventArgs e) {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = Properties.Resources.AllFiles + "|*.*";
-            ofd.Multiselect = false;
+		private void browse_Click(object sender, EventArgs e) {
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = Properties.Resources.AllFiles + "|*.*";
+			ofd.Multiselect = false;
 
-            if (ofd.ShowDialog() == DialogResult.OK) {
-                fileName.Text = ofd.FileName;
-            }
-        }
+			if (ofd.ShowDialog() == DialogResult.OK) {
+				fileName.Text = ofd.FileName;
+			}
+		}
 
-        private void fileSelectNext_Click(object sender, EventArgs e) {
-            OnFinished();
-        }
+		private void fileSelectNext_Click(object sender, EventArgs e) {
+			OnFinished();
+		}
 
-        #region IImporterUI
-        public void Apply() {
-            dualSection.SetImporters(importer, fileName.Text, null, string.Empty, generateSecondHalf.Checked);
-        }
+		#region IImporterUI
+		public void Apply() {
+			dualSection.SetImporters(importer, fileName.Text, null, string.Empty, generateSecondHalf.Checked);
+		}
 
-        public event EventHandler Finished;
-        private void OnFinished() {
-            EventHandler temp = Finished;
-            if (temp != null)
-                temp(this, EventArgs.Empty);
-        }
+		public event EventHandler Finished;
+		private void OnFinished() {
+			EventHandler temp = Finished;
+			if (temp != null)
+				temp(this, EventArgs.Empty);
+		}
 
-        public IImporter<IBilingualDictionary> Importer {
-            get { return dualSection; }
-        }
-        #endregion
+		public IImporter<IBilingualDictionary> Importer {
+			get { return dualSection; }
+		}
+		#endregion
 
-        private void fileName_TextChanged(object sender, EventArgs e) {
-            fileSelectNext.Enabled = fileName.TextLength > 0;
-        }
-    }
+		private void fileName_TextChanged(object sender, EventArgs e) {
+			fileSelectNext.Enabled = fileName.TextLength > 0;
+		}
+	}
 }

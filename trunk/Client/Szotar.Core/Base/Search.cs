@@ -185,162 +185,162 @@ namespace Szotar {
 			return str;
 		}
 
-        static AccentTable accentTable = new AccentTable();
+		static AccentTable accentTable = new AccentTable();
 
-        // Determine if x contains y, irrespective of accented characters and standalone accents.
-        public static bool Contains(string x, string y, bool ignoreCase) {
-            return GetMatch(x, y, ignoreCase) != null;
-        }
+		// Determine if x contains y, irrespective of accented characters and standalone accents.
+		public static bool Contains(string x, string y, bool ignoreCase) {
+			return GetMatch(x, y, ignoreCase) != null;
+		}
 
-        public static MatchType? GetMatch(string x, string y, bool ignoreCase) {
-            // return x.IndexOf(y, StringComparison.Ordinal); 
+		public static MatchType? GetMatch(string x, string y, bool ignoreCase) {
+			// return x.IndexOf(y, StringComparison.Ordinal); 
 
-            if (string.IsNullOrEmpty(y))
-                return MatchType.NormalMatch;
+			if (string.IsNullOrEmpty(y))
+				return MatchType.NormalMatch;
 
-            // Find the first non-accent char in y
-            int firstY = -1;
-            for (int i = 0; i < y.Length; ++i) {
-                if (!accentTable.IsAccent(y[i])) {
-                    firstY = i;
-                    break;
-                }
-            }
+			// Find the first non-accent char in y
+			int firstY = -1;
+			for (int i = 0; i < y.Length; ++i) {
+				if (!accentTable.IsAccent(y[i])) {
+					firstY = i;
+					break;
+				}
+			}
 
-            // No actual characters in y
-            if (firstY == -1)
-                return MatchType.NormalMatch;
+			// No actual characters in y
+			if (firstY == -1)
+				return MatchType.NormalMatch;
 
-            // The first thing to do is to look for the first character of y in x.
-            char searchFor = accentTable[y[firstY]];
-            if (ignoreCase)
-                searchFor = char.ToLower(searchFor);
+			// The first thing to do is to look for the first character of y in x.
+			char searchFor = accentTable[y[firstY]];
+			if (ignoreCase)
+				searchFor = char.ToLower(searchFor);
 
-            for (int i = 0; i < x.Length; ++i) {
-                // Skip combining diacritics (some accented characters are made of a base character and a combining diacritic character.
-                // Unicode calls it a non-spacing mark.)
-                if (accentTable.IsAccent(x[i]))
-                    continue;
+			for (int i = 0; i < x.Length; ++i) {
+				// Skip combining diacritics (some accented characters are made of a base character and a combining diacritic character.
+				// Unicode calls it a non-spacing mark.)
+				if (accentTable.IsAccent(x[i]))
+					continue;
 
-                char cx = accentTable[x[i]];
-                if (ignoreCase)
-                    cx = char.ToLower(cx);
+				char cx = accentTable[x[i]];
+				if (ignoreCase)
+					cx = char.ToLower(cx);
 
-                if (cx == searchFor) {
-                    int foundAt = i;
+				if (cx == searchFor) {
+					int foundAt = i;
 
-                    // Once we find it, iterate through x and y at the same time.
-                    // If we reach the end of y without either running off the end of x
-                    // or finding a non-match, x contains y.
-                    for (int j = firstY; ; ) {
-                        while (i < x.Length && accentTable.IsAccent(x[i]))
-                            ++i;
-                        bool hasX = true;
-                        if (i >= x.Length)
-                            hasX = false;
+					// Once we find it, iterate through x and y at the same time.
+					// If we reach the end of y without either running off the end of x
+					// or finding a non-match, x contains y.
+					for (int j = firstY; ; ) {
+						while (i < x.Length && accentTable.IsAccent(x[i]))
+							++i;
+						bool hasX = true;
+						if (i >= x.Length)
+							hasX = false;
 
-                        while (j < y.Length && accentTable.IsAccent(y[j]))
-                            ++j;
-                        if (j >= y.Length) {
-                            if (foundAt > 0)
-                                return MatchType.NormalMatch;
-                            if (hasX)
-                                return MatchType.PerfectMatch;
-                            return MatchType.StartMatch; // Found y.
-                        }
+						while (j < y.Length && accentTable.IsAccent(y[j]))
+							++j;
+						if (j >= y.Length) {
+							if (foundAt > 0)
+								return MatchType.NormalMatch;
+							if (hasX)
+								return MatchType.PerfectMatch;
+							return MatchType.StartMatch; // Found y.
+						}
 
-                        if (!hasX)
-                            return null;
+						if (!hasX)
+							return null;
 
-                        cx = x[i];
-                        char cy = accentTable[y[j]];
-                        if (ignoreCase) {
-                            cy = char.ToLower(cy);
-                            cx = char.ToLower(cx);
-                        }
+						cx = x[i];
+						char cy = accentTable[y[j]];
+						if (ignoreCase) {
+							cy = char.ToLower(cy);
+							cx = char.ToLower(cx);
+						}
 
-                        if (cx != cy)
-                            break;
+						if (cx != cy)
+							break;
 
-                        if (++i >= x.Length)
-                            hasX = false;
-                        if (++j >= y.Length) {
-                            if (foundAt > 0)
-                                return MatchType.NormalMatch;
-                            if (!hasX)
-                                return MatchType.PerfectMatch;
-                            return MatchType.StartMatch;
-                        }
-                        
-                        if (!hasX)
-                            return null;
-                    }
-                }
-            }
+						if (++i >= x.Length)
+							hasX = false;
+						if (++j >= y.Length) {
+							if (foundAt > 0)
+								return MatchType.NormalMatch;
+							if (!hasX)
+								return MatchType.PerfectMatch;
+							return MatchType.StartMatch;
+						}
+						
+						if (!hasX)
+							return null;
+					}
+				}
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-        // Speeds up converting accented characters to non-accented characteres by way of
-        // a pre-computed table for the whole Basic Multilingual Plane. Characters not in
-        // the BMP are not currently supported.
-        class AccentTable {
-            char[] bmp = null;
-            bool[] isAccent = null;
+		// Speeds up converting accented characters to non-accented characteres by way of
+		// a pre-computed table for the whole Basic Multilingual Plane. Characters not in
+		// the BMP are not currently supported.
+		class AccentTable {
+			char[] bmp = null;
+			bool[] isAccent = null;
 
-            public bool IsAccent(char c) {
-                if (isAccent == null)
-                    InitTable();
+			public bool IsAccent(char c) {
+				if (isAccent == null)
+					InitTable();
 
-                return isAccent[(int)c];
-            }
+				return isAccent[(int)c];
+			}
 
-            public char this[char index] {
-                get {
-                    if (bmp == null)
-                        InitTable();
+			public char this[char index] {
+				get {
+					if (bmp == null)
+						InitTable();
 
-                    int c = (int)index;
-                    if (c < 65536)
-                        return bmp[c];
-                    else
-                        return index; // TODO: Non-BMP ones?
-                }
-            }
+					int c = (int)index;
+					if (c < 65536)
+						return bmp[c];
+					else
+						return index; // TODO: Non-BMP ones?
+				}
+			}
 
-            private void InitTable() {
-                Metrics.Measure("Initializing accent removal table", delegate {
-                    bmp = new char[65536];
-                    isAccent = new bool[65536];
+			private void InitTable() {
+				Metrics.Measure("Initializing accent removal table", delegate {
+					bmp = new char[65536];
+					isAccent = new bool[65536];
 
-                    for (int i = 0; i < 65536; ++i) {
-                        char c = (char)i;
+					for (int i = 0; i < 65536; ++i) {
+						char c = (char)i;
 
-                        var category = char.GetUnicodeCategory(c);
-                        if (category == System.Globalization.UnicodeCategory.NonSpacingMark) {
-                            isAccent[i] = true;
-                            continue;
-                        }
+						var category = char.GetUnicodeCategory(c);
+						if (category == System.Globalization.UnicodeCategory.NonSpacingMark) {
+							isAccent[i] = true;
+							continue;
+						}
 
-                        if (category == System.Globalization.UnicodeCategory.Surrogate)
-                            continue;
+						if (category == System.Globalization.UnicodeCategory.Surrogate)
+							continue;
 
-                        // Normalize() throws exceptions on some characters because they aren't valid on their own.
-                        try {
-                            string denorm = new string(c, 1).Normalize(NormalizationForm.FormD);
+						// Normalize() throws exceptions on some characters because they aren't valid on their own.
+						try {
+							string denorm = new string(c, 1).Normalize(NormalizationForm.FormD);
 
-                            foreach (char x in denorm) {
-                                if (char.GetUnicodeCategory(x) != System.Globalization.UnicodeCategory.NonSpacingMark) {
-                                    bmp[i] = x;
-                                    break;
-                                }
-                            }
-                        } catch (ArgumentException) {
-                            // This character isn't a valid code point on its own
-                        }
-                    }
-                });
-            }
-        }
-    }
+							foreach (char x in denorm) {
+								if (char.GetUnicodeCategory(x) != System.Globalization.UnicodeCategory.NonSpacingMark) {
+									bmp[i] = x;
+									break;
+								}
+							}
+						} catch (ArgumentException) {
+							// This character isn't a valid code point on its own
+						}
+					}
+				});
+			}
+		}
+	}
 }

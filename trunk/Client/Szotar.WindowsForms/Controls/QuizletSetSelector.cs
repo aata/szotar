@@ -4,16 +4,16 @@ using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
 	using System.Globalization;
-    using System.Text.RegularExpressions;
-    using System.Threading;
+	using System.Text.RegularExpressions;
+	using System.Threading;
 
-    [ImporterUI(typeof(QuizletImporter))]
+	[ImporterUI(typeof(QuizletImporter))]
 	public partial class QuizletSetSelector : UserControl, IImporterUI<WordList> {
 		long? selectedSet;
 		QuizletImporter importer;
-        CancellationTokenSource cts;
-        DisposableComponent disposableComponent;
-        bool searching;
+		CancellationTokenSource cts;
+		DisposableComponent disposableComponent;
+		bool searching;
 
 		public IImporter<WordList> Importer {
 			get { return importer; }
@@ -22,15 +22,15 @@ namespace Szotar.WindowsForms.Controls {
 		public QuizletSetSelector() {
 			InitializeComponent();
 
-            importer = new QuizletImporter();
+			importer = new QuizletImporter();
 
-            if (this.components == null)
-                this.components = new System.ComponentModel.Container();
+			if (this.components == null)
+				this.components = new System.ComponentModel.Container();
 
-            cts = new CancellationTokenSource();
-            components.Add(disposableComponent = new DisposableComponent(cts));
+			cts = new CancellationTokenSource();
+			components.Add(disposableComponent = new DisposableComponent(cts));
 
-            searching = false;
+			searching = false;
 			importButton.Enabled = false;
 			searchResults.SelectedIndexChanged += new EventHandler(searchResults_SelectedIndexChanged);
 		}
@@ -50,51 +50,51 @@ namespace Szotar.WindowsForms.Controls {
 			AbortRequest();
 
 			string search = searchBox.Text;
-            new QuizletAPI().SearchSets(searchBox.Text.Trim(), SetResults, SearchError, cts.Token);
+			new QuizletAPI().SearchSets(searchBox.Text.Trim(), SetResults, SearchError, cts.Token);
 
-            searching = true;
+			searching = true;
 			progressBar.Visible = true;
 			searchButton.Text = "&Abort";
 		}
 
 		// Aborts the current web request, if any.
 		private void AbortRequest() {
-            if (searching) {
-                cts.Cancel();
-                cts.Dispose();
-                disposableComponent.Thing = cts = new CancellationTokenSource();
-                searching = false;
-                progressBar.Visible = false;
-                searchButton.Text = "&Search";
-            }
+			if (searching) {
+				cts.Cancel();
+				cts.Dispose();
+				disposableComponent.Thing = cts = new CancellationTokenSource();
+				searching = false;
+				progressBar.Visible = false;
+				searchButton.Text = "&Search";
+			}
 		}
 
-        private void SearchError(Exception e) {
-            searching = false;
-            searchButton.Text = "&Search";
-            progressBar.Visible = false;
+		private void SearchError(Exception e) {
+			searching = false;
+			searchButton.Text = "&Search";
+			progressBar.Visible = false;
 
-            searchResults.Items.Clear();
-            searchResults.Items.Add("Error: " + (e != null ? e.Message : "<Unknown>"));
-            searchResults.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            searchResults.Enabled = false;
-        }
+			searchResults.Items.Clear();
+			searchResults.Items.Add("Error: " + (e != null ? e.Message : "<Unknown>"));
+			searchResults.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+			searchResults.Enabled = false;
+		}
 
-        private void SetResults(List<QuizletAPI.SetInfo> results) {
-            searching = false;
+		private void SetResults(List<QuizletAPI.SetInfo> results) {
+			searching = false;
 			searchButton.Text = "&Search";
 			progressBar.Visible = false;
 
 			searchResults.Enabled = true;
 			searchResults.BeginUpdate();
 			searchResults.Items.Clear();
-            foreach (QuizletAPI.SetInfo set in results) {
+			foreach (QuizletAPI.SetInfo set in results) {
 				ListViewItem lvitem = new ListViewItem(new string[] { 
-                    set.Title, 
-                    set.Author, 
-                    set.Created.ToString("d", CultureInfo.CurrentUICulture), 
-                    set.TermCount.ToString(CultureInfo.CurrentUICulture), 
-                    set.ID.ToString(CultureInfo.CurrentUICulture) });
+					set.Title, 
+					set.Author, 
+					set.Created.ToString("d", CultureInfo.CurrentUICulture), 
+					set.TermCount.ToString(CultureInfo.CurrentUICulture), 
+					set.ID.ToString(CultureInfo.CurrentUICulture) });
 				lvitem.Tag = set.ID;
 				searchResults.Items.Add(lvitem);
 			}
@@ -146,25 +146,25 @@ namespace Szotar.WindowsForms.Controls {
 			OnFinished();
 		}
 
-        private void searchResults_ItemActivate(object sender, EventArgs e) {
-            if (searchResults.SelectedIndices.Count == 0)
-                return;
+		private void searchResults_ItemActivate(object sender, EventArgs e) {
+			if (searchResults.SelectedIndices.Count == 0)
+				return;
 
-            importButton_Click(sender, e);
-        }
-
-		private void searchButton_Click(object sender, EventArgs e) {
-            if (searching)
-				AbortRequest();
-			else
-    			StartSearch();
+			importButton_Click(sender, e);
 		}
 
-        private void searchBox_Search(object sender, EventArgs e) {
-            if (searching)
-                AbortRequest();
-            StartSearch();
-        }
+		private void searchButton_Click(object sender, EventArgs e) {
+			if (searching)
+				AbortRequest();
+			else
+				StartSearch();
+		}
+
+		private void searchBox_Search(object sender, EventArgs e) {
+			if (searching)
+				AbortRequest();
+			StartSearch();
+		}
 
 		void searchResults_SelectedIndexChanged(object sender, EventArgs e) {
 			UpdateImportButton();
@@ -187,8 +187,8 @@ namespace Szotar.WindowsForms.Controls {
 		}
 		#endregion Events
 
-        private void attribution_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            System.Diagnostics.Process.Start("http://quizlet.com/");
-        }
+		private void attribution_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+			System.Diagnostics.Process.Start("http://quizlet.com/");
+		}
 	}
 }

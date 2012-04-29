@@ -329,183 +329,183 @@ namespace Szotar {
 			: base(info, context) { }
 	}
 
-    /// <summary>
-    /// Converts objects to and from JSON using a set of converters for System types.
-    /// </summary>
-    /// <remarks>
-    /// Converters for system types (which are not modifiable by the program) cannot be created by
-    /// implementing IJsonConvertible, so we must implement a system of handlers for system types.
-    /// It's a shame C# doesn't have type classes.
-    /// 
-    /// There are converters for: bool, int, double, float, long, short and string. There is also
-    /// a special case for List&lt;T&gt;. It would be nice to have instances for all IList&lt;T&gt;-
-    /// and IDictionary&lt;T&gt;-derived classes (obviously, in these cases, the class would have to 
-    /// be default-constructible).</remarks>
-    public class JsonContext : IJsonContext {
-        Dictionary<Type, IJsonConverter> converters;
+	/// <summary>
+	/// Converts objects to and from JSON using a set of converters for System types.
+	/// </summary>
+	/// <remarks>
+	/// Converters for system types (which are not modifiable by the program) cannot be created by
+	/// implementing IJsonConvertible, so we must implement a system of handlers for system types.
+	/// It's a shame C# doesn't have type classes.
+	/// 
+	/// There are converters for: bool, int, double, float, long, short and string. There is also
+	/// a special case for List&lt;T&gt;. It would be nice to have instances for all IList&lt;T&gt;-
+	/// and IDictionary&lt;T&gt;-derived classes (obviously, in these cases, the class would have to 
+	/// be default-constructible).</remarks>
+	public class JsonContext : IJsonContext {
+		Dictionary<Type, IJsonConverter> converters;
 
-        public JsonContext() {
-            converters = new Dictionary<Type, IJsonConverter>();
+		public JsonContext() {
+			converters = new Dictionary<Type, IJsonConverter>();
 
-            // The JsonIntegralConverter uses the LongValue, the JsonFloatingConverter uses
-            // the DoubleValue.
-            converters.Add(typeof(string), new JsonStringConverter());
-            converters.Add(typeof(double), new JsonFloatingConverter<double>());
-            converters.Add(typeof(float), new JsonFloatingConverter<float>());
-            converters.Add(typeof(int), new JsonIntegralConverter<int>());
-            converters.Add(typeof(long), new JsonIntegralConverter<long>());
-            converters.Add(typeof(short), new JsonIntegralConverter<short>());
-            converters.Add(typeof(byte), new JsonIntegralConverter<byte>());
-            converters.Add(typeof(bool), new JsonBoolConverter());           
-        }
+			// The JsonIntegralConverter uses the LongValue, the JsonFloatingConverter uses
+			// the DoubleValue.
+			converters.Add(typeof(string), new JsonStringConverter());
+			converters.Add(typeof(double), new JsonFloatingConverter<double>());
+			converters.Add(typeof(float), new JsonFloatingConverter<float>());
+			converters.Add(typeof(int), new JsonIntegralConverter<int>());
+			converters.Add(typeof(long), new JsonIntegralConverter<long>());
+			converters.Add(typeof(short), new JsonIntegralConverter<short>());
+			converters.Add(typeof(byte), new JsonIntegralConverter<byte>());
+			converters.Add(typeof(bool), new JsonBoolConverter());           
+		}
 
-        public JsonValue ToJson(object value) {
-            return GetConverter(value.GetType()).ToJson(value, this);
-        }
+		public JsonValue ToJson(object value) {
+			return GetConverter(value.GetType()).ToJson(value, this);
+		}
 
-        public T FromJson<T>(JsonValue json) {
-            return (T)GetConverter<T>().FromJson(json, this);
-        }
+		public T FromJson<T>(JsonValue json) {
+			return (T)GetConverter<T>().FromJson(json, this);
+		}
 
-        protected IJsonConverter GetConverter<T>() {
-            return GetConverter(typeof(T));
-        }
+		protected IJsonConverter GetConverter<T>() {
+			return GetConverter(typeof(T));
+		}
 
-        // Converts an object to and from JSON by using its IJsonConvertible instance.
-        class ReflectionConverter : IJsonConverter {
-            Type type;
+		// Converts an object to and from JSON by using its IJsonConvertible instance.
+		class ReflectionConverter : IJsonConverter {
+			Type type;
 
-            public ReflectionConverter(Type type) {
-                // It is not known yet if the type even implements IJsonConvertible.
-                // If it does not, a conversion exception will be thrown.
-                this.type = type;
-            }
+			public ReflectionConverter(Type type) {
+				// It is not known yet if the type even implements IJsonConvertible.
+				// If it does not, a conversion exception will be thrown.
+				this.type = type;
+			}
 
-            public JsonValue ToJson(object value, IJsonContext context) {
-                if (value == null)
-                    return null;
+			public JsonValue ToJson(object value, IJsonContext context) {
+				if (value == null)
+					return null;
 
-                var c = value as IJsonConvertible;
-                if (c != null)
-                    return c.ToJson(context);
+				var c = value as IJsonConvertible;
+				if (c != null)
+					return c.ToJson(context);
 
-                throw new JsonConvertException("There is no converter registered for the type " + type.Namespace + "." + type.Name + " and it does not implement IJsonConvertible");
-            }
+				throw new JsonConvertException("There is no converter registered for the type " + type.Namespace + "." + type.Name + " and it does not implement IJsonConvertible");
+			}
 
-            public object FromJson(JsonValue json, IJsonContext context) {
-                var c = type.GetConstructor(
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                    null,
-                    new[] { typeof(JsonValue), typeof(IJsonContext) },
-                    null
-                    );
+			public object FromJson(JsonValue json, IJsonContext context) {
+				var c = type.GetConstructor(
+					BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+					null,
+					new[] { typeof(JsonValue), typeof(IJsonContext) },
+					null
+					);
 
-                if (c != null)
-                    return c.Invoke(new object[] { json, context });
+				if (c != null)
+					return c.Invoke(new object[] { json, context });
 
-                throw new JsonConvertException("There is no converter registered for the type " + type.Namespace + "." + type.Name + " and it does not have a constructor taking a JsonValue and an IJsonContext");
-            }
-        }
+				throw new JsonConvertException("There is no converter registered for the type " + type.Namespace + "." + type.Name + " and it does not have a constructor taking a JsonValue and an IJsonContext");
+			}
+		}
 
-        protected IJsonConverter GetConverter(Type type) {
-            IJsonConverter converter;
-            if (converters.TryGetValue(type, out converter))
-                return converter;
+		protected IJsonConverter GetConverter(Type type) {
+			IJsonConverter converter;
+			if (converters.TryGetValue(type, out converter))
+				return converter;
 
-            // A special case for List<T>.
-            if (type.IsGenericType) {
-                if (type.GetGenericTypeDefinition() == typeof(List<>)) {
-                    var elemT = type.GetGenericArguments()[0];
-                    var convT = typeof(JsonListConverter<>).MakeGenericType(elemT);
-                    return (IJsonConverter)Activator.CreateInstance(convT);
-                }
-            }
+			// A special case for List<T>.
+			if (type.IsGenericType) {
+				if (type.GetGenericTypeDefinition() == typeof(List<>)) {
+					var elemT = type.GetGenericArguments()[0];
+					var convT = typeof(JsonListConverter<>).MakeGenericType(elemT);
+					return (IJsonConverter)Activator.CreateInstance(convT);
+				}
+			}
 
-            return new ReflectionConverter(type);
-        }
+			return new ReflectionConverter(type);
+		}
 
-        public class JsonBoolConverter : IJsonConverter {
-            public JsonValue ToJson(object value, IJsonContext context) {
-                return new JsonBool(Convert.ToBoolean(value));
-            }
+		public class JsonBoolConverter : IJsonConverter {
+			public JsonValue ToJson(object value, IJsonContext context) {
+				return new JsonBool(Convert.ToBoolean(value));
+			}
 
-            public object FromJson(JsonValue value, IJsonContext context) {
-                var b = value as JsonBool;
-                if (b != null)
-                    return b.Value;
+			public object FromJson(JsonValue value, IJsonContext context) {
+				var b = value as JsonBool;
+				if (b != null)
+					return b.Value;
 
-                throw new JsonConvertException("Value was not a boolean");
-            }
-        }
+				throw new JsonConvertException("Value was not a boolean");
+			}
+		}
 
-        public class JsonFloatingConverter<T> : IJsonConverter {
-            public JsonValue ToJson(object value, IJsonContext context) {
-                return new JsonNumber(Convert.ToDouble(value));
-            }
+		public class JsonFloatingConverter<T> : IJsonConverter {
+			public JsonValue ToJson(object value, IJsonContext context) {
+				return new JsonNumber(Convert.ToDouble(value));
+			}
 
-            public object FromJson(JsonValue value, IJsonContext context) {
-                var n = value as JsonNumber;
-                if (n != null)
-                    return Convert.ChangeType(n.DoubleValue, typeof(T));
-                else
-                    throw new JsonConvertException("Value was not a number");
-            }
-        }
+			public object FromJson(JsonValue value, IJsonContext context) {
+				var n = value as JsonNumber;
+				if (n != null)
+					return Convert.ChangeType(n.DoubleValue, typeof(T));
+				else
+					throw new JsonConvertException("Value was not a number");
+			}
+		}
 
-        public class JsonIntegralConverter<T> : IJsonConverter {
-            public JsonValue ToJson(object value, IJsonContext context) {
-                return new JsonNumber(Convert.ToDouble(value));
-            }
+		public class JsonIntegralConverter<T> : IJsonConverter {
+			public JsonValue ToJson(object value, IJsonContext context) {
+				return new JsonNumber(Convert.ToDouble(value));
+			}
 
-            public object FromJson(JsonValue value, IJsonContext context) {
-                var n = value as JsonNumber;
-                if (n != null)
-                    return Convert.ChangeType(n.LongValue, typeof(T));
-                else
-                    throw new JsonConvertException("Value was not a number");
-            }
-        }
+			public object FromJson(JsonValue value, IJsonContext context) {
+				var n = value as JsonNumber;
+				if (n != null)
+					return Convert.ChangeType(n.LongValue, typeof(T));
+				else
+					throw new JsonConvertException("Value was not a number");
+			}
+		}
 
-        public class JsonStringConverter : IJsonConverter {
-            public JsonValue ToJson(object value, IJsonContext context) {
-                return new JsonString(Convert.ToString(value));
-            }
+		public class JsonStringConverter : IJsonConverter {
+			public JsonValue ToJson(object value, IJsonContext context) {
+				return new JsonString(Convert.ToString(value));
+			}
 
-            public object FromJson(JsonValue json, IJsonContext context) {
-                var s = json as JsonString;
-                if (s != null)
-                    return s.Value;
-                else
-                    throw new JsonConvertException("Value was not a string");
-            }
-        }
+			public object FromJson(JsonValue json, IJsonContext context) {
+				var s = json as JsonString;
+				if (s != null)
+					return s.Value;
+				else
+					throw new JsonConvertException("Value was not a string");
+			}
+		}
 
-        public class JsonListConverter<T> : IJsonConverter {
-            public JsonValue ToJson(object value, IJsonContext context) {
-                var list = value as List<T>;
-                if (list == null)
-                    throw new JsonConvertException("Value was not a List<" + typeof(T).ToString() + ">");
+		public class JsonListConverter<T> : IJsonConverter {
+			public JsonValue ToJson(object value, IJsonContext context) {
+				var list = value as List<T>;
+				if (list == null)
+					throw new JsonConvertException("Value was not a List<" + typeof(T).ToString() + ">");
 
-                var array = new JsonArray();
-                foreach (var item in list)
-                    array.Items.Add(context.ToJson(item));
+				var array = new JsonArray();
+				foreach (var item in list)
+					array.Items.Add(context.ToJson(item));
 
-                return array;
-            }
+				return array;
+			}
 
-            public object FromJson(JsonValue json, IJsonContext context) {
-                var array = json as JsonArray;
-                if (array == null)
-                    throw new JsonConvertException("Value was not an array");
+			public object FromJson(JsonValue json, IJsonContext context) {
+				var array = json as JsonArray;
+				if (array == null)
+					throw new JsonConvertException("Value was not an array");
 
-                var list = new List<T>();
-                foreach (var item in array.Items)
-                    list.Add(context.FromJson<T>(item));
+				var list = new List<T>();
+				foreach (var item in array.Items)
+					list.Add(context.FromJson<T>(item));
 
-                return list;
-            }
-        }
-    }
+				return list;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Saves the configuration to disk as a JSON-formatted file, using IJsonConverter and IJsonConvertible
@@ -521,13 +521,13 @@ namespace Szotar {
 		: IConfiguration
 		, IJsonContext 
 	{
-        JsonContext context;
+		JsonContext context;
 		Dictionary<string, object> values;
 		string path;
 		bool dirty = false;
 
 		public JsonConfiguration(string path) {
-            context = new JsonContext();
+			context = new JsonContext();
 			values = new Dictionary<string, object>();
 			this.path = path;
 
@@ -610,7 +610,7 @@ namespace Szotar {
 					if (value is JsonValue) {
 						T real;
 						try {
-                            real = context.FromJson<T>((JsonValue)value);
+							real = context.FromJson<T>((JsonValue)value);
 						} catch (JsonConvertException e) {
 							ProgramLog.Default.AddMessage(LogType.Error, "JSON conversion exception while retrieving {0}: {1}", setting, e.Message);
 							real = default(T);
@@ -665,12 +665,12 @@ namespace Szotar {
 				handler(this, new SettingChangedEventArgs(setting));
 		}
 
-        JsonValue IJsonContext.ToJson(object value) {
-            return context.ToJson(value);
-        }
+		JsonValue IJsonContext.ToJson(object value) {
+			return context.ToJson(value);
+		}
 
-        T IJsonContext.FromJson<T>(JsonValue json) {
-            return context.FromJson<T>(json);
-        }
-    }
+		T IJsonContext.FromJson<T>(JsonValue json) {
+			return context.FromJson<T>(json);
+		}
+	}
 }

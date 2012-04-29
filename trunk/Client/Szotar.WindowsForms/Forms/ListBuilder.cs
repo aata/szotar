@@ -29,7 +29,7 @@ namespace Szotar.WindowsForms.Forms {
 			MakeRecent();
 		}
 
-        // Constructor is protected in order to make sure no other word lists are open for this list.
+		// Constructor is protected in order to make sure no other word lists are open for this list.
 		protected ListBuilder(WordList wordList) {
 			InitializeComponent();
 
@@ -40,7 +40,7 @@ namespace Szotar.WindowsForms.Forms {
 			name.Text = list.Name;
 			author.Text = list.Author;
 			url.Text = list.Url;
-            UpdateEntryCount();
+			UpdateEntryCount();
 
 			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
 			meta.Height = GuiConfiguration.ListBuilderMetadataSectionHeight;
@@ -65,7 +65,7 @@ namespace Szotar.WindowsForms.Forms {
 			redo.Click += delegate { list.Redo(); };
 			editMenu.DropDownOpening += new EventHandler(editMenu_DropDownOpening);
 			itemContextMenu.Opening += new CancelEventHandler(itemContextMenu_Opening);
-            mainMenu.Items.Add(new TagMenu() { WordList = list });
+			mainMenu.Items.Add(new TagMenu() { WordList = list });
 
 			grid.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(grid_ColumnHeaderMouseClick);
 
@@ -101,8 +101,8 @@ namespace Szotar.WindowsForms.Forms {
 			}
 
 			var list = DataStore.Database.GetWordList(setID);
-            if (list == null)
-                return null;
+			if (list == null)
+				return null;
 
 			var form = new ListBuilder(list);
 			form.Show();
@@ -134,8 +134,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void MakeRecent() {
-            list.Accessed = DateTime.Now;
-            DataStore.Database.RaiseWordListOpened(list.ID);
+			list.Accessed = DateTime.Now;
+			DataStore.Database.RaiseWordListOpened(list.ID);
 		}
 
 		void remove_Click(object sender, EventArgs e) {
@@ -182,8 +182,8 @@ namespace Szotar.WindowsForms.Forms {
 		void list_ListChanged(object sender, ListChangedEventArgs e) {
 			sortColumn = null;
 
-            if (e.ListChangedType == ListChangedType.ItemAdded || e.ListChangedType == ListChangedType.ItemDeleted || e.ListChangedType == ListChangedType.Reset)
-                UpdateEntryCount();
+			if (e.ListChangedType == ListChangedType.ItemAdded || e.ListChangedType == ListChangedType.ItemDeleted || e.ListChangedType == ListChangedType.Reset)
+				UpdateEntryCount();
 		}
 
 		private void UpdateTitle() {
@@ -277,9 +277,9 @@ namespace Szotar.WindowsForms.Forms {
 			MakeRecent();
 		}
 
-        void UpdateEntryCount() {
-            entriesLabel.Text = string.Format(Properties.Resources.NEntries, list.Count);
-        }
+		void UpdateEntryCount() {
+			entriesLabel.Text = string.Format(Properties.Resources.NEntries, list.Count);
+		}
 
 		void list_PropertyChanged(object sender, PropertyChangedEventArgs e) {
 			switch (e.PropertyName) {
@@ -300,8 +300,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 		#endregion
 
-        #region Drop Shadow
-        public class ShadowTag {
+		#region Drop Shadow
+		public class ShadowTag {
 			public System.Drawing.Point Down { get; set; }
 			public int OriginalHeight { get; set; }
 		}
@@ -319,9 +319,9 @@ namespace Szotar.WindowsForms.Forms {
 		private void shadow_MouseDown(object sender, MouseEventArgs e) {
 			shadow.Tag = new ShadowTag { Down = e.Location, OriginalHeight = shadow.Height };
 		}
-        #endregion
+		#endregion
 
-        private void ListBuilder_Closing(object sender, CancelEventArgs e) {
+		private void ListBuilder_Closing(object sender, CancelEventArgs e) {
 			UnwireListEvents();
 
 			if (isNewList && list.Count == 0) {
@@ -433,45 +433,45 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-        public void ScrollToResult(ListSearchResult result) {
-            if (result.PositionHint.HasValue) {
-                var hint = result.PositionHint.Value;
-                if (hint >= 0 && hint < list.Count && list[hint].Phrase == result.Phrase && list[hint].Translation == result.Translation) {
-                    ScrollToPosition(hint);
-                    return;
-                }
-            }
+		public void ScrollToResult(ListSearchResult result) {
+			if (result.PositionHint.HasValue) {
+				var hint = result.PositionHint.Value;
+				if (hint >= 0 && hint < list.Count && list[hint].Phrase == result.Phrase && list[hint].Translation == result.Translation) {
+					ScrollToPosition(hint);
+					return;
+				}
+			}
 
-            for (int i = 0; i < list.Count; i++) {
-                var item = list[i];
-                if (item.Phrase == result.Phrase && item.Translation == result.Translation) {
-                    ScrollToPosition(i);
-                    return;
-                }
-            }
+			for (int i = 0; i < list.Count; i++) {
+				var item = list[i];
+				if (item.Phrase == result.Phrase && item.Translation == result.Translation) {
+					ScrollToPosition(i);
+					return;
+				}
+			}
 
-            // Couldn't find the item... just scroll to where it was last
-            if(result.PositionHint.HasValue)
-                ScrollToPosition(result.PositionHint.Value);
-        }
-
-        public void ScrollToPosition(int position) {
-			grid.ScrollToIndex(position);
-            grid.SelectRow(position);
+			// Couldn't find the item... just scroll to where it was last
+			if(result.PositionHint.HasValue)
+				ScrollToPosition(result.PositionHint.Value);
 		}
 
-        public bool ScrollToItem(string phrase, string translation) {
-            for (int i = 0; i < list.Count; i++) {
-                if (list[i].Phrase == phrase && list[i].Translation == translation) {
-                    ScrollToPosition(i);
-                    return true;
-                }
-            }
-            return false;
-        }
+		public void ScrollToPosition(int position) {
+			grid.ScrollToIndex(position);
+			grid.SelectRow(position);
+		}
+
+		public bool ScrollToItem(string phrase, string translation) {
+			for (int i = 0; i < list.Count; i++) {
+				if (list[i].Phrase == phrase && list[i].Translation == translation) {
+					ScrollToPosition(i);
+					return true;
+				}
+			}
+			return false;
+		}
 
 		void showStartPage_Click(object sender, EventArgs e) {
-            ShowForm.Show<StartPage>();
+			ShowForm.Show<StartPage>();
 		}
 
 		private void deleteList_Click(object sender, EventArgs e) {

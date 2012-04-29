@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Forms {
 	public partial class StartPage : Form {
-        TagMenu tagMenu;
+		TagMenu tagMenu;
 
 		public StartPage() {
 			InitializeComponent();
@@ -19,45 +19,45 @@ namespace Szotar.WindowsForms.Forms {
 
 			recentItems.ListsChosen += new EventHandler(recentItems_ListsChosen);
 
-            tagMenu = new TagMenu();
-            listContextMenu.Items.Insert(listContextMenu.Items.IndexOf(newListCM), tagMenu);
+			tagMenu = new TagMenu();
+			listContextMenu.Items.Insert(listContextMenu.Items.IndexOf(newListCM), tagMenu);
 		}
 
-        #region List Search
-        private void listContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e) {
-            var selectedLists = recentItems.SelectedLists();
+		#region List Search
+		private void listContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e) {
+			var selectedLists = recentItems.SelectedLists();
 
-            listContextMenuSeparator.Visible = flashcardsListMI.Visible = learnListMI.Visible = selectedLists.Count > 0;
+			listContextMenuSeparator.Visible = flashcardsListMI.Visible = learnListMI.Visible = selectedLists.Count > 0;
 
-            if (selectedLists.Count == 1)
-                tagMenu.WordList = Sqlite.SqliteWordList.FromSetID(DataStore.Database, selectedLists[0].SetID);
-            else
-                tagMenu.WordList = null;
-        }
+			if (selectedLists.Count == 1)
+				tagMenu.WordList = Sqlite.SqliteWordList.FromSetID(DataStore.Database, selectedLists[0].SetID);
+			else
+				tagMenu.WordList = null;
+		}
 
 		private void newListMI_Click(object sender, EventArgs e) {
 			new ListBuilder().Show();
 		}
 
 		private void openListMI_Click(object sender, EventArgs e) {
-            OpenTags(recentItems.SelectedTags());
+			OpenTags(recentItems.SelectedTags());
 			OpenLists(recentItems.SelectedLists());
-            OpenDictionaries(recentItems.SelectedDictionaries());
+			OpenDictionaries(recentItems.SelectedDictionaries());
 		}
 
 		private void recentItems_ListsChosen(object sender, EventArgs e) {
-            OpenTags(recentItems.SelectedTags());
-            OpenLists(recentItems.SelectedLists());
-            OpenDictionaries(recentItems.SelectedDictionaries());
+			OpenTags(recentItems.SelectedTags());
+			OpenLists(recentItems.SelectedLists());
+			OpenDictionaries(recentItems.SelectedDictionaries());
 		}
 
-        private void flashcardsListMI_Click(object sender, EventArgs e) {
-            PracticeLists(PracticeMode.Flashcards, recentItems.SelectedLists());
-        }
+		private void flashcardsListMI_Click(object sender, EventArgs e) {
+			PracticeLists(PracticeMode.Flashcards, recentItems.SelectedLists());
+		}
 
-        private void learnListMI_Click(object sender, EventArgs e) {
-            PracticeLists(PracticeMode.Learn, recentItems.SelectedLists());
-        }
+		private void learnListMI_Click(object sender, EventArgs e) {
+			PracticeLists(PracticeMode.Learn, recentItems.SelectedLists());
+		}
 
 		T? NullableMin<T>(T? x, T? y)
 			where T : struct, IComparable<T> {
@@ -79,25 +79,25 @@ namespace Szotar.WindowsForms.Forms {
 
 			foreach (var current in chosen) {
 				var i = opened.FindIndex(x => x.SetID == current.SetID);
-                if (i != -1) {
-                    if (!opened[i].PositionHint.HasValue || opened[i].PositionHint.Value > (current.PositionHint ?? int.MaxValue)) 
-                        opened[i] = current;
-                } else {
-                    opened.Add(current);
-                }
+				if (i != -1) {
+					if (!opened[i].PositionHint.HasValue || opened[i].PositionHint.Value > (current.PositionHint ?? int.MaxValue)) 
+						opened[i] = current;
+				} else {
+					opened.Add(current);
+				}
 			}
 
 			return opened;
 		}
-        private void OpenTags(IList<string> tags) {
-            if (tags.Count > 0)
-                recentItems.SearchTerm = "tag:" + tags[0];
-        }
+		private void OpenTags(IList<string> tags) {
+			if (tags.Count > 0)
+				recentItems.SearchTerm = "tag:" + tags[0];
+		}
 
-        private void OpenDictionaries(IList<DictionaryInfo> dicts) {
-            foreach(var di in dicts)
-                LookupForm.OpenDictionary(di);
-        }
+		private void OpenDictionaries(IList<DictionaryInfo> dicts) {
+			foreach(var di in dicts)
+				LookupForm.OpenDictionary(di);
+		}
 
 		private void OpenLists(IList<ListSearchResult> chosen) {
 			foreach (var open in UniqueLists(chosen))
@@ -141,21 +141,21 @@ namespace Szotar.WindowsForms.Forms {
 			ShowForm.Show<About>();
 		}
 
-        private void practiceRandom_Click(object sender, EventArgs e) {
-            new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
-        }
+		private void practiceRandom_Click(object sender, EventArgs e) {
+			new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
+		}
 		#endregion
 
-        private void findDuplicates_Click(object sender, EventArgs e) {
-            ShowForm.Show<FindDuplicates>();
-        }
+		private void findDuplicates_Click(object sender, EventArgs e) {
+			ShowForm.Show<FindDuplicates>();
+		}
 
-        private void importDictionaryMI_Click(object sender, EventArgs e) {
-            ShowForm.Show<DictionaryImport>();
-        }
+		private void importDictionaryMI_Click(object sender, EventArgs e) {
+			ShowForm.Show<DictionaryImport>();
+		}
 
-        private void importListMI_Click(object sender, EventArgs e) {
-            ShowForm.Show<ImportForm>();
-        }
+		private void importListMI_Click(object sender, EventArgs e) {
+			ShowForm.Show<ImportForm>();
+		}
 	}
 }

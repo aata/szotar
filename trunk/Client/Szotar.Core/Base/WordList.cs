@@ -92,9 +92,9 @@ namespace Szotar {
 		public abstract string Name { get; set; }
 		public abstract string Author { get; set; }
 		public abstract string Language { get; set; }
-        public abstract string Url { get; set; }
-        public abstract DateTime? Date { get; set; }
-        public abstract DateTime? Accessed { get; set; }
+		public abstract string Url { get; set; }
+		public abstract DateTime? Date { get; set; }
+		public abstract DateTime? Accessed { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		protected void RaisePropertyChanged(string propertyName) {
@@ -129,10 +129,10 @@ namespace Szotar {
 		/// </summary>
 		public abstract string RedoDescription { get; }
 
-        public abstract string[] Tags { get; }
-        public abstract void Tag(string tag);
-        public abstract void Untag(string tag);
-        public abstract bool HasTag(string tag);
+		public abstract string[] Tags { get; }
+		public abstract void Tag(string tag);
+		public abstract void Untag(string tag);
+		public abstract bool HasTag(string tag);
 
 	}
 

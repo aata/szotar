@@ -18,9 +18,9 @@ namespace Szotar.WindowsForms {
 			get { return new StringTable(Properties.Resources.ResourceManager); }
 		}
 
-        public override IStringTable GetStringTable(string tableName) {
-            return new StringTable(tableName);
-        }
+		public override IStringTable GetStringTable(string tableName) {
+			return new StringTable(tableName);
+		}
 	}
 
 	public class TypeStringTable : StringTable {

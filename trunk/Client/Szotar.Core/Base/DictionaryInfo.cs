@@ -25,12 +25,12 @@ namespace Szotar {
 			// This needs a default: for example, JSON-serialized DictionaryInfo objects might not have it.
 			// Maybe it shouldn't be a delegate after all. LookupForm makes sure the dictionary is deallocated
 			// after closing anyway, so it's not like the weak reference does anything.
-            GetFullInstance = delegate() {
-                if (Path.EndsWith(".dictx"))
-                    return SqliteDictionary.FromPath(Path);
-                else
-                    return new SimpleDictionary(Path);
-            };
+			GetFullInstance = delegate() {
+				if (Path.EndsWith(".dictx"))
+					return SqliteDictionary.FromPath(Path);
+				else
+					return new SimpleDictionary(Path);
+			};
 		}
 
 		int IKeyCompare<DictionaryInfo>.CompareKeyWith(DictionaryInfo b) {
