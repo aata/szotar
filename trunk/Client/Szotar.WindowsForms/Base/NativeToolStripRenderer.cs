@@ -1,4 +1,4 @@
-﻿using System;
+ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -7,6 +7,14 @@ using System.Windows.Forms.VisualStyles;
 // Thanks for fixes:
 //  * Marco Minerva, jachymko - http://www.codeplex.com/windowsformsaero
 //  * Ben Ryves - http://www.benryves.com/
+//
+// ** Note for anyone considering using this: **
+//
+// A better alternative to using this class is to use the MainMenu and ContextMenu
+// controls instead of MenuStrip and ContextMenuStrip, as they provide true native
+// rendering. If you require icons, try this:
+//
+// http://wyday.com/blog/2009/making-the-menus-in-your-net-app-look-professional/
 
 namespace Szotar.WindowsForms {
 	public enum ToolbarTheme {
