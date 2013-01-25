@@ -145,7 +145,7 @@
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="content.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
+    <value>0</value>
   </data>
   <data name="&gt;&gt;content.Name" xml:space="preserve">
     <value>content</value>
@@ -235,7 +235,7 @@
     <value>Standard</value>
   </data>
   <data name="importerSelection.Size" type="System.Drawing.Size, System.Drawing">
-    <value>172, 27</value>
+    <value>268, 27</value>
   </data>
   <data name="toolStrip.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>

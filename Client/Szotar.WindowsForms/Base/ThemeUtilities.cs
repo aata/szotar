@@ -32,10 +32,9 @@ namespace Szotar.WindowsForms {
 					NativeMethods.SetWindowTheme(control.Handle, "explorer", null);
 
 					if (control is TreeView) {
-						int extStyle =
-							NativeMethods.TVS_EX_DOUBLEBUFFER |
-							NativeMethods.TVS_EX_AUTOHSCROLL |
-							NativeMethods.TVS_EX_FADEINOUTEXPANDOS;
+						const int extStyle = NativeMethods.TVS_EX_DOUBLEBUFFER |
+						                     NativeMethods.TVS_EX_AUTOHSCROLL |
+						                     NativeMethods.TVS_EX_FADEINOUTEXPANDOS;
 
 						NativeMethods.SendMessage(
 							control.Handle,
@@ -43,12 +42,12 @@ namespace Szotar.WindowsForms {
 							IntPtr.Zero,
 							new IntPtr(extStyle));
 
-						TreeView tv = control as TreeView;
+						var tv = control as TreeView;
 						tv.ShowLines = false;
 						tv.HotTracking = true;
 
 					} else if (control is ListView) {
-						ListView lv = control as ListView;
+						var lv = control as ListView;
 
 						int extLvStyle = NativeMethods.SendMessage(
 							control.Handle,

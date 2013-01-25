@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 using Duplicate = Szotar.Sqlite.SqliteDataStore.Duplicate;
 
 namespace Szotar.WindowsForms.Forms {
 	public partial class FindDuplicates : Form {
-		Queue<KeyValuePair<Duplicate, Duplicate>> duplicates;
+	    readonly Queue<KeyValuePair<Duplicate, Duplicate>> duplicates;
 
 		public FindDuplicates() {
 			InitializeComponent();
@@ -20,17 +18,25 @@ namespace Szotar.WindowsForms.Forms {
 				components = new Container();
 
 			duplicates = new Queue<KeyValuePair<Duplicate,Duplicate>>(DataStore.Database.FindDuplicateListItems());
+
+            if (duplicates.Count == 0) {
+                MessageBox.Show(Properties.Resources.NoDuplicateEntriesFound, base.Text, MessageBoxButtons.OK,
+                                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                Close();
+                return;
+            }
+
 			GoToNext();
 
-			leftTermEditor.ItemDeleted += new EventHandler(termEditor_ItemDeleted);
-			rightTermEditor.ItemDeleted += new EventHandler(termEditor_ItemDeleted);
+			leftTermEditor.ItemDeleted += TermEditorItemDeleted;
+			rightTermEditor.ItemDeleted += TermEditorItemDeleted;
 
-			Font boldFont = new Font(this.Font, FontStyle.Bold);
+			var boldFont = new Font(base.Font, FontStyle.Bold);
 			components.Add(new DisposableComponent(boldFont));
 			leftListName.Font = rightListName.Font = boldFont;
 		}
 
-		void termEditor_ItemDeleted(object sender, EventArgs e) {
+		void TermEditorItemDeleted(object sender, EventArgs e) {
 			GoToNext();
 		}
 
@@ -49,17 +55,17 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		private void deleteLeft_Click(object sender, EventArgs e) {
+		private void DeleteLeft(object sender, EventArgs e) {
 			rightTermEditor.Save();
 			leftTermEditor.Item.Owner.Remove(leftTermEditor.Item);
 		}
 
-		private void deleteRight_Click(object sender, EventArgs e) {
+		private void DeleteRight(object sender, EventArgs e) {
 			leftTermEditor.Save();
 			rightTermEditor.Item.Owner.Remove(rightTermEditor.Item);
 		}
 
-		private void next_Click(object sender, EventArgs e) {
+		private void NextItem(object sender, EventArgs e) {
 			leftTermEditor.Save();
 			rightTermEditor.Save();
 			GoToNext();
@@ -78,7 +84,7 @@ namespace Szotar.WindowsForms.Forms {
 			return true;
 		}
 
-		private void close_Click(object sender, EventArgs e) {
+		private void CloseClicked(object sender, EventArgs e) {
 			leftTermEditor.Save();
 			rightTermEditor.Save();
 			Close();

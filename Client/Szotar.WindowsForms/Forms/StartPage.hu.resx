@@ -119,43 +119,43 @@
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="newListMI.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
+    <value>216, 22</value>
   </data>
   <data name="newListMI.Text" xml:space="preserve">
     <value>&amp;Új lista</value>
   </data>
   <data name="practiceRandom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
+    <value>216, 22</value>
   </data>
   <data name="practiceRandom.Text" xml:space="preserve">
     <value>&amp;Gyakorolás</value>
   </data>
   <data name="close.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
+    <value>216, 22</value>
   </data>
   <data name="close.Text" xml:space="preserve">
     <value>&amp;Bezárás</value>
   </data>
   <data name="toolStripSeparator1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 6</value>
+    <value>213, 6</value>
   </data>
   <data name="importDictionaryMI.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
+    <value>216, 22</value>
   </data>
   <data name="importDictionaryMI.Text" xml:space="preserve">
     <value>&amp;Szótár importálás...</value>
   </data>
   <data name="importListMI.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
+    <value>216, 22</value>
   </data>
   <data name="importListMI.Text" xml:space="preserve">
     <value>&amp;Lista importálás...</value>
   </data>
   <data name="fileSep.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 6</value>
+    <value>213, 6</value>
   </data>
   <data name="exitProgram.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
+    <value>216, 22</value>
   </data>
   <data name="exitProgram.Text" xml:space="preserve">
     <value>{0} &amp;kijárása</value>
@@ -203,7 +203,7 @@
     <value>&amp;Súgó</value>
   </data>
   <data name="menu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>568, 24</value>
+    <value>570, 24</value>
   </data>
   <data name="openListMI.Size" type="System.Drawing.Size, System.Drawing">
     <value>152, 22</value>
@@ -233,13 +233,13 @@
     <value>&amp;Tanulás</value>
   </data>
   <data name="listContextMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>153, 120</value>
+    <value>153, 98</value>
   </data>
   <data name="recentItems.Size" type="System.Drawing.Size, System.Drawing">
-    <value>568, 395</value>
+    <value>570, 350</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>568, 419</value>
+    <value>570, 374</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

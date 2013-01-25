@@ -1,9 +1,6 @@
-﻿using System.Runtime.Serialization;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using System.Xml;
 using System;
-using Szotar;
-using Szotar.Json;
 
 namespace Szotar {
 	[Serializable]

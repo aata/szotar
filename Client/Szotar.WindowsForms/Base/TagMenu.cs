@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using Szotar.WindowsForms.Properties;
 
 namespace Szotar{
 	public class TagMenu : ToolStripMenuItem {
-		ToolStripTextBox customTag;
+	    readonly ToolStripTextBox customTag;
 		WordList list;
 
 		public TagMenu() {
-			Text = "&Tags";
+			base.Text = Resources.TagsMenuHeader;
 
 			customTag = new ToolStripTextBox();
-			customTag.KeyUp += new KeyEventHandler(customTag_KeyUp);
+			customTag.KeyUp += CustomTagKeyUp;
 
-			DropDownOpening += new EventHandler(TagMenu_DropDownOpening);
+			DropDownOpening += OnDropDownOpening;
 		}
 
 		public override bool HasDropDownItems {
@@ -24,7 +23,7 @@ namespace Szotar{
 			}
 		}
 
-		void TagMenu_DropDownOpening(object sender, EventArgs e) {
+		void OnDropDownOpening(object sender, EventArgs e) {
 			DropDownItems.Clear();
 
 			if (list == null)
@@ -34,25 +33,24 @@ namespace Szotar{
 			var tags = DataStore.Database.GetTags(false);
 
 			foreach (var tag in tags) {
-				var item = new ToolStripMenuItem(tag.Key);
-				item.Tag = tag.Key;
-				item.CheckOnClick = true;
-				item.Checked = currentTags.Contains(tag.Key);
-				item.CheckedChanged += new EventHandler(item_CheckedChanged);
+				var item = new ToolStripMenuItem(tag.Key)
+				           {Tag = tag.Key, CheckOnClick = true, Checked = currentTags.Contains(tag.Key)};
+			    item.CheckedChanged += ItemCheckedChanged;
 				DropDownItems.Insert(DropDownItems.Count, item);
 			}
 
 			DropDownItems.Insert(DropDownItems.Count, customTag);
 		}
 
-		void customTag_KeyUp(object sender, KeyEventArgs e) {
+		void CustomTagKeyUp(object sender, KeyEventArgs e) {
 			string tag = ((ToolStripTextBox)sender).Text.Trim();
-			if (e.KeyCode == Keys.Enter && !string.IsNullOrEmpty(tag)) {
-				list.Tag(tag);
-				DropDown.Close();
-				((ToolStripTextBox)sender).Clear();
-				e.Handled = true;
-			}
+		    if (e.KeyCode != Keys.Enter || string.IsNullOrEmpty(tag))
+		        return;
+		    
+            list.Tag(tag);
+		    DropDown.Close();
+		    ((ToolStripTextBox)sender).Clear();
+		    e.Handled = true;
 		}
 
 		public WordList WordList {
@@ -63,9 +61,9 @@ namespace Szotar{
 			}
 		}
 
-		void item_CheckedChanged(object sender, EventArgs e) {
+		void ItemCheckedChanged(object sender, EventArgs e) {
 			var item = (ToolStripMenuItem)sender;
-			string tag = (string)item.Tag;
+			var tag = (string)item.Tag;
 			if (item.Checked)
 				WordList.Tag(tag);
 			else

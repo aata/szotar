@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Szotar.Json;
 
 namespace Szotar {
 	public interface IKeyCompare<T> {

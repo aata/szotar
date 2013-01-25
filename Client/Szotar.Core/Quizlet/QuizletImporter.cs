@@ -1,25 +1,20 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Szotar.Sqlite;
 
-namespace Szotar {
-	using System.Net;
-	using System.Globalization;
-	using System.IO;
-	using System.Xml;
-	using System.ComponentModel;
-	using System.Xml.XPath;
-
-	[ImporterAttribute("Quizlet", typeof(WordList))]
+namespace Szotar.Quizlet {
+    [ImporterAttribute("Quizlet", typeof(WordList))]
+    [ImporterDescription("Import a set from Quizlet", "Quizlet")]
 	public class QuizletImporter : IImporter<WordList> {
 		long? setID;
-		System.Threading.CancellationTokenSource cts;
+		CancellationTokenSource cts;
 		bool disposed;
-		IStringTable stringTable;
+	    readonly IStringTable stringTable;
 
 		public QuizletImporter()
 			: this(null) {
-			cts = new System.Threading.CancellationTokenSource();
+			cts = new CancellationTokenSource();
 			stringTable = LocalizationProvider.Default.GetStringTable("Quizlet");
 		}
 
@@ -32,55 +27,46 @@ namespace Szotar {
 			set { setID = value; }
 		}
 
-		public void BeginImport() {
+		public async Task<WordList> BeginImportAsTask() {
 			if (disposed)
 				throw new ObjectDisposedException("QuizletImporter");
 
-			if (setID == null) {
-				OnCompleted(null, new InvalidOperationException("Cannot begin quizlet import when Set is null"), false, null);
-				return;
-			}
+            if (setID == null)
+                throw new InvalidOperationException("Cannot begin quizlet import when Set is null");
 
+		    var api = new QuizletApi();
+			OnProgressChanged(stringTable["ContactingServer"].FormatUI(api.ServiceUri.Host), null);
+            
+		    var set = await api.FetchSetInfo(setID.Value, cts.Token);
+		    if (set.Terms == null)
+		        throw new FormatException("JSON for set information did not contain the terms of the set");
 
-			OnProgressChanged(stringTable["ContactingServer"], null);
+		    var list = DataStore.Database.CreateSet(set.Title, set.Author, null, set.Uri.ToString(), DateTime.Now);
+			foreach (var term in set.Terms)
+				list.Add(new WordListEntry(list, term.Term, term.Definition));
 
-			new QuizletAPI().GetSetInfo(
-				setID.Value,
-				set => {
-					OnProgressChanged(stringTable["ReceivedResponse"], null);
-
-					if (set.Terms == null) {
-						OnCompleted(null, new FormatException("JSON for set information did not contain the terms of the set"), false, null);
-						return;
-					}
-
-					var list = DataStore.Database.CreateSet(set.Title, set.Author, null, set.Uri.ToString(), DateTime.Now);
-					foreach (var pair in set.Terms)
-						list.Add(new WordListEntry(list, pair.Phrase, pair.Translation));
-					OnCompleted(list, null, false, null);
-				},
-				e => {
-					OnCompleted(null, e, e is OperationCanceledException, null);
-				},
-				cts.Token);
+		    return list;
 		}
 
-		public void Cancel() {
+        public void BeginImport() {
+            BeginImportAsTask().ContinueWith(t => OnCompleted(t.Result, t.Exception, t.IsCanceled, null));
+        }
+
+        public void Cancel() {
 			cts.Cancel();
 		}
 
+        public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
 		public event EventHandler<ImportCompletedEventArgs<WordList>> Completed;
 
 		private void OnCompleted(WordList result, Exception exception, bool cancelled, object state) {
-			
-			EventHandler<ImportCompletedEventArgs<WordList>> h = Completed;
+			var h = Completed;
 			if (h != null)
 				h(this, new ImportCompletedEventArgs<WordList>(result, exception, cancelled, state));
 		}
 
-		public event EventHandler<ProgressMessageEventArgs> ProgressChanged;
 		private void OnProgressChanged(string message, int? percentage) {
-			EventHandler<ProgressMessageEventArgs> h = ProgressChanged;
+			var h = ProgressChanged;
 			if (h != null)
 				h(this, new ProgressMessageEventArgs(message, percentage));
 		}

@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
 	public partial class SearchBox : UserControl {
 		string text, promptText;
-		Font promptFont;
-		Color foreColor, promptForeColor;
+	    Font promptFont;
+	    readonly Color foreColor, promptForeColor;
 
-		TextBox textBox;
+	    readonly TextBox textBox;
 
 		public SearchBox() {
 			InitializeComponent();
@@ -21,17 +19,17 @@ namespace Szotar.WindowsForms.Controls {
 			prompting = true;
 
 			textBox = new TextBox { Dock = DockStyle.Fill };
-			textBox.GotFocus += new EventHandler(SearchBox_Enter);
-			textBox.LostFocus += new EventHandler(SearchBox_Leave);
-			textBox.TextChanged += new EventHandler(SearchBox_TextChanged);
+			textBox.GotFocus += SearchBoxEnter;
+			textBox.LostFocus += SearchBoxLeave;
+			textBox.TextChanged += SearchBoxTextChanged;
 			Controls.Add(textBox);
 
-			textBox.KeyUp += new KeyEventHandler(textBox_KeyUp);
+			textBox.KeyUp += TextBoxKeyUp;
 
 			foreColor = SystemColors.ControlText;
 			promptForeColor = SystemColors.GrayText;
 
-			promptFont = new Font(Font, FontStyle.Italic);
+			promptFont = new Font(base.Font, FontStyle.Italic);
 
 			components = components ?? new Container();
 			components.Add(new DisposableComponent(promptFont));
@@ -44,21 +42,38 @@ namespace Szotar.WindowsForms.Controls {
 		[Browsable(true)]
 		public event EventHandler Search;
 
-		void textBox_KeyUp(object sender, KeyEventArgs e) {
-			if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return) {
-				e.Handled = true;
-				var h = Search;
-				if (h != null)
-					h(this, new EventArgs());
-			}
+		void TextBoxKeyUp(object sender, KeyEventArgs e) {
+		    if (e.KeyCode != Keys.Enter && e.KeyCode != Keys.Return)
+		        return;
+		    
+            e.Handled = true;
+		    var h = Search;
+		    if (h != null)
+		        h(this, new EventArgs());
 		}
 
-		void SearchBox_TextChanged(object sender, EventArgs e) {
-			if (!canPrompt && textBox.Text != text) {
-				Text = textBox.Text;
-				OnTextChanged(new EventArgs());
-			}
+		void SearchBoxTextChanged(object sender, EventArgs e) {
+		    if (canPrompt || textBox.Text == text)
+		        return;
+		    
+            Text = textBox.Text;
+		    OnTextChanged(new EventArgs());
 		}
+
+        protected override void OnFontChanged(EventArgs e) {
+            base.OnFontChanged(e);
+
+            promptFont = new Font(Font, FontStyle.Italic);
+            if (prompting)
+                textBox.Font = promptFont;
+
+            //foreach (var dc in components.Components.OfType<DisposableComponent>()) {
+            //    dc.Dispose();
+            //    break;
+            //}
+
+            //components.Add(new DisposableComponent(promptFont));
+        }
 
 		public override string Text {
 			get {
@@ -90,12 +105,12 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-		void SearchBox_Leave(object sender, EventArgs e) {
+		void SearchBoxLeave(object sender, EventArgs e) {
 			canPrompt = true;
 			UpdatePrompt();
 		}
 
-		void SearchBox_Enter(object sender, EventArgs e) {
+		void SearchBoxEnter(object sender, EventArgs e) {
 			canPrompt = false;
 			UpdatePrompt();
 		}
@@ -118,11 +133,9 @@ namespace Szotar.WindowsForms.Controls {
 		[Browsable(true), Localizable(true), AmbientValue("")]
 		public String PromptText {
 			get {
-				if (string.IsNullOrEmpty(promptText))
-					return "Search";
-				return promptText;
+			    return string.IsNullOrEmpty(promptText) ? Properties.Resources.SearchPrompt : promptText;
 			}
-			set { 
+		    set { 
 				promptText = value; 
 				UpdatePrompt();
 			}

@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="RecentListStoreName" xml:space="preserve">
     <value>Legfrissabbi listák</value>
@@ -293,5 +293,20 @@
   </data>
   <data name="Save" xml:space="preserve">
     <value>M&amp;entés</value>
+  </data>
+  <data name="NoDataToShow" xml:space="preserve">
+    <value>Semmilyen listák vagy a szótárak nincsenek még. Próbálj meg hozzáadni egy listát a listamenüből.</value>
+  </data>
+  <data name="NothingToShowGroup" xml:space="preserve">
+    <value>Semmi mutatni</value>
+  </data>
+  <data name="NoDuplicateEntriesFound" xml:space="preserve">
+    <value>Nincs duplikált elemeket találtak.</value>
+  </data>
+  <data name="SearchPrompt" xml:space="preserve">
+    <value>Keresés</value>
+  </data>
+  <data name="TagsMenuHeader" xml:space="preserve">
+    <value>&amp;Címkék</value>
   </data>
 </root>
