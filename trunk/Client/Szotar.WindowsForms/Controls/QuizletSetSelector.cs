@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Szotar.Quizlet;
 
 namespace Szotar.WindowsForms.Controls {
 	using System.Globalization;
@@ -10,9 +13,9 @@ namespace Szotar.WindowsForms.Controls {
 	[ImporterUI(typeof(QuizletImporter))]
 	public partial class QuizletSetSelector : UserControl, IImporterUI<WordList> {
 		long? selectedSet;
-		QuizletImporter importer;
+	    readonly QuizletImporter importer;
 		CancellationTokenSource cts;
-		DisposableComponent disposableComponent;
+	    readonly DisposableComponent disposableComponent;
 		bool searching;
 
 		public IImporter<WordList> Importer {
@@ -24,15 +27,15 @@ namespace Szotar.WindowsForms.Controls {
 
 			importer = new QuizletImporter();
 
-			if (this.components == null)
-				this.components = new System.ComponentModel.Container();
+			if (components == null)
+				components = new System.ComponentModel.Container();
 
 			cts = new CancellationTokenSource();
 			components.Add(disposableComponent = new DisposableComponent(cts));
 
 			searching = false;
 			importButton.Enabled = false;
-			searchResults.SelectedIndexChanged += new EventHandler(searchResults_SelectedIndexChanged);
+			searchResults.SelectedIndexChanged += SearchResultsSelectedIndexChanged;
 		}
 
 		public event EventHandler Finished;
@@ -49,8 +52,14 @@ namespace Szotar.WindowsForms.Controls {
 		private void StartSearch() {
 			AbortRequest();
 
-			string search = searchBox.Text;
-			new QuizletAPI().SearchSets(searchBox.Text.Trim(), SetResults, SearchError, cts.Token);
+            new QuizletApi().SearchSets(searchBox.Text.Trim(), cts.Token).ContinueWith(t => {
+                if (t.Exception != null)
+                    SearchError(t.Exception);
+                else if (t.IsCanceled)
+                    SearchError(new OperationCanceledException());
+                else 
+                    SetResults(t.Result);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
 
 			searching = true;
 			progressBar.Visible = true;
@@ -59,17 +68,22 @@ namespace Szotar.WindowsForms.Controls {
 
 		// Aborts the current web request, if any.
 		private void AbortRequest() {
-			if (searching) {
-				cts.Cancel();
-				cts.Dispose();
-				disposableComponent.Thing = cts = new CancellationTokenSource();
-				searching = false;
-				progressBar.Visible = false;
-				searchButton.Text = "&Search";
-			}
+		    if (!searching)
+		        return;
+
+		    cts.Cancel();
+		    cts.Dispose();
+		    disposableComponent.Thing = cts = new CancellationTokenSource();
+		    searching = false;
+		    progressBar.Visible = false;
+		    searchButton.Text = "&Search";
 		}
 
 		private void SearchError(Exception e) {
+            var ae = e as AggregateException;
+            if (ae != null && ae.InnerExceptions.Count == 1)
+                e = ae.InnerExceptions[0];
+
 			searching = false;
 			searchButton.Text = "&Search";
 			progressBar.Visible = false;
@@ -80,7 +94,7 @@ namespace Szotar.WindowsForms.Controls {
 			searchResults.Enabled = false;
 		}
 
-		private void SetResults(List<QuizletAPI.SetInfo> results) {
+		private void SetResults(IEnumerable<SetModel> results) {
 			searching = false;
 			searchButton.Text = "&Search";
 			progressBar.Visible = false;
@@ -88,15 +102,14 @@ namespace Szotar.WindowsForms.Controls {
 			searchResults.Enabled = true;
 			searchResults.BeginUpdate();
 			searchResults.Items.Clear();
-			foreach (QuizletAPI.SetInfo set in results) {
-				ListViewItem lvitem = new ListViewItem(new string[] { 
+			foreach (var set in results) {
+				var item = new ListViewItem(new[] { 
 					set.Title, 
 					set.Author, 
 					set.Created.ToString("d", CultureInfo.CurrentUICulture), 
 					set.TermCount.ToString(CultureInfo.CurrentUICulture), 
-					set.ID.ToString(CultureInfo.CurrentUICulture) });
-				lvitem.Tag = set.ID;
-				searchResults.Items.Add(lvitem);
+					set.SetID.ToString(CultureInfo.CurrentUICulture) }) {Tag = set.SetID};
+			    searchResults.Items.Add(item);
 			}
 			searchResults.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
 			searchResults.EndUpdate();
@@ -114,10 +127,10 @@ namespace Szotar.WindowsForms.Controls {
 					foreach (ListViewItem item in searchResults.SelectedItems)
 						importButton.Enabled = item.Tag is long;
 			} else if (tabControl.SelectedTab == manualTab) {
-				int parseTest;
-				Match match = Regex.Match(manualInput.Text, "(\\d+)", RegexOptions.CultureInvariant);
+			    var match = Regex.Match(manualInput.Text, "(\\d+)", RegexOptions.CultureInvariant);
 				if (match.Success) {
-					if (int.TryParse(match.Captures[0].Value, out parseTest)) {
+				    int parseTest;
+				    if (int.TryParse(match.Captures[0].Value, out parseTest)) {
 						importButton.Enabled = true;
 						errorProvider.SetError(manualInput, null);
 					} else {
@@ -132,7 +145,7 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		#region Events
-		private void importButton_Click(object sender, EventArgs e) {
+		private void ImportButtonClick(object sender, EventArgs e) {
 			if (tabControl.SelectedTab == searchTab) {
 				if (searchResults.Enabled)
 					foreach (ListViewItem item in searchResults.SelectedItems)
@@ -146,49 +159,49 @@ namespace Szotar.WindowsForms.Controls {
 			OnFinished();
 		}
 
-		private void searchResults_ItemActivate(object sender, EventArgs e) {
+		private void SearchResultsItemActivate(object sender, EventArgs e) {
 			if (searchResults.SelectedIndices.Count == 0)
 				return;
 
-			importButton_Click(sender, e);
+			ImportButtonClick(sender, e);
 		}
 
-		private void searchButton_Click(object sender, EventArgs e) {
+		private void SearchButtonClick(object sender, EventArgs e) {
 			if (searching)
 				AbortRequest();
 			else
 				StartSearch();
 		}
 
-		private void searchBox_Search(object sender, EventArgs e) {
+		private void SearchBoxSearch(object sender, EventArgs e) {
 			if (searching)
 				AbortRequest();
 			StartSearch();
 		}
 
-		void searchResults_SelectedIndexChanged(object sender, EventArgs e) {
+		void SearchResultsSelectedIndexChanged(object sender, EventArgs e) {
 			UpdateImportButton();
 		}
 
-		private void manualInput_TextChanged(object sender, EventArgs e) {
+		private void ManualInputTextChanged(object sender, EventArgs e) {
 			UpdateImportButton();
 		}
 
-		private void manualInput_KeyPress(object sender, KeyPressEventArgs e) {
+		private void ManualInputKeyPress(object sender, KeyPressEventArgs e) {
 			if (e.KeyChar == '\r') {
 				e.Handled = true;
-				importButton_Click(null, null);
+				ImportButtonClick(null, null);
 			}
 		}
 
 		//Decide whether or not the import button should be allowed.
-		private void tabControl_TabIndexChanged(object sender, EventArgs e) {
+		private void TabControlTabIndexChanged(object sender, EventArgs e) {
 			UpdateImportButton();
 		}
 		#endregion Events
 
-		private void attribution_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			System.Diagnostics.Process.Start("http://quizlet.com/");
+		private void AttributionLinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+			Process.Start("http://quizlet.com/");
 		}
 	}
 }

@@ -54,7 +54,10 @@ namespace Szotar.WindowsForms {
 			}
 
 			var newForm = create();
-			newForm.Show();
+
+            // Could have closed itself due to some error.
+            if (!newForm.IsDisposed)
+			    newForm.Show();
 			return newForm;
 		}
 	}

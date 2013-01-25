@@ -112,199 +112,319 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="leftTermEditor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>261, 49</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="leftListName.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="leftTermEditor.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
-  <data name="&gt;&gt;table.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="close.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Right</value>
-  </data>
-  <data name="&gt;&gt;leftListName.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="leftListName.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="leftListName.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
   </data>
-  <data name="deleteRight.Location" type="System.Drawing.Point, System.Drawing">
-    <value>456, 71</value>
+  <data name="leftListName.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
-  <data name="&gt;&gt;rightListName.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="leftListName.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 0</value>
   </data>
-  <data name="close.Size" type="System.Drawing.Size, System.Drawing">
-    <value>75, 23</value>
-  </data>
-  <data name="deleteLeft.Text" xml:space="preserve">
-    <value>&amp;Delete</value>
-  </data>
-  <data name="&gt;&gt;rightListName.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;next.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;leftTermEditor.Parent" xml:space="preserve">
-    <value>table</value>
-  </data>
-  <data name="deleteRight.Text" xml:space="preserve">
-    <value>D&amp;elete</value>
-  </data>
-  <data name="&gt;&gt;close.Name" xml:space="preserve">
-    <value>close</value>
-  </data>
-  <data name="leftListName.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleCenter</value>
-  </data>
-  <data name="table.RowCount" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="rightListName.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="leftListName.Size" type="System.Drawing.Size, System.Drawing">
     <value>261, 13</value>
   </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
-  </data>
-  <data name="&gt;&gt;rightListName.Parent" xml:space="preserve">
-    <value>table</value>
-  </data>
-  <data name="deleteLeft.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="rightTermEditor.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;close.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>FindDuplicates</value>
-  </data>
-  <data name="&gt;&gt;leftTermEditor.Type" xml:space="preserve">
-    <value>Szotar.WindowsForms.Controls.TermEditor, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;next.Name" xml:space="preserve">
-    <value>next</value>
-  </data>
-  <data name="&gt;&gt;leftListName.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;next.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="rightTermEditor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>261, 49</value>
-  </data>
-  <data name="table.ColumnCount" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="next.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="deleteRight.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="&gt;&gt;rightTermEditor.ZOrder" xml:space="preserve">
-    <value>2</value>
+  <data name="leftListName.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
   </data>
   <data name="leftListName.Text" xml:space="preserve">
     <value>label1</value>
   </data>
-  <data name="leftListName.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 0</value>
+  <data name="leftListName.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleCenter</value>
   </data>
-  <data name="table.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+  <data name="&gt;&gt;leftListName.Name" xml:space="preserve">
+    <value>leftListName</value>
   </data>
-  <data name="close.Location" type="System.Drawing.Point, System.Drawing">
-    <value>475, 117</value>
+  <data name="&gt;&gt;leftListName.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="leftListName.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="&gt;&gt;leftListName.Parent" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="&gt;&gt;leftListName.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="deleteRight.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="deleteRight.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="deleteRight.Location" type="System.Drawing.Point, System.Drawing">
+    <value>456, 71</value>
+  </data>
+  <data name="deleteRight.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="deleteRight.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="deleteRight.Text" xml:space="preserve">
+    <value>D&amp;elete</value>
+  </data>
+  <data name="&gt;&gt;deleteRight.Name" xml:space="preserve">
+    <value>deleteRight</value>
+  </data>
+  <data name="&gt;&gt;deleteRight.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;deleteRight.Parent" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="&gt;&gt;deleteRight.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="deleteLeft.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="deleteLeft.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="deleteLeft.Location" type="System.Drawing.Point, System.Drawing">
+    <value>189, 71</value>
+  </data>
+  <data name="deleteLeft.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="deleteLeft.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="deleteLeft.Text" xml:space="preserve">
+    <value>&amp;Delete</value>
+  </data>
+  <data name="&gt;&gt;deleteLeft.Name" xml:space="preserve">
+    <value>deleteLeft</value>
+  </data>
+  <data name="&gt;&gt;deleteLeft.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;deleteLeft.Parent" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="&gt;&gt;deleteLeft.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="table.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="table.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="table.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="table.ColumnCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="rightListName.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="rightListName.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="rightListName.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="rightListName.Location" type="System.Drawing.Point, System.Drawing">
+    <value>270, 0</value>
+  </data>
+  <data name="rightListName.Size" type="System.Drawing.Size, System.Drawing">
     <value>261, 13</value>
   </data>
   <data name="rightListName.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
   </data>
-  <data name="table.Size" type="System.Drawing.Size, System.Drawing">
-    <value>534, 97</value>
+  <data name="rightListName.Text" xml:space="preserve">
+    <value>label1</value>
   </data>
-  <data name="&gt;&gt;next.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="rightTermEditor.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
-  <data name="&gt;&gt;close.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;deleteLeft.Parent" xml:space="preserve">
-    <value>table</value>
+  <data name="rightListName.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleCenter</value>
   </data>
   <data name="&gt;&gt;rightListName.Name" xml:space="preserve">
     <value>rightListName</value>
   </data>
-  <data name="rightTermEditor.Location" type="System.Drawing.Point, System.Drawing">
-    <value>270, 16</value>
+  <data name="&gt;&gt;rightListName.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;rightTermEditor.Name" xml:space="preserve">
-    <value>rightTermEditor</value>
+  <data name="&gt;&gt;rightListName.Parent" xml:space="preserve">
+    <value>table</value>
   </data>
-  <data name="$this.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+  <data name="&gt;&gt;rightListName.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="leftTermEditor.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="leftTermEditor.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
+  </data>
+  <data name="leftTermEditor.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 16</value>
+  </data>
+  <data name="leftTermEditor.Size" type="System.Drawing.Size, System.Drawing">
+    <value>261, 49</value>
+  </data>
+  <data name="leftTermEditor.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
   </data>
   <data name="&gt;&gt;leftTermEditor.Name" xml:space="preserve">
     <value>leftTermEditor</value>
   </data>
-  <data name="deleteLeft.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;leftTermEditor.Type" xml:space="preserve">
+    <value>Szotar.WindowsForms.Controls.TermEditor, Szotar, Version=0.6.0.0, Culture=neutral, PublicKeyToken=739b9ce0e05eb683</value>
+  </data>
+  <data name="&gt;&gt;leftTermEditor.Parent" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="&gt;&gt;leftTermEditor.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="rightTermEditor.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="rightTermEditor.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="rightTermEditor.Location" type="System.Drawing.Point, System.Drawing">
+    <value>270, 16</value>
+  </data>
+  <data name="rightTermEditor.Size" type="System.Drawing.Size, System.Drawing">
+    <value>261, 49</value>
+  </data>
+  <data name="rightTermEditor.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;rightTermEditor.Name" xml:space="preserve">
+    <value>rightTermEditor</value>
+  </data>
+  <data name="&gt;&gt;rightTermEditor.Type" xml:space="preserve">
+    <value>Szotar.WindowsForms.Controls.TermEditor, Szotar, Version=0.6.0.0, Culture=neutral, PublicKeyToken=739b9ce0e05eb683</value>
+  </data>
+  <data name="&gt;&gt;rightTermEditor.Parent" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="&gt;&gt;rightTermEditor.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="table.Location" type="System.Drawing.Point, System.Drawing">
+    <value>13, 13</value>
+  </data>
+  <data name="table.RowCount" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="table.Size" type="System.Drawing.Size, System.Drawing">
+    <value>534, 97</value>
+  </data>
+  <data name="table.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;table.Name" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="&gt;&gt;table.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;table.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;table.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="table.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="rightListName" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="leftTermEditor" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="rightTermEditor" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="deleteLeft" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="deleteRight" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="leftListName" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="close.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="close.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="close.Location" type="System.Drawing.Point, System.Drawing">
+    <value>475, 117</value>
+  </data>
+  <data name="close.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="close.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="close.Text" xml:space="preserve">
+    <value>&amp;Close</value>
+  </data>
+  <data name="&gt;&gt;close.Name" xml:space="preserve">
+    <value>close</value>
+  </data>
+  <data name="&gt;&gt;close.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;close.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;close.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
   <data name="next.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
-  <data name="&gt;&gt;deleteLeft.ZOrder" xml:space="preserve">
-    <value>3</value>
+  <data name="next.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
-  <data name="leftTermEditor.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 16</value>
+  <data name="next.Location" type="System.Drawing.Point, System.Drawing">
+    <value>394, 117</value>
   </data>
-  <data name="deleteRight.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
+  <data name="next.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
   </data>
-  <data name="&gt;&gt;deleteLeft.Name" xml:space="preserve">
-    <value>deleteLeft</value>
+  <data name="next.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
   </data>
-  <data name="&gt;&gt;deleteRight.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="next.Text" xml:space="preserve">
+    <value>&amp;Next</value>
   </data>
-  <data name="&gt;&gt;close.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;next.Name" xml:space="preserve">
+    <value>next</value>
   </data>
-  <data name="&gt;&gt;leftListName.Name" xml:space="preserve">
-    <value>leftListName</value>
+  <data name="&gt;&gt;next.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="table.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
+  <data name="&gt;&gt;next.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
-  <data name="close.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
+  <data name="&gt;&gt;next.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Language" type="System.Globalization.CultureInfo, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>hu</value>
+  </metadata>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="$this.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>562, 152</value>
+  </data>
+  <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Segoe UI, 8.25pt</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -1076,109 +1196,13 @@
         wAAAAAD/////////wAAAAAP//////////////////////////////////////////////////////w==
 </value>
   </data>
-  <data name="rightListName.Text" xml:space="preserve">
-    <value>label1</value>
-  </data>
-  <data name="leftListName.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;deleteRight.Name" xml:space="preserve">
-    <value>deleteRight</value>
-  </data>
-  <data name="rightListName.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Segoe UI, 8.25pt</value>
-  </data>
-  <data name="deleteLeft.Size" type="System.Drawing.Size, System.Drawing">
-    <value>75, 23</value>
-  </data>
-  <data name="&gt;&gt;leftListName.Parent" xml:space="preserve">
-    <value>table</value>
-  </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Find Duplicate Terms</value>
   </data>
-  <data name="next.Text" xml:space="preserve">
-    <value>&amp;Next</value>
-  </data>
-  <data name="next.Size" type="System.Drawing.Size, System.Drawing">
-    <value>75, 23</value>
-  </data>
-  <data name="leftTermEditor.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;deleteRight.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;rightTermEditor.Type" xml:space="preserve">
-    <value>Szotar.WindowsForms.Controls.TermEditor, Szotar, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="deleteLeft.Location" type="System.Drawing.Point, System.Drawing">
-    <value>189, 71</value>
-  </data>
-  <data name="&gt;&gt;table.Name" xml:space="preserve">
-    <value>table</value>
-  </data>
-  <data name="table.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="close.Text" xml:space="preserve">
-    <value>&amp;Close</value>
-  </data>
-  <data name="rightListName.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleCenter</value>
-  </data>
-  <data name="&gt;&gt;deleteLeft.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="next.Location" type="System.Drawing.Point, System.Drawing">
-    <value>394, 117</value>
-  </data>
-  <data name="&gt;&gt;deleteRight.Parent" xml:space="preserve">
-    <value>table</value>
-  </data>
-  <data name="table.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;table.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="rightListName.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>562, 152</value>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>FindDuplicates</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="table.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="rightListName" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="leftTermEditor" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="rightTermEditor" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="deleteLeft" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="deleteRight" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="leftListName" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,50,Percent,50" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
-  <data name="table.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 13</value>
-  </data>
-  <data name="deleteRight.Size" type="System.Drawing.Size, System.Drawing">
-    <value>75, 23</value>
-  </data>
-  <data name="&gt;&gt;table.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="rightListName.Location" type="System.Drawing.Point, System.Drawing">
-    <value>270, 0</value>
-  </data>
-  <data name="&gt;&gt;rightTermEditor.Parent" xml:space="preserve">
-    <value>table</value>
-  </data>
-  <data name="&gt;&gt;leftTermEditor.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="$this.Language" type="System.Globalization.CultureInfo, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>hu</value>
-  </metadata>
 </root>

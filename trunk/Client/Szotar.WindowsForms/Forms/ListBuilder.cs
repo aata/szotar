@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Forms {
 	public partial class ListBuilder : Form {
-		WordList list;
-		bool isNewList = false;
+	    readonly WordList list;
+	    readonly bool isNewList;
 
 		Control queuedUpdateControl;
 		Action queuedUpdateAction;
-		Timer queuedUpdateTimer;
+	    readonly Timer queuedUpdateTimer;
 
 		public WordList WordList { get { return list; } }
 
@@ -33,10 +31,10 @@ namespace Szotar.WindowsForms.Forms {
 		protected ListBuilder(WordList wordList) {
 			InitializeComponent();
 
-			this.list = wordList;
+			list = wordList;
 			grid.DataSource = wordList;
 
-			this.UpdateTitle();
+			UpdateTitle();
 			name.Text = list.Name;
 			author.Text = list.Author;
 			url.Text = list.Url;
@@ -45,29 +43,29 @@ namespace Szotar.WindowsForms.Forms {
 			grid.ColumnRatio = GuiConfiguration.ListBuilderColumnRatio;
 			meta.Height = GuiConfiguration.ListBuilderMetadataSectionHeight;
 
-			this.Layout += new LayoutEventHandler(ListBuilder_Layout);
-			this.Closing += new CancelEventHandler(ListBuilder_Closing);
-			editMetadata.Click += new EventHandler(editMetadata_Click);
-			copyAsCsv.Click += new EventHandler(copyAsCsv_Click);
-			sort.Click += new EventHandler(sort_Click);
-			swapAll.Click += new EventHandler(swapAll_Click);
-			shadow.MouseDown += new MouseEventHandler(shadow_MouseDown);
-			shadow.MouseMove += new MouseEventHandler(shadow_MouseMove);
-			name.TextChanged += new EventHandler(name_TextChanged);
-			author.TextChanged += new EventHandler(author_TextChanged);
-			url.TextChanged += new EventHandler(url_TextChanged);
-			showStartPage.Click += new EventHandler(showStartPage_Click);
-			close.Click += new EventHandler(close_Click);
-			deleteList.Click += new EventHandler(deleteList_Click);
-			grid.ColumnRatioChanged += new EventHandler(grid_ColumnRatioChanged);
+			Layout += ListBuilderLayout;
+			Closing += ListBuilderClosing;
+			editMetadata.Click += EditMetadataClick;
+			copyAsCsv.Click += CopyAsCsvClick;
+			sort.Click += SortItems;
+			swapAll.Click += SwapAll;
+			shadow.MouseDown += ShadowMouseDown;
+			shadow.MouseMove += ShadowMouseMove;
+			name.TextChanged += NameTextChanged;
+			author.TextChanged += AuthorTextChanged;
+			url.TextChanged += UrlTextChanged;
+			showStartPage.Click += showStartPage_Click;
+			close.Click += CloseClick;
+			deleteList.Click += DeleteListClick;
+			grid.ColumnRatioChanged += GridColumnRatioChanged;
 
 			undo.Click += delegate { list.Undo(); };
 			redo.Click += delegate { list.Redo(); };
-			editMenu.DropDownOpening += new EventHandler(editMenu_DropDownOpening);
-			itemContextMenu.Opening += new CancelEventHandler(itemContextMenu_Opening);
-			mainMenu.Items.Add(new TagMenu() { WordList = list });
+			editMenu.DropDownOpening += EditMenuDropDownOpening;
+			itemContextMenu.Opening += ItemContextMenuOpening;
+			mainMenu.Items.Add(new TagMenu { WordList = list });
 
-			grid.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(grid_ColumnHeaderMouseClick);
+			grid.ColumnHeaderMouseClick += ColumnHeaderClicked;
 
 			cutMI.Click += delegate { grid.Cut(); };
 			copyMI.Click += delegate { grid.Copy(); };
@@ -76,17 +74,17 @@ namespace Szotar.WindowsForms.Forms {
 			copyCM.Click += delegate { grid.Copy(); };
 			pasteCM.Click += delegate { grid.Paste(); };
 
-			swap.Click += new EventHandler(swap_Click);
+			swap.Click += SwapItems;
 
-			deleteMI.Click += new EventHandler(remove_Click);
-			deleteCM.Click += new EventHandler(remove_Click);
+			deleteMI.Click += RemoveItems;
+			deleteCM.Click += RemoveItems;
 
 			WireListEvents();
 			MakeRecent();
 
-			queuedUpdateTimer = new Timer() { Interval = 150, Enabled = false };
+			queuedUpdateTimer = new Timer { Interval = 150, Enabled = false };
 			components.Add(queuedUpdateTimer);
-			queuedUpdateTimer.Tick += new EventHandler(queuedUpdateTimer_Tick); 
+			queuedUpdateTimer.Tick += QueuedUpdateTimerTick; 
 		}
 
 		/// <summary>Opens a ListBuilder for the given Word List, or focusses an existing ListBuilder 
@@ -94,10 +92,11 @@ namespace Szotar.WindowsForms.Forms {
 		public static ListBuilder Open(long setID) {
 			foreach (Form f in Application.OpenForms) {
 				var lb = f as ListBuilder;
-				if (lb != null && lb.WordList.ID == setID) {
-					lb.BringToFront();
-					return lb;
-				}
+			    if (lb == null || lb.WordList.ID != setID)
+			        continue;
+
+			    lb.BringToFront();
+			    return lb;
 			}
 
 			var list = DataStore.Database.GetWordList(setID);
@@ -110,24 +109,24 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		private void WireListEvents() {
-			list.PropertyChanged += new PropertyChangedEventHandler(list_PropertyChanged);
-			list.ListDeleted += new EventHandler(list_ListDeleted);
-			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
+			list.PropertyChanged += ListPropertyChanged;
+			list.ListDeleted += ListDeleted;
+			list.ListChanged += ListChanged;
 		}
 
 		private void UnwireListEvents() {
-			list.PropertyChanged -= new PropertyChangedEventHandler(list_PropertyChanged);
-			list.ListDeleted -= new EventHandler(list_ListDeleted);
-			list.ListChanged -= new ListChangedEventHandler(list_ListChanged);
+			list.PropertyChanged -= ListPropertyChanged;
+			list.ListDeleted -= ListDeleted;
+			list.ListChanged -= ListChanged;
 		}
 
-		void grid_ColumnRatioChanged(object sender, EventArgs e) {
+		void GridColumnRatioChanged(object sender, EventArgs e) {
 			GuiConfiguration.ListBuilderColumnRatio = grid.ColumnRatio;
 		}
 
-		void list_ListDeleted(object sender, EventArgs e) {
+		void ListDeleted(object sender, EventArgs e) {
 			// Suppress the "would you like to keep this list?" message.
-			this.Closing -= new CancelEventHandler(ListBuilder_Closing);
+			Closing -= ListBuilderClosing;
 			UnwireListEvents();
 
 			Close();
@@ -138,15 +137,15 @@ namespace Szotar.WindowsForms.Forms {
 			DataStore.Database.RaiseWordListOpened(list.ID);
 		}
 
-		void remove_Click(object sender, EventArgs e) {
+		void RemoveItems(object sender, EventArgs e) {
 			list.RemoveAt(new List<int>(grid.SelectedEntryIndices));
 		}
 
-		void swap_Click(object sender, EventArgs e) {
+		void SwapItems(object sender, EventArgs e) {
 			list.SwapRows(new List<int>(grid.SelectedEntryIndices));
 		}
 
-		void swapAll_Click(object sender, EventArgs e) {
+		void SwapAll(object sender, EventArgs e) {
 			var rows = new List<int>();
 			for (int i = 0; i < list.Count; ++i)
 				rows.Add(i);
@@ -154,13 +153,13 @@ namespace Szotar.WindowsForms.Forms {
 			list.SwapRows(rows);
 		}
 
-		void sort_Click(object sender, EventArgs e) {
-			list.Sort((a, b) => a.Phrase.CompareTo(b.Phrase));
+		void SortItems(object sender, EventArgs e) {
+			list.Sort((a, b) => string.Compare(a.Phrase, b.Phrase, StringComparison.CurrentCultureIgnoreCase));
 		}
 
 		int? sortColumn;
 		bool sortAscending;
-		void grid_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e) {
+		void ColumnHeaderClicked(object sender, DataGridViewCellMouseEventArgs e) {
 			int direction = 1;
 
 			if (sortColumn == e.ColumnIndex) {
@@ -170,16 +169,19 @@ namespace Szotar.WindowsForms.Forms {
 				sortAscending = true;
 			}
 
-			if (e.ColumnIndex == 0) {
-				list.Sort((a, b) => direction * a.Phrase.CompareTo(b.Phrase));
-				sortColumn = 0;
-			} else if (e.ColumnIndex == 1) {
-				list.Sort((a, b) => direction * a.Translation.CompareTo(b.Translation));
-				sortColumn = 1;
+			switch (e.ColumnIndex) {
+			    case 0:
+			        list.Sort((a, b) => direction * string.Compare(a.Phrase, b.Phrase, StringComparison.CurrentCultureIgnoreCase));
+			        sortColumn = 0;
+			        break;
+			    case 1:
+			        list.Sort((a, b) => direction * string.Compare(a.Translation, b.Translation, StringComparison.CurrentCultureIgnoreCase));
+			        sortColumn = 1;
+			        break;
 			}
 		}
 
-		void list_ListChanged(object sender, ListChangedEventArgs e) {
+		void ListChanged(object sender, ListChangedEventArgs e) {
 			sortColumn = null;
 
 			if (e.ListChangedType == ListChangedType.ItemAdded || e.ListChangedType == ListChangedType.ItemDeleted || e.ListChangedType == ListChangedType.Reset)
@@ -202,7 +204,7 @@ namespace Szotar.WindowsForms.Forms {
 			return grid.CanPaste;
 		}
 
-		void editMenu_DropDownOpening(object sender, EventArgs e) {
+		void EditMenuDropDownOpening(object sender, EventArgs e) {
 			string undoDesc = list.UndoDescription;
 			string redoDesc = list.RedoDescription;
 
@@ -227,14 +229,14 @@ namespace Szotar.WindowsForms.Forms {
 			pasteMI.Enabled = CanPaste();
 		}
 
-		void itemContextMenu_Opening(object sender, CancelEventArgs e) {
+		void ItemContextMenuOpening(object sender, CancelEventArgs e) {
 			cutCM.Enabled = CanCut();
 			copyCM.Enabled = CanCopy();
 			pasteCM.Enabled = CanPaste();
 		}
 
 		#region Metadata Bindings
-		void queuedUpdateTimer_Tick(object sender, EventArgs e) {
+		void QueuedUpdateTimerTick(object sender, EventArgs e) {
 			queuedUpdateTimer.Stop();
 
 			if (queuedUpdateControl != null && queuedUpdateAction != null) {
@@ -264,15 +266,15 @@ namespace Szotar.WindowsForms.Forms {
 		// TODO: The database will be updated every time a character is typed... not good.
 		// It would be better if the database update were delayed until no keys have been
 		// pressed for, say, 200 milliseconds.
-		void url_TextChanged(object sender, EventArgs e) {
+		void UrlTextChanged(object sender, EventArgs e) {
 			list.Url = url.Text;
 		}
 
-		void author_TextChanged(object sender, EventArgs e) {
+		void AuthorTextChanged(object sender, EventArgs e) {
 			list.Author = author.Text;
 		}
 
-		void name_TextChanged(object sender, EventArgs e) {
+		void NameTextChanged(object sender, EventArgs e) {
 			list.Name = name.Text;
 			MakeRecent();
 		}
@@ -281,12 +283,12 @@ namespace Szotar.WindowsForms.Forms {
 			entriesLabel.Text = string.Format(Properties.Resources.NEntries, list.Count);
 		}
 
-		void list_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+		void ListPropertyChanged(object sender, PropertyChangedEventArgs e) {
 			switch (e.PropertyName) {
 				case "Name":
 					if (!name.Text.Equals(list.Name))
 						name.Text = list.Name;
-					this.UpdateTitle();
+					UpdateTitle();
 					break;
 				case "Author":
 					if (!author.Text.Equals(list.Author))
@@ -306,8 +308,8 @@ namespace Szotar.WindowsForms.Forms {
 			public int OriginalHeight { get; set; }
 		}
 
-		private void shadow_MouseMove(object sender, MouseEventArgs e) {
-			ShadowTag tag = shadow.Tag as ShadowTag;
+		private void ShadowMouseMove(object sender, MouseEventArgs e) {
+			var tag = shadow.Tag as ShadowTag;
 			if (e.Button == MouseButtons.Left && tag != null) {
 				System.Drawing.Point down = tag.Down;
 				meta.Height += down.Y - e.Y;
@@ -316,32 +318,32 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		private void shadow_MouseDown(object sender, MouseEventArgs e) {
+		private void ShadowMouseDown(object sender, MouseEventArgs e) {
 			shadow.Tag = new ShadowTag { Down = e.Location, OriginalHeight = shadow.Height };
 		}
 		#endregion
 
-		private void ListBuilder_Closing(object sender, CancelEventArgs e) {
+		private void ListBuilderClosing(object sender, CancelEventArgs e) {
 			UnwireListEvents();
 
-			if (isNewList && list.Count == 0) {
-				var dr = MessageBox.Show(
-					Properties.Resources.ConfirmKeepNewWordList,
-					Properties.Resources.ConfirmKeepNewWordListCaption,
-					MessageBoxButtons.YesNoCancel,
-					MessageBoxIcon.Question,
-					MessageBoxDefaultButton.Button1);
+		    if (!isNewList || list.Count != 0)
+		        return;
+		    
+            var dr = MessageBox.Show(
+		        Properties.Resources.ConfirmKeepNewWordList,
+		        Properties.Resources.ConfirmKeepNewWordListCaption,
+		        MessageBoxButtons.YesNoCancel,
+		        MessageBoxIcon.Question,
+		        MessageBoxDefaultButton.Button1);
 
-				if (dr == DialogResult.Cancel) {
-					e.Cancel = true;
-					return;
-				} else if (dr == DialogResult.No) {
-					list.DeleteWordList();
-				}
-			}
+		    if (dr == DialogResult.Cancel) {
+		        e.Cancel = true;
+		    } else if (dr == DialogResult.No) {
+		        list.DeleteWordList();
+		    }
 		}
 
-		private void editMetadata_Click(object sender, EventArgs e) {
+		private void EditMetadataClick(object sender, EventArgs e) {
 			editMetadata.Checked = !editMetadata.Checked;
 			if (editMetadata.Checked)
 				ShowMeta();
@@ -349,7 +351,7 @@ namespace Szotar.WindowsForms.Forms {
 				HideMeta();
 		}
 
-		private void copyAsCsv_Click(object sender, EventArgs e) {
+		private void CopyAsCsvClick(object sender, EventArgs e) {
 			var sb = new StringBuilder();
 
 			foreach (WordListEntry pair in list) {
@@ -379,7 +381,7 @@ namespace Szotar.WindowsForms.Forms {
 				Clipboard.SetText(sb.ToString());
 		}
 
-		private void ListBuilder_Layout(object sender, LayoutEventArgs e) {
+		private void ListBuilderLayout(object sender, LayoutEventArgs e) {
 			grid.Top = mainMenu.Bottom;
 			UpdateGridHeight();
 			grid.Width = ClientSize.Width;
@@ -423,13 +425,14 @@ namespace Szotar.WindowsForms.Forms {
 				return meta.Visible;
 			}
 			set {
-				// Don't do anything it if it hasn't changed since Show/HideMeta will break in such cases.
-				if (value != ShowMetadata) {
-					if (value)
-						ShowMeta();
-					else
-						HideMeta();
-				}
+			    // Don't do anything it if it hasn't changed since Show/HideMeta will break in such cases.
+			    if (value == ShowMetadata)
+			        return;
+			    
+                if (value)
+			        ShowMeta();
+			    else
+			        HideMeta();
 			}
 		}
 
@@ -474,7 +477,7 @@ namespace Szotar.WindowsForms.Forms {
 			ShowForm.Show<StartPage>();
 		}
 
-		private void deleteList_Click(object sender, EventArgs e) {
+		private void DeleteListClick(object sender, EventArgs e) {
 			var dr = MessageBox.Show(
 				Properties.Resources.ConfirmDeleteWordList,
 				Properties.Resources.ConfirmDeleteWordListCaption,
@@ -490,27 +493,25 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		private void close_Click(object sender, EventArgs e) {
+		private void CloseClick(object sender, EventArgs e) {
 			Close();
 		}
 
 		// For now, simply insert the new items at the end of the list.
 		// There might be a better way to do this.
-		void Paste(List<List<string>> lines, int? row) {
-			var entries = new List<WordListEntry>();
+		void Paste(IEnumerable<List<string>> lines, int? row) {
+			var entries = (from line in lines
+			               where line.Count >= 2
+			               select new WordListEntry(list, line[0], line[1])).ToList();
 
-			foreach (var line in lines)
-				if (line.Count >= 2)
-					entries.Add(new WordListEntry(list, line[0], line[1]));
-
-			if (entries.Count > 0) {
+		    if (entries.Count > 0) {
 				list.Insert(row ?? list.Count, entries);
 				grid.Refresh(); // XXX Is this necessary?
 			}
 		}
 
 		// Detect comma-separated/tab-separated based on the paste content.
-		private void pasteCSV_Click(object sender, EventArgs e) {
+		private void PasteCsvClick(object sender, EventArgs e) {
 			int validCSV, validTSV;
 			List<List<string>> csv, tsv;
 
@@ -526,10 +527,7 @@ namespace Szotar.WindowsForms.Forms {
 			csv = CsvUtilities.ParseCSV(',', text, out validCSV);
 			tsv = CsvUtilities.ParseCSV('\t', text, out validTSV);
 
-			if (validTSV >= validCSV)
-				Paste(tsv, null);
-			else
-				Paste(csv, null);
+		    Paste(validTSV >= validCSV ? tsv : csv, null);
 		}
 
 		private void Practice(PracticeMode mode) {
@@ -539,14 +537,13 @@ namespace Szotar.WindowsForms.Forms {
 			}
 
 			PracticeWindow.OpenNewSession(mode, new[] { new ListSearchResult(list.ID.Value) });
-
 		}
 
-		private void flashcards_Click(object sender, EventArgs e) {
+		private void FlashcardsClick(object sender, EventArgs e) {
 			Practice(PracticeMode.Flashcards);
 		}
 
-		private void learn_Click(object sender, EventArgs e) {
+		private void LearnClick(object sender, EventArgs e) {
 			Practice(PracticeMode.Learn);
 		}
 	}
