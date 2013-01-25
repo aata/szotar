@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
@@ -40,17 +35,20 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void WireEventHandlers() {
-			List.ListChanged += new ListChangedEventHandler(list_ListChanged);
-			List.ListDeleted += new EventHandler(list_ListDeleted);
+			List.ListChanged += ListChanged;
+			List.ListDeleted += ListDeleted;
 		}
 
-		void list_ListDeleted(object sender, EventArgs e) {
+		void ListDeleted(object sender, EventArgs e) {
 			Item = null;
 			RaiseItemDeleted();
 		}
 
-		void list_ListChanged(object sender, ListChangedEventArgs e) {
-			if (e.ListChangedType == ListChangedType.ItemDeleted) {
+		void ListChanged(object sender, ListChangedEventArgs e) {
+            if (e.ListChangedType == ListChangedType.ItemDeleted) {
+                if (item == null || List == null)
+                    return;
+
 				if (!List.Contains(item)) {
 					Item = null;
 					RaiseItemDeleted();
@@ -66,8 +64,8 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void UnwireEventHandlers() {
-			List.ListChanged -= new ListChangedEventHandler(list_ListChanged);
-			List.ListDeleted -= new EventHandler(list_ListDeleted);
+			List.ListChanged -= ListChanged;
+			List.ListDeleted -= ListDeleted;
 		}
 
 		new void Update() {
