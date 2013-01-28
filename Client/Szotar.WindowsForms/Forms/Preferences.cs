@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
 
 using Szotar.WindowsForms.Preferences;
@@ -12,7 +9,7 @@ namespace Szotar.WindowsForms.Forms {
 	public partial class Preferences : Form {
 		TreeNode displayedNode;
 		PreferencePage displayedPage;
-		List<PreferencePage> commitList = new List<PreferencePage>();
+		readonly List<PreferencePage> commitList = new List<PreferencePage>();
 
 		public Preferences() {
 			InitializeComponent();
@@ -21,7 +18,7 @@ namespace Szotar.WindowsForms.Forms {
 			tree.Nodes.Clear();
 
 			foreach (Type type in System.Reflection.Assembly.GetExecutingAssembly().GetTypes()) {
-				Attribute attr = Attribute.GetCustomAttribute(type, typeof(PreferencePageAttribute), true);
+				var attr = Attribute.GetCustomAttribute(type, typeof(PreferencePageAttribute), true);
 				if (attr != null)
 					FindOrCreateNode(new NodeTag { Type = type, Attribute = attr as PreferencePageAttribute });
 			}
@@ -30,14 +27,14 @@ namespace Szotar.WindowsForms.Forms {
 			tree.Sort();
 			tree.ExpandAll();
 
-			tree.AfterSelect += new TreeViewEventHandler(tree_AfterSelect);
+			tree.AfterSelect += tree_AfterSelect;
 		}
 
 		private TreeNode FindOrCreateNode(NodeTag tag) {
-			TreeNodeCollection parentNodeCollection = null;
+			TreeNodeCollection parentNodeCollection;
 
 			if (tag.Attribute.Parent != null) {
-				NodeTag parentTag = new NodeTag {
+				var parentTag = new NodeTag {
 					Attribute = (PreferencePageAttribute)Attribute.GetCustomAttribute(tag.Attribute.Parent, typeof(PreferencePageAttribute)),
 					Type = tag.Attribute.Parent
 				};
@@ -56,7 +53,7 @@ namespace Szotar.WindowsForms.Forms {
 				parentNodeCollection = tree.Nodes;
 			}
 
-			TreeNode createdNode = new TreeNode(tag.Attribute.Name);
+			var createdNode = new TreeNode(tag.Attribute.LocalisedName);
 			createdNode.Tag = tag;
 			createdNode.Name = tag.Type.AssemblyQualifiedName;
 			parentNodeCollection.Add(createdNode);
@@ -64,8 +61,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void tree_AfterSelect(object sender, TreeViewEventArgs e) {
-			NodeTag tag = null;
-			TreeNode finalNode = null;
+			NodeTag tag;
+			TreeNode finalNode;
 
 			try {
 				// Get the first leaf node
@@ -92,20 +89,12 @@ namespace Szotar.WindowsForms.Forms {
 			if (displayedNode == finalNode)
 				return;
 
-			PreferencePage page = null;
-			foreach (PreferencePage uncommittedPage in commitList) {
-				if (uncommittedPage.GetType() == tag.Type) {
-					page = uncommittedPage;
-					break;
-				}
-			}
+			PreferencePage page = commitList.FirstOrDefault(uncommittedPage => uncommittedPage.GetType() == tag.Type) 
+				?? Activator.CreateInstance(tag.Type) as PreferencePage;
 
-			if (page == null) {
-				page = Activator.CreateInstance(tag.Type) as PreferencePage;
+			if (page != null) {
 				page.Owner = this;
-			}
-
-			if (page == null) {
+			} else {
 				displayedNode = null;
 				displayedPage = null;
 				content.Controls.Clear();
@@ -132,17 +121,15 @@ namespace Szotar.WindowsForms.Forms {
 			public PreferencePageAttribute Attribute { get; set; }
 		}
 
-		internal class ComparePreferencePagesByOrder : System.Collections.IComparer, System.Collections.Generic.IComparer<TreeNode> {
+		internal class ComparePreferencePagesByOrder : System.Collections.IComparer, IComparer<TreeNode> {
 			public int Compare(object x, object y) {
-				return ((System.Collections.Generic.IComparer<TreeNode>)this).Compare(x as System.Windows.Forms.TreeNode, y as System.Windows.Forms.TreeNode);
+				return ((IComparer<TreeNode>)this).Compare(x as TreeNode, y as TreeNode);
 			}
 
-			int System.Collections.Generic.IComparer<TreeNode>.Compare(System.Windows.Forms.TreeNode x, System.Windows.Forms.TreeNode y) {
-				if (x.Tag is NodeTag && y.Tag is NodeTag) {
+			int IComparer<TreeNode>.Compare(TreeNode x, TreeNode y) {
+				if (x.Tag is NodeTag && y.Tag is NodeTag)
 					return (y.Tag as NodeTag).Attribute.Importance.CompareTo((x.Tag as NodeTag).Attribute.Importance);
-				} else {
-					throw new ArgumentException();
-				}
+				throw new ArgumentException();
 			}
 		}
 
@@ -154,7 +141,7 @@ namespace Szotar.WindowsForms.Forms {
 			if (commitList.IndexOf(displayedPage) == -1)
 				commitList.Add(displayedPage);
 
-			foreach (PreferencePage page in commitList)
+			foreach (var page in commitList)
 				page.Commit();
 
 			Configuration.Save();
@@ -176,15 +163,6 @@ namespace Szotar.WindowsForms.Forms {
 			commitList.Clear();
 			if (displayedPage != null)
 				commitList.Add(displayedPage);
-		}
-	}
-
-	internal static class ArrayExtensions {
-		public static T GetFirstOrNull<T>(IEnumerable<T> enumerable) {
-			var e = enumerable.GetEnumerator();
-			if (e.MoveNext())
-				return e.Current;
-			return default(T);
 		}
 	}
 }

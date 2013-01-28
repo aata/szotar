@@ -11,6 +11,10 @@ namespace Szotar {
 		public DateTime? Date { get; set; }
 		public long? TermCount { get; set; }
 		public DateTime? Accessed { get; set; }
+		
+		public long? SyncID { get; set; }
+		public DateTime? SyncDate { get; set; }
+		public bool SyncNeeded { get; set; }
 
 		public ListInfo() { }
 
@@ -24,10 +28,10 @@ namespace Szotar {
 					case "ID":
 						if (k.Value != null) {
 							var n = k.Value as JsonNumber;
-							if (n != null)
-								ID = (long)n.LongValue;
-							else
+							if (n == null)
 								throw new JsonConvertException("ListInfo.ID was not a number");
+							
+							ID = n.LongValue;
 						}
 						break;
 
@@ -37,31 +41,43 @@ namespace Szotar {
 					case "Url":
 						if (k.Value != null) {
 							var s = k.Value as JsonString;
-							if (s != null)
-								SetStringProperty(k.Key, s.Value);
-							else
+							if (s == null)
 								throw new JsonConvertException("ListInfo." + k.Key + " was not a number");
+							
+							SetStringProperty(k.Key, s.Value);
 						}
 						break;
 
 					case "Date":
 						if (k.Value != null) {
 							var s = k.Value as JsonString;
-							if (s != null)
-								Date = DateTime.Parse(s.Value);
-							else
+							if (s == null)
 								throw new JsonConvertException("ListInfo.Date was not a string");
+							
+							Date = DateTime.Parse(s.Value);
 						}
 						break;
 
 					case "TermCount":
 						if (k.Value != null) {
 							var n = k.Value as JsonNumber;
-							if (n != null)
-								TermCount = (long)n.LongValue;
-							else
+							if (n == null)
 								throw new JsonConvertException("ListInfo.TermCount was not a number");
+							
+							TermCount = n.LongValue;
 						}
+						break;
+
+					case "SyncID":
+						SyncID = context.FromJson<long>(k.Value);
+						break;
+
+					case "SyncDate":
+						SyncDate = context.FromJson<long>(k.Value).DateTimeFromUnixTime();
+						break;
+
+					case "SyncNeeded":
+						SyncNeeded = context.FromJson<bool>(k.Value);
 						break;
 				}
 			}
@@ -93,6 +109,11 @@ namespace Szotar {
 				dict.Items.Add("Date", new JsonString(Date.Value.ToString("s")));
 			if (TermCount.HasValue)
 				dict.Items.Add("TermCount", new JsonNumber(TermCount.Value));
+			if (SyncID.HasValue)
+				dict.Items.Add("SyncID", new JsonNumber(SyncID.Value));
+			if (SyncDate.HasValue)
+				dict.Items.Add("SyncDate", new JsonNumber(SyncDate.Value.ToUnixTime()));
+			dict.Items.Add("SyncNeeded", new JsonBool(SyncNeeded));
 
 			return dict;
 		}
