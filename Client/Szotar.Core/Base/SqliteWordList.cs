@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
@@ -33,13 +34,14 @@ using CultureInfo = System.Globalization.CultureInfo;
 // as such things could cause normal undo/redo functionality to fail.
 namespace Szotar.Sqlite {
 	public class SqliteWordList : WordList {
-		Worker worker;
-		BindingList<WordListEntry> list;
-		long id;
+		readonly Worker worker;
+		readonly BindingList<WordListEntry> list;
+		readonly long id;
 		bool raiseListEvents = true;
-		UndoList<Command> undoList;
+		readonly UndoList<Command> undoList;
 
 		public SqliteDataStore DataStore { get; private set; }
+
 		public override long? ID {
 			get { return id; }
 		}
@@ -51,7 +53,7 @@ namespace Szotar.Sqlite {
 			undoList = new UndoList<Command>();
 
 			list = new BindingList<WordListEntry>(worker.GetAllEntries());
-			list.ListChanged += new ListChangedEventHandler(list_ListChanged);
+			list.ListChanged += BindingListChanged;
 		}
 
 		public static SqliteWordList FromSetID(SqliteDataStore store, long setID) {
@@ -66,7 +68,7 @@ namespace Szotar.Sqlite {
 
 		//Re-raise the ListChanged event with the SqliteWordList as the originator.
 		//Using BindingList as the in-memory list makes this very easy.
-		void list_ListChanged(object sender, ListChangedEventArgs e) {
+		void BindingListChanged(object sender, ListChangedEventArgs e) {
 			if (raiseListEvents)
 				RaiseListChanged(e);
 		}
@@ -81,7 +83,7 @@ namespace Szotar.Sqlite {
 		//Delete first then raise seems the more sensible option, given the name, but still...
 		//What if something wants to use the list before it's deleted?
 		public override void DeleteWordList() {
-			DataStore.DeleteWordList(ID.Value);
+			DataStore.DeleteWordList(id);
 
 			//RaiseDeleted() not needed. SqliteDataStore will do that for us, as an an extra safety 
 			//measure for if SqliteDataStore's DeleteWordList is called without calling DeleteWordList 
@@ -131,7 +133,7 @@ namespace Szotar.Sqlite {
 		}
 
 		//Will probably want both a Created and Modified property in the future.
-		public override System.DateTime? Date {
+		public override DateTime? Date {
 			get { return (DateTime?)worker.GetWordListProperty("Created"); }
 			set {
 				if (value == null)
@@ -141,7 +143,7 @@ namespace Szotar.Sqlite {
 			}
 		}
 
-		public override System.DateTime? Accessed {
+		public override DateTime? Accessed {
 			get { return (DateTime?)worker.GetWordListProperty("Accessed"); }
 			set {
 				if (value == null)
@@ -151,14 +153,14 @@ namespace Szotar.Sqlite {
 			}
 		}
 
-		public override T GetProperty<T>(WordListEntry entry, WordList.EntryProperty property) {
+		public override T GetProperty<T>(WordListEntry entry, EntryProperty property) {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
 			return (T)worker.GetProperty(index, property.ToString());
 		}
 
 		/// <summary>Set a property of an entry in the database (but not in the in-memory list).</summary>
-		public override void SetProperty(WordListEntry entry, WordList.EntryProperty property, object value) {
+		public override void SetProperty(WordListEntry entry, EntryProperty property, object value) {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
 			worker.SetProperty(index, property.ToString(), value);
@@ -279,14 +281,14 @@ namespace Szotar.Sqlite {
 		#region Worker
 		//Worker does the dirty database work. It's nicer if it's separated from the rest of the list code.
 		protected class Worker : SqliteObject {
-			SqliteWordList list;
+			readonly SqliteWordList list;
 
 			//These are called particularly often, any performance enhancements are useful.
-			DbCommand insertCommand, deleteCommand, existsCommand;
-			DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
+			readonly DbCommand insertCommand, deleteCommand, existsCommand;
+			readonly DbParameter insertCommandSetID, insertCommandListPosition, insertCommandPhrase,
 				insertCommandTranslation, deleteCommandSetID, deleteCommandListPosition, existsCommandID;
 
-			public Worker(SqliteDataStore store, SqliteWordList list)
+			public Worker(SqliteObject store, SqliteWordList list)
 				: base(store) {
 				this.list = list;
 
@@ -342,6 +344,7 @@ namespace Szotar.Sqlite {
 			protected override void Dispose(bool disposing) {
 				// Don't need to dispose of the parameters.
 				insertCommand.Dispose();
+				existsCommand.Dispose();
 				deleteCommand.Dispose();
 
 				base.Dispose(disposing);
@@ -358,9 +361,9 @@ namespace Szotar.Sqlite {
 			/// because it will probably be quite slow with many items.</remarks>
 			public void Insert(int index, WordListEntry item) {
 				if (item == null)
-					throw new System.ArgumentNullException();
+					throw new ArgumentNullException();
 				if (index < 0 || index > list.Count)
-					throw new System.ArgumentOutOfRangeException("index");
+					throw new ArgumentOutOfRangeException("index");
 
 				using (var txn = Connection.BeginTransaction()) {
 					insertCommandSetID.Value = list.ID;
@@ -379,7 +382,7 @@ namespace Szotar.Sqlite {
 			/// </summary>
 			public void Insert(int index, IList<WordListEntry> entries) {
 				if (index < 0)
-					throw new System.ArgumentOutOfRangeException("index");
+					throw new ArgumentOutOfRangeException("index");
 				if (entries.Count == 0)
 					return;
 
@@ -458,7 +461,7 @@ namespace Szotar.Sqlite {
 			/// TODO: This could be made faster by making the sorting optional.
 			public void RemoveAt(IEnumerable<int> indices) {
 				if (indices == null)
-					throw new System.ArgumentNullException();
+					throw new ArgumentNullException();
 
 				var sorted = new List<int>(indices);
 				sorted.Sort();
@@ -481,10 +484,10 @@ namespace Szotar.Sqlite {
 			/// Avoid if possible, use the in-memory list.</summary>
 			public IList<WordListEntry> GetEntries(IEnumerable<int> indices) {
 				if (indices == null)
-					throw new System.ArgumentNullException();
+					throw new ArgumentNullException();
 
 				using (var command = Connection.CreateCommand()) {
-					var sb = new System.Text.StringBuilder();
+					var sb = new StringBuilder();
 					sb.Append(@"
 						SELECT Phrase, Translation
 							FROM VocabItems WHERE SetID = ? AND ListPosition IN (");
@@ -522,12 +525,12 @@ namespace Szotar.Sqlite {
 
 				while (reader.Read()) {
 					if (reader.IsDBNull(0) || reader.IsDBNull(1))
-						throw new System.Data.StrongTypingException("One of the fields of a word list entry was DBNull.");
+						throw new StrongTypingException("One of the fields of a word list entry was DBNull.");
 
-					string phrase = (string)reader.GetValue(0);
-					string translation = (string)reader.GetValue(1);
+					var phrase = (string)reader.GetValue(0);
+					var translation = (string)reader.GetValue(1);
 
-					var entry = new WordListEntry(this.list, phrase, translation);
+					var entry = new WordListEntry(list, phrase, translation);
 					result.Add(entry);
 				}
 
@@ -634,7 +637,7 @@ namespace Szotar.Sqlite {
 
 						var setID = cmd.CreateParameter();
 						setID.ParameterName = "SetID";
-						setID.Value = this.list.ID.Value;
+						setID.Value = list.id;
 						cmd.Parameters.Add(setID);
 
 						var oldPos = cmd.CreateParameter();
@@ -657,7 +660,7 @@ namespace Szotar.Sqlite {
 						@"UPDATE VocabItems
 							SET ListPosition = -(ListPosition + 1)
 							WHERE SetID = ? AND ListPosition < 0",
-						this.list.ID.Value);
+						list.id);
 
 					txn.Commit();
 				}
@@ -671,9 +674,9 @@ namespace Szotar.Sqlite {
 			protected Worker worker;
 			protected IList<WordListEntry> list;
 
-			public Command(SqliteWordList owner) {
-				this.worker = owner.worker;
-				this.list = owner.list;
+			protected Command(SqliteWordList owner) {
+				worker = owner.worker;
+				list = owner.list;
 				this.owner = owner;
 			}
 
@@ -686,7 +689,7 @@ namespace Szotar.Sqlite {
 
 		///<summary>Updates an entire item in the list.</summary>
 		protected class SetItem : Command {
-			int index;
+			readonly int index;
 			WordListEntry item;
 			WordListEntry oldItem;
 
@@ -744,8 +747,8 @@ namespace Szotar.Sqlite {
 
 		///<summary>Inserts one item into the list.</summary>
 		protected class Insertion : Command {
-			int index;
-			WordListEntry item;
+			readonly int index;
+			readonly WordListEntry item;
 
 			public Insertion(SqliteWordList owner, int index, WordListEntry item)
 				: base(owner)
@@ -775,8 +778,8 @@ namespace Szotar.Sqlite {
 
 		/// <summary>Inserts many items into the list. Faster than inserting one item.</summary>
 		protected class MultipleInsertion : Command {
-			int index;
-			IList<WordListEntry> items;
+			readonly int index;
+			readonly IList<WordListEntry> items;
 
 			public MultipleInsertion(SqliteWordList owner, int index, IList<WordListEntry> items)
 				: base(owner)
@@ -813,11 +816,11 @@ namespace Szotar.Sqlite {
 
 		/// <summary>Sets a single property of a single item in the list.</summary>
 		protected class SetValue<T> : Command {
-			int index;
-			T oldValue, newValue;
-			WordList.EntryProperty property;
+			readonly int index;
+			readonly T oldValue, newValue;
+			readonly EntryProperty property;
 
-			public SetValue(SqliteWordList owner, int index, WordList.EntryProperty property, T oldValue, T newValue)
+			public SetValue(SqliteWordList owner, int index, EntryProperty property, T oldValue, T newValue)
 				: base(owner)
 			{
 				this.index = index;
@@ -853,8 +856,8 @@ namespace Szotar.Sqlite {
 
 		/// <summary>Deletes one or more items from the list.</summary>
 		protected class Deletion : Command {
-			List<KeyValuePair<int, WordListEntry>> items = new List<KeyValuePair<int, WordListEntry>>();
-			List<int> indices;
+			readonly List<KeyValuePair<int, WordListEntry>> items = new List<KeyValuePair<int, WordListEntry>>();
+			readonly List<int> indices;
 			List<int> reverseIndices;
 
 			public Deletion(SqliteWordList owner, IEnumerable<int> indices)
@@ -922,7 +925,7 @@ namespace Szotar.Sqlite {
 		/// <summary>Swaps the phrase and translation of the entries at the given indices. Safe with regards to
 		/// out-of-band changes, since it stores no data.</summary>
 		protected class SwapRowsCommand : Command {
-			IList<int> indices;
+			readonly IList<int> indices;
 
 			public SwapRowsCommand(SqliteWordList owner, IList<int> indices)
 				: base(owner)
@@ -957,12 +960,12 @@ namespace Szotar.Sqlite {
 		// the sorted list, which can be used to reverse the operation.
 		protected class SortCommand : Command {
 			struct Movement {
-				public int FromIndex;
-				public int ToIndex;
+				public int FromIndex { get; set; }
+				public int ToIndex { get; set; }
 			};
 
-			Comparison<WordListEntry> comparison;
-			List<Movement> movements = new List<Movement>();
+			readonly Comparison<WordListEntry> comparison;
+			readonly List<Movement> movements = new List<Movement>();
 
 			public SortCommand(SqliteWordList owner, Comparison<WordListEntry> comparison) 
 				: base(owner)
@@ -983,7 +986,7 @@ namespace Szotar.Sqlite {
 				for (int i = 0; i < original.Count; ++i) {
 					int newIndex = sorted.IndexOf(original[i]);
 
-					System.Diagnostics.Debug.Assert(newIndex >= 0);
+					Debug.Assert(newIndex >= 0);
 
 					movements.Add(new Movement {
 						FromIndex = i,
@@ -1036,10 +1039,10 @@ namespace Szotar.Sqlite {
 		// If multiple rows are moved, they retain their order in the list, and are all inserted
 		// at the given position.
 		protected class MoveRowsCommand : Command {
-			List<int> rows;
-			int destination;
+			readonly List<int> rows;
+			readonly int destination;
 			int shiftedDestination;
-			bool idempotent;
+			readonly bool idempotent;
 
 			public MoveRowsCommand(SqliteWordList owner, IList<int> rows, int destination)
 				: base(owner)
@@ -1141,48 +1144,34 @@ namespace Szotar.Sqlite {
 			}
 		}
 
-		bool IsMajor(Command command) {
+		static bool IsMajor(Command command) {
 			return command.AffectedRows > 8;
 		}
 		#endregion
 
 		#region Undo
 		void Do(Command command) {
-			MaybePerformMajorUpdate(IsMajor(command), delegate { 
-				undoList.Do(command); 
-			});
+			MaybePerformMajorUpdate(IsMajor(command), () => undoList.Do(command));
 		}
 
 		public override void Undo() {
 			var cmd = undoList.UndoCommand;
 			if (cmd != null)
-				MaybePerformMajorUpdate(IsMajor(cmd), delegate { 
-					undoList.Undo(1); 
-				});
+				MaybePerformMajorUpdate(IsMajor(cmd), () => undoList.Undo(1));
 		}
 
 		public override void Redo() {
 			var cmd = undoList.RedoCommand;
 			if (cmd != null)
-				MaybePerformMajorUpdate(IsMajor(cmd), delegate { 
-					undoList.Redo(1); 
-				});
+				MaybePerformMajorUpdate(IsMajor(cmd), () => undoList.Redo(1));
 		}
 
 		public override string UndoDescription {
-			get {
-				foreach (string desc in undoList.UndoItemDescriptions)
-					return desc;
-				return null;
-			}
+			get { return undoList.UndoItemDescriptions.FirstOrDefault(); }
 		}
 
 		public override string RedoDescription {
-			get {
-				foreach (string desc in undoList.RedoItemDescriptions)
-					return desc;
-				return null;
-			}
+			get { return undoList.RedoItemDescriptions.FirstOrDefault(); }
 		}
 		#endregion
 	}
