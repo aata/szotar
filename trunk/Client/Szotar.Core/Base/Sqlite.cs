@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Globalization;
@@ -199,8 +200,10 @@ namespace Szotar.Sqlite {
 			using (DbCommand command = conn.CreateCommand()) {
 				command.CommandText = sql;
 
+				int i = 1;
 				foreach (object p in parameters) {
 					var param = command.CreateParameter();
+					param.ParameterName = "@" + i++;
 					param.Value = p;
 					command.Parameters.Add(param);
 				}
@@ -254,7 +257,7 @@ namespace Szotar.Sqlite {
 		}
 
 		protected override int ApplicationSchemaVersion() {
-			return 4;
+			return 5;
 		}
 
 		protected override void IncrementalUpgradeSchema(int toVersion) {
@@ -263,6 +266,7 @@ namespace Szotar.Sqlite {
 				case 2: UpgradePracticeSchema(); break;
 				case 3: AddAccessedColumn(); break;
 				case 4: AddTagsTable(); break;
+                case 5: AddSyncColumns(); break;
 				default: throw new ArgumentOutOfRangeException("toVersion");
 			}
 		}
@@ -270,6 +274,8 @@ namespace Szotar.Sqlite {
 		// Initialize the database to schema version 1, the initial version.
 		private void InitDatabase() {
 			ExecuteSQL(@"
+				PRAGMA foreign_keys = ON;
+
 				CREATE TABLE VocabItems (
 					id INTEGER PRIMARY KEY AUTOINCREMENT, 
 					Phrase TEXT NOT NULL, 
@@ -294,7 +300,11 @@ namespace Szotar.Sqlite {
 
 				CREATE INDEX Sets_Index ON Sets (id);
 
-				CREATE TABLE SetProperties (SetID INTEGER NOT NULL, Property TEXT, Value TEXT, FOREIGN KEY (SetID) REFERENCES Sets(id));
+				CREATE TABLE SetProperties (
+					SetID INTEGER NOT NULL, 
+					Property TEXT, 
+					Value TEXT, 
+					FOREIGN KEY (SetID) REFERENCES Sets(id) ON DELETE CASCADE);
 				CREATE INDEX SetProperties_Index ON SetProperties (SetID, Property);");
 		}
 
@@ -317,9 +327,8 @@ namespace Szotar.Sqlite {
 					id INTEGER PRIMARY KEY AUTOINCREMENT,
 					Phrase TEXT NOT NULL COLLATE NOCASE,
 					Translation TEXT NOT NULL COLLATE NOCASE,
-					SetID INTEGER NOT NULL,
-					ListPosition INTEGER NOT NULL,
-					FOREIGN KEY (SetID) REFERENCES Sets(id));
+					SetID INTEGER NOT NULL REFERENCES Sets(id) ON DELETE CASCADE,
+					ListPosition INTEGER NOT NULL);
 				
 				CREATE INDEX VocabItems_IndexP ON VocabItems (Phrase);
 				CREATE INDEX VocabItems_IndexT ON VocabItems (Translation);
@@ -335,11 +344,10 @@ namespace Szotar.Sqlite {
 					id INTEGER PRIMARY KEY AUTOINCREMENT,
 					Phrase TEXT NOT NULL COLLATE NOCASE,
 					Translation TEXT NOT NULL COLLATE NOCASE,
-					SetID INTEGER NOT NULL,
+					SetID INTEGER NOT NULL REFERENCES Sets(id) ON DELETE CASCADE,
 					Created DATE NOT NULL,
-					Result INTEGER NOT NULL, -- 1 for success, 0 for failure
-					FOREIGN KEY(SetID) REFERENCES Sets(id)
-					);
+					Result INTEGER NOT NULL -- 1 for success, 0 for failure
+				);
 
 				-- Are these necessary?
 				CREATE INDEX PracticeHistory_IndexP ON PracticeHistory (Phrase);
@@ -358,9 +366,21 @@ namespace Szotar.Sqlite {
 			ExecuteSQL(@"
 				CREATE TABLE Tags (
 					tag TEXT NOT NULL,
-					SetID INTEGER NOT NULL,
-					FOREIGN KEY(SetID) REFERENCES Sets(id)
+					SetID INTEGER NOT NULL REFERENCES Sets(id) ON DELETE CASCADE,
+					PRIMARY KEY (tag, SetID)
 				);");
+		}
+
+		private void AddSyncColumns() {
+			ExecuteSQL(@"
+				ALTER TABLE VocabItems ADD SyncID INTEGER NULL;
+				ALTER TABLE VocabItems ADD SyncNeeded BOOLEAN NOT NULL DEFAULT 0;
+				ALTER TABLE VocabItems ADD Deleted BOOLEAN NOT NULL DEFAULT 0;
+
+				ALTER TABLE Sets ADD SyncID INTEGER NULL;
+				ALTER TABLE Sets ADD SyncDate DATE NULL;
+				ALTER TABLE Sets ADD SyncNeeded BOOLEAN NOT NULL DEFAULT 0;
+				ALTER TABLE Sets ADD Deleted BOOLEAN NOT NULL DEFAULT 0;");
 		}
 
 		#region Tags
@@ -373,9 +393,12 @@ namespace Szotar.Sqlite {
 
 		public IEnumerable<ListInfo> SearchByTag(string tag) {
 			using (var reader = SelectReader(@"
-				SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = id) 
-				FROM Tags INNER JOIN Sets ON Tags.SetID = Sets.id
+				SELECT s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded, count(vi.id)
+				FROM Tags t
+					JOIN Sets s ON t.SetID = s.id
+					JOIN VocabItems vi ON s.id = vi.SetID
 				WHERE tag = ?
+				GROUP by s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded
 				ORDER BY Name ASC", tag)) {
 				
 				while (reader.Read())
@@ -384,7 +407,7 @@ namespace Szotar.Sqlite {
 		}
 
 		public IEnumerable<string> GetTags(long setID) {
-			using (var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ?", setID)) {
+			using (var reader = SelectReader("SELECT tag FROM Tags WHERE SetID = ? ORDER BY tag ASC", setID)) {
 				while (reader.Read())
 					yield return reader.GetString(0);
 			}
@@ -395,9 +418,11 @@ namespace Szotar.Sqlite {
 		}
 
 		public void Tag(string tag, long setID) {
-			// Need to check this here or we may violate the uniqueness/foreign key constraint.
-			if(!HasTag(tag, setID) && WordListExists(setID))
-				ExecuteSQL("INSERT INTO Tags (tag, SetID) VALUES (?, ?)", tag, setID);
+			if(WordListExists(setID))
+				ExecuteSQL(@"
+					-- Need to check this here or we may violate the uniqueness/foreign key constraint.
+					IF NOT EXISTS(SELECT 1 FROM Tags WHERE tag = ?1 AND SetID = ?2)
+						INSERT INTO Tags (tag, SetID) SELECT ?1, ?2 FROM Sets WHERE id = ?2", tag, setID);
 		}
 
 		public void Untag(string tag, long setID) {
@@ -450,10 +475,12 @@ namespace Szotar.Sqlite {
 		public IEnumerable<ListInfo> GetRecentSets(int limit) {
 			using (var reader = SelectReader(@"
 				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
-				SELECT id, Name, Author, Language, Url, Created, Accessed, (SELECT count(*) FROM VocabItems WHERE SetID = Sets.id)
-				FROM Sets
-				WHERE Accessed NOT NULL
-				ORDER BY Accessed DESC
+				SELECT s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded, COUNT(vi.id)
+				FROM Sets s LEFT JOIN VocabItems vi
+					ON s.id = vi.SetID
+				WHERE s.Accessed NOT NULL
+				GROUP BY s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded
+				ORDER BY s.Accessed DESC
 				LIMIT " + limit)) {
 
 				while (reader.Read()) {
@@ -462,7 +489,7 @@ namespace Szotar.Sqlite {
 			}
 		}
 
-		private ListInfo ListInfoFromReader(DbDataReader reader) {
+		private static ListInfo ListInfoFromReader(IDataRecord reader) {
 			var list = new ListInfo();
 
 			list.ID = reader.GetInt64(0);
@@ -478,7 +505,12 @@ namespace Szotar.Sqlite {
 			if (!reader.IsDBNull(6))
 				list.Accessed = reader.GetDateTime(6);
 			if (!reader.IsDBNull(7))
-				list.TermCount = reader.GetInt64(7);
+				list.SyncID = reader.GetInt64(7);
+			if (!reader.IsDBNull(8))
+				list.SyncDate = reader.GetDateTime(8);
+			list.SyncNeeded = reader.GetBoolean(9);
+			if (!reader.IsDBNull(10))
+				list.TermCount = reader.GetInt64(10);
 
 			return list;
 		}
@@ -486,10 +518,10 @@ namespace Szotar.Sqlite {
 		public IEnumerable<ListInfo> GetAllSets() {
 			using (var reader = SelectReader(@"
 				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
-				SELECT s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, Count(*)
+				SELECT s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded, Count(*)
                 FROM Sets s
-                JOIN VocabItems vi on s.ID = vi.SetID
-                GROUP BY s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed
+					JOIN VocabItems vi on s.ID = vi.SetID
+                GROUP BY s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded
                 ORDER BY s.Name ASC, s.Created DESC")) {
 				while (reader.Read())
 					yield return ListInfoFromReader(reader);
@@ -527,10 +559,12 @@ namespace Szotar.Sqlite {
 				sb.Append("%");
 			}
 
-			using (var reader = SelectReader(
-				"TYPES Integer, Text, Text, Text, Integer;" +
-				"SELECT SetID, Name, Phrase, Translation, ListPosition FROM VocabItems vi JOIN Sets s ON vi.SetID = s.ID" +
-				"WHERE Phrase LIKE ? OR Translation LIKE ? ORDER BY SetID ASC, Phrase ASC", sb.ToString(), sb.ToString())) {
+			using (var reader = SelectReader(@"
+				TYPES Integer, Text, Text, Text, Integer;
+				SELECT SetID, Name, Phrase, Translation, ListPosition 
+				FROM VocabItems vi JOIN Sets s ON vi.SetID = s.ID
+				WHERE Phrase LIKE @1 OR Translation LIKE @1 
+				ORDER BY SetID ASC, Phrase ASC", sb.ToString())) {
 
 				while (reader.Read()) {
                     var wsr = new WordSearchResult {
@@ -589,10 +623,7 @@ namespace Szotar.Sqlite {
 				wordLists.Remove(setID);
 
 			using (var txn = Connection.BeginTransaction()) {
-				ExecuteSQL("DELETE FROM VocabItems WHERE SetID = ?", setID);
-				ExecuteSQL("DELETE FROM SetProperties WHERE SetID = ?", setID);
-				ExecuteSQL("DELETE FROM PracticeHistory WHERE SetID = ?", setID);
-				ExecuteSQL("DELETE FROM Tags WHERE SetID = ?", setID);
+				// The rest is handled by cascading deletes on foreign keys.
 				ExecuteSQL("DELETE FROM Sets WHERE id = ?", setID);
 
 				txn.Commit();
@@ -626,11 +657,9 @@ namespace Szotar.Sqlite {
 
 			    bool hasListItems = false;
 
-			    foreach (var r in items) {
-			        if (!r.HasItem) {
-			            query.Append(r.SetID).Append(", ");
-			            hasListItems = true;
-			        }
+			    foreach (var r in items.Where(r => !r.HasItem)) {
+				    query.Append(r.SetID).Append(", ");
+				    hasListItems = true;
 			    }
 
 			    if (hasListItems) {
@@ -664,11 +693,11 @@ namespace Szotar.Sqlite {
 		void GetResults(DbCommand command, ICollection<PracticeItem> output) {
 			using (var reader = command.ExecuteReader()) {
 				if (reader.FieldCount != 3)
-					throw new System.Data.StrongTypingException("Practice query should only return 3 columns");
+					throw new StrongTypingException("Practice query should only return 3 columns");
 
 				while (reader.Read()) {
 					if (reader.IsDBNull(0) || reader.IsDBNull(1) || reader.IsDBNull(2))
-						throw new System.Data.StrongTypingException("Practice query returned a null value in one of the columns");
+						throw new StrongTypingException("Practice query returned a null value in one of the columns");
 
 					var item = new PracticeItem(
 						reader.GetInt64(0),

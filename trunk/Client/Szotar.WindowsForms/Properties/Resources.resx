@@ -300,13 +300,13 @@
   <data name="NoDataToShowGroup" xml:space="preserve">
     <value>Nothing to show</value>
   </data>
-  <data name="NoDuplicateEntriesFound">
-    <value xml:space="preserve">No duplicate entries were found.</value>
+  <data name="NoDuplicateEntriesFound" xml:space="preserve">
+    <value>No duplicate entries were found.</value>
   </data>
-  <data name="SearchPrompt">
-    <value xml:space="preserve">Search</value>
+  <data name="SearchPrompt" xml:space="preserve">
+    <value>Search</value>
   </data>
-  <data name="TagsMenuHeader">
-    <value xml:space="preserve">&amp;Tags</value>
+  <data name="TagsMenuHeader" xml:space="preserve">
+    <value>&amp;Tags</value>
   </data>
 </root>
