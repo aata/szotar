@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Szotar.Sqlite;
@@ -44,6 +45,13 @@ namespace Szotar.Quizlet {
 		    var list = DataStore.Database.CreateSet(set.Title, set.Author, null, set.Uri.ToString(), DateTime.Now);
 			foreach (var term in set.Terms)
 				list.Add(new WordListEntry(list, term.Term, term.Definition));
+
+			foreach (var subject in set.Subjects.Distinct(StringComparer.CurrentCultureIgnoreCase))
+				list.Tag(subject);
+
+			list.SyncID = setID;
+			list.SyncDate = DateTime.UtcNow;
+			list.SyncNeeded = false;
 
 		    return list;
 		}

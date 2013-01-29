@@ -702,7 +702,7 @@ namespace Szotar {
         }
 
         public JsonDictionary GetSubDictionary(string key) {
-            return JsonDictionary.FromValue(this[key]);
+            return FromValue(this[key]);
         }
 
         public T Get<T>(string key, IJsonContext context) {

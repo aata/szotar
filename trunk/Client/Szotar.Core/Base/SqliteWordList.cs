@@ -153,6 +153,36 @@ namespace Szotar.Sqlite {
 			}
 		}
 
+		#region Sync fields
+		public override long? SyncID {
+			get { return (long?)worker.GetWordListProperty("SyncID"); }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+				worker.SetWordListProperty("SyncID", value);
+				RaisePropertyChanged("SyncID");
+			}
+		}
+
+		public override DateTime? SyncDate {
+			get { return (DateTime?)worker.GetWordListProperty("SyncDate"); }
+			set {
+				if (value == null)
+					throw new ArgumentNullException();
+				worker.SetWordListProperty("SyncDate", value);
+				RaisePropertyChanged("SyncDate");
+			}
+		}
+
+		public override bool SyncNeeded {
+			get { return (long)worker.GetWordListProperty("SyncNeeded") == 1; }
+			set {
+				worker.SetWordListProperty("SyncNeeded", value);
+				RaisePropertyChanged("SyncNeeded");
+			}
+		}
+		#endregion
+		/// <summary>Get a property of an entry from the database.</summary>
 		public override T GetProperty<T>(WordListEntry entry, EntryProperty property) {
 			int index = IndexOf(entry);
 			Debug.Assert(index >= 0);
@@ -180,45 +210,45 @@ namespace Szotar.Sqlite {
 		public override void Insert(int index, WordListEntry item) {
 			if (index > Count || index < 0)
 				throw new ArgumentOutOfRangeException("index");
-			undoList.Do(new Insertion(this, index, item));
+			Do(new Insertion(this, index, item));
 		}
 
 		public override void Insert(int index, IList<WordListEntry> items) {
 			if (index > Count || index < 0)
 				throw new ArgumentOutOfRangeException("index");
-			undoList.Do(new MultipleInsertion(this, index, items));
+			Do(new MultipleInsertion(this, index, items));
 		}
 
 		public override bool Remove(WordListEntry item) {
 			bool existed = list.Contains(item);
-			undoList.Do(new Deletion(this, IndexOf(item)));
+			Do(new Deletion(this, IndexOf(item)));
 			return existed;
 		}
 
 		public override void RemoveAt(int index) {
 			if (index >= Count || index < 0)
 				throw new ArgumentOutOfRangeException("index");
-			undoList.Do(new Deletion(this, index));
+			Do(new Deletion(this, index));
 		}
 
 		public override void RemoveAt(IList<int> indices) {
-			undoList.Do(new Deletion(this, indices));
+			Do(new Deletion(this, indices));
 		}
 
 		public override void SwapRows(IList<int> indices) {
-			undoList.Do(new SwapRowsCommand(this, indices));
+			Do(new SwapRowsCommand(this, indices));
 		}
 
 		public override void Clear() {
-			undoList.Do(new Deletion(this, EnumRange(0, list.Count - 1)));
+			Do(new Deletion(this, EnumRange(0, list.Count - 1)));
 		}
 
 		public override void Sort(Comparison<WordListEntry> comparison) {
-			undoList.Do(new SortCommand(this, comparison));
+			Do(new SortCommand(this, comparison));
 		}
 
 		public override void MoveRows(IList<int> rows, int destinationRowIndex) {
-			undoList.Do(new MoveRowsCommand(this, rows, destinationRowIndex));
+			Do(new MoveRowsCommand(this, rows, destinationRowIndex));
 		}
 
 		protected IEnumerable<int> EnumRange(int from, int to) {
@@ -244,7 +274,7 @@ namespace Szotar.Sqlite {
 
 		public override WordListEntry this[int index] {
 			get { return list[index]; }
-			set { undoList.Do(new SetItem(this, index, value)); }
+			set { Do(new SetItem(this, index, value)); }
 		}
 
 		public override int IndexOf(WordListEntry item) {

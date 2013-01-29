@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Szotar {
 	public class NullWeakReference<T> {
-		private WeakReference weak;
+		private readonly WeakReference weak;
 
 		public NullWeakReference(T @object) {
 			weak = new WeakReference(@object);

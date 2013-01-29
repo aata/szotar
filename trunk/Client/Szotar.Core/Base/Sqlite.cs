@@ -35,7 +35,7 @@ namespace Szotar.Sqlite {
 			get { return path; }
 			set {
 				conn.Close();
-				System.IO.File.Move(path, value);
+				IO.File.Move(path, value);
 				path = value;
 				conn.ConnectionString = "Data Source=" + path;
 				conn.Open();
@@ -216,6 +216,7 @@ namespace Szotar.Sqlite {
 			var param = command.CreateParameter();
 			param.Value = value;
 			command.Parameters.Add(param);
+			param.ParameterName = "@" + command.Parameters.Count;
 		}
 
 		protected DbCommand CreateCommand() {
@@ -418,11 +419,7 @@ namespace Szotar.Sqlite {
 		}
 
 		public void Tag(string tag, long setID) {
-			if(WordListExists(setID))
-				ExecuteSQL(@"
-					-- Need to check this here or we may violate the uniqueness/foreign key constraint.
-					IF NOT EXISTS(SELECT 1 FROM Tags WHERE tag = ?1 AND SetID = ?2)
-						INSERT INTO Tags (tag, SetID) SELECT ?1, ?2 FROM Sets WHERE id = ?2", tag, setID);
+			ExecuteSQL(@"INSERT OR IGNORE INTO Tags (tag, SetID) VALUES (?, ?)", tag, setID);
 		}
 
 		public void Untag(string tag, long setID) {
@@ -522,6 +519,20 @@ namespace Szotar.Sqlite {
                 FROM Sets s
 					JOIN VocabItems vi on s.ID = vi.SetID
                 GROUP BY s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded
+                ORDER BY s.Name ASC, s.Created DESC")) {
+				while (reader.Read())
+					yield return ListInfoFromReader(reader);
+			}
+		}
+
+		public IEnumerable<ListInfo> GetSetsForSync() {
+			using (var reader = SelectReader(@"
+				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+				SELECT s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded, Count(*)
+                FROM Sets s
+					JOIN VocabItems vi on s.ID = vi.SetID
+                GROUP BY s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded
+				HAVING s.SyncNeeded
                 ORDER BY s.Name ASC, s.Created DESC")) {
 				while (reader.Read())
 					yield return ListInfoFromReader(reader);

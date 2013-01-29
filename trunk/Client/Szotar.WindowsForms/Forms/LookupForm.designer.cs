@@ -122,19 +122,19 @@
             // 
             addToList.Name = "addToList";
             resources.ApplyResources(addToList, "addToList");
-            addToList.Click += new System.EventHandler(this.addToList_Click);
+            addToList.Click += new System.EventHandler(this.AddToListClick);
             // 
             // reverseLookup
             // 
             reverseLookup.Name = "reverseLookup";
             resources.ApplyResources(reverseLookup, "reverseLookup");
-            reverseLookup.Click += new System.EventHandler(this.reverseLookupToolStripMenuItem_Click);
+            reverseLookup.Click += new System.EventHandler(this.ReverseLookupToolStripMenuItemClick);
             // 
             // showStartPage
             // 
             showStartPage.Name = "showStartPage";
             resources.ApplyResources(showStartPage, "showStartPage");
-            showStartPage.Click += new System.EventHandler(this.showStartPage_Click);
+            showStartPage.Click += new System.EventHandler(this.ShowStartPageClick);
             // 
             // fileSep
             // 
@@ -163,19 +163,19 @@
             // 
             this.forwards.Name = "forwards";
             resources.ApplyResources(this.forwards, "forwards");
-            this.forwards.Click += new System.EventHandler(this.forwards_Click);
+            this.forwards.Click += new System.EventHandler(this.ForwardsClick);
             // 
             // backwards
             // 
             this.backwards.Name = "backwards";
             resources.ApplyResources(this.backwards, "backwards");
-            this.backwards.Click += new System.EventHandler(this.backwards_Click);
+            this.backwards.Click += new System.EventHandler(this.BackwardsClick);
             // 
             // switchModeMenuItem
             // 
             switchModeMenuItem.Name = "switchModeMenuItem";
             resources.ApplyResources(switchModeMenuItem, "switchModeMenuItem");
-            switchModeMenuItem.Click += new System.EventHandler(this.switchModeMenuItem_Click);
+            switchModeMenuItem.Click += new System.EventHandler(this.SwitchModeMenuItemClick);
             // 
             // searchSep1
             // 
@@ -186,13 +186,13 @@
             // 
             focusSearchFieldMenuItem.Name = "focusSearchFieldMenuItem";
             resources.ApplyResources(focusSearchFieldMenuItem, "focusSearchFieldMenuItem");
-            focusSearchFieldMenuItem.Click += new System.EventHandler(this.focusSearchField_Click);
+            focusSearchFieldMenuItem.Click += new System.EventHandler(this.FocusSearchFieldClick);
             // 
             // clearSearch
             // 
             clearSearch.Name = "clearSearch";
             resources.ApplyResources(clearSearch, "clearSearch");
-            clearSearch.Click += new System.EventHandler(this.clearSearch_Click);
+            clearSearch.Click += new System.EventHandler(this.ClearSearchClick);
             // 
             // toolStripMenuItem3
             // 
@@ -204,7 +204,7 @@
             this.ignoreAccentsMenuItem.CheckOnClick = true;
             this.ignoreAccentsMenuItem.Name = "ignoreAccentsMenuItem";
             resources.ApplyResources(this.ignoreAccentsMenuItem, "ignoreAccentsMenuItem");
-            this.ignoreAccentsMenuItem.Click += new System.EventHandler(this.ignoreAccentsMenuItem_Click);
+            this.ignoreAccentsMenuItem.Click += new System.EventHandler(this.IgnoreAccentsMenuItemClick);
             // 
             // ignoreCaseMenuItem
             // 
@@ -213,7 +213,7 @@
             this.ignoreCaseMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ignoreCaseMenuItem.Name = "ignoreCaseMenuItem";
             resources.ApplyResources(this.ignoreCaseMenuItem, "ignoreCaseMenuItem");
-            this.ignoreCaseMenuItem.Click += new System.EventHandler(this.ignoreCaseMenuItem_Click);
+            this.ignoreCaseMenuItem.Click += new System.EventHandler(this.IgnoreCaseMenuItemClick);
             // 
             // toolStripSeparator1
             // 
@@ -224,13 +224,13 @@
             // 
             nextPerfectMatch.Name = "nextPerfectMatch";
             resources.ApplyResources(nextPerfectMatch, "nextPerfectMatch");
-            nextPerfectMatch.Click += new System.EventHandler(this.nextPerfectMatch_Click);
+            nextPerfectMatch.Click += new System.EventHandler(this.NextPerfectMatchClick);
             // 
             // previousPerfectMatch
             // 
             previousPerfectMatch.Name = "previousPerfectMatch";
             resources.ApplyResources(previousPerfectMatch, "previousPerfectMatch");
-            previousPerfectMatch.Click += new System.EventHandler(this.previousPerfectMatch_Click);
+            previousPerfectMatch.Click += new System.EventHandler(this.PreviousPerfectMatchClick);
             // 
             // listMenu
             // 
@@ -248,19 +248,19 @@
             newList.Image = global::Szotar.WindowsForms.Properties.Resources.GenericDocument16;
             newList.Name = "newList";
             resources.ApplyResources(newList, "newList");
-            newList.Click += new System.EventHandler(this.newList_Click);
+            newList.Click += new System.EventHandler(this.NewListClick);
             // 
             // openList
             // 
             openList.Name = "openList";
             resources.ApplyResources(openList, "openList");
-            openList.Click += new System.EventHandler(this.openList_Click);
+            openList.Click += new System.EventHandler(this.OpenListClick);
             // 
             // importList
             // 
             importList.Name = "importList";
             resources.ApplyResources(importList, "importList");
-            importList.Click += new System.EventHandler(this.importList_Click);
+            importList.Click += new System.EventHandler(this.ImportListClick);
             // 
             // listsSep
             // 
@@ -273,7 +273,7 @@
             dummyItem1});
             this.recentLists.Name = "recentLists";
             resources.ApplyResources(this.recentLists, "recentLists");
-            this.recentLists.DropDownOpening += new System.EventHandler(this.recentLists_DropDownOpening);
+            this.recentLists.DropDownOpening += new System.EventHandler(this.RecentListsDropDownOpening);
             // 
             // dummyItem1
             // 
@@ -290,13 +290,13 @@
             importDictionary});
             dictionaryMenu.Name = "dictionaryMenu";
             resources.ApplyResources(dictionaryMenu, "dictionaryMenu");
-            dictionaryMenu.DropDownOpening += new System.EventHandler(this.dictionaryMenu_DropDownOpening);
+            dictionaryMenu.DropDownOpening += new System.EventHandler(this.DictionaryMenuDropDownOpening);
             // 
             // copyMI
             // 
             this.copyMI.Name = "copyMI";
             resources.ApplyResources(this.copyMI, "copyMI");
-            this.copyMI.Click += new System.EventHandler(this.copyMI_Click);
+            this.copyMI.Click += new System.EventHandler(this.CopyMIClick);
             // 
             // dictSep1
             // 
@@ -307,19 +307,19 @@
             // 
             editInformation.Name = "editInformation";
             resources.ApplyResources(editInformation, "editInformation");
-            editInformation.Click += new System.EventHandler(this.editInformation_Click);
+            editInformation.Click += new System.EventHandler(this.EditInformationClick);
             // 
             // addEntry
             // 
             addEntry.Name = "addEntry";
             resources.ApplyResources(addEntry, "addEntry");
-            addEntry.Click += new System.EventHandler(this.addEntry_Click);
+            addEntry.Click += new System.EventHandler(this.AddEntryClick);
             // 
             // importDictionary
             // 
             importDictionary.Name = "importDictionary";
             resources.ApplyResources(importDictionary, "importDictionary");
-            importDictionary.Click += new System.EventHandler(this.importDictionary_Click);
+            importDictionary.Click += new System.EventHandler(this.ImportDictionaryClick);
             // 
             // toolsMenu
             // 
@@ -336,19 +336,19 @@
             // 
             dictsFolder.Name = "dictsFolder";
             resources.ApplyResources(dictsFolder, "dictsFolder");
-            dictsFolder.Click += new System.EventHandler(this.dictsFolder_Click);
+            dictsFolder.Click += new System.EventHandler(this.DictsFolderClick);
             // 
             // charMap
             // 
             charMap.Name = "charMap";
             resources.ApplyResources(charMap, "charMap");
-            charMap.Click += new System.EventHandler(this.charMap_Click);
+            charMap.Click += new System.EventHandler(this.CharMapClick);
             // 
             // debugLog
             // 
             debugLog.Name = "debugLog";
             resources.ApplyResources(debugLog, "debugLog");
-            debugLog.Click += new System.EventHandler(this.debugLog_Click);
+            debugLog.Click += new System.EventHandler(this.DebugLogClick);
             // 
             // toolsSep
             // 
@@ -359,7 +359,7 @@
             // 
             options.Name = "options";
             resources.ApplyResources(options, "options");
-            options.Click += new System.EventHandler(this.options_Click);
+            options.Click += new System.EventHandler(this.OptionsClick);
             // 
             // contextMenuSeparator
             // 
@@ -370,13 +370,13 @@
             // 
             this.copyCM.Name = "copyCM";
             resources.ApplyResources(this.copyCM, "copyCM");
-            this.copyCM.Click += new System.EventHandler(this.copyCM_Click);
+            this.copyCM.Click += new System.EventHandler(this.CopyCMClick);
             // 
             // exitMenuItem
             // 
             this.exitMenuItem.Name = "exitMenuItem";
             resources.ApplyResources(this.exitMenuItem, "exitMenuItem");
-            this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
+            this.exitMenuItem.Click += new System.EventHandler(this.ExitMenuItemClick);
             // 
             // fileMenu
             // 
@@ -392,7 +392,7 @@
             // 
             this.closeWindow.Name = "closeWindow";
             resources.ApplyResources(this.closeWindow, "closeWindow");
-            this.closeWindow.Click += new System.EventHandler(this.closeWindow_Click);
+            this.closeWindow.Click += new System.EventHandler(this.CloseWindowClick);
             // 
             // grid
             // 
@@ -428,7 +428,7 @@
             this.grid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.grid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.grid.VirtualMode = true;
-            this.grid.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grid_CellMouseDoubleClick);
+            this.grid.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.GridCellMouseDoubleClick);
             // 
             // contextMenu
             // 
@@ -443,7 +443,7 @@
             this.deleteMI});
             this.contextMenu.Name = "listBuilderMenu";
             resources.ApplyResources(this.contextMenu, "contextMenu");
-            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuOpening);
             // 
             // addTo
             // 
@@ -454,26 +454,26 @@
             // 
             this.newItemCM.Name = "newItemCM";
             resources.ApplyResources(this.newItemCM, "newItemCM");
-            this.newItemCM.Click += new System.EventHandler(this.addEntry_Click);
+            this.newItemCM.Click += new System.EventHandler(this.AddEntryClick);
             // 
             // editMI
             // 
             this.editMI.Name = "editMI";
             resources.ApplyResources(this.editMI, "editMI");
-            this.editMI.Click += new System.EventHandler(this.editMI_Click);
+            this.editMI.Click += new System.EventHandler(this.EditMIClick);
             // 
             // deleteMI
             // 
             this.deleteMI.Name = "deleteMI";
             resources.ApplyResources(this.deleteMI, "deleteMI");
-            this.deleteMI.Click += new System.EventHandler(this.deleteMI_Click);
+            this.deleteMI.Click += new System.EventHandler(this.DeleteMIClick);
             // 
             // switchMode
             // 
             resources.ApplyResources(this.switchMode, "switchMode");
             this.switchMode.Name = "switchMode";
             this.switchMode.UseVisualStyleBackColor = true;
-            this.switchMode.Click += new System.EventHandler(this.switchMode_Click);
+            this.switchMode.Click += new System.EventHandler(this.SwitchModeClick);
             // 
             // ignoreLabel
             // 
@@ -541,7 +541,7 @@
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "LookupForm";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LookupForm_KeyDown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.LookupFormKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.grid)).EndInit();
             this.contextMenu.ResumeLayout(false);
             this.searchPanel.ResumeLayout(false);

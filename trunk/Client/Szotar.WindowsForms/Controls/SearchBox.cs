@@ -24,7 +24,7 @@ namespace Szotar.WindowsForms.Controls {
 			textBox.TextChanged += SearchBoxTextChanged;
 			Controls.Add(textBox);
 
-			textBox.KeyUp += TextBoxKeyUp;
+			textBox.KeyPress += TextBoxKeyPress;
 
 			foreColor = SystemColors.ControlText;
 			promptForeColor = SystemColors.GrayText;
@@ -42,8 +42,8 @@ namespace Szotar.WindowsForms.Controls {
 		[Browsable(true)]
 		public event EventHandler Search;
 
-		void TextBoxKeyUp(object sender, KeyEventArgs e) {
-		    if (e.KeyCode != Keys.Enter && e.KeyCode != Keys.Return)
+		void TextBoxKeyPress(object sender, KeyPressEventArgs e) {
+		    if (e.KeyChar != (char)Keys.Enter)
 		        return;
 		    
             e.Handled = true;
