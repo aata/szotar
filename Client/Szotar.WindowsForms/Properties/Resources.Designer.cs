@@ -61,6 +61,15 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Abort.
+        /// </summary>
+        internal static string Abort {
+            get {
+                return ResourceManager.GetString("Abort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Add.
         /// </summary>
         internal static string Add {
@@ -476,6 +485,15 @@ namespace Szotar.WindowsForms.Properties {
         internal static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Search.
+        /// </summary>
+        internal static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
             }
         }
         

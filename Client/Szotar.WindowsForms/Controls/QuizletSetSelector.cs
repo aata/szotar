@@ -46,7 +46,8 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		public void Apply() {
-			importer.Set = selectedSet.Value;
+			if (selectedSet != null)
+				importer.Set = selectedSet.Value;
 		}
 
 		private void StartSearch() {
@@ -63,7 +64,7 @@ namespace Szotar.WindowsForms.Controls {
 
 			searching = true;
 			progressBar.Visible = true;
-			searchButton.Text = "&Abort";
+			searchButton.Text = Properties.Resources.Abort;
 		}
 
 		// Aborts the current web request, if any.
@@ -76,7 +77,7 @@ namespace Szotar.WindowsForms.Controls {
 		    disposableComponent.Thing = cts = new CancellationTokenSource();
 		    searching = false;
 		    progressBar.Visible = false;
-		    searchButton.Text = "&Search";
+		    searchButton.Text = Properties.Resources.Search;
 		}
 
 		private void SearchError(Exception e) {
@@ -85,7 +86,7 @@ namespace Szotar.WindowsForms.Controls {
                 e = ae.InnerExceptions[0];
 
 			searching = false;
-			searchButton.Text = "&Search";
+			searchButton.Text = Properties.Resources.Search;
 			progressBar.Visible = false;
 
 			searchResults.Items.Clear();
@@ -96,7 +97,7 @@ namespace Szotar.WindowsForms.Controls {
 
 		private void SetResults(IEnumerable<SetModel> results) {
 			searching = false;
-			searchButton.Text = "&Search";
+			searchButton.Text = Properties.Resources.Search;
 			progressBar.Visible = false;
 
 			searchResults.Enabled = true;
@@ -188,7 +189,7 @@ namespace Szotar.WindowsForms.Controls {
 		}
 
 		private void ManualInputKeyPress(object sender, KeyPressEventArgs e) {
-			if (e.KeyChar == '\r') {
+			if (e.KeyChar == (char)Keys.Return) {
 				e.Handled = true;
 				ImportButtonClick(null, null);
 			}

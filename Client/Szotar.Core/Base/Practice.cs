@@ -40,14 +40,10 @@ namespace Szotar {
 			History.Add(new KeyValuePair<DateTime, bool>(created, correct));
 		}
 
-		int DaysAgo(DateTime d) {
-			return DateTime.Now.Subtract(d).Days;
-		}
-
 		// Value between 0 and 1 indicating the need to practice this item.
 		double Need() {
 			double need = 0.9; // Starts very high.
-			int manyDays = 28;
+			const int manyDays = 28;
 
 			foreach (var kvp in History) {
 				// Correct results reduce the need to practice.
@@ -55,13 +51,10 @@ namespace Szotar {
 				int days = DaysAgo(kvp.Key);
 
 				// Factor is between 0.5 (for old results) and 1 (for recent results). 
-				double factor = 1.0 / (1.0 + Math.Max(Math.Min((double)days / (double)manyDays, 0.0), 1.0));
+				double factor = 1.0 / (1.0 + Math.Max(Math.Min(days / (double)manyDays, 0.0), 1.0));
 				//timeWeight = Math.Pow(timeWeight, 0.5);
 
-				if (kvp.Value)
-					need = Lerp(need, 0, factor / 2); // Incorrect results count for more than correct results... because I say so
-				else
-					need = Lerp(need, 1, factor);
+				need = kvp.Value ? Lerp(need, 0, factor / 2) : Lerp(need, 1, factor);
 			}
 
 			// Not having any recent results increases need to practice (to a point).
@@ -75,7 +68,11 @@ namespace Szotar {
 			return need;
 		}
 
-		private double Lerp(double x, double y, double factor) {
+		static int DaysAgo(DateTime d) {
+			return DateTime.Now.Subtract(d).Days;
+		}
+
+		static double Lerp(double x, double y, double factor) {
 			return x + (y - x) * factor;
 		}
 
@@ -94,8 +91,8 @@ namespace Szotar {
 
 	/// <summary>A circular queue of PracticeItems, which shuffles itself every time it repeats.</summary>
 	public class PracticeQueue {
-		PracticeItem[] items;
-		Random random = new Random();
+		readonly PracticeItem[] items;
+		readonly Random random = new Random();
 
 		public PracticeQueue(List<PracticeItem> items) {
 			if (items.Count == 0)

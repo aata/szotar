@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 
 namespace Szotar {
@@ -14,7 +12,7 @@ namespace Szotar {
 	}
 
 	#region Attributes
-	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	public sealed class ImporterAttribute : Attribute {
 		// See the attribute guidelines at 
 		//  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
@@ -35,7 +33,7 @@ namespace Szotar {
 		}
 	}
 
-	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	public sealed class ImporterUIAttribute : Attribute {
 		// See the attribute guidelines at 
 		//  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
@@ -50,7 +48,7 @@ namespace Szotar {
 		}
 	}
 
-	[global::System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	public sealed class ImporterDescriptionAttribute : Attribute {
 		// See the attribute guidelines at 
 		//  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconusingattributeclasses.asp
@@ -99,7 +97,7 @@ namespace Szotar {
 	}
 
 	public class ImportCompletedEventArgs<T> : AsyncCompletedEventArgs {
-		T importedObject;
+		readonly T importedObject;
 
 		public ImportCompletedEventArgs(T importedObject, Exception e, bool cancelled, object state)
 			: base(e, cancelled, state) {

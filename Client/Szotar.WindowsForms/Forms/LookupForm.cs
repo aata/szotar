@@ -28,27 +28,24 @@ namespace Szotar.WindowsForms.Forms {
 		SearchMode searchMode, displayedSearchMode;
 		IList<SearchResult> results;
 
-		CultureInfo sourceCulture, targetCulture;
+		readonly CultureInfo sourceCulture, targetCulture;
 		DisposableComponent listFontComponent;
-		bool ctrlHeld = false;
 		Font defaultGridFont;
 
 		class LookupFormFileIsInUse : FileIsInUse {
-			LookupForm form;
+			readonly LookupForm form;
 
 			public LookupFormFileIsInUse(LookupForm form, string path)
 				: base(path)
 			{
 				this.form = form;
-				base.CanClose = true;
-				base.WindowHandle = form.Handle;
+				CanClose = true;
+				WindowHandle = form.Handle;
 			}
 
 			// Who knows what thread this will be invoked on?
 			public override void CloseFile() {
-				form.Invoke(new Action(delegate {
-					form.Close();
-				}));
+				form.Invoke(new Action(() => form.Close()));
 			}
 		}
 
@@ -86,7 +83,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			InitialiseView();
 
-			this.Load += delegate {
+			Load += delegate {
 				UpdateResults();
 			};
 			Show();
@@ -121,11 +118,11 @@ namespace Szotar.WindowsForms.Forms {
 
 			InitializeDragAndDrop();
 
-			searchBox.TextChanged += new EventHandler(searchBox_TextChanged);
+			searchBox.TextChanged += SearchBoxTextChanged;
 
 			// Show custom tooltips that don't get in the way of the mouse and don't disappear so quickly.
-			grid.MouseMove += new MouseEventHandler(grid_MouseMove);
-			grid.MouseLeave += new EventHandler(grid_MouseLeave);
+			grid.MouseMove += GridMouseMove;
+			grid.MouseLeave += GridMouseLeave;
 			grid.ShowCellToolTips = false;
 
 			// Bind an empty result set to the grid: this causes the columns to be created.
@@ -146,28 +143,26 @@ namespace Szotar.WindowsForms.Forms {
 			grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 			grid.Columns[0].FillWeight = GuiConfiguration.LookupFormColumn1FillWeight;
 			grid.Columns[1].Resizable = DataGridViewTriState.False;
-			grid.CellFormatting += new DataGridViewCellFormattingEventHandler(grid_CellFormatting);
-			grid.ColumnWidthChanged += new DataGridViewColumnEventHandler(grid_ColumnWidthChanged);
+			grid.CellFormatting += GridCellFormatting;
+			grid.ColumnWidthChanged += GridColumnWidthChanged;
 
 			ignoreAccentsCheck.Checked = ignoreAccentsMenuItem.Checked = GuiConfiguration.IgnoreAccents;
-			ignoreAccentsCheck.Click += new EventHandler(ignoreAccentsCheck_Click);
+			ignoreAccentsCheck.Click += IgnoreAccentsCheckClick;
 			ignoreCaseCheck.Checked = ignoreCaseMenuItem.Checked = GuiConfiguration.IgnoreCase;
-			ignoreCaseCheck.Click += new EventHandler(ignoreCaseCheck_Click);
+			ignoreCaseCheck.Click += IgnoreCaseCheckClick;
 
-			this.Shown += new EventHandler(LookupForm_Shown);
-			this.Closed += new EventHandler(LookupForm_Closed);
-			this.InputLanguageChanged += new InputLanguageChangedEventHandler(LookupForm_InputLanguageChanged);
-			this.KeyDown += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = true; };
-			this.KeyUp += (s, e) => { if (e.KeyCode == Keys.ControlKey) ctrlHeld = false; };
-			grid.KeyUp += new KeyEventHandler(grid_KeyUp);
+			Shown += LookupFormShown;
+			Closed += LookupFormClosed;
+			InputLanguageChanged += LookupFormInputLanguageChanged;
+			grid.KeyUp += GridKeyUp;
 
 			mainMenu.Renderer = contextMenu.Renderer = toolStripPanel.Renderer = new ToolStripAeroRenderer(ToolbarTheme.CommunicationsToolbar);
 			exitMenuItem.Text = string.Format(exitMenuItem.Text, Application.ProductName);
-			fileMenu.DropDownOpening += new EventHandler(fileMenu_DropDownOpening);
+			fileMenu.DropDownOpening += FileMenuDropDownOpening;
 		}
 
-		void LookupForm_Shown(object sender, EventArgs e) {
-			this.PerformLayout();
+		void LookupFormShown(object sender, EventArgs e) {
+			PerformLayout();
 			searchBox.Focus();
 		}
 		#endregion
@@ -175,7 +170,7 @@ namespace Szotar.WindowsForms.Forms {
 		#region Appearance
 		/// <summary>Colours a cell differently based on how well the result matched the search term
 		/// and whether the cell is on an alternating row.</summary>
-		void grid_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
+		void GridCellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
 			MatchType matchType = results != null && e.RowIndex < results.Count ? results[e.RowIndex].MatchType : MatchType.NormalMatch;
 
 			switch (matchType) {
@@ -195,7 +190,7 @@ namespace Szotar.WindowsForms.Forms {
 		void AdjustGridRowHeight() {
 			int pixels;
 
-			using (Graphics g = grid.CreateGraphics()) {
+			using (var g = grid.CreateGraphics()) {
 				float inches = grid.Font.SizeInPoints / 72;
 				const double lineHeight = 1.9;
 				pixels = (int)(Math.Round(lineHeight * inches * g.DpiY));
@@ -214,11 +209,11 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Settings Bindings
 		private void RegisterSettingsChangedEventHandlers() {
-			Configuration.Default.SettingChanged += new EventHandler<SettingChangedEventArgs>(SettingChanging);
+			Configuration.Default.SettingChanged += SettingChanging;
 		}
 
 		private void UnregisterSettingsChangedEventHandlers() {
-			Configuration.Default.SettingChanged -= new EventHandler<SettingChangedEventArgs>(SettingChanging);
+			Configuration.Default.SettingChanged -= SettingChanging;
 		}
 
 		// Update UI state.
@@ -239,7 +234,7 @@ namespace Szotar.WindowsForms.Forms {
 					components.Remove(listFontComponent);
 					disposeOf = grid.Font;
 				}
-				Font font = GuiConfiguration.GetListFont();
+				var font = GuiConfiguration.GetListFont();
 				if (font != null) {
 					if (defaultGridFont == null)
 						defaultGridFont = grid.Font;
@@ -254,7 +249,7 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		void grid_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e) {
+		void GridColumnWidthChanged(object sender, DataGridViewColumnEventArgs e) {
 			GuiConfiguration.LookupFormColumn1FillWeight = grid.Columns[0].FillWeight;
 		}
 		#endregion
@@ -265,8 +260,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		void UpdateResults() {
-			ISearchDataSource dict = this.GetSectionBySearchMode(this.SearchMode);
-			SearchMode finalSearchMode = this.SearchMode;
+			var dict = GetSectionBySearchMode(SearchMode);
+			var finalSearchMode = SearchMode;
 
 			string search = searchBox.Text.Trim().Normalize();
 
@@ -276,7 +271,7 @@ namespace Szotar.WindowsForms.Forms {
 			int i = 0;
 
 			// Look for the first result containing the search term at the start.
-			foreach (SearchResult result in dict.Search(search, ignoreAccentsCheck.Checked, ignoreCaseCheck.Checked)) {
+			foreach (var result in dict.Search(search, ignoreAccentsCheck.Checked, ignoreCaseCheck.Checked)) {
 				if (result.MatchType != MatchType.NormalMatch && foundAt < 0 && !hadPerfect)
 					foundAt = i;
 				if (result.MatchType == MatchType.PerfectMatch && !hadPerfect) {
@@ -290,8 +285,8 @@ namespace Szotar.WindowsForms.Forms {
 
 			if (results.Count == 0) {
 				finalSearchMode = SearchMode == SearchMode.Backward ? SearchMode.Forward : SearchMode.Backward;
-				dict = this.GetSectionBySearchMode(finalSearchMode);
-				foreach (SearchResult result in dict.Search(search, ignoreAccentsCheck.Checked, ignoreCaseCheck.Checked)) {
+				dict = GetSectionBySearchMode(finalSearchMode);
+				foreach (var result in dict.Search(search, ignoreAccentsCheck.Checked, ignoreCaseCheck.Checked)) {
 					if (result.MatchType != MatchType.NormalMatch && foundAt < 0 && !hadPerfect)
 						foundAt = i;
 					if (result.MatchType == MatchType.PerfectMatch && !hadPerfect) {
@@ -358,39 +353,30 @@ namespace Szotar.WindowsForms.Forms {
 			if (infoTipRow == rowIndex)
 				return infoTipText;
 
-			SearchMode dsm = DisplayedSearchMode;
-			Entry entry = results[rowIndex].Entry;
+			var dsm = DisplayedSearchMode;
+			var entry = results[rowIndex].Entry;
 			if (entry.Translations == null)
 				GetSectionBySearchMode(DisplayedSearchMode).GetFullEntry(entry);
 
-			ISearchDataSource otherSide = GetSectionBySearchMode(dsm == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward);
-			StringBuilder sb = new StringBuilder();
-			foreach (Translation term in entry.Translations) {
-				if (sb.Length > 0)
-					sb.Append(",");
-				sb.Append(term.Value);
-			}
+			var otherSide = GetSectionBySearchMode(dsm == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward);
+			var sb = new StringBuilder(string.Join(",", from term in entry.Translations select term.Value));
 			string search = sb.ToString();
 			sb.Length = 0;
 
-			foreach (SearchResult sr in otherSide.Search(search, false, false)) {
-				if (sr.MatchType == MatchType.PerfectMatch) {
+			foreach (var sr in otherSide.Search(search, false, false))
+				if (sr.MatchType == MatchType.PerfectMatch)
 					sb.AppendLine(SanitizeToolTipLine(sr.Phrase + " -> " + sr.Translation));
-				}
-			}
 
-			if (sb.Length > 0)
-				return sb.ToString();
-			return null;
+			return sb.Length > 0 ? sb.ToString() : null;
 		}
 
 		/// <summary>Removes some common annoyances with tooltips (really wide tooltips).</summary>
 		/// <remarks>Currently obsolete (tooltip size is limited, text wraps).</remarks>
-		string SanitizeToolTipLine(string line) {
+		static string SanitizeToolTipLine(string line) {
 			return line;
 		}
 
-		void grid_MouseMove(object sender, MouseEventArgs e) {
+		void GridMouseMove(object sender, MouseEventArgs e) {
 			if (e.Button != MouseButtons.None)
 				return;
 
@@ -422,9 +408,7 @@ namespace Szotar.WindowsForms.Forms {
 			infoTipText = text;
 
 			if (infoTip == null) {
-				infoTip = new ToolTip(components);
-				infoTip.StripAmpersands = false;
-				infoTip.UseAnimation = false;
+				infoTip = new ToolTip(components) { StripAmpersands = false, UseAnimation = false };
 				infoTip.Popup += (s, e3) => { e3.ToolTipSize = new Size(Math.Min(e3.ToolTipSize.Width, grid.Width), e3.ToolTipSize.Height); };
 			}
 
@@ -441,7 +425,7 @@ namespace Szotar.WindowsForms.Forms {
 			infoTip.Show(text, grid, e.X + offset, e.Y + offset);
 		}
 
-		void grid_MouseLeave(object sender, EventArgs e) {
+		void GridMouseLeave(object sender, EventArgs e) {
 			if (infoTip != null && infoTip.Active)
 				infoTip.Hide(grid);
 		}
@@ -459,10 +443,7 @@ namespace Szotar.WindowsForms.Forms {
 				if (searchMode == value)
 					return;
 				searchMode = value;
-				if (SearchMode == SearchMode.Forward)
-					switchMode.Text = forwards.Text;
-				else
-					switchMode.Text = backwards.Text;
+				switchMode.Text = SearchMode == SearchMode.Forward ? forwards.Text : backwards.Text;
 				UpdateResults();
 			}
 		}
@@ -482,13 +463,13 @@ namespace Szotar.WindowsForms.Forms {
 
 		#region Misc Control Events
 		/// <summary>Updates the current search results to reflect the new search terms.</summary>
-		private void searchBox_TextChanged(object sender, EventArgs e) {
+		private void SearchBoxTextChanged(object sender, EventArgs e) {
 			UpdateResults();
 		}
 
 		/// <summary>Switches the current search mode from Forward to Backward (and vice versa), 
 		/// and focuses the search field.</summary>
-		private void switchMode_Click(object sender, EventArgs e) {
+		private void SwitchModeClick(object sender, EventArgs e) {
 			SwitchMode();
 			FocusSearchField();
 		}
@@ -496,34 +477,34 @@ namespace Szotar.WindowsForms.Forms {
 		/// <summary>Performs a reverse-lookup of the cell that was double-clicked.</summary>
 		/// <remarks>This is somewhat redundant now that the tooltips do this too, but
 		/// the tooltips are quite limited, and it is harder to interact with them.</remarks>
-		private void grid_CellMouseDoubleClick(object sender, DataGridViewCellEventArgs e) {
-			if (results != null && e.RowIndex >= 0) {
-				SearchResult sr = results[e.RowIndex];
+		private void GridCellMouseDoubleClick(object sender, DataGridViewCellEventArgs e) {
+			if (results == null || e.RowIndex < 0)
+				return;
+			SearchResult sr = results[e.RowIndex];
 
-				var sb = new StringBuilder();
-				var otherSide = GetSectionBySearchMode(DisplayedSearchMode == SearchMode.Backward ? SearchMode.Forward : SearchMode.Backward);
+			var sb = new StringBuilder();
+			var otherSide = GetSectionBySearchMode(DisplayedSearchMode == SearchMode.Backward ? SearchMode.Forward : SearchMode.Backward);
 
-				foreach (Translation t in sr.Entry.Translations) {
-					sb.Append(t.Value);
-					sb.Append(": ");
-					int n = 0;
-					foreach (var rsr in otherSide.Search(t.Value, false, false)) {
-						if (rsr.MatchType == MatchType.PerfectMatch) {
-							if (rsr.Entry.Translations == null)
-								otherSide.GetFullEntry(rsr.Entry);
+			foreach (var t in sr.Entry.Translations) {
+				sb.Append(t.Value);
+				sb.Append(": ");
+				int n = 0;
+				foreach (var rsr in otherSide.Search(t.Value, false, false)) {
+					if (rsr.MatchType == MatchType.PerfectMatch) {
+						if (rsr.Entry.Translations == null)
+							otherSide.GetFullEntry(rsr.Entry);
 
-							foreach (var tr in rsr.Entry.Translations) {
-								if (n++ > 0)
-									sb.Append(", ");
-								sb.Append(tr.Value);
-							}
+						foreach (var tr in rsr.Entry.Translations) {
+							if (n++ > 0)
+								sb.Append(", ");
+							sb.Append(tr.Value);
 						}
 					}
-					sb.AppendLine();
 				}
-
-				MessageBox.Show(sb.ToString());
+				sb.AppendLine();
 			}
+
+			MessageBox.Show(sb.ToString());
 		}
 		#endregion
 
@@ -532,44 +513,53 @@ namespace Szotar.WindowsForms.Forms {
 		/// Some keyboard shortcuts to invoke the GC. Quite useful for testing how much memory is really
 		/// in use. Also clears the search when Escape is pressed.
 		/// </summary>
-		private void LookupForm_KeyDown(object sender, KeyEventArgs e) {
-			if (e.KeyCode == Keys.F9)
-				GC.Collect(GC.MaxGeneration);
-			else if (e.KeyCode == Keys.F8)
-				GC.Collect(1);
-			else if (e.KeyCode == Keys.F7)
-				GC.Collect(0);
-			else if (e.KeyCode == Keys.Escape)
-				searchBox.Text = string.Empty;
-			else if (e.KeyCode == Keys.F10) {
-				int shared = 0;
-				for (int i = 0; i < grid.Rows.Count; ++i)
-					if (grid.Rows.SharedRow(i).Index == -1)
-						shared++;
-				MessageBox.Show(string.Format("Shared rows: {0} of {1}", shared, grid.Rows.Count), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-			} else if (e.KeyCode == Keys.F11) {
-				var dict = Dictionary as SimpleDictionary;
-				if (dict != null) {
-					var forward = (SimpleDictionary.Section)Dictionary.ForwardsSection;
-					var backward = (SimpleDictionary.Section)Dictionary.ReverseSection;
+		private void LookupFormKeyDown(object sender, KeyEventArgs e) {
+			switch (e.KeyCode) {
+				case Keys.F9:
+					GC.Collect(GC.MaxGeneration);
+					break;
+				case Keys.F8:
+					GC.Collect(1);
+					break;
+				case Keys.F7:
+					GC.Collect(0);
+					break;
+				case Keys.Escape:
+					searchBox.Text = string.Empty;
+					break;
+				case Keys.F10: {
+					int shared = 0;
+					for (int i = 0; i < grid.Rows.Count; ++i)
+						if (grid.Rows.SharedRow(i).Index == -1)
+							shared++;
+					MessageBox.Show(string.Format("Shared rows: {0} of {1}", shared, grid.Rows.Count), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+					break;
+					}
+				case Keys.F11: {
+					var dict = Dictionary as SimpleDictionary;
+					if (dict != null) {
+						var forward = (SimpleDictionary.Section)Dictionary.ForwardsSection;
+						var backward = (SimpleDictionary.Section)Dictionary.ReverseSection;
 
-					MessageBox.Show(
-						string.Format(
-							"Debug statistics for {0}:\n\nForwards section: {1} of {2} fully loaded\nBackwards section: {3} of {4} fully loaded",
-							dict.Name ?? dict.Path,
-							forward.FullyLoadedCount,
-							forward.HeadWords,
-							backward.FullyLoadedCount,
-							backward.HeadWords
-							),
-						Dictionary.Name,
-						MessageBoxButtons.OK,
-						MessageBoxIcon.Information);
+						MessageBox.Show(
+							string.Format(
+								"Debug statistics for {0}:\n\nForwards section: {1} of {2} fully loaded\nBackwards section: {3} of {4} fully loaded",
+								dict.Name ?? dict.Path,
+								forward.FullyLoadedCount,
+								forward.HeadWords,
+								backward.FullyLoadedCount,
+								backward.HeadWords
+								),
+							Dictionary.Name,
+							MessageBoxButtons.OK,
+							MessageBoxIcon.Information);
+					}
+					break;
 				}
 			}
 		}
 
-		void LookupForm_Closed(object sender, EventArgs e) {
+		void LookupFormClosed(object sender, EventArgs e) {
 			GuiConfiguration.Save();
 
 			RemoveEventHandlers();
@@ -581,7 +571,7 @@ namespace Szotar.WindowsForms.Forms {
 			GC.Collect(GC.MaxGeneration);
 		}
 
-		void LookupForm_InputLanguageChanged(object sender, InputLanguageChangedEventArgs e) {
+		void LookupFormInputLanguageChanged(object sender, InputLanguageChangedEventArgs e) {
 			if (targetCulture != null && targetCulture.Equals(e.InputLanguage.Culture)) {
 				SearchMode = SearchMode.Backward;
 			} else if (sourceCulture != null && sourceCulture.Equals(e.InputLanguage.Culture)) {
@@ -601,11 +591,11 @@ namespace Szotar.WindowsForms.Forms {
 		Rectangle dragBox;
 
 		void InitializeDragAndDrop() {
-			grid.MouseDown += new MouseEventHandler(grid_MouseDown);
-			grid.MouseMove += new MouseEventHandler(grid_MouseMove_Drag);
+			grid.MouseDown += GridMouseDown;
+			grid.MouseMove += GridMouseMoveDrag;
 		}
 
-		void grid_MouseDown(object sender, MouseEventArgs e) {
+		void GridMouseDown(object sender, MouseEventArgs e) {
 			if (e.Button == MouseButtons.Left) {
 				var dragSize = SystemInformation.DragSize;
 
@@ -632,16 +622,17 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		void grid_MouseMove_Drag(object sender, MouseEventArgs e) {
+		void GridMouseMoveDrag(object sender, MouseEventArgs e) {
 			if (e.Button != MouseButtons.Left)
 				return;
 
-			if (dragBox != Rectangle.Empty && !dragBox.Contains(e.Location)) {
-				var data = MakeDataObjectFromSelection();
+			if (dragBox == Rectangle.Empty || dragBox.Contains(e.Location))
+				return;
 
-				grid.DoDragDrop(data, DragDropEffects.Copy | DragDropEffects.Scroll);
-				dragBox = Rectangle.Empty;
-			}
+			var data = MakeDataObjectFromSelection();
+
+			grid.DoDragDrop(data, DragDropEffects.Copy | DragDropEffects.Scroll);
+			dragBox = Rectangle.Empty;
 		}
 
 		DataObject MakeDataObjectFromSelection() {
@@ -673,7 +664,7 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region Clipboard
-		void grid_KeyUp(object sender, KeyEventArgs e) {
+		void GridKeyUp(object sender, KeyEventArgs e) {
 			if (e.Modifiers == Keys.Control && e.KeyCode == Keys.C) {
 				CopySelection();
 				e.Handled = true;
@@ -697,22 +688,22 @@ namespace Szotar.WindowsForms.Forms {
 		#region File Menu
 		/// <summary>Shows the start page. Attempt to find an existing start page,
 		/// or create one if none exists.</summary>
-		private void showStartPage_Click(object sender, EventArgs e) {
+		private void ShowStartPageClick(object sender, EventArgs e) {
 			ShowForm.Show<StartPage>();
 		}
 
-		private void closeWindow_Click(object sender, EventArgs e) {
+		private void CloseWindowClick(object sender, EventArgs e) {
 			Close();
 		}
 
 		/// <summary>Exit the entire program.</summary>
-		private void exitMenuItem_Click(object sender, EventArgs e) {
+		private void ExitMenuItemClick(object sender, EventArgs e) {
 			Application.Exit();
 		}
 
 		/// <summary>Populates the list of recent dictionaries when the File menu opens.</summary>
 		/// <remarks>The items it adds are tagged with "MRU", so that they can be removed again later.</remarks>
-		void fileMenu_DropDownOpening(object sender, EventArgs e) {
+		void FileMenuDropDownOpening(object sender, EventArgs e) {
 			//Remove existing entries
 			var items = fileMenu.DropDownItems;
 			for (int i = 0; i < items.Count; ) {
@@ -736,9 +727,8 @@ namespace Szotar.WindowsForms.Forms {
 						mru[i].Name,
 						null,
 						delegate { OpenDictionary(info); }
-						);
+						) { Tag = "MRU" };
 
-					item.Tag = "MRU";
 					items.Insert(index, item);
 					count++;
 					index++;
@@ -746,56 +736,55 @@ namespace Szotar.WindowsForms.Forms {
 			}
 
 			if (count > 0) {
-				var item = new ToolStripSeparator();
-				item.Tag = "MRU";
+				var item = new ToolStripSeparator { Tag = "MRU" };
 				items.Insert(index, item);
 			}
 		}
 		#endregion
 
 		#region Search Menu
-		private void forwards_Click(object sender, EventArgs e) {
+		private void ForwardsClick(object sender, EventArgs e) {
 			SearchMode = SearchMode.Forward;
 			FocusSearchField();
 		}
 
-		private void backwards_Click(object sender, EventArgs e) {
+		private void BackwardsClick(object sender, EventArgs e) {
 			SearchMode = SearchMode.Backward;
 			FocusSearchField();
 		}
 
-		private void switchModeMenuItem_Click(object sender, EventArgs e) {
+		private void SwitchModeMenuItemClick(object sender, EventArgs e) {
 			SwitchMode();
 			FocusSearchField();
 		}
 
-		void focusSearchField_Click(object sender, EventArgs e) {
+		void FocusSearchFieldClick(object sender, EventArgs e) {
 			FocusSearchField();
 		}
 
-		void clearSearch_Click(object sender, EventArgs e) {
+		void ClearSearchClick(object sender, EventArgs e) {
 			searchBox.Text = String.Empty;
 		}
 
-		void ignoreAccentsMenuItem_Click(object sender, EventArgs e) {
+		void IgnoreAccentsMenuItemClick(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreAccents = ignoreAccentsMenuItem.Checked;
 		}
 
-		void ignoreCaseMenuItem_Click(object sender, EventArgs e) {
+		void IgnoreCaseMenuItemClick(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreCase = ignoreCaseMenuItem.Checked;
 		}
 
-		void ignoreCaseCheck_Click(object sender, EventArgs e) {
+		void IgnoreCaseCheckClick(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreCase = ignoreCaseCheck.Checked;
 		}
 
-		void ignoreAccentsCheck_Click(object sender, EventArgs e) {
+		void IgnoreAccentsCheckClick(object sender, EventArgs e) {
 			GuiConfiguration.IgnoreAccents = ignoreAccentsCheck.Checked;
 		}
 
 		/// <summary>Navigates to the next exact match in the search results.</summary>
 		/// <remarks>Would it perhaps be better to wrap in the case where no more are found?</remarks>
-		void nextPerfectMatch_Click(object sender, EventArgs e) {
+		void NextPerfectMatchClick(object sender, EventArgs e) {
 			if (results != null) {
 				int index = grid.FirstDisplayedScrollingRowIndex;
 				while (++index < results.Count) {
@@ -810,8 +799,8 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		/// <summary>Navigates to the previous exact match in the results.</summary>
-		/// <seealso cref="nextPerfectMatch_Click"/>
-		void previousPerfectMatch_Click(object sender, EventArgs e) {
+		/// <seealso cref="NextPerfectMatchClick"/>
+		void PreviousPerfectMatchClick(object sender, EventArgs e) {
 			if (results != null) {
 				int index = grid.FirstDisplayedScrollingRowIndex;
 				while (--index >= 0) {
@@ -827,55 +816,53 @@ namespace Szotar.WindowsForms.Forms {
 		#endregion
 
 		#region List Menu
-		void newList_Click(object sender, EventArgs e) {
+		void NewListClick(object sender, EventArgs e) {
 			new ListBuilder().Show();
 		}
 
-		void openList_Click(object sender, EventArgs e) {
+		void OpenListClick(object sender, EventArgs e) {
 			ShowForm.Show<StartPage>();
 		}
 
-		void importList_Click(object sender, EventArgs e) {
+		void ImportListClick(object sender, EventArgs e) {
 			ShowForm.Show<ImportForm>();
 		}
 
 		/// <summary>
 		/// Populates the list of recent Lists. Adds menu items which call OpenRecentFile on click.
 		/// </summary>
-		void recentLists_DropDownOpening(object sender, EventArgs e) {
+		void RecentListsDropDownOpening(object sender, EventArgs e) {
 			recentLists.DropDownItems.Clear();
 
-			foreach (ListInfo li in DataStore.Database.GetRecentSets(Configuration.RecentListsSize)) {
-				var handler = new EventHandler(this.OpenRecentFile);
-				var item = new ToolStripMenuItem(li.Name, null, handler);
-				item.Tag = li;
+			foreach (var li in DataStore.Database.GetRecentSets(Configuration.RecentListsSize)) {
+				var handler = new EventHandler(OpenRecentFile);
+				var item = new ToolStripMenuItem(li.Name, null, handler) { Tag = li };
 				recentLists.DropDownItems.Add(item);
 			}
 
 			if (recentLists.DropDownItems.Count == 0) {
-				var emptyItem = new ToolStripMenuItem(Resources.LookupForm.NoLists);
-				emptyItem.Enabled = false;
+				var emptyItem = new ToolStripMenuItem(Resources.LookupForm.NoLists) { Enabled = false };
 				recentLists.DropDownItems.Add(emptyItem);
 			}
 		}
 
-		void OpenRecentFile(object sender, EventArgs e) {
-			ListInfo info = ((sender as ToolStripMenuItem).Tag as ListInfo);
-			if (info.ID.HasValue)
+		static void OpenRecentFile(object sender, EventArgs e) {
+			var info = (((ToolStripMenuItem) sender).Tag as ListInfo);
+			if (info != null && info.ID.HasValue)
 				ListBuilder.Open(info.ID.Value);
 		}
 		#endregion
 
 		#region Dictionary Menu
-		private void dictionaryMenu_DropDownOpening(object sender, EventArgs e) {
+		private void DictionaryMenuDropDownOpening(object sender, EventArgs e) {
 			copyMI.Enabled = CanCopy();
 		}
 
-		private void copyMI_Click(object sender, EventArgs e) {
+		private void CopyMIClick(object sender, EventArgs e) {
 			CopySelection();
 		}
 
-		void editInformation_Click(object sender, EventArgs e) {
+		void EditInformationClick(object sender, EventArgs e) {
 			var dr = new DictionaryInfoEditor(Dictionary, true).ShowDialog();
 
 			if (dr == DialogResult.OK) {
@@ -894,42 +881,42 @@ namespace Szotar.WindowsForms.Forms {
 			grid.Columns[1].HeaderText = displayedSearchMode == SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
 		}
 
-		void importDictionary_Click(object sender, EventArgs e) {
+		void ImportDictionaryClick(object sender, EventArgs e) {
 			ShowForm.Show<DictionaryImport>();
 		}
 
-		private void addEntry_Click(object sender, EventArgs e) {
-			string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
-			string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage: Dictionary.FirstLanguage;
+		private void AddEntryClick(object sender, EventArgs e) {
+			string phraseLanguage = displayedSearchMode == SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+			string translationLanguage = displayedSearchMode == SearchMode.Forward ? Dictionary.SecondLanguage: Dictionary.FirstLanguage;
 
-			var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(this.displayedSearchMode), phraseLanguage, translationLanguage).ShowDialog();
-			if (dr == System.Windows.Forms.DialogResult.OK)
+			var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(displayedSearchMode), phraseLanguage, translationLanguage).ShowDialog();
+			if (dr == DialogResult.OK)
 				UpdateResults();
 		}
 		#endregion
 
 		#region Tools Menu
-		void dictsFolder_Click(object sender, EventArgs e) {
+		void DictsFolderClick(object sender, EventArgs e) {
 			DataStore.UserDataStore.EnsureDirectoryExists(Configuration.DictionariesFolderName);
 			string path = System.IO.Path.Combine(DataStore.UserDataStore.Path, Configuration.DictionariesFolderName);
 			System.Diagnostics.Process.Start(path);
 		}
 
-		void charMap_Click(object sender, EventArgs e) {
+		void CharMapClick(object sender, EventArgs e) {
 			System.Diagnostics.Process.Start("charmap.exe");
 		}
 
-		void debugLog_Click(object sender, EventArgs e) {
+		void DebugLogClick(object sender, EventArgs e) {
 			ShowForm.Show<LogViewerForm>();
 		}
 
-		void options_Click(object sender, EventArgs e) {
+		void OptionsClick(object sender, EventArgs e) {
 			ShowForm.Show<Preferences>();
 		}
 		#endregion
 
 		#region Context Menu
-		private void contextMenu_Opening(object sender, CancelEventArgs _) {
+		private void ContextMenuOpening(object sender, CancelEventArgs _) {
 			copyCM.Enabled = CanCopy();			
 
 			var open = new List<long>();
@@ -937,11 +924,11 @@ namespace Szotar.WindowsForms.Forms {
 			addTo.DropDownItems.Clear();
 
 			// Find out what word list editors are already open.
-			foreach (Form f in Application.OpenForms) {
+			foreach (var f in Application.OpenForms) {
 				var lb = f as ListBuilder;
 				if (lb != null) {
 					open.Add(lb.WordList.ID.Value);
-					var item = new ToolStripMenuItem(lb.WordList.Name, null, new EventHandler((s, e) => AddToExistingList(lb.WordList.ID.Value)));
+					var item = new ToolStripMenuItem(lb.WordList.Name, null, (s, e) => AddToExistingList(lb.WordList.ID.Value));
 					addTo.DropDownItems.Add(item);
 				}
 			}
@@ -954,7 +941,7 @@ namespace Szotar.WindowsForms.Forms {
 
 			foreach (var info in recent) {
 				var info_ = info; // HACK: Copy for closure
-				var item = new ToolStripMenuItem(info.Name, null, new EventHandler((s, e) => AddToExistingList(info_.ID.Value)));
+				var item = new ToolStripMenuItem(info.Name, null, (s, e) => AddToExistingList(info_.ID.Value));
 				addTo.DropDownItems.Add(item);
 			}
 
@@ -979,39 +966,27 @@ namespace Szotar.WindowsForms.Forms {
 		}
 
 		IEnumerable<SearchResult> GetSelectedResults() {
-			for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
-				index >= 0;
-				index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) {
-				yield return results[index];
-			}
+			return from i in GetSelectedIndices()
+				   select results[i];
 		}
 
 		IEnumerable<TranslationPair> GetSelectedTranslationPairs() {
-			for (int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
-				index >= 0;
-				index = grid.Rows.GetNextRow(index, DataGridViewElementStates.Selected)) {
-				yield return new TranslationPair(results[index].Phrase, results[index].Translation);
-			}
+			return from r in GetSelectedResults()
+				   select new TranslationPair(r.Phrase, r.Translation);
 		}
 
 		private void AddEntries(ListBuilder lb) {
-			var entries = new List<TranslationPair>();
-			foreach (DataGridViewRow row in grid.SelectedRows) {
-				var entry = results[row.Index];
-				entries.Add(new TranslationPair(entry.Phrase, entry.Translation));
-			}
-
 			// TODO: Maybe pass this method an IEnumerable instead.
 			lb.AddEntries(GetSelectedTranslationPairs());
 		}
 
-		private void addToList_Click(object sender, EventArgs e) {
+		private void AddToListClick(object sender, EventArgs e) {
 			var lb = new ListBuilder();
 			AddEntries(lb);
 			lb.Show();
 		}
 
-		void copyCM_Click(object sender, EventArgs e) {
+		void CopyCMClick(object sender, EventArgs e) {
 			CopySelection();
 		}
 
@@ -1020,7 +995,7 @@ namespace Szotar.WindowsForms.Forms {
 		/// refers to the opposite direction to the currently displayed direction (for whatever reason
 		/// that may be).
 		/// </summary>
-		private void reverseLookupToolStripMenuItem_Click(object sender, EventArgs e) {
+		private void ReverseLookupToolStripMenuItemClick(object sender, EventArgs e) {
 			int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
 			if (index >= 0) {
 				searchMode = DisplayedSearchMode == SearchMode.Forward ? SearchMode.Backward : SearchMode.Forward;
@@ -1028,21 +1003,21 @@ namespace Szotar.WindowsForms.Forms {
 			}
 		}
 
-		private void editMI_Click(object sender, EventArgs e) {
+		private void EditMIClick(object sender, EventArgs e) {
 			int index = grid.Rows.GetFirstRow(DataGridViewElementStates.Selected);
 			if (index < 0)
 				return;
 
-			string phraseLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
-			string translationLanguage = displayedSearchMode == Forms.SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
+			string phraseLanguage = displayedSearchMode == SearchMode.Forward ? Dictionary.FirstLanguage : Dictionary.SecondLanguage;
+			string translationLanguage = displayedSearchMode == SearchMode.Forward ? Dictionary.SecondLanguage : Dictionary.FirstLanguage;
 
 			var dr = new Dialogs.EditDictionaryItem(GetSectionBySearchMode(displayedSearchMode), phraseLanguage, translationLanguage, results[index].Entry).ShowDialog();
 			if (dr == DialogResult.OK)
 				UpdateResults();
 		}
 
-		private void deleteMI_Click(object sender, EventArgs e) {
-			var remove = this.GetSelectedResults().Select(sr => sr.Entry).ToArray();
+		private void DeleteMIClick(object sender, EventArgs e) {
+			var remove = GetSelectedResults().Select(sr => sr.Entry).ToArray();
 			GetSectionBySearchMode(displayedSearchMode).RemoveEntries(remove);
 		}
 		#endregion

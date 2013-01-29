@@ -134,9 +134,12 @@ namespace Szotar {
 		public abstract void Untag(string tag);
 		public abstract bool HasTag(string tag);
 
+		public virtual long? SyncID { get; set; }
+		public virtual DateTime? SyncDate { get; set; }
+		public virtual bool SyncNeeded { get; set; }
 	}
 
-	public class WordListEntry : System.ComponentModel.INotifyPropertyChanged {
+	public class WordListEntry : INotifyPropertyChanged {
 		WordList owner;
 		string phrase;
 		string translation;
@@ -148,19 +151,13 @@ namespace Szotar {
 
 		public WordListEntry(WordList owner, string phrase, string translation) {
 			this.owner = owner;
-			this.phrase = phrase;
-			this.translation = translation;
-
-			// This is really the wrong place to put this, but it's better to have it not break than break.
-			if (phrase == null)
-				phrase = string.Empty;
-			if (translation == null)
-				translation = string.Empty;
+			this.phrase = phrase ?? "";
+			this.translation = translation ?? "";
 		}
 
-		public void AddTo(WordList owner, int index) {
-			Owner = owner;
-			owner.Insert(index, this);
+		public void AddTo(WordList newOwner, int index) {
+			Owner = newOwner;
+			newOwner.Insert(index, this);
 		}
 
 		public string Phrase {
