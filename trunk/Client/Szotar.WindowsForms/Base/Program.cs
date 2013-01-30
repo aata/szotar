@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace Szotar.WindowsForms {
 	static class Program {
 		[STAThread]
-		static void Main() {
+		static void Main(string[] commandLine) {
 			try {
-				RealMain();
+				RealMain(commandLine);
 			} catch (System.IO.FileNotFoundException e) {
 				if (e.FileName.StartsWith("Szotar.Core"))
 					Errors.DllNotFound("Szotar.Core.dll", e);
@@ -21,7 +23,7 @@ namespace Szotar.WindowsForms {
 		// method referring to that assembly is JIT compiled. Accordingly, we wrap Main in
 		// a try/catch block to provide a better error message.
 		// This is obviously moot if ILMerge is used, but that can't be taken for granted.
-		static void RealMain() {
+		static void RealMain(string[] commandLine) {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
@@ -60,78 +62,72 @@ namespace Szotar.WindowsForms {
 				}
 			}
 
-			if(CheckForExistingInstance())
-				return;
-
 			ProtocolHandler.Register("szotar", "Szótár URL");
+			new SingleInstanceController().Run(commandLine);
+		}
 
-			switch (GuiConfiguration.StartupAction) {
-				case "StartPage":
-					new Forms.StartPage().Show();
-					break;
-
-				case "Practice":
-					new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount), PracticeMode.Learn).Show();
-					break;
-
-				case "Dictionary":
-				default:
-					string dict = GuiConfiguration.StartupDictionary;
-					if (string.IsNullOrEmpty(dict))
-						goto case "StartPage";
-
-					Exception error = null;
-
-					try {
-						DictionaryInfo info = new SimpleDictionary.Info(dict);
-						new Forms.LookupForm(info).Show();
-					} catch (System.IO.IOException e) { // TODO: Access/permission exceptions?
-						error = e;
-					} catch (DictionaryLoadException e) {
-						error = e;
-						// Maybe there should be some UI for this (it's there, but not loadable?)...
-					}
-
-					if (error != null) {
-						ProgramLog.Default.AddMessage(LogType.Error, "Could not load dictionary {0}: {1}", dict, error.Message);
-						goto case "StartPage";
-					}
-					break;
+		private class SingleInstanceController : WindowsFormsApplicationBase {
+			public SingleInstanceController() {
+				IsSingleInstance = true;
+				ShutdownStyle = ShutdownMode.AfterAllFormsClose;
+				Application.Idle += OnIdle;
 			}
 
-			RunUntilNoForms();
-		}
+			private static void OnIdle(object sender, EventArgs eventArgs) {
+				if (Configuration.Default.NeedsSaving)
+					Configuration.Default.Save();
+			}
 
-		// TODO Send message with arguments to existing instance
-		private static bool CheckForExistingInstance() {
-			bool created;
-			new EventWaitHandle(false, EventResetMode.ManualReset, @"Local\Szotar.SingleInstance#" + Environment.UserDomainName + "#" + Environment.UserName, out created);
-			return !created;
-		}
+			protected override bool OnStartup(StartupEventArgs args) {
+				HandleCommandLine(args.CommandLine);
+				return true;
+			}
 
-		private static void RunUntilNoForms() {
-			Application.Run(new SzotarContext());
-		}
-	}
+			private static bool HandleCommandLine(ReadOnlyCollection<string> commandLine) {
+				return false;
+			}
 
-	/// <summary>
-	/// Waits until all Forms are closed before exiting the main thread. The default
-	/// application context exits after the initial Form is closed.
-	/// </summary>
-	public class SzotarContext : ApplicationContext {
-		public SzotarContext() {
-			// This is easier than adding a handler to the Close event of every form that opens.
-			Application.Idle += ApplicationIdle;
-		}
+			protected override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs) {
+				if (HandleCommandLine(eventArgs.CommandLine))
+					return;
 
-		[System.Diagnostics.DebuggerStepThrough]
-		void ApplicationIdle(object sender, EventArgs e) {
-			// ApplicationContext also calls ExitThread, except it only waits for one form.
-			if (Application.OpenForms.Count == 0)
-				ExitThread();
+				eventArgs.BringToForeground = true;
+			}
 
-			if (Configuration.Default.NeedsSaving)
-				Configuration.Default.Save();
+			protected override void OnCreateMainForm() {
+				switch (GuiConfiguration.StartupAction) {
+					case "Practice":
+						MainForm =
+							new Forms.PracticeWindow(DataStore.Database.GetSuggestedPracticeItems(GuiConfiguration.PracticeDefaultCount),
+							                         PracticeMode.Learn);
+						break;
+
+					case "Dictionary":
+						string dict = GuiConfiguration.StartupDictionary;
+						if (string.IsNullOrEmpty(dict))
+							break;
+
+						Exception error = null;
+
+						try {
+							DictionaryInfo info = new SimpleDictionary.Info(dict);
+							MainForm = new Forms.LookupForm(info);
+						} catch (System.IO.IOException e) {
+							// TODO: Access/permission exceptions?
+							error = e;
+						} catch (DictionaryLoadException e) {
+							error = e;
+							// Maybe there should be some UI for this (it's there, but not loadable?)...
+						}
+
+						if (error != null)
+							ProgramLog.Default.AddMessage(LogType.Error, "Could not load dictionary {0}: {1}", dict, error.Message);
+						break;
+				}
+
+				if (MainForm == null)
+					MainForm = new Forms.StartPage();
+			}
 		}
 	}
 }
