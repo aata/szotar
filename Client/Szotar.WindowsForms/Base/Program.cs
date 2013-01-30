@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms {
@@ -29,7 +30,7 @@ namespace Szotar.WindowsForms {
 
 			try {
 				DataStore.InitializeDatabase();
-			} catch (Szotar.Sqlite.DatabaseVersionException e) {
+			} catch (Sqlite.DatabaseVersionException e) {
 				Errors.NewerDatabaseVersion(e);
 				return;
 			} catch (System.IO.FileNotFoundException e) {
@@ -50,14 +51,19 @@ namespace Szotar.WindowsForms {
 				try {
 					// According to MSDN, we should set both CurrentCulture and CurrentUICulture.
 					// http://msdn.microsoft.com/en-us/library/w7x1y988.aspx
-					var culture = new System.Globalization.CultureInfo(GuiConfiguration.UiLanguage);
+					var culture = new CultureInfo(GuiConfiguration.UiLanguage);
 
-					System.Threading.Thread.CurrentThread.CurrentCulture = culture;
-					System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+					Thread.CurrentThread.CurrentCulture = culture;
+					Thread.CurrentThread.CurrentUICulture = culture;
 				} catch (ArgumentException) {
 					ProgramLog.Default.AddMessage(LogType.Error, "The UI language \"{0}\" is invalid.", GuiConfiguration.UiLanguage);
 				}
 			}
+
+			if(CheckForExistingInstance())
+				return;
+
+			ProtocolHandler.Register("szotar", "Szótár URL");
 
 			switch (GuiConfiguration.StartupAction) {
 				case "StartPage":
@@ -81,21 +87,26 @@ namespace Szotar.WindowsForms {
 						new Forms.LookupForm(info).Show();
 					} catch (System.IO.IOException e) { // TODO: Access/permission exceptions?
 						error = e;
-						goto case "StartPage";
 					} catch (DictionaryLoadException e) {
 						error = e;
 						// Maybe there should be some UI for this (it's there, but not loadable?)...
-						goto case "StartPage";
 					}
 
-					if (error != null)
+					if (error != null) {
 						ProgramLog.Default.AddMessage(LogType.Error, "Could not load dictionary {0}: {1}", dict, error.Message);
-
+						goto case "StartPage";
+					}
 					break;
 			}
 
 			RunUntilNoForms();
-			return;
+		}
+
+		// TODO Send message with arguments to existing instance
+		private static bool CheckForExistingInstance() {
+			bool created;
+			new EventWaitHandle(false, EventResetMode.ManualReset, @"Local\Szotar.SingleInstance#" + Environment.UserDomainName + "#" + Environment.UserName, out created);
+			return !created;
 		}
 
 		private static void RunUntilNoForms() {
@@ -110,14 +121,14 @@ namespace Szotar.WindowsForms {
 	public class SzotarContext : ApplicationContext {
 		public SzotarContext() {
 			// This is easier than adding a handler to the Close event of every form that opens.
-			Application.Idle += new EventHandler(Application_Idle);
+			Application.Idle += ApplicationIdle;
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
-		void Application_Idle(object sender, EventArgs e) {
+		void ApplicationIdle(object sender, EventArgs e) {
 			// ApplicationContext also calls ExitThread, except it only waits for one form.
 			if (Application.OpenForms.Count == 0)
-				this.ExitThread();
+				ExitThread();
 
 			if (Configuration.Default.NeedsSaving)
 				Configuration.Default.Save();

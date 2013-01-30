@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Linq;
@@ -44,25 +47,14 @@ namespace Szotar.WindowsForms {
 		public bool IsAcceptable(string guess, string answer) {
 			guess = Fix(guess);
 
-			if (guess == Fix(answer))
-				return true;
-
-			foreach (string s in answer.Split(';'))
-				if (guess == Fix(s))
-					return true;
-
-			foreach (string s in answer.Split(','))
-				if (guess == Fix(s))
-					return true;
-
-			return false;
+			return guess == Fix(answer) || answer.Split(';', ',').Any(s => guess == Fix(s));
 		}
 
 		// TODO: Possible enhancements: regex-based or word-based replacements in given answer, such as:
 		//       sg -> something
 		//       vkit -> valakit
 		string Fix(string s) {
-			var sb = new System.Text.StringBuilder();
+			var sb = new StringBuilder();
 
 			bool wasSpace = false;
 			int parens = 0;
@@ -119,12 +111,12 @@ namespace Szotar.WindowsForms {
 	}
 
 	class RoundOverview : UserControl {
-		TableLayoutPanel table;
-		Label roundNo = new Label();
-		Label correctLabel = new Label(), incorrectLabel = new Label();
-		Label correctCount = new Label(), incorrectCount = new Label();
-		Label correctRatio = new Label(), incorrectRatio = new Label();
-		Label prompt = new Label();
+		readonly TableLayoutPanel table;
+		readonly Label roundNo = new Label();
+		readonly Label correctLabel = new Label(), incorrectLabel = new Label();
+		readonly Label correctCount = new Label(), incorrectCount = new Label();
+		readonly Label correctRatio = new Label(), incorrectRatio = new Label();
+		readonly Label prompt = new Label();
 
 		public RoundOverview() : this(0, 0, 0) { }
 
@@ -134,8 +126,8 @@ namespace Szotar.WindowsForms {
 			int incorrect = count - correct;
 			correctLabel.Text = Resources.LearnMode.Correct;
 			incorrectLabel.Text = Resources.LearnMode.Incorrect;
-			correctCount.Text = correct.ToString();
-			incorrectCount.Text = incorrect.ToString();
+			correctCount.Text = correct.ToString(CultureInfo.CurrentUICulture);
+			incorrectCount.Text = incorrect.ToString(CultureInfo.CurrentUICulture);
 			correctRatio.Text = RatioToPercentage(correct, count);
 			incorrectRatio.Text = RatioToPercentage(incorrect, count);
 			prompt.Text = Resources.LearnMode.PressAnyKey;
@@ -148,12 +140,12 @@ namespace Szotar.WindowsForms {
 			correctCount.ForeColor = correctLabel.ForeColor = correctRatio.ForeColor = AnswerColors.Correct;
 			incorrectCount.ForeColor = incorrectLabel.ForeColor = incorrectRatio.ForeColor = AnswerColors.Incorrect;
 
-			Font = new Font(Font.FontFamily, Font.Size * 1.4f);
+			base.Font = new Font(base.Font.FontFamily, base.Font.Size * 1.4f);
 			FontFamily titleFontFamily = Array.Exists(FontFamily.Families, x => x.Name == "Cambria") 
 				? new FontFamily("Cambria")
 				: roundNo.Font.FontFamily;
 
-			roundNo.Font = new Font(titleFontFamily, Font.Size * 2.0f, FontStyle.Bold);
+			roundNo.Font = new Font(titleFontFamily, base.Font.Size * 2.0f, FontStyle.Bold);
 			Disposed += delegate {
 				Font.Dispose();
 				roundNo.Font.Dispose();
@@ -161,7 +153,7 @@ namespace Szotar.WindowsForms {
 			
 			prompt.ForeColor = SystemColors.GrayText;
 
-			table = new TableLayoutPanel() { RowCount = 4, ColumnCount = 3 }; 
+			table = new TableLayoutPanel { RowCount = 4, ColumnCount = 3 }; 
 			
 			foreach (var label in new[] { roundNo, correctLabel, incorrectLabel, correctCount, incorrectCount, correctRatio, incorrectRatio, prompt }) {
 				label.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Top;
@@ -214,11 +206,10 @@ namespace Szotar.WindowsForms {
 			UpdateScore(round, count, correct);
 		}
 
-		string RatioToPercentage(int nom, int denom) {
-			if (denom == 0)
-				return "100%";
-
-			return string.Format("{0:D}%", nom * 100 / denom);
+		static string RatioToPercentage(int nom, int denom) {
+			return denom == 0 
+				? "100%" 
+				: string.Format("{0:D}%", nom * 100 / denom);
 		}
 
 		new void Layout() {
@@ -238,11 +229,11 @@ namespace Szotar.WindowsForms {
 	};
 
 	class GameOverview : UserControl {
-		ListView list;
-		List<ListViewGroup> groups;
+		readonly ListView list;
+		readonly List<ListViewGroup> groups;
 
 		public GameOverview(LearnMode mode) {
-			list = new ListView() { 
+			list = new ListView { 
 				Dock = DockStyle.Fill, 
 				Margin = new Padding(3),
 				FullRowSelect = true,
@@ -257,15 +248,16 @@ namespace Szotar.WindowsForms {
 			InitializeContextMenu();
 
 			list.Resize += delegate { DistributeColumns(); };
-			this.Load += delegate { DistributeColumns(); };
+			Load += delegate { DistributeColumns(); };
 		}
 
 		void DistributeColumns() {
-			if (list.Columns.Count >= 3) {
-				list.Columns[0].Width = list.ClientSize.Width / 2;
-				list.Columns[1].Width = list.ClientSize.Width / 2;
-				list.Columns[2].Width = 0;
-			}
+			if (list.Columns.Count < 3)
+				return;
+			
+			list.Columns[0].Width = list.ClientSize.Width / 2;
+			list.Columns[1].Width = list.ClientSize.Width / 2;
+			list.Columns[2].Width = 0;
 		}
 
 		public void UpdateOverview(IList<IList<Attempt>> rounds) {
@@ -296,7 +288,7 @@ namespace Szotar.WindowsForms {
 							translation = attempt.Item.Phrase;
 						}
 
-						var item = new ListViewItem(new string[] { phrase, translation, "" }, group);
+						var item = new ListViewItem(new[] { phrase, translation, "" }, group);
 						if(!attempt.Correct)
 							item.ForeColor = SystemColors.GrayText;
 						item.Tag = attempt;
@@ -319,6 +311,8 @@ namespace Szotar.WindowsForms {
 			EventHandler viewInListClick = (s, e) => {                
 				foreach (ListViewItem item in list.SelectedItems) {
 					var attempt = item.Tag as Attempt;
+					if (attempt == null)
+						continue;
 					var form = Forms.ListBuilder.Open(attempt.Item.SetID);
 					if(form != null)
 						form.ScrollToItem(attempt.Item.Phrase, attempt.Item.Translation);
@@ -335,14 +329,14 @@ namespace Szotar.WindowsForms {
 
 	// TODO: Add items in the file menu that open the word lists currently being learnt.
 	class OptionsMenu : MenuStrip {
-		LearnMode mode;
-		ToolStripMenuItem swapItem, optionsItem;
+		readonly LearnMode mode;
+		readonly ToolStripMenuItem swapItem, optionsItem;
 
 		public OptionsMenu(LearnMode mode) {
 			this.mode = mode;
 
 			optionsItem = new ToolStripMenuItem(Resources.LearnMode.Options);
-			Items.Add(optionsItem);
+			base.Items.Add(optionsItem);
 
 			swapItem = new ToolStripMenuItem(Resources.LearnMode.Swap);
 			swapItem.Click += delegate {
@@ -350,7 +344,7 @@ namespace Szotar.WindowsForms {
 			};
 			swapItem.ShortcutKeys = Keys.Control | Keys.I;
 
-			optionsItem.DropDownOpening += new EventHandler(optionsItem_DropDownOpening);
+			optionsItem.DropDownOpening += OptionsItemDropDownOpening;
 			optionsItem.DropDownItems.Add(swapItem);
 			optionsItem.DropDownItems.Add(new ToolStripSeparator());
 			
@@ -360,7 +354,7 @@ namespace Szotar.WindowsForms {
 			AddFixupItem(Resources.LearnMode.IgnoreCase, "PracticeFixCase", optionsItem);
 		}
 
-		void optionsItem_DropDownOpening(object sender, EventArgs e) {
+		void OptionsItemDropDownOpening(object sender, EventArgs e) {
 			swapItem.Checked = mode.Swap;
 			foreach (ToolStripItem item in optionsItem.DropDownItems) {
 				var menuItem = item as ToolStripMenuItem;
@@ -399,9 +393,8 @@ namespace Szotar.WindowsForms {
 		GameOverview gameOverview;
 
 		Font font, smallFont, extraSmallFont, scoreFont;
-		Random rng;
-
-		AnswerChecker answerChecker = new AnswerChecker();
+		readonly Random rng;
+		readonly AnswerChecker answerChecker = new AnswerChecker();
 
 		enum State {
 			Guessing,
@@ -412,7 +405,7 @@ namespace Szotar.WindowsForms {
 
 		State state;
 		Timer timer;
-		int fadeOutInterval = 250;
+		const int fadeOutInterval = 250;
 		string lastGuess;
 
 		List<IList<Attempt>> rounds;
@@ -431,29 +424,33 @@ namespace Szotar.WindowsForms {
 		public override void Start(IPracticeWindow owner) {
 			base.Start(owner);
 
-			GameArea.Resize += new EventHandler(OnGameAreaResize);
+			GameArea.Resize += OnGameAreaResize;
 
 			// State
 			rounds = new List<IList<Attempt>>();
 			StartRound();
 
 			// UI
-			font = new Font(GameArea.FindForm().Font.FontFamily, 24);
-			smallFont = new Font(GameArea.FindForm().Font.FontFamily, 16);
-			extraSmallFont = new Font(GameArea.FindForm().Font.FontFamily, 12);
-			scoreFont = new Font(GameArea.FindForm().Font.FontFamily, 16);
+			var form = GameArea.FindForm();
+			var formFont = form != null ? form.Font : SystemFonts.DefaultFont;
+			var fontFamily = formFont.FontFamily;
 
-			phrase = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
-			answer = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = font };
-			scoreLabel = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = scoreFont, Dock = DockStyle.Bottom, TextAlign = ContentAlignment.BottomRight };
-			history = new Label() { AutoSize = true, BackColor = Color.Transparent, Font = extraSmallFont, Dock = DockStyle.Top, TextAlign = ContentAlignment.MiddleLeft };
-			translation = new TextBox() { Font = font };
-			affirmation = new TextBox() { Font = font };
-			overrideButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.OverrideButton };
-			editButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.EditButton };
-			viewButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.ViewInListButton };
-			deleteButton = new Button() { Font = GameArea.FindForm().Font, Text = Resources.LearnMode.DeleteButton };
-			roundOverview = new RoundOverview() { Dock = DockStyle.Fill };
+			font = new Font(fontFamily, 24);
+			smallFont = new Font(fontFamily, 16);
+			extraSmallFont = new Font(fontFamily, 12);
+			scoreFont = new Font(fontFamily, 16);
+
+			phrase = new Label { AutoSize = true, BackColor = Color.Transparent, Font = font };
+			answer = new Label { AutoSize = true, BackColor = Color.Transparent, Font = font };
+			scoreLabel = new Label { AutoSize = true, BackColor = Color.Transparent, Font = scoreFont, Dock = DockStyle.Bottom, TextAlign = ContentAlignment.BottomRight };
+			history = new Label { AutoSize = true, BackColor = Color.Transparent, Font = extraSmallFont, Dock = DockStyle.Top, TextAlign = ContentAlignment.MiddleLeft };
+			translation = new TextBox { Font = font };
+			affirmation = new TextBox { Font = font };
+			overrideButton = new Button { Font = formFont, Text = Resources.LearnMode.OverrideButton };
+			editButton = new Button { Font = formFont, Text = Resources.LearnMode.EditButton };
+			viewButton = new Button { Font = formFont, Text = Resources.LearnMode.ViewInListButton };
+			deleteButton = new Button { Font = formFont, Text = Resources.LearnMode.DeleteButton };
+			roundOverview = new RoundOverview { Dock = DockStyle.Fill };
 			gameOverview = new GameOverview(this) { Dock = DockStyle.Fill };
 
 			GameArea.Controls.Add(phrase);
@@ -470,13 +467,13 @@ namespace Szotar.WindowsForms {
 			GameArea.Controls.Add(gameOverview);
 
 			translation.TextChanged += delegate { Layout(); };
-			translation.KeyUp += new KeyEventHandler(translation_KeyUp);
-			affirmation.TextChanged += new EventHandler(affirmation_TextChanged);
+			translation.KeyUp += TranslationKeyUp;
+			affirmation.TextChanged += AffirmationTextChanged;
 			overrideButton.Click += delegate { Override(items[index], lastGuess); };
-			editButton.Click += new EventHandler(editButton_Click);
-			viewButton.Click += new EventHandler(viewButton_Click);
-			deleteButton.Click += new EventHandler(deleteButton_Click);
-			roundOverview.KeyUp += new KeyEventHandler(roundOverview_KeyUp);
+			editButton.Click += EditButtonClick;
+			viewButton.Click += ViewButtonClick;
+			deleteButton.Click += DeleteButtonClick;
+			roundOverview.KeyUp += RoundOverviewKeyUp;
 
 			// Stop the beep sound being produced when Enter is pressed.
 			// (Handling KeyUp is not sufficient to stop this.)
@@ -491,7 +488,7 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
-		void editButton_Click(object sender, EventArgs e) {
+		void EditButtonClick(object sender, EventArgs e) {
 			var newItem = Dialogs.EditPracticeItem.Show(items[index]);
 			if (newItem != null)
 				items[index] = newItem;
@@ -499,7 +496,7 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
-		void deleteButton_Click(object sender, EventArgs e) {
+		void DeleteButtonClick(object sender, EventArgs e) {
 			var dr = MessageBox.Show(
 				GameArea,
 				Properties.Resources.ConfirmDeletePracticeItem,
@@ -508,17 +505,18 @@ namespace Szotar.WindowsForms {
 				MessageBoxIcon.None,
 				MessageBoxDefaultButton.Button2);
 
-			if (dr == DialogResult.OK) {
-				var list = DataStore.Database.GetWordList(items[index].SetID);
-				for (int i = 0; i < list.Count; i++) {
-					var item = list[i];
-					if (item.Phrase == items[index].Phrase && item.Translation == items[index].Translation)
-						list.RemoveAt(i);
-				}
+			if (dr != DialogResult.OK)
+				return;
+			
+			var list = DataStore.Database.GetWordList(items[index].SetID);
+			for (int i = 0; i < list.Count; i++) {
+				var item = list[i];
+				if (item.Phrase == items[index].Phrase && item.Translation == items[index].Translation)
+					list.RemoveAt(i);
 			}
 		}
 
-		void viewButton_Click(object sender, EventArgs e) {
+		void ViewButtonClick(object sender, EventArgs e) {
 			var form = Forms.ListBuilder.Open(items[index].SetID);
 			if (form != null)
 				form.ScrollToItem(items[index].Phrase, items[index].Translation);
@@ -528,7 +526,7 @@ namespace Szotar.WindowsForms {
 			base.Stop();
 
 			answerChecker.RemoveEventHandlers();
-			GameArea.Resize -= new EventHandler(OnGameAreaResize);
+			GameArea.Resize -= OnGameAreaResize;
 		}
 
 		void StartRound() {
@@ -539,51 +537,44 @@ namespace Szotar.WindowsForms {
 				rounds.Add(currentRound);
 			currentRound = new List<Attempt>();
 
-			if (previousRound != null)
-				items = new List<PracticeItem>(from x in previousRound where !x.Correct select x.Item);
-			else
-				items = Owner.GetAllItems();
+			items = previousRound != null 
+				? new List<PracticeItem>(from x in previousRound where !x.Correct select x.Item) 
+				: Owner.GetAllItems();
 
 			items.Shuffle(rng);
 
 			index = 0;
 			score = 0;
 
-			if (items.Count > 0)
-				state = State.Guessing;
-			else
-				state = State.GameOverview;
+			state = items.Count > 0 ? State.Guessing : State.GameOverview;
 		}
 
 		public bool Swap {
 			get { return swap; }
 			set {
-				if (swap != value) {
-					swap = value;
+				if (swap == value)
+					return;
+				swap = value;
 
-					// Shuffle the remaining items so you don't get the same one again (which would be too easy.)
-					// This could also be done by simply moving the current item to the back of the list and shifting
-					// the rest frontwards.
-					items.Shuffle(rng, index, items.Count - index);
-					Update();
-					Layout();
-				}
+				// Shuffle the remaining items so you don't get the same one again (which would be too easy.)
+				// This could also be done by simply moving the current item to the back of the list and shifting
+				// the rest frontwards.
+				items.Shuffle(rng, index, items.Count - index);
+				Update();
+				Layout();
 			}
 		}
 
 		string CurrentPhrase { get { return swap ? items[index].Translation : items[index].Phrase; } }
 		string CurrentTranslation { get { return swap ? items[index].Phrase : items[index].Translation; } }
 
-		void ReportGuess(PracticeItem item, bool correct) {
+		static void ReportGuess(PracticeItem item, bool correct) {
 			item.History.Add(DateTime.Now, correct);
 			DataStore.Database.AddPracticeHistory(item.SetID, item.Phrase, item.Translation, correct);
 		}
 
 		void NextPhrase() {
-			if (++index >= items.Count)
-				state = State.RoundOverview;
-			else
-				state = State.Guessing;
+			state = ++index >= items.Count ? State.RoundOverview : State.Guessing;
 
 			Update();
 			Layout();
@@ -597,7 +588,7 @@ namespace Szotar.WindowsForms {
 			NextPhrase();
 		}
 
-		void Wrong(PracticeItem item, string guess) {
+		void Wrong() {
 			// Don't report the answer as wrong yet -- the user may still override.
 			state = State.ViewingAnswer;
 
@@ -618,8 +609,8 @@ namespace Szotar.WindowsForms {
 			NextPhrase();
 		}
 
-		bool fadingOutAnswer = false;
-		void affirmation_TextChanged(object sender, EventArgs e) {
+		bool fadingOutAnswer;
+		void AffirmationTextChanged(object sender, EventArgs e) {
 			if (fadingOutAnswer)
 				return;
 
@@ -635,14 +626,14 @@ namespace Szotar.WindowsForms {
 			Layout();
 		}
 
-		void FadeOutText(int ms, TextBox textBox, Action whenDone) {
+		void FadeOutText(int ms, Control textBox, Action whenDone) {
 			Color fg = textBox.ForeColor, bg = textBox.BackColor;
 
 			Func<int, float> clamp = x => (byte)Math.Max(0, Math.Min((int)x, 255));
 			Fade(ms, p => {
-				var r = clamp((float)fg.R + p * (float)(bg.R - fg.R));
-				var g = clamp((float)fg.G + p * (float)(bg.G - fg.G));
-				var b = clamp((float)fg.B + p * (float)(bg.B - fg.B));
+				var r = clamp(fg.R + p * (bg.R - fg.R));
+				var g = clamp(fg.G + p * (bg.G - fg.G));
+				var b = clamp(fg.B + p * (bg.B - fg.B));
 				textBox.ForeColor = Color.FromArgb(r, g, b);
 			}, delegate {
 				whenDone();
@@ -651,9 +642,9 @@ namespace Szotar.WindowsForms {
 		}
 
 		void Fade(int ms, Action<float> action, Action completion) {
-			timer = timer ?? new Timer() { Interval = 2, Tag = 1, Enabled = false };
+			timer = timer ?? new Timer { Interval = 2, Tag = 1, Enabled = false };
 
-			var sw = new System.Diagnostics.Stopwatch();
+			var sw = new Stopwatch();
 			sw.Start();
 
 			EventHandler onTick = null;
@@ -669,7 +660,7 @@ namespace Szotar.WindowsForms {
 					complete = true;
 				}
 
-				float progress = Math.Max(0.0f, Math.Min((float)elapsed / (float)ms, 1.0f));
+				float progress = Math.Max(0.0f, Math.Min(elapsed / (float)ms, 1.0f));
 				action(progress);
 				if(complete)
 					completion();
@@ -679,34 +670,34 @@ namespace Szotar.WindowsForms {
 			timer.Start();
 		}
 
-		bool fadingOutGuess = false;
-		void translation_KeyUp(object sender, KeyEventArgs e) {
+		bool fadingOutGuess;
+		void TranslationKeyUp(object sender, KeyEventArgs e) {
 			if (fadingOutGuess) {
 				e.Handled = e.SuppressKeyPress = true;
 				return;
 			}
 
-			if (e.KeyCode == Keys.Return) {
-				bool correct = answerChecker.IsAcceptable(translation.Text, CurrentTranslation);
-				lastGuess = translation.Text;
+			if (e.KeyCode != Keys.Return)
+				return;
+			bool correct = answerChecker.IsAcceptable(translation.Text, CurrentTranslation);
+			lastGuess = translation.Text;
 
-				// TODO: Remove this or make it optional
-				if (!correct && !string.IsNullOrEmpty(translation.Text.Trim()))
-					System.Media.SystemSounds.Asterisk.Play();
+			// TODO: Remove this or make it optional
+			if (!correct && !string.IsNullOrEmpty(translation.Text.Trim()))
+				System.Media.SystemSounds.Asterisk.Play();
 
-				FadeOutText(fadeOutInterval, translation, delegate {
-					fadingOutGuess = false;
-					if (correct)
-						Correct(items[index], translation.Text);
-					else
-						Wrong(items[index], translation.Text);
-				});
+			FadeOutText(fadeOutInterval, translation, delegate {
+				fadingOutGuess = false;
+				if (correct)
+					Correct(items[index], translation.Text);
+				else
+					Wrong();
+			});
 
-				e.Handled = e.SuppressKeyPress = true;
-			}
+			e.Handled = e.SuppressKeyPress = true;
 		}
 
-		void roundOverview_KeyUp(object sender, KeyEventArgs e) {
+		void RoundOverviewKeyUp(object sender, KeyEventArgs e) {
 			StartRound();
 			Update();
 			Layout();
@@ -768,7 +759,7 @@ namespace Szotar.WindowsForms {
 		}
 
 		// TODO: Make the font smaller when the form is small?
-		void SizeToWidth(TextBox textBox) {
+		void SizeToWidth(TextBoxBase textBox) {
 			if (!(textBox.Visible || (bool?)textBox.Tag == true))
 				return;
 
@@ -778,7 +769,6 @@ namespace Szotar.WindowsForms {
 				float actual = g.MeasureString(textBox.Text + "m", font).Width;
 
 				bool fits = true;
-				float width = actual;
 				if (actual < min) {
 					actual = min;
 				} else if (actual >= max) {

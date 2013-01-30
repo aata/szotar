@@ -374,10 +374,6 @@ namespace Szotar.Sqlite {
 
 		private void AddSyncColumns() {
 			ExecuteSQL(@"
-				ALTER TABLE VocabItems ADD SyncID INTEGER NULL;
-				ALTER TABLE VocabItems ADD SyncNeeded BOOLEAN NOT NULL DEFAULT 0;
-				ALTER TABLE VocabItems ADD Deleted BOOLEAN NOT NULL DEFAULT 0;
-
 				ALTER TABLE Sets ADD SyncID INTEGER NULL;
 				ALTER TABLE Sets ADD SyncDate DATE NULL;
 				ALTER TABLE Sets ADD SyncNeeded BOOLEAN NOT NULL DEFAULT 0;
@@ -512,6 +508,20 @@ namespace Szotar.Sqlite {
 			return list;
 		}
 
+		public IEnumerable<ListInfo> GetSets(IEnumerable<long> setIDs) {
+			using (var reader = SelectReader(@"
+				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
+				SELECT s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded, Count(*)
+                FROM Sets s
+					JOIN VocabItems vi on s.ID = vi.SetID
+				WHERE s.id in (" + string.Join(",", setIDs) + @")
+                GROUP BY s.id, s.Name, s.Author, s.Language, s.Url, s.Created, s.Accessed, s.SyncID, s.SyncDate, s.SyncNeeded
+                ORDER BY s.Name ASC, s.Created DESC")) {
+				while (reader.Read())
+					yield return ListInfoFromReader(reader);
+			}
+		}
+
 		public IEnumerable<ListInfo> GetAllSets() {
 			using (var reader = SelectReader(@"
 				TYPES Integer, Text, Text, Text, Text, Date, Date, Integer; 
@@ -537,6 +547,12 @@ namespace Szotar.Sqlite {
 				while (reader.Read())
 					yield return ListInfoFromReader(reader);
 			}
+		}
+		
+		public IEnumerable<TranslationPair> GetDeletedListEntries(long setID) {
+			using (var reader = SelectReader(@"SELECT Phrase, Translation FROM VocabItems WHERE SetID = ? AND ListPosition IS NULL", setID))
+			  while (reader.Read())
+				  yield return new TranslationPair(reader.GetString(0), reader.GetString(1));
 		}
 
 		public class WordSearchResult {

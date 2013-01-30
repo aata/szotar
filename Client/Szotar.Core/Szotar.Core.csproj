@@ -122,6 +122,7 @@
     <Compile Include="Quizlet\IQuizletService.cs" />
     <Compile Include="Quizlet\QuizletAPI.cs" />
     <Compile Include="Quizlet\QuizletImporter.cs" />
+    <Compile Include="Quizlet\Sync.cs" />
     <Compile Include="Quizlet\SetModel.cs" />
     <Compile Include="Quizlet\SetPermissions.cs" />
     <Compile Include="Quizlet\TermModel.cs" />

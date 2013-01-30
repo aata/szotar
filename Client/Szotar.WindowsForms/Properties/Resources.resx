@@ -309,10 +309,25 @@
   <data name="TagsMenuHeader" xml:space="preserve">
     <value>&amp;Tags</value>
   </data>
-  <data name="Abort">
-    <value xml:space="preserve">&amp;Abort</value>
+  <data name="Abort" xml:space="preserve">
+    <value>&amp;Abort</value>
   </data>
-  <data name="Search">
-    <value xml:space="preserve">&amp;Search</value>
+  <data name="Search" xml:space="preserve">
+    <value>&amp;Search</value>
+  </data>
+  <data name="LogIn" xml:space="preserve">
+    <value>&amp;Log In</value>
+  </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>&amp;Log Out</value>
+  </data>
+  <data name="ErrorLoggingIn" xml:space="preserve">
+    <value>Error logging in to Quizlet</value>
+  </data>
+  <data name="UnknownErrorLoggingIn" xml:space="preserve">
+    <value>Unknown error logging in to Quizlet</value>
+  </data>
+  <data name="InvalidAuthResponse" xml:space="preserve">
+    <value>Server returned an invalid response (possible CSRF attack)</value>
   </data>
 </root>

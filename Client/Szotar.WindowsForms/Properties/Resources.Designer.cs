@@ -251,6 +251,15 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error logging in to Quizlet.
+        /// </summary>
+        internal static string ErrorLoggingIn {
+            get {
+                return ResourceManager.GetString("ErrorLoggingIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Finish.
         /// </summary>
         internal static string FinishCommand {
@@ -326,12 +335,39 @@ namespace Szotar.WindowsForms.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Server returned an invalid response (possible CSRF attack).
+        /// </summary>
+        internal static string InvalidAuthResponse {
+            get {
+                return ResourceManager.GetString("InvalidAuthResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap List48 {
             get {
                 object obj = ResourceManager.GetObject("List48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Log In.
+        /// </summary>
+        internal static string LogIn {
+            get {
+                return ResourceManager.GetString("LogIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Log Out.
+        /// </summary>
+        internal static string LogOut {
+            get {
+                return ResourceManager.GetString("LogOut", resourceCulture);
             }
         }
         
@@ -594,6 +630,15 @@ namespace Szotar.WindowsForms.Properties {
         internal static string UndoSpecific {
             get {
                 return ResourceManager.GetString("UndoSpecific", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown error logging in to Quizlet.
+        /// </summary>
+        internal static string UnknownErrorLoggingIn {
+            get {
+                return ResourceManager.GetString("UnknownErrorLoggingIn", resourceCulture);
             }
         }
     }

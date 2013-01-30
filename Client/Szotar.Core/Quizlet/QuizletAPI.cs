@@ -177,6 +177,10 @@ namespace Szotar.Quizlet {
             return new JsonContext().FromJson<UserModel>(json);
         }
 
+		public async Task UpdateSet(SetModel set, CancellationToken cancel, IProgress<ProgressChangedEventArgs> progress = null) {
+			// TODO Implement
+		}
+
         protected enum RequestType {
             Get,
             Post,

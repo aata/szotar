@@ -106,5 +106,16 @@ namespace Szotar.Quizlet {
                 Visibility = Visibility
             };
         }
+
+		public ListInfo AsListInfo() {
+			return new ListInfo {
+				Author = Author,
+				Date = Created,
+				ID = SetID,
+				Name = Title,
+				TermCount = TermCount,
+				Url = Uri.ToString()
+			};
+		}
     }
 }
