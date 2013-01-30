@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <ManifestCertificateThumbprint>501BCDCAA24767DA2D18A22D64A2B66A183B565D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>88F37DDE357C7AF3989C57A28899201CFAADB7F3</ManifestCertificateThumbprint>
     <ManifestKeyFile>Szotar.WindowsForms_TemporaryKey.pfx</ManifestKeyFile>
     <GenerateManifests>true</GenerateManifests>
     <SignManifests>true</SignManifests>
@@ -22,7 +22,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
-    <PublishUrl>D:\Projects\Szotar\Publish\</PublishUrl>
+    <PublishUrl>C:\Users\Lee\Subversion\Szotar\Publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -100,8 +100,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -116,12 +118,16 @@
     </Compile>
     <Compile Include="Base\Practice.cs">
     </Compile>
+    <Compile Include="Base\ProtocolHandler.cs" />
     <Compile Include="Base\ShowForm.cs" />
     <Compile Include="Base\TagMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Base\ThemeUtilities.cs" />
     <Compile Include="Base\WordListEntries.cs" />
+    <Compile Include="Controls\WebBrowserWithErrors.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\DictionarySectionUI.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -264,6 +270,12 @@
       <DependentUpon>StartPage.cs</DependentUpon>
     </Compile>
     <Compile Include="Importing\DualSection.cs" />
+    <Compile Include="Preferences\Quizlet.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Preferences\Quizlet.Designer.cs">
+      <DependentUpon>Quizlet.cs</DependentUpon>
+    </Compile>
     <Compile Include="Preferences\Display.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -446,6 +458,12 @@
       <DependentUpon>StartPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Quizlet.hu.resx">
+      <DependentUpon>Quizlet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preferences\Quizlet.resx">
+      <DependentUpon>Quizlet.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Preferences\Display.hu.resx">
       <DependentUpon>Display.cs</DependentUpon>
     </EmbeddedResource>
@@ -570,6 +588,11 @@
     <Content Include="Resources\Images\TopInwardShadow.png" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -578,26 +601,26 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
       <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
+      <ProductName>Windows Installer 4.5</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>

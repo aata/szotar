@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Szotar.WindowsForms.Controls {
@@ -36,8 +31,14 @@ namespace Szotar.WindowsForms.Controls {
 			}
 		}
 
-		private void cancel_Click(object sender, EventArgs e) {
+		private void CancelClick(object sender, EventArgs e) {
 			OnCancelled();
+			cancel.Enabled = false;
+		}
+
+		public void Cancel() {
+			OnCancelled();
+			cancel.Enabled = false;
 		}
 
 		public event EventHandler Cancelled;

@@ -18,5 +18,7 @@ namespace Szotar.Quizlet {
 
         Task<UserModel> FetchUserInfo(string userName, CancellationToken token, IProgress<ProgressChangedEventArgs> progress = null);
         Task<List<SetModel>> FetchUserSets(string userName, CancellationToken cancel, IProgress<ProgressChangedEventArgs> progress = null);
+
+	    Task UpdateSet(SetModel set, CancellationToken cancel, IProgress<ProgressChangedEventArgs> progress = null);
     }
 }

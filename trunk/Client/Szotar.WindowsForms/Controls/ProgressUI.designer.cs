@@ -45,7 +45,7 @@
 			this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.cancel.Name = "cancel";
 			this.cancel.UseVisualStyleBackColor = true;
-			this.cancel.Click += new System.EventHandler(this.cancel_Click);
+			this.cancel.Click += new System.EventHandler(this.CancelClick);
 			// 
 			// ProgressUI
 			// 
