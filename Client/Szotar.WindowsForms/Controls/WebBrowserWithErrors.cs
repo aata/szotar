@@ -3,7 +3,12 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 
+// See http://msdn.microsoft.com/en-us/library/system.windows.forms.webbrowser.createsink.aspx
+// for the gory details.
 namespace Szotar.WindowsForms.Controls {
+	/// <summary>
+	/// A version of WebBrowser that allows trapping NavigateError events.
+	/// </summary>
 	public class WebBrowserWithErrors : WebBrowser {
 		AxHost.ConnectionPointCookie cookie;
 		EventHelper helper;
